@@ -212,7 +212,7 @@
         });
     }
     bind();
-    // Rebind after apple-layout boots in case partials were injected after parse
-    document.addEventListener('apple-layout:ready', bind);
+    // Rebind after the layout boots in case partials were injected after parse
+    document.addEventListener('hadrian-layout:ready', bind);
 })();
 {/literal}</script>

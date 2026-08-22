@@ -1,4 +1,4 @@
-{* Hostnodes — Announcements list (Apple-style).
+{* Hostnodes — Announcements list.
 
    WHMCS standard variables expected:
      $announcements    — array, each: id, date, title, text

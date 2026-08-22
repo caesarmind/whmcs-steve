@@ -1,4 +1,4 @@
-{* Hostnodes - Domain pricing (Apple-style): TLD price table.
+{* Hostnodes - Domain pricing: TLD price table.
 
    WHMCS variables (cross-checked against Lagom domain-pricing.tpl):
      $pricing       - extension => { group('hot'|'new'|'sale'|''), categories[],

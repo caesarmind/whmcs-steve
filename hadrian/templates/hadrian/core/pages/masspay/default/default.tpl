@@ -1,4 +1,4 @@
-{* Hostnodes — Mass Payment (Apple-style).
+{* Hostnodes — Mass Payment.
 
    REAL WHMCS variables on /clientarea.php?action=masspay, verified against
    stock six/masspay.tpl. The previous version of this file invented all of

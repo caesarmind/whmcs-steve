@@ -1,4 +1,4 @@
-{* Hostnodes — View Support Ticket (Apple-style).
+{* Hostnodes — View Support Ticket.
 
    WHMCS standard variables on viewticket.php:
      $tid, $c, $id, $subject, $status, $priority, $department, $service,
@@ -78,7 +78,7 @@
                 <div class="thread">
                     {* The whole conversation — the opening post AND every reply —
                        comes from $descreplies (newest first). All stock WHMCS themes
-                       (nexus, lagom, hostnodes-apple) iterate this single collection;
+                       (nexus, lagom, hadrian) iterate this single collection;
                        there is no separate $message or top-level $attachments, which
                        is why opening-post attachments were previously invisible.
                        .thread is column-reverse (viewticket.css) so the opening post

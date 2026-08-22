@@ -1,4 +1,4 @@
-{* Hostnodes - Download denied (Apple-style): access notice.
+{* Hostnodes - Download denied: access notice.
 
    WHMCS renders this when a download is blocked (no active service / wrong role).
    No list data; the page is a single notice card. The empty state is a

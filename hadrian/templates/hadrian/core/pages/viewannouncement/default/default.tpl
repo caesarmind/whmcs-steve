@@ -1,4 +1,4 @@
-{* Hostnodes — View single announcement (Apple-style).
+{* Hostnodes — View single announcement.
 
    WHMCS standard variables on announcements.php?id=X:
      $id         — announcement id

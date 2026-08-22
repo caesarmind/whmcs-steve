@@ -1,4 +1,4 @@
-{* Hostnodes — Domain Details (Apple-style).
+{* Hostnodes — Domain Details.
 
    WHMCS top-level variables for this page (verified against Nexus/Lagom):
      $domain, $domainid, $registrationdate, $nextduedate

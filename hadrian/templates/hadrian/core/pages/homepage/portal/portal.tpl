@@ -1,6 +1,6 @@
-{* Hostnodes — Public homepage (Apple portal-style hero + sections).
+{* Hostnodes — Public homepage (portal-style hero + sections).
 
-   Mirrors apple-client-area/portal-home.html. Designed for top-nav layout
+   Mirrors the v18 portal-home mockup. Designed for top-nav layout
    but works in any layout via the universal toggles.
 
    WHMCS variables expected:

@@ -1,4 +1,4 @@
-{* Hostnodes - Upgrade / downgrade (Apple-style). Real WHMCS upgrade templatefile.
+{* Hostnodes - Upgrade / downgrade. Real WHMCS upgrade templatefile.
 
    WHMCS variables (cross-checked against Lagom upgrade.tpl):
      $type            - 'package' | 'configoptions'

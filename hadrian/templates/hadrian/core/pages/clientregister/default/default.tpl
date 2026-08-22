@@ -1,4 +1,4 @@
-{* Hostnodes — Create Account (Apple-style), wired to the native WHMCS
+{* Hostnodes — Create Account, wired to the native WHMCS
    register.php contract.
 
    Verified WHMCS 9 variables on /register (see WHMCS9 theme docs +
@@ -34,7 +34,7 @@
 
 {* Phone country-code chooser (flag + dial code), same library/version as the
    hadrian_cart checkout. Pinned to v18 because v19+ drops the auto-bundled utils.
-   Loaded BEFORE our page CSS so the Apple overrides below win specificity ties. *}
+   Loaded BEFORE our page CSS so the theme overrides below win specificity ties. *}
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@18.5.3/build/css/intlTelInput.css">
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/clientregister.css?v={$hadrian.version|default:'1.0'}">
 
@@ -217,7 +217,7 @@
             {* #2 — native WHMCS mailing-list opt-in. Renders only when the admin
                has enabled it; text comes straight from the admin-configured
                $marketingEmailOptInMessage, default state from $marketingEmailOptIn.
-               The native field name is marketingoptin; styled as an Apple toggle. *}
+               The native field name is marketingoptin; styled as a pill toggle. *}
             {if $showMarketingEmailOptIn}
             <section class="cr-section cr-marketing">
                 <h2 class="cr-section-title">{$LANG.emailMarketing.joinOurMailingList}</h2>

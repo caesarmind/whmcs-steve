@@ -240,7 +240,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
     line-height: 1.45;
 }
 
-/* Custom fields output WHMCS's own input markup ($customfield.input); style it to match the Apple form fields */
+/* Custom fields output WHMCS's own input markup ($customfield.input); style it to match the theme's form fields */
 .tk-submit-form .tk-customfield .form-control:not([type="checkbox"]):not([type="radio"]),
 .tk-submit-form .tk-customfield input[type="text"],
 .tk-submit-form .tk-customfield input[type="password"],

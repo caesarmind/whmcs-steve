@@ -1,4 +1,4 @@
-{* Hostnodes — Your Profile (Apple-style).
+{* Hostnodes — Your Profile.
 
    WHMCS v9 data (verified against Nexus user-profile.tpl):
      $user                     — WHMCS\User\User Eloquent model

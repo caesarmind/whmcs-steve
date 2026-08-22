@@ -6,7 +6,7 @@
  */
 return [
     'display_name' => 'Default',
-    'description'  => 'Centered Apple-style login card with email/password + Remember me.',
+    'description'  => 'Centered login card with email/password + Remember me.',
     'preview'      => 'thumb.png',
     'settings'     => [
         'showEyebrow' => [

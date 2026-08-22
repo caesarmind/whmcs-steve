@@ -1,4 +1,4 @@
-{* Hostnodes - New contact (Apple-style). Add-contact form variant of
+{* Hostnodes - New contact. Add-contact form variant of
    account-contacts-manage (shares the .ct-* component CSS).
 
    WHMCS v9 data (verified against account-contacts-manage / Nexus):

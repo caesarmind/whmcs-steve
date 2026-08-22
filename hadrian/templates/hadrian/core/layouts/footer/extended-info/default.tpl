@@ -1,8 +1,8 @@
 {* Extended Footer + Info layout — brand block left, menu cols right.
 
    Two-zone layout:
-     1. Brand block (.hp-footer-legal) — admin-uploaded logo (or Apple-
-        leaf fallback + company name), description tagline, and a row
+     1. Brand block (.hp-footer-legal) — admin-uploaded logo (or the
+        fallback glyph + company name), description tagline, and a row
         of social icons. All three pieces are driven by the Branding
         admin tab via $mtBrand.
      2. Menu cols (.hp-footer-cols) — admin Footer Menu, same renderer
@@ -23,7 +23,7 @@
                     {if !empty($mtBrand.logoUrl)}<img src="{$mtBrand.logoUrl|escape}" alt="{$companyname|escape}" class="hp-footer-brand-logo is-light">{/if}
                     {if !empty($mtBrand.logoDarkUrl)}<img src="{$mtBrand.logoDarkUrl|escape}" alt="{$companyname|escape}" class="hp-footer-brand-logo is-dark">{/if}
                 {else}
-                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.05 12.54c-.02-2.62 2.14-3.87 2.24-3.94-1.22-1.78-3.12-2.03-3.79-2.05-1.61-.16-3.15.95-3.97.95-.83 0-2.09-.93-3.45-.9-1.77.03-3.41 1.03-4.32 2.62-1.86 3.22-.47 7.97 1.32 10.58.88 1.28 1.92 2.71 3.28 2.66 1.32-.05 1.82-.85 3.42-.85 1.59 0 2.04.85 3.44.82 1.43-.02 2.32-1.29 3.18-2.58 1.01-1.48 1.42-2.92 1.44-3-.03-.01-2.77-1.06-2.79-4.21zM14.3 4.88c.72-.88 1.21-2.09 1.07-3.3-1.04.04-2.3.69-3.05 1.56-.67.77-1.25 2.01-1.09 3.19 1.16.09 2.35-.59 3.07-1.45z"/></svg>
+                    <svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="4"/></svg>
                     <span>{$companyname|escape}</span>
                 {/if}
             </div>

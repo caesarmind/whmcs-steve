@@ -1,4 +1,4 @@
-/* Edit payment method (Apple-style). Reuses global .card / .form-* / .btn-*.
+/* Edit payment method. Reuses global .card / .form-* / .btn-*.
    Prefix: .pm-* */
 
 .page-header { margin: 8px 0 20px; }

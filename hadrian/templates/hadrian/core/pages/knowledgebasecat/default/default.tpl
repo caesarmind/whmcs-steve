@@ -1,4 +1,4 @@
-{* Hostnodes — Knowledgebase Category (Apple-style).
+{* Hostnodes — Knowledgebase Category.
 
    WHMCS standard variables expected:
      $category         — current category: id, name, description, parent

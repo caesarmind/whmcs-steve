@@ -1,4 +1,4 @@
-/* Configure SSL (Apple-style) -- shared wizard CSS (stepone/steptwo/complete).
+/* Configure SSL -- shared wizard CSS (stepone/steptwo/complete).
    Reuses global .card / .form-* / .btn-* components. Prefix: .ssl-* */
 
 .page-header { margin: 8px 0 20px; }

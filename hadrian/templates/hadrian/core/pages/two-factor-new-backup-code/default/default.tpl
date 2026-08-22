@@ -1,4 +1,4 @@
-{* Hostnodes — New Backup Codes Display (Apple-style).
+{* Hostnodes — New Backup Codes Display.
 
    WHMCS standard variables on /clientarea.php?action=twofactor&sub=backup:
      $backupCode  — newly generated backup recovery code (single)

@@ -1,4 +1,4 @@
-{* Hostnodes - Configure SSL, step 2 (Apple-style): domain validation method.
+{* Hostnodes - Configure SSL, step 2: domain validation method.
 
    WHMCS variables (cross-checked against Lagom configuressl-steptwo.tpl):
      $cert            - cert token (form posts to configuressl.php?cert=...&step=3)

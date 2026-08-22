@@ -59,7 +59,7 @@
 }
 .cr-help { font-size: var(--text-sm); color: var(--color-text-tertiary); margin: 2px 0 0; line-height: 1.45; }
 
-/* Phone country-code chooser (intl-tel-input, Apple-style) -------------- */
+/* Phone country-code chooser (intl-tel-input) --------------------------- */
 .cr-form .iti { display: block; width: 100%; }
 .cr-form .iti__tel-input,
 .cr-form input.iti__tel-input.form-input { width: 100%; box-sizing: border-box; }
@@ -105,7 +105,7 @@
 .cr-check a:hover { text-decoration: underline; }
 .cr-terms { margin: 0; }
 
-/* #2 -- Apple-style toggle switch for the marketing opt-in --------------- */
+/* #2 -- Pill-shaped toggle switch for the marketing opt-in --------------- */
 .cr-marketing { gap: 12px; }
 .cr-marketing-msg { font-size: var(--text-base); color: var(--color-text-secondary); line-height: 1.55; margin: 0; }
 .cr-switch { display: flex; align-items: center; gap: 12px; cursor: pointer; }

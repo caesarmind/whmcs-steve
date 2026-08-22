@@ -1,4 +1,4 @@
-{* Hostnodes - Markdown guide (Apple-style): syntax reference (static content). *}
+{* Hostnodes - Markdown guide: syntax reference (static content). *}
 {assign var=dashIsEmpty value='full'}
 
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/markdown-guide.css?v={$hadrian.version|default:'1.0'}">

@@ -1,4 +1,4 @@
-{* Hostnodes — Domain DNS Records (Apple-style).
+{* Hostnodes — Domain DNS Records.
 
    WHMCS variables for this page:
      $domain, $domainid

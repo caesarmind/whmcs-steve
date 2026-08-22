@@ -16,7 +16,7 @@
  * announcements as cards BELOW it rather than beside it. That is the difference
  * from Split, which puts the announcements in a second column and leaves the
  * page neutral -- here the colour runs the whole scroll length and the posts sit
- * on it. Built from apple-client-area/login-v4.html.
+ * on it. Built from the v18 login-v4 mockup.
  *
  * OPTIONS ARE VARIANT-SCOPED, stored as `<key>__beacon` (PagesController's
  * declaredOptions namespaces them, Hooks flattens the active variant's values

@@ -1,5 +1,5 @@
 /* ============================================
-   WHMCS by Apple — Shared JavaScript
+   Hadrian -- Shared JavaScript
    ============================================ */
 
 // Dynamic greeting based on time of day
@@ -42,6 +42,11 @@ document.addEventListener('click', function(e) {
 // https, since setting it on http would make the cookie silently un-writable.
 var MT_THEME_COOKIE = 'mt_theme';
 
+// The pre-c5d0adb localStorage key. Read-only now, and only to migrate a
+// visitor who has not loaded the site since. Renaming it would find nothing
+// and silently reset their saved choice, so it keeps the historical name.
+var LEGACY_THEME_KEY = 'apple-theme';
+
 function mtReadTheme() {
     var m = document.cookie.match(/(?:^|;\s*)mt_theme=(light|dark)(?:;|$)/);
     return m ? m[1] : null;
@@ -53,12 +58,12 @@ function mtWriteTheme(value) {
     // Mirrored into localStorage purely as a fallback for a visitor whose
     // browser refuses cookies: the server cannot see it, so they still get the
     // flash, but their choice at least survives the page.
-    try { localStorage.setItem('apple-theme', value); } catch (e) {}
+    try { localStorage.setItem(MT_THEME_COOKIE, value); } catch (e) {}
 }
 
 function mtClearTheme() {
     document.cookie = MT_THEME_COOKIE + '=;path=/;max-age=0;SameSite=Lax';
-    try { localStorage.removeItem('apple-theme'); } catch (e) {}
+    try { localStorage.removeItem(MT_THEME_COOKIE); localStorage.removeItem(LEGACY_THEME_KEY); } catch (e) {}
 }
 
 // Dark mode toggle. Null-checks #darkModeToggle because some layouts
@@ -98,7 +103,7 @@ function toggleDarkMode() {
             // after upgrading still flashes once -- the cookie does not exist
             // yet when the server renders -- and every load after it is clean.
             var legacy = null;
-            try { legacy = localStorage.getItem('apple-theme'); } catch (e) {}
+            try { legacy = localStorage.getItem(LEGACY_THEME_KEY) || localStorage.getItem(MT_THEME_COOKIE); } catch (e) {}
             if (legacy === 'dark' || legacy === 'light') {
                 saved = legacy;
                 mtWriteTheme(legacy);

@@ -1,4 +1,4 @@
-/* Ticket flow (Apple-style) -- shared CSS for submit-confirm / customfields /
+/* Ticket flow -- shared CSS for submit-confirm / customfields /
    kbsuggestions / ticketfeedback. Reuses global .card / .form-* / .btn-*. Prefix: .tk-* */
 
 .page-header { margin: 8px 0 20px; }

@@ -1,4 +1,4 @@
-{* Hostnodes — Register Nameservers / Glue Records (Apple-style).
+{* Hostnodes — Register Nameservers / Glue Records.
 
    WHMCS variables:
      $domain, $domainid

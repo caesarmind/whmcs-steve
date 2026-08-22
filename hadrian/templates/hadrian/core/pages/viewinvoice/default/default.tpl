@@ -1,4 +1,4 @@
-{* Hostnodes — View Invoice (Apple-style).
+{* Hostnodes — View Invoice.
 
    WHMCS exposes invoice variables as TOP-LEVEL (no $invoicedata wrapper,
    $invoiceitems not $lineitems — verified against Nexus):

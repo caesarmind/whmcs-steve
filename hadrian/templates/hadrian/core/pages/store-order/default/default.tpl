@@ -1,5 +1,5 @@
 {* Store landing - Order. Configure Your Order.
-   Ported from apple-client-area/store/order.html (the single-product order
+   Ported from the v18 store order mockup (the single-product order
    configuration screen: product config + addons + order summary + checkout).
    header.tpl/footer.tpl already provide html/head/nav/breadcrumb/footer + the
    .content-area wrapper, so we emit only the inner content (page-header +

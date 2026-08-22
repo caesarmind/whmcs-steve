@@ -1,4 +1,4 @@
-{* Hostnodes - 3D Secure verification (Apple-style).
+{* Hostnodes - 3D Secure verification.
    WHMCS variable (Lagom 3dsecure.tpl): $code - the gateway's 3DS form HTML, which is
    auto-submitted into the iframe so the bank's challenge loads inline.
 *}

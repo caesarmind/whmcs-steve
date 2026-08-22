@@ -1,4 +1,4 @@
-{* Hostnodes — Email Forwarding (Apple-style).
+{* Hostnodes — Email Forwarding.
 
    WHMCS variables for this page:
      $domain, $domainid

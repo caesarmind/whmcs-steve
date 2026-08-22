@@ -1,4 +1,4 @@
-{* Hostnodes - View quote (Apple-style). Rendered between header.tpl + footer.tpl
+{* Hostnodes - View quote. Rendered between header.tpl + footer.tpl
    by the viewquote dispatcher (this WHMCS route bypasses client-area chrome).
 
    WHMCS variables (cross-checked against Lagom viewquote.tpl):
@@ -40,7 +40,7 @@
         ['description'=>'Site migration service','discountpc'=>0,'discount'=>'','amount'=>'$53.00','taxed'=>false]
     ]}
     {assign var=clientsdetails value=['firstname'=>'Arshile','lastname'=>'Gogia','companyname'=>'Henderson Design Studio','address1'=>'742 Evergreen Terrace','address2'=>'','city'=>'Springfield','state'=>'IL','postcode'=>'62704','country'=>'United States']}
-    {assign var=payto value='<strong>Hostnodes</strong><br>One Apple Park Way<br>Cupertino, CA 95014<br>United States'}
+    {assign var=payto value='<strong>Hostnodes</strong><br>1 Example Way<br>Springfield, IL 62701<br>United States'}
 {/if}
 
 {assign var=qStage value=$stage|default:''}

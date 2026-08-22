@@ -1,4 +1,4 @@
-{* Hostnodes — Account Details (Apple-style).
+{* Hostnodes — Account Details.
 
    WHMCS standard variables expected:
      $clientsdetails    — firstname, lastname, companyname, email, address1,

@@ -1,5 +1,5 @@
 {* Store landing - Website Builder (Weebly).
-   Ported from apple-client-area/website-builder.html (Public/Marketing landing).
+   Ported from the v18 Website Builder mockup (Public/Marketing landing).
    header.tpl/footer.tpl provide the shell + .content-area, so we emit only the
    inner content (page-header + when-full marketing + when-empty offline state).
 

@@ -1,4 +1,4 @@
-{* Hostnodes — Client Home dashboard (Apple-style).
+{* Hostnodes — Client Home dashboard.
 
    Variables expected from WHMCS:
      $clientsdetails.firstname / .lastname / .email

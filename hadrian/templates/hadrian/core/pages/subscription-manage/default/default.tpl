@@ -1,4 +1,4 @@
-{* Hostnodes - Email subscription management (Apple-style).
+{* Hostnodes - Email subscription management.
 
    Matches the real WHMCS subscription-manage templatefile (cross-checked against
    Lagom subscription-manage.tpl): an opt-in / opt-out confirmation page.

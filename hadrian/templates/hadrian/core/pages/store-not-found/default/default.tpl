@@ -1,5 +1,5 @@
 {* Store landing - Not Found (utility page).
-   Ported from apple-client-area/store/not-found.html.
+   Ported from the v18 store not-found mockup.
    header.tpl/footer.tpl provide the shell + .content-area, so we emit only the
    inner centered message (no full/empty split - this is a single state).
 

@@ -1,5 +1,5 @@
 /*
- * hadrian_cart -- main Apple-language stylesheet
+ * hadrian_cart -- main cart-flow stylesheet
  * --------------------------------------------------------------
  * Owns the visual look for every cart-flow page (products,
  * viewcart, configureproduct, domainregister, domaintransfer,
@@ -25,8 +25,8 @@
  */
 
 /* ---------------------------------------------------------------
-   1. TOKENS -- Apple light mode only.
-   These are the same values apple-client-area/css/apple-theme.css
+   1. TOKENS -- light mode only.
+   These are the same values the client-area theme's token sheet
    exposes; redeclared here so the cart pages don't have to
    depend on the client-area theme bundle being loaded first.
 
@@ -87,7 +87,7 @@
    defines --text-*.
 
    The scale itself is left OUT of the :root block above on purpose.
-   core-theme.css declares --text-*/--fw-* on plain `:root` too, and
+   core-theme.css declares the --text- and --fw- scales on plain `:root`
    this file is <link>ed from common.tpl -- i.e. inside <body>, later
    in source order. Mirroring the scale here would tie on specificity,
    win on order, and freeze the type at these stock values, which is
@@ -721,7 +721,7 @@ body {
 
 /* ===============================================================
    STORE (.st-*) -- the actual products-page layout.
-   Source: apple-client-area/store.html
+   Source: the v18 client-area store mockup
    Used by: products.tpl, sidebar-categories.tpl
    =============================================================== */
 
@@ -988,7 +988,7 @@ body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
 /* Description body for Variant A.
    Wrapper is a <div> populated from $product.description (admin-authored HTML,
    typically <ul><li>...</li></ul>). Same class also styles a legacy ul-as-wrapper
-   used by the mockup (apple-client-area/store.html) for backward compatibility.
+   used by the mockup (the v18 client-area store page) for backward compatibility.
    Variants B + G use the same pattern at smaller scale so a single bit of HTML
    in the description renders consistently regardless of which variant is active. */
 .st-plan-features {
@@ -1188,7 +1188,7 @@ body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
    visible viewport empty after the category header.
 
    The per-wrapper fallback uses #order-standard_cart so it only
-   applies inside the cart-flow page, not in apple-client-area mockups
+   applies inside the cart-flow page, not in the v18 client-area mockups
    where stacking all variants is the intended dev behavior. */
 .plan-variant { display: block; }
 body[data-plan="a"] .plan-variant:not(.v-a),
@@ -2007,7 +2007,7 @@ body.modal-open { overflow: hidden; }
 
 /* ===============================================================
    DOMAIN PICKER (.dp-*) -- configureproductdomain.tpl layout.
-   Source: apple-client-area/configureproductdomain.html inline <style>
+   Source: the v18 client-area domain-picker mockup, inline <style>
    Used by: configureproductdomain.tpl
 
    The .dp-* classes were live in the TPL but only had inline styles
@@ -2192,7 +2192,7 @@ body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
     color: var(--color-text-secondary);
 }
 
-/* Safe-search toggle -- Apple switch style */
+/* Safe-search toggle -- pill switch style */
 .dp-toggle-row {
     display: flex; align-items: center; gap: 12px;
     padding: 12px 0;
@@ -2342,7 +2342,7 @@ body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
 
 /* ===============================================================
    CONFIGURE PRODUCT (.cp-*) -- configureproduct.tpl layout.
-   Source: apple-client-area/configureproduct.html inline <style>
+   Source: the v18 client-area configure-product mockup, inline <style>
    Used by: configureproduct.tpl
    The .st-addon-* classes referenced from this page are already
    defined above (ported earlier for products.tpl Variant H).
@@ -2728,7 +2728,7 @@ body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
    .pull-right.float-right (price), grouped under .summary-totals
    for setup/recurring, plus .total-due-today as the closing strip.
    We restyle each of those classes in place so the WHMCS-driven
-   summary reads as the Apple-style line list + Due Today block.
+   summary reads as the themed line list + Due Today block.
    =============================================================== */
 
 /* Product name + group eyebrow at the very top of the summary body.
@@ -3092,7 +3092,7 @@ body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
     background: #fff;
 }
 
-/* Per-provider logo tint (Apple addon mockup vibe) */
+/* Per-provider logo tint (matches the addon mockup) */
 .addon-promo-container-symantec   .logo { background: rgba(255, 159, 10, 0.08); }
 .addon-promo-container-weebly     .logo { background: rgba(0, 113, 227, 0.06); }
 .addon-promo-container-spamexperts .logo { background: rgba(0, 113, 227, 0.06); }
@@ -3130,7 +3130,7 @@ body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
 
 /* ===============================================================
    13. DOMAIN REGISTER (.dr-*)
-   Source: apple-client-area/cart-domain-register.html
+   Source: the v18 client-area domain-register mockup
    Used by: domainregister.tpl
    Search card + AI/Classic mode tabs + result card + popular TLD
    grid + suggestions list + pricing table + transfer CTA.
@@ -3250,7 +3250,7 @@ textarea.dr-search-input {
 }
 .dr-generate-btn:hover { background: var(--color-accent-hover); color: #fff; }
 
-/* AI-mode filters -- right-aligned "Filters" dropdown (Apple).
+/* AI-mode filters -- right-aligned "Filters" dropdown.
    Replaces the old bootstrap-multiselect widgets. The hidden native
    <select>s (.dr-tld-source / .dr-length-source) are the source of
    truth WHMCS serializes; this panel just mirrors them via filter JS. */
@@ -3261,11 +3261,11 @@ textarea.dr-search-input {
    positioning context so the panel drops straight down below it. */
 .dr-search-box { position: relative; }
 /* The in-bar Filters panel is absolutely positioned against .dr-search-box.
-   The shared apple-layout pill rule (#order-standard_cart .domain-checker-bg
+   The shared core-layout pill rule (#order-standard_cart .domain-checker-bg
    .input-group-box) sets overflow:hidden -- which clips the dropdown to the
    52px bar. Un-clip this box so the panel can drop below it; the pill still
    renders cleanly since its children fit within the radius. Specificity
-   (1,3,0) beats the apple-layout rule (1,2,0); !important is needed to also
+   (1,3,0) beats the core-layout rule (1,2,0); !important is needed to also
    beat bootstrap-multiselect.min.css's input-group overflow rule (it is
    CORS-loaded so it out-specifies a plain selector; confirmed live). */
 #order-standard_cart .domain-checker-bg .input-group-box.dr-search-box { overflow: visible !important; }

@@ -1,4 +1,4 @@
-{* Hostnodes — Two-Factor Authentication Challenge (Apple-style).
+{* Hostnodes — Two-Factor Authentication Challenge.
 
    WHMCS standard variables on /login/twofactor:
      $challenge      — raw HTML widget WHMCS renders for the primary 2FA method

@@ -1,4 +1,4 @@
-{* Hostnodes - Submit ticket custom fields (Apple-style).
+{* Hostnodes - Submit ticket custom fields.
    Department-specific custom fields shown during ticket submission.
    WHMCS variables (Lagom supportticketsubmit-customfields.tpl):
      $customfields - each: id, type ('tickbox'|'text'|'textarea'|'dropdown'|'link'|...),

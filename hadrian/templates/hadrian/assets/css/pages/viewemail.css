@@ -1,4 +1,4 @@
-/* View email (Apple-style) -- standalone popup window (no client-area chrome).
+/* View email -- standalone popup window (no client-area chrome).
    Uses var() with literal fallbacks so it renders even if tokens don't load. */
 
 body.vem-popup {

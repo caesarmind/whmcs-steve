@@ -1,4 +1,4 @@
-{* Hostnodes — Domain Addons confirmation (Apple-style).
+{* Hostnodes — Domain Addons confirmation.
 
    This page is the buy / disable confirmation step. WHMCS provides:
      $domain, $domainid

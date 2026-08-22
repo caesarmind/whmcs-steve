@@ -33,8 +33,8 @@
  *     panel after a card is picked.
  *   - "disabled" attribute on expired cards.
  *
- * Apple visual layer:
- *   - We swap the FontAwesome i.fa-cc-* icons for the same Apple
+ * Visual layer:
+ *   - We swap the FontAwesome i.fa-cc-* icons for the same
  *     mini-card visual used on /account/paymentmethods. The visual
  *     ALSO needs the brand class (.visa / .mc / .amex / .pp / .bank)
  *     so style.min.css can paint the right gradient.
@@ -105,7 +105,7 @@
                    value="{$payMethod->id}">
         </div>
 
-        {* Cell 2: Apple mini-card visual (was a FontAwesome icon) *}
+        {* Cell 2: Themed mini-card visual (was a FontAwesome icon) *}
         <div class="paymethod-info paymethod-info-brand{if $payMethodExpired} is-expired{/if}"
              data-paymethod-id="{$payMethod->id}">
             <div class="pm-card-visual {$brandClass}">{$brandLabel}</div>

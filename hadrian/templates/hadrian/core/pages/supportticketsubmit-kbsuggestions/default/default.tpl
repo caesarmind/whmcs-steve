@@ -1,4 +1,4 @@
-{* Hostnodes - Submit ticket KB suggestions (Apple-style).
+{* Hostnodes - Submit ticket KB suggestions.
    Knowledgebase articles suggested from the ticket subject, shown before submitting.
    WHMCS variables (Lagom supportticketsubmit-kbsuggestions.tpl):
      $kbarticles - each: id, title, article (excerpt)

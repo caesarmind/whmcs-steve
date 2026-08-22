@@ -26,7 +26,7 @@ return [
     ],
 
     /* Named sidebar styles, modelled on the five-way toggle in the v18 mockup
-       (apple-client-area: Light / Tinted / Dark / Graphite / Brand).
+       (Light / Tinted / Dark / Graphite / Brand).
 
        A STYLE IS A SET OF COLOURS, not one colour that implies the rest. The
        mockup makes that plain -- each of its styles declares eight or nine
@@ -326,7 +326,7 @@ return [
             // Left as-is rather than "fixed" in the CSS because adding
             // --color-red: #ff453a to the dark block is a VISIBLE change to
             // every danger dot and fill in dark mode. Worth doing (it is what
-            // --color-red-text already uses, and Apple's dark systemRed), but
+            // --color-red-text already uses, and the dark-mode danger red), but
             // it is a design call, not a silent cleanup.
             ['var' => '--color-red',         'label' => 'Danger',       'light' => '#ff3b30',               'dark' => '#ff3b30'],
             ['var' => '--color-red-text',    'label' => 'Danger text',  'light' => '#d70015',               'dark' => '#ff453a'],

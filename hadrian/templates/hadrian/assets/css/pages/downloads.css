@@ -1,5 +1,5 @@
-/* Downloads (Apple-style) -- category browser + popular files.
-   Ported from apple-client-area/downloads.html. Prefix: .dl-* */
+/* Downloads -- category browser + popular files.
+   Ported from the v18 client-area mockups. Prefix: .dl-* */
 
 .page-header { margin: 8px 0 24px; }
 .page-header h1 {

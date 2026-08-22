@@ -1,4 +1,4 @@
-{* Hostnodes — Support Tickets list (Apple-style).
+{* Hostnodes — Support Tickets list.
 
    WHMCS standard variables expected:
      $tickets       — array, each: id, tid, c, subject, department, lastreply,

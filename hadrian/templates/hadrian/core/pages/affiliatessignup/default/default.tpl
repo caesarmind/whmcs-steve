@@ -1,4 +1,4 @@
-{* Hostnodes - Affiliate program activation / opt-in (Apple-style).
+{* Hostnodes - Affiliate program activation / opt-in.
 
    WHMCS standard variables expected:
      $affiliatesystemenabled - bool: the affiliate program is enabled

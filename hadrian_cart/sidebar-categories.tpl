@@ -25,7 +25,7 @@
  * regardless of $child->getIcon(). WHMCS exposes icons as FontAwesome
  * class names (e.g. "fas fa-cube"); we don't load FontAwesome on the
  * cart pages, so any class-based icon would render as empty. The cube
- * SVG is a neutral placeholder that visually balances the Apple
+ * SVG is a neutral placeholder that visually balances the theme's
  * primitives. Per-category-name icon mapping can be layered on later.
  *}
 

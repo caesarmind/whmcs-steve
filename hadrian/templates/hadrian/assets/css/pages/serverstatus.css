@@ -1,4 +1,4 @@
-/* Server Status - page CSS (Apple-style status page) */
+/* Server Status - page CSS (overall-status banner + server list). Prefix: .ss-* */
 
 .page-header { margin: 8px 0 24px; }
 .page-header h1 {

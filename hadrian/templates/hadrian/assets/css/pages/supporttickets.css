@@ -1,5 +1,5 @@
 
-/* Page header -- Apple list-page pattern */
+/* Page header -- shared list-page pattern */
 .page-header { margin: 8px 0 32px; }
 .page-header h1 {
     font-size: var(--text-h2);

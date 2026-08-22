@@ -70,7 +70,7 @@ return [
        below. No custom pixels: the button's HEIGHT derives from its font size
        because core-theme.css uses em-relative padding, so picking a bigger
        Typography size grows the whole button. `default` is a scale KEY; the
-       defaults keep the Apple look (radius -> Pill) and MUST mirror the --btn-*
+       defaults keep the shipped look (radius -> Pill) and MUST mirror the --btn-*
        tokens in core-theme.css. (sizeMin/Max guard the px path the code still
        supports, though no field uses it today.) */
     'sizeMin' => 0,

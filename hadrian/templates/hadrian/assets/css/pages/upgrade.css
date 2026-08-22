@@ -1,4 +1,4 @@
-/* Upgrade flow (Apple-style) -- shared CSS for upgrade / upgrade-configure / upgradesummary.
+/* Upgrade flow -- shared CSS for upgrade / upgrade-configure / upgradesummary.
    Reuses global .card / .form-* / .btn-* . Prefix: .up-* (+ .plan-*, .summary-row) */
 
 .page-header { margin: 8px 0 20px; }

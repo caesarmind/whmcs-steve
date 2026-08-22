@@ -1,4 +1,4 @@
-{* Hostnodes — Change Password (Apple-style).
+{* Hostnodes — Change Password.
 
    WHMCS standard variables (templatefile user-password / changepassword):
      $clientsdetails  — for the page eyebrow (email)

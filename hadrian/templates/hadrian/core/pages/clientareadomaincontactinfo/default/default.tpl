@@ -1,4 +1,4 @@
-{* Hostnodes — Domain Contact Info / WHOIS (Apple-style).
+{* Hostnodes — Domain Contact Info / WHOIS.
 
    WHMCS variables:
      $domain, $domainid

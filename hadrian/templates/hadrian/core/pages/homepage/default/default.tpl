@@ -1,6 +1,6 @@
-{* Hostnodes - Public marketing homepage (Apple "Hosting, redesigned").
+{* Hostnodes - Public marketing homepage (the "Hosting, redesigned" landing).
 
-   Ported from apple-client-area/homepage.html. The mockup is a full standalone
+   Ported from the v18 homepage mockup. The mockup is a full standalone
    page; header.tpl/footer.tpl already provide the nav + footer, so we emit only
    the inner content. The hero keeps the working domain-search form + captcha
    from the previous portal homepage (now preserved as the 'portal' variant).
@@ -214,7 +214,7 @@
     <p class="sub">{$hadrianLang.home.pricingSub}</p>
 
     <div class="when-full">
-        {* .hp-pricing-grid + .hp-price-card is the theme's standard Apple card
+        {* .hp-pricing-grid + .hp-price-card is the theme's standard card
            grid — already used by 7 store pages — rather than the joined
            .hp-segmented-bar, which reads as a dense comparison table and left a
            gaping void in any card that has no price.

@@ -1,4 +1,4 @@
-{* Hostnodes — Email Verification result (Apple-style).
+{* Hostnodes — Email Verification result.
 
    WHMCS standard variables on /verify-email:
      $success  — bool, verification succeeded

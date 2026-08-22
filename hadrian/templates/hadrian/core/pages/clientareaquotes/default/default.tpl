@@ -1,4 +1,4 @@
-{* Hostnodes — My Quotes list (Apple-style).
+{* Hostnodes — My Quotes list.
 
    WHMCS standard variables expected:
      $quotes           — array, each: id, subject, datecreated, validuntil,

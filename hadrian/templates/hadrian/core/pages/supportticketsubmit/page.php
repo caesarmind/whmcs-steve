@@ -10,5 +10,5 @@ return [
     'group'        => 'Support',
     'type'         => 'client-portal',
     'listDisplay'  => true,
-    'description'  => 'Department picker (step 1) + ticket form (step 2) — Apple-style cards and inputs.',
+    'description'  => 'Department picker (step 1) + ticket form (step 2) — themed cards and inputs.',
 ];

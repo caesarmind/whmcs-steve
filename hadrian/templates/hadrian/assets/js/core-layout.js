@@ -996,7 +996,7 @@
             initFreePriceLabels();
             initDismissibles();
             initLogoSwap();
-            document.dispatchEvent(new CustomEvent('apple-layout:ready'));
+            document.dispatchEvent(new CustomEvent('hadrian-layout:ready'));
         });
     }
 

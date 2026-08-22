@@ -1,4 +1,4 @@
-{* Hostnodes — Add Funds (Apple-style).
+{* Hostnodes — Add Funds.
 
    WHMCS standard variables on /clientarea.php?action=addfunds:
      $minimumamount   — minimum top-up

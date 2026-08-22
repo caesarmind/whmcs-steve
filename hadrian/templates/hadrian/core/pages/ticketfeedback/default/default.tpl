@@ -1,4 +1,4 @@
-{* Hostnodes - Ticket feedback (Apple-style): rate a resolved ticket.
+{* Hostnodes - Ticket feedback: rate a resolved ticket.
 
    WHMCS variables (cross-checked against Lagom ticketfeedback.tpl):
      $stillopen / $feedbackdone / $success - state flags

@@ -1,12 +1,12 @@
 /* ============================================
-   WHMCS by Apple -- Design System
-   Cupertino / macOS Ventura+
+   Hadrian -- Design System
+   Tokens, primitives and shared components
    ============================================ */
 
 /* --- Bundled font: Inter (self-hosted, SIL OFL) ---
    One variable file (weights 100-900) covers the whole type scale with no
    external request. Inter is the theme's default typeface (see --font-family)
-   for a consistent SF-Pro-like look on every platform; the system stack stays
+   for a consistent look on every platform; the system stack stays
    as the fallback if the font fails to load. */
 @font-face {
     font-family: 'Inter';
@@ -49,7 +49,7 @@
     --color-blue-text: #0071e3;
     --color-gray-bg: rgba(142, 142, 147, 0.12);
     --color-gray-text: #6e6e73;
-    /* Sidebar icon tiles (Apple system-color palette) */
+    /* Sidebar icon tiles (bright saturated system palette) */
     --color-icon-blue: #007aff;
     --color-icon-purple: #af52de;
     --color-icon-orange: #ff9500;
@@ -312,7 +312,7 @@
        + radius so buttons track Typography until explicitly overridden.
        Per-variant defaults MUST mirror core/config/buttons.php. ========== */
     /* Geometry: em-relative padding so a button's HEIGHT derives from its
-       (Typography-defined) font size. Defaults reproduce the ~36/30/44px Apple
+       (Typography-defined) font size. Defaults reproduce the ~36/30/44px reference
        heights; pick a bigger font size and the whole button scales. */
     --btn-pad-y: 0.65em;  --btn-pad-x: 1.43em;  --btn-radius: var(--radius-pill);
     --btn-font-size: var(--text-md);  --btn-font-weight: var(--fw-medium);  --btn-line-height: 1.2;
@@ -851,7 +851,7 @@ body[data-sidebar-side="right"] .main-content { margin-left: 0; margin-right: va
 #overview, #products, #features, #pricing, #faq, #templates, #compare { scroll-margin-top: 104px; }
 html { scroll-behavior: smooth; }
 
-/* Product subnav (Apple product-page TOC style) */
+/* Product subnav (sticky product-page TOC style) */
 /* top/left offsets track the top nav's height -- it is sticky above them, so a
    taller bar must push both of these down or they overlap it. */
 .homepage-subnav { position: sticky; top: var(--topnav-height, 44px); z-index: 49; background: rgba(251,251,253,0.82); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom: 1px solid rgba(0,0,0,0.08); }
@@ -884,7 +884,7 @@ html { scroll-behavior: smooth; }
 }
 [data-theme="dark"] .homepage-nav a { color: var(--color-text-primary); }
 
-/* --- Nav Mega-Menu Dropdown (Apple-style on hover) --- */
+/* --- Nav Mega-Menu Dropdown (frosted full-width panel on hover) --- */
 .nav-item-dropdown { position: static; display: flex; align-items: center; align-self: stretch; }
 .nav-dropdown-trigger { display: inline-flex; align-items: center; gap: 4px; cursor: pointer; color: var(--color-text-primary); opacity: 0.85; font-size: var(--text-sm); transition: opacity 0.15s ease; text-decoration: none; height: 100%; }
 .nav-dropdown-trigger:hover { opacity: 1; }
@@ -1278,7 +1278,7 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .btn-group { display: flex; gap: 10px; }
 
 /* ============================================
-   FORMS -- Apple-style
+   FORMS
    ============================================ */
 .form-group { margin-bottom: 20px; }
 .form-label { display: block; font-size: var(--input-label-font-size); font-weight: var(--input-label-font-weight); color: var(--input-label-color); margin-bottom: 6px; }
@@ -1322,7 +1322,7 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .password-toggle svg { width: 18px; height: 18px; }
 
 /* ============================================
-   GROUPED LIST -- macOS Settings Style
+   GROUPED LIST -- grouped settings rows
    ============================================ */
 .settings-group { background: var(--color-surface); border-radius: var(--radius-lg); margin-bottom: 24px; overflow: hidden; }
 .settings-group-header { padding: 16px 24px 8px; }
@@ -1802,7 +1802,7 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .hp-footer-bottom-links a + a::before { content: ""; position: absolute; left: 0; top: 50%; height: 12px; width: 1px; background: rgba(0,0,0,0.18); transform: translateY(-50%); }
 .hp-footer-bottom-links a:hover { text-decoration: underline; }
 .hp-footer-bottom > .locale-btn { justify-self: end; }
-/* Brand block -- Apple-style wordmark + tagline + Trustpilot chip + socials + payments */
+/* Brand block -- wordmark + tagline + Trustpilot chip + socials + payments */
 .hp-footer-legal { color: var(--color-text-secondary); }
 .hp-footer-brand-mark { display: flex; align-items: center; gap: 7px; width: max-content; font-size: var(--text-lg); font-weight: var(--fw-medium); letter-spacing: -0.01em; color: var(--color-text-primary); margin-bottom: 14px; }
 .hp-footer-brand-mark svg { width: 18px; height: 18px; flex-shrink: 0; }
@@ -1857,7 +1857,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 }
 [data-theme="dark"] .hp-footer-top,
 [data-theme="dark"] body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols { border-color: rgba(255,255,255,0.1); }
-/* Floating footer-layout preview chip -- Apple-style dark pill, bottom-center */
+/* Floating footer-layout preview chip -- dark translucent pill, bottom-center */
 .fp-chip {
     position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%);
     z-index: 1000;
@@ -2632,7 +2632,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .hp-locations-map-section.dark .hp-map-pin .pin-label { background: #2a2a2c; color: var(--color-surface); }
 .hp-locations-map-section.dark .hp-map-legend-item { color: #a1a1a6; }
 
-/* --- "Our Values" Block (Apple iPad style -- cards with icon top-left, left-aligned) --- */
+/* --- "Our Values" Block (cards with icon top-left, left-aligned) --- */
 .hp-values-section { max-width: var(--w-prose); margin: 0 auto; padding: 100px 22px; }
 .hp-values-section h2 { font-size: var(--text-display); font-weight: var(--fw-semibold); letter-spacing: -0.03em; margin: 0 0 48px; color: var(--color-text-primary); text-align: left; line-height: var(--lh-tight); }
 .hp-values-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
@@ -2644,7 +2644,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .hp-value-item .value-link { font-size: var(--text-lg); color: var(--color-link); text-decoration: none; }
 .hp-value-item .value-link:hover { text-decoration: underline; }
 
-/* --- "Worth the Upgrade?" Block (Apple iPhone Air style) --- */
+/* --- "Worth the Upgrade?" Block (two-column metric grid, hairline dividers) --- */
 .hp-upgrade-section { padding: 100px 22px; background: var(--color-bg); }
 .hp-upgrade-section h2 { font-size: var(--text-display-sm); font-weight: var(--fw-semibold); letter-spacing: -0.025em; text-align: center; margin: 0 0 12px; color: var(--color-text-primary); }
 .hp-upgrade-section .upgrade-sub { font-size: var(--text-2xl); color: var(--color-text-secondary); text-align: center; max-width: 560px; margin: 0 auto 56px; }
@@ -2697,7 +2697,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 }
 
 /* ============================================
-   Apple-Inspired Additions (20 new blocks)
+   Marketing Block Additions (20 new blocks)
    ============================================ */
 
 /* === HEROES === */
@@ -2776,7 +2776,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
    than the card's default left-align, because each card carries only a name,
    a tagline and one price -- left-aligning that little content in a wide card
    looks unbalanced. Generous leading, one accent (the price), everything else
-   quiet: the Apple pricing-card shape.                                      */
+   quiet: the classic pricing-card shape.                                    */
 .hp-price-card.pc-group { text-align: center; align-items: stretch; padding: 40px 28px 32px; }
 .hp-price-card.pc-group h3 { font-size: var(--text-h4); letter-spacing: -0.02em; margin: 0 0 8px; }
 .hp-price-card.pc-group .pc-tagline { font-size: var(--text-md); color: var(--color-text-secondary); line-height: 1.5; margin: 0 0 28px; }
@@ -2793,8 +2793,8 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 
    Quiet text link rather than the filled pill the base .hp-price-card .buy
    gives it. On a browse step the category name and price should lead; two
-   solid accent slabs outweighed the names they sat under. Apple reserves the
-   filled button for the one action it actually wants and uses a chevron link
+   solid accent slabs outweighed the names they sat under. Reserve the
+   filled button for the one action the page actually wants; use a chevron link
    for everything else.
 
    Scoped to .pc-group, which only the homepage category cards carry -- the
@@ -3051,9 +3051,9 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .hp-cta-immersive .btn { background: var(--color-surface); color: var(--color-text-primary); padding: 14px 32px; border-radius: var(--radius-pill); font-size: var(--text-lg); font-weight: var(--fw-medium); text-decoration: none; display: inline-block; transition: transform 0.2s; }
 .hp-cta-immersive .btn:hover { transform: translateY(-1px); }
 
-/* === APPLE-INSPIRED === */
+/* === SHOWCASE SECTIONS === */
 
-/* Environment Pledge (like apple.com/environment) */
+/* Environment Pledge (rotating globe visual + stat pairs) */
 .hp-eco-section { max-width: var(--w-prose); margin: 0 auto; padding: 100px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
 .hp-eco-visual { width: 100%; aspect-ratio: 1; background: radial-gradient(circle at 35% 35%, #7dd3a8 0%, #0a9c44 60%, #054e23 100%); border-radius: 50%; box-shadow: inset -30px -30px 80px rgba(0,0,0,0.3), 0 20px 80px rgba(10,156,68,0.3); position: relative; overflow: hidden; animation: globe-rotate 30s linear infinite; }
 .hp-eco-visual::before { content: ''; position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(255,255,255,0.2); transform: scaleY(0.3); top: 50%; }
@@ -3113,7 +3113,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .hp-mag-small p { font-size: var(--text-md); margin: 0; line-height: 1.45; opacity: 0.85; }
 .hp-mag-small .mvsm { margin-top: auto; padding-top: 12px; font-size: var(--text-h2); text-align: center; opacity: 0.9; }
 
-/* === Alive Heroes -- animated Apple-style backgrounds === */
+/* === Alive Heroes -- animated gradient backgrounds === */
 
 /* Aurora -- drifting mesh gradient */
 .hp-hero-aurora { position: relative; min-height: 560px; padding: 120px 22px 100px; text-align: center; overflow: hidden; background: var(--color-bg); }
@@ -3197,7 +3197,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .hp-silicon-hero .lead { font-size: var(--text-2xl); line-height: 1.45; letter-spacing: -0.01em; color: var(--color-text-tertiary); max-width: 780px; margin: 0; }
 .hp-silicon-hero .lead strong { color: var(--color-text-primary); font-weight: var(--fw-semibold); }
 
-/* === Duo Dark Feature Cards (apple.com AI duo) === */
+/* === Duo Dark Feature Cards (two dark cards side by side) === */
 .hp-duo-feature { max-width: var(--w-prose); margin: 0 auto; padding: 48px 22px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 .hp-duo-card { background: var(--color-text-primary); border-radius: 24px; padding: 32px 32px 0; color: var(--color-surface); overflow: hidden; display: flex; flex-direction: column; min-height: 480px; }
 .hp-duo-card .duo-text { font-size: var(--text-lg); line-height: 1.5; color: #a1a1a6; margin: 0 0 28px; }
@@ -3278,7 +3278,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .hp-hadrian-security-full .sec-feature p { font-size: var(--text-lg); line-height: 1.5; color: #a1a1a6; margin: 0; }
 .hp-hadrian-security-full .sec-feature p strong { display: block; color: var(--color-text-primary); font-weight: var(--fw-semibold); font-size: var(--text-xl); margin-bottom: 4px; }
 
-/* === Value Packed -- "Say hello to a good buy." (iPhone 17e style) === */
+/* === Value Packed -- "Say hello to a good buy." (centred value-proposition block) === */
 .hp-hadrian-value-packed { background: var(--color-surface); padding: 100px 22px 0; }
 .hp-hadrian-value-packed .vp-inner { max-width: 760px; margin: 0 auto; text-align: center; }
 .hp-hadrian-value-packed .vp-eyebrow { font-size: var(--text-xl); font-weight: var(--fw-semibold); color: #b073e7; margin: 0 0 14px; letter-spacing: -0.005em; }
@@ -3448,7 +3448,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
     .hp-announce-notice .announce-notice-close { position: absolute; top: 8px; right: 8px; }
 }
 
-/* === Worth the Upgrade -- Compare Grid (iPhone Pro style) === */
+/* === Worth the Upgrade -- Compare Grid (dark rounded card) === */
 .hp-hadrian-upgrade-compare { background: #000; padding: 60px 22px; }
 .hp-upgrade-card { max-width: 1080px; margin: 0 auto; background: var(--color-text-primary); border-radius: 28px; padding: 44px 44px 44px; color: var(--color-surface); }
 .hp-upgrade-header { display: grid; grid-template-columns: 1.6fr 1fr; gap: 32px; margin-bottom: 36px; align-items: start; }
@@ -3888,7 +3888,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 }
 
 /* =============================================
-   LIGHT-MODE OVERRIDES for always-dark Apple sections
+   LIGHT-MODE OVERRIDES for always-dark marketing sections
    These blocks were designed dark-first. Adapt them so they
    also work cleanly on light pages.
    ============================================= */
@@ -4012,7 +4012,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .homepage-nav.only-top .nav-section { display: none; }
 .homepage-nav .nav-divider { width: 1px; height: 16px; background: var(--color-border); }
 
-/* Topnav: classic dropdown -- Apple-style frosted floating panel, hover-triggered.
+/* Topnav: classic dropdown -- frosted floating panel, hover-triggered.
    Default state for any dropdown_parent item with config.dropdown_style empty or
    "default". Icons are only rendered when admin's topnav_show_icons toggle is on
    AND the item has a config.icon set (handled in the TPL). */
@@ -4134,7 +4134,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 /* ============================================
    Cart view-page chrome (.vc-*)
    --------------------------------------------
-   Wraps the nexus_cart Vue SPA at /cart.php?a=view with the Apple
+   Wraps the nexus_cart Vue SPA at /cart.php?a=view with the v18
    mockup's page header + 5-step strip. Lives here (not inline in
    hadrian_cart/viewcart.tpl) because WHMCS strips <style>/<link>
    from cart TPL output. .vc- prefix prevents collisions with the
@@ -4204,7 +4204,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
     .h-captcha { transform: scale(0.86); transform-origin: center top; }
 }
 
-/* -- intl-tel-input (phone country-code picker) -- Apple-styled, applied wherever
+/* -- intl-tel-input (phone country-code picker) -- theme-styled, applied wherever
    the widget is used (register, contacts). body-prefixed so these win over the
    CDN intlTelInput.css regardless of stylesheet load order. -- */
 /* :not(.iti--container) is load-bearing. With dropdownContainer:document.body the

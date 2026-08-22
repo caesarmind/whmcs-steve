@@ -14,7 +14,7 @@
  *     ALL rows into the <tbody>; DataTables enhances that static table for
  *     client-side paging/search/sort/filter. No network calls.
  *
- * Either way the SAME Apple chrome is driven through controls tagged
+ * Either way the SAME theme chrome is driven through controls tagged
  * data-mt-for="<tableId>": the search box (data-mt-search), page-size <select>
  * (data-dt-length), pager (data-dt-pager), info text (data-dt-info) and the
  * filter tabs (data-mt-filter). Row-click navigation (tr[data-href]) and kebab
@@ -289,7 +289,7 @@
 
     // --------------------------------------------------------------- wiring
 
-    /** Wire the Apple footer/search/filter controls to a DataTable (either mode). */
+    /** Wire the theme footer/search/filter controls to a DataTable (either mode). */
     function wireControls(id, dt, opts) {
         // Search box
         var search = ctrl('data-mt-search', id);
@@ -369,7 +369,7 @@
         });
     }
 
-    /** Reflect the table's current sort column/direction on the Apple header buttons. */
+    /** Reflect the table's current sort column/direction on the theme header buttons. */
     function reflectSortHeader(thead, dt) {
         if (!thead) { return; }
         thead.querySelectorAll('[data-sort], .svc-sort, [data-dir]').forEach(function (b) {
@@ -386,7 +386,7 @@
         }
     }
 
-    /** Mirror sort state into ?orderby=&sort= and reflect it on the Apple header. */
+    /** Mirror sort state into ?orderby=&sort= and reflect it on the theme header. */
     function wireSortSync(id, dt, type) {
         var meta = TYPE_META[type] || {};
         var thead = document.getElementById(id);
@@ -519,7 +519,7 @@
         wireControls(cfg.id, dt, { mode: 'client', filterCol: cfg.filterCol });
         wireSortSync(cfg.id, dt, cfg.type);
 
-        // Reconcile the Apple controls with whatever stateSave restored: a restored
+        // Reconcile the theme controls with whatever stateSave restored: a restored
         // column filter wins; otherwise honour the server-rendered active tab (the
         // ?status= initial filter) on first paint.
         var restoredFilter = (cfg.filterCol !== null && cfg.filterCol >= 0) ? dt.column(cfg.filterCol).search() : '';

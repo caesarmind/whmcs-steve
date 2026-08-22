@@ -1,4 +1,4 @@
-{* Hostnodes - Upgrade summary (Apple-style). Real WHMCS upgrade confirm step.
+{* Hostnodes - Upgrade summary. Real WHMCS upgrade confirm step.
 
    WHMCS variables (cross-checked against Lagom upgradesummary.tpl):
      $type        - 'package' | 'configoptions'        $id - service id

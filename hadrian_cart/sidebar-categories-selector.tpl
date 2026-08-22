@@ -15,11 +15,11 @@
  *   - menuItemName / value / class="list-group-item" / "selected"
  *     attributes on each <option> are the legacy hooks WHMCS expects.
  *
- * Apple visual layer:
- *   - .card-subnav wrapper inherits the Apple card surface from
+ * Visual layer:
+ *   - .card-subnav wrapper inherits the shared card surface from
  *     style.min.css (rounded, hairline border, light shadow).
- *   - .form-control already restyled to the Apple input primitive.
- *   - .panel-heading and .panel-footer pick up the Apple typography
+ *   - .form-control already restyled to the theme's input primitive.
+ *   - .panel-heading and .panel-footer pick up the theme's typography
  *     resets without any new class hooks needed here.
  *}
 

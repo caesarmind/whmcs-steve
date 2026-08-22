@@ -112,7 +112,7 @@ html { scroll-behavior: smooth; }
 
 /* Module client area -- the server module's raw output ($moduleclientarea):
    the "Login to control panel" SSO button, change-password form, etc. The
-   module emits Bootstrap-ish markup, so map its buttons to the Apple look. */
+   module emits Bootstrap-ish markup, so map its buttons to the theme's button look. */
 .module-client-area { font-size: var(--text-base); color: var(--color-text-secondary); line-height: 1.5; }
 .module-client-area .btn,
 .module-client-area input[type="submit"],
@@ -168,7 +168,7 @@ html { scroll-behavior: smooth; }
 .pd-alert-success { background: var(--color-green-bg); color: var(--color-green-text); }
 
 /* Quick Shortcuts -- cPanel feature launchpad (WHMCS SSO app-token deep-links).
-   Apple tile grid; colored icon chips grouped by feature family. */
+   Rounded tile grid; colored icon chips grouped by feature family. */
 .pd-shortcuts { display: grid; grid-template-columns: repeat(auto-fill, minmax(132px, 1fr)); gap: 10px; }
 .pd-shortcut { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px 10px 14px; background: var(--color-surface-secondary); border-radius: var(--radius-md); text-decoration: none; text-align: center; transition: transform var(--transition-fast), box-shadow var(--transition-fast); }
 .pd-shortcut:hover { transform: translateY(-1px); box-shadow: var(--shadow-card-hover); text-decoration: none; }

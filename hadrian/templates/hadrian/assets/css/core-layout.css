@@ -103,7 +103,7 @@ body:not([data-layout="top"]) { background: var(--color-bg); }
 /* -- Full-bleed marketing pages (store landings) ----------- */
 /* The hp-* marketing sections are built to span the viewport with their
    backgrounds reaching the screen edges, each capping its own inner content
-   (like the apple-client-area mockups, where <body> is display:block). The
+   (like the v18 client-area mockups, where <body> is display:block). The
    standard .content-area (max-width + 48px gutter) traps them at the column
    width, so on wide screens a section's coloured background stops short of
    both edges. For these pages drop the cap + side gutter so backgrounded
@@ -536,7 +536,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 .ph-breadcrumb-inner .sep { opacity: 0.4; font-size: var(--text-xs); }
 .ph-breadcrumb-inner .current { color: var(--color-text-primary); font-weight: var(--fw-medium); }
 
-/* Back-link breadcrumb (top-layout): a single Apple-style "< Home" link in
+/* Back-link breadcrumb (top-layout): a single minimal "< Home" link in
    place of a full trail. The band drops its grey fill + hairline so the link
    reads as a content affordance, not a chrome bar. The current page is
    carried by the large page title just below. */
@@ -1090,7 +1090,7 @@ body[data-layout="side"] .ph-section:last-of-type { padding-bottom: 48px; }
 /* -- .when-full / .when-empty toggle -------------------------------
    Some page tpls render both states and rely on body[data-data] (set
    by the page tpl's inline script) to pick which one is visible. The
-   preview chip in the apple-client-area mockups also relies on this
+   preview chip in the v18 client-area mockups also relies on this
    toggle to flip states without a reload. */
 body[data-data="empty"] .when-full       { display: none !important; }
 body:not([data-data="empty"]) .when-empty { display: none !important; }
@@ -1106,7 +1106,7 @@ body:not([data-data="empty"]) .when-empty { display: none !important; }
    site-wide.
      inside  (default): one unified white card -- title + body share a surface.
      outside: the .card-header title floats on the page background ABOVE a flat
-              .card-body that keeps the white surface -- Apple section style. */
+              .card-body that keeps the white surface -- grouped-section style. */
 body[data-svc-layout="outside"] .content-area .card:has(> .card-body) {
     background: transparent;
     border: 0;
@@ -1127,7 +1127,7 @@ body[data-svc-layout="outside"] .content-area .card:has(> .card-body) > .card-bo
    would leave them looking unchanged. For these, "outside" instead flattens the
    card onto the page background as a plain divided list -- visible even with no
    title to lift out. Multi-card groups (announcements, emails, downloads, KB...)
-   read as an Apple plain list; a lone card reads as flat content on the page.
+   read as one plain divided list; a lone card reads as flat content on the page.
    :not(:has(> .card-header)) makes this win over the rule above. */
 body[data-svc-layout="outside"] .content-area .card:has(> .card-body):not(:has(> .card-header)) {
     background: transparent;
@@ -1521,7 +1521,7 @@ body[data-tpl="fraudcheck"] {
 
    Scoped to body[data-tpl="cart-flow"] so the rules NEVER bleed
    into the rest of the client area (which uses .ph-*, .ct-*, etc.
-   without any class overlap). Apple visual tokens used throughout
+   without any class overlap). The theme design tokens are used throughout
    so the cart still feels native instead of like raw Bootstrap.
    =============================================================== */
 body[data-tpl="cart"],
@@ -1787,14 +1787,14 @@ body[data-tpl="fraudcheck"] {
 }
 
 /* ===============================================================
-   Apple-language overrides for standard_cart's cart-flow pages
+   Hadrian visual-language overrides for standard_cart's cart-flow pages
    ---------------------------------------------------------------
    The base Bootstrap shim above gets standard_cart rendering at
    all. These rules take that further: reshape the actual DOM
-   standard_cart emits so it matches the Apple visual language
-   from apple-client-area/store.html -- 240px sidebar + main grid,
+   standard_cart emits so it matches the Hadrian visual language
+   from the v18 client-area mockups -- 240px sidebar + main grid,
    .subnav-card-style sidebar items, .st-cat-head-style page
-   header, .st-plan-style product cards, and pill-shaped Apple
+   header, .st-plan-style product cards, and pill-shaped
    buttons. All achieved via CSS targeting standard_cart's
    wrapper structure (no TPL changes -- forms keep working).
    =============================================================== */
@@ -2052,7 +2052,7 @@ body[data-tpl="fraudcheck"] {
         color: var(--color-surface);
     }
 
-    /* -- Domain selection (.domain-selection-options) -- Apple radio cards -- */
+    /* -- Domain selection (.domain-selection-options) -- rounded radio cards -- */
     #order-standard_cart .domain-selection-options {
         background: var(--color-surface, var(--color-surface));
         border: 0.5px solid var(--color-border, var(--color-border));
@@ -2180,7 +2180,7 @@ body[data-tpl="fraudcheck"] {
         color: var(--color-accent, var(--color-accent));
     }
 
-    /* -- View Cart / Order Summary table -- Apple style --------- */
+    /* -- View Cart / Order Summary table -- card style ---------- */
     #order-standard_cart .bordered-totals,
     #order-standard_cart .checkout-summary,
     #order-standard_cart .summary-container {
@@ -2221,7 +2221,7 @@ body[data-tpl="fraudcheck"] {
     /* === Refinements for configureproductdomain to match the mockup ===
        The .domain-selection-options rules above style the SECTION,
        this section styles each radio option to look like a tappable
-       Apple card with a 20px radio circle and the accent-light
+       rounded card with a 20px radio circle and the accent-light
        background flag when checked. ---------------------------- */
     #order-standard_cart .domain-selection-options {
         padding: 0;
@@ -2519,9 +2519,9 @@ body[data-tpl="fraudcheck"] {
         margin-bottom: 12px;
     }
 
-    /* === viewcart -- Apple empty state + trust strip + addon nesting ===
+    /* === viewcart -- empty state + trust strip + addon nesting ===
        The view-cart-empty / .ct-empty markup lives inside the cart
-       items list when $cartitems == 0. Style it as an Apple "nothing
+       items list when $cartitems == 0. Style it as a centred "nothing
        to see" panel with icon, headline, and 2-button action row.
        ------------------------------------------------------------ */
     #order-standard_cart .view-cart-empty {
@@ -2669,7 +2669,7 @@ body[data-tpl="fraudcheck"] {
 
     /* Section sub-heading (Server config, Configure package, Available
        addons, Required info). Standard_cart uses a flat-color band; we
-       want a thin Apple eyebrow label. */
+       want a thin uppercase eyebrow label. */
     #order-standard_cart .sub-heading {
         margin: 24px 0 12px;
         padding: 0;
@@ -2794,7 +2794,7 @@ body[data-tpl="fraudcheck"] {
 
     /* === checkout -- total-due banner, gateway picker, CC inputs ===
        The big green "total due today" banner sits between the form
-       sections and the payment method picker. Apple-style: white
+       sections and the payment method picker. Restyled: white
        card with subtle accent border + large total. */
     #order-standard_cart #totalDueToday {
         background: linear-gradient(180deg, var(--color-surface-tertiary, #fafafd) 0%, var(--color-surface-primary, var(--color-surface)) 100%);
@@ -3206,7 +3206,7 @@ body[data-tpl="fraudcheck"] {
    Cart-area heading defaults -- specificity (0,0,1) so any class
    selector wins. The body[data-tpl=...] list is inside :where() so
    it contributes 0 specificity; only the trailing h1/h2/h3 counts.
-   These define the Apple-style sizes for ANY heading in the cart
+   These define the default sizes for ANY heading in the cart
    flow that doesn't have a more specific class rule attached.
    =============================================================== */
 :where(

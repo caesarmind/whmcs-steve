@@ -1,5 +1,5 @@
 {* Store landing - SEO Tools (MarketGoo).
-   Ported from apple-client-area/seo-tools.html (Public/Marketing landing).
+   Ported from the v18 SEO Tools mockup (Public/Marketing landing).
    header.tpl/footer.tpl provide the shell + .content-area, so we emit only the
    inner content (page-header + when-full marketing + when-empty offline state).
 

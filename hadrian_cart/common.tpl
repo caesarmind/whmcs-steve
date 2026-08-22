@@ -22,7 +22,7 @@
  *}
 
 {* Hadrian design-language stylesheet -- owns all cart-page typography, layout, components *}
-<link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/style.min.css?v={$hadrian.assetVersion|default:'21'}">
+<link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/style.min.css?v={$hadrian.assetVersion|default:'22'}">
 
 {* --vl-* token overrides (safety net -- applies inside any Vue Shadow DOM that loads) *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/custom.css?v={$hadrian.assetVersion|default:'21'}">

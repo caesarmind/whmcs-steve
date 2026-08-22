@@ -1,4 +1,4 @@
-{* Hostnodes — My Products & Services (Apple-style services table).
+{* Hostnodes — My Products & Services (services table).
 
    WHMCS standard variables expected:
      $products        — array of associative arrays per service

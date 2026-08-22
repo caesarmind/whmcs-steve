@@ -4,7 +4,7 @@
 
    One centred column on a full-page colour field: brand bar pinned top-left,
    a line of copy, the sign-in card, and the announcements as cards below.
-   Built from apple-client-area/login-v4.html.
+   Built from the v18 client-area mockups.
 
    THE FIELD IS PAINTED ON .mt-bcn, NOT ON <body>. The reference paints
    body.lv4 directly, but this template is included INTO the theme's shell and

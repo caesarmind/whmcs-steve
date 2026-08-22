@@ -1049,7 +1049,7 @@ return [
     ],
 
     /* Store landing pages (core/pages/store-*). Marketing copy ported from
-       the apple-client-area Public/Marketing mockups. Prices/brand names are
+       the v18 Public/Marketing mockups. Prices/brand names are
        driven by live WHMCS store vars in the tpl, so they are not tokenized
        here. Typography uses HTML entities (output raw) to match the mockups. */
     'store' => [
@@ -1834,7 +1834,7 @@ return [
         'wblEmptyHome'       => 'Home',
 
         /* SiteLock / Website Security (core/pages/store-sitelock). Ported from
-           apple-client-area/website-security.html; the mockup's rough "what is /
+           the v18 Website Security mockup; the mockup's rough "what is /
            who uses / emergency" prose was rewritten into clean SiteLock copy. */
         'slEyebrow'           => 'Security',
         'slPageTitle'         => 'Website Security',
@@ -1925,7 +1925,7 @@ return [
         'slEmptyHome'         => 'Back to home',
 
         /* SpamExperts / Email Services (core/pages/store-spamexperts).
-           Ported from apple-client-area/email-services.html. */
+           Ported from the v18 Email Services mockup. */
         'seEyebrow'           => 'E-mail Services',
         'sePageTitle'         => 'Email security built to protect your mailbox',
         'sePageSubtitle'      => 'SpamExperts is a unique self-learning filtering mechanism with advanced spam pattern detection to dynamically adapt to new spammer techniques.',
@@ -2016,7 +2016,7 @@ return [
         'seEmptyHome'         => 'Back to home',
 
         /* Store order-configuration screen (core/pages/store-order). Ported from
-           apple-client-area/store/order.html; wired to the six/store/order.tpl
+           the v18 store order mockup; wired to the six/store/order.tpl
            cart-order contract with static demo copy as the preview fallback. */
         'ordEyebrow'          => 'Store',
         'ordPageTitle'        => 'Configure Your Order',
@@ -2061,7 +2061,7 @@ return [
         'ordEmptyBrowse'      => 'Browse the store',
 
         /* Store product not-found (core/pages/store-not-found). Ported from
-           apple-client-area/store/not-found.html. */
+           the v18 store not-found mockup. */
         'nfTitle'             => 'Product Not Found',
         'nfText'              => 'The product you&rsquo;re looking for doesn&rsquo;t exist or is no longer available.',
         'nfRef'               => 'Reference',
@@ -2069,7 +2069,7 @@ return [
         'nfDashboard'         => 'Go to Dashboard',
 
         /* XOVI NOW (core/pages/store-xovinow). Ported from
-           apple-client-area/xovi-now.html; two rough mockup strings (rank-tracker
+           the v18 XOVI NOW mockup; two rough mockup strings (rank-tracker
            blurb, an FAQ question) were rewritten into clean copy. */
         'xoHeroTitle'         => 'Boost your search rankings.',
         'xoHeroTitleAccent'   => 'NOW.',
@@ -2161,7 +2161,7 @@ return [
     ],
 
     /* Public marketing homepage (core/pages/homepage/marketing - the "Hosting,
-       redesigned" landing ported from apple-client-area/homepage.html). */
+       redesigned" landing ported from the v18 homepage mockup). */
     'home' => [
         'heroEyebrow'        => 'Premium managed hosting',
         'heroTitle'          => 'Hosting, redesigned.',

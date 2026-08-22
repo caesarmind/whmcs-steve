@@ -1,4 +1,4 @@
-{* Hostnodes - Edit payment method (Apple-style).
+{* Hostnodes - Edit payment method.
 
    WHMCS v9 data (verified against shipped account-paymentmethods.tpl / Nexus):
      $payMethod  - the method being edited: ->id, ->description,

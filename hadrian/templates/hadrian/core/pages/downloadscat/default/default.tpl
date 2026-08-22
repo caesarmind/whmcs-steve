@@ -1,4 +1,4 @@
-{* Hostnodes - Download category (Apple-style): files within a category.
+{* Hostnodes - Download category: files within a category.
 
    WHMCS standard variables expected (downloads.php?action=displaycat&catid=X):
      $pagetitle     - category name

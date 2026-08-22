@@ -1,4 +1,4 @@
-{* Hostnodes — My Invoices list (Apple-style).
+{* Hostnodes — My Invoices list.
 
    WHMCS standard variables expected:
      $invoices         — array, each: id, invoicenum, datecreated, total, status,

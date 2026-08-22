@@ -18,7 +18,7 @@
  *   - <form method="post" action="{$WEB_ROOT}/cart.php?..."> currency
  *     selector with the action-string sprintf preserved.
  *
- * Apple visual layer:
+ * Visual layer:
  *   - .card primitive inherits rounded + bordered surface.
  *   - .currency-picker-form is a new wrapper so we can give the
  *     <select> a top divider on mobile without affecting desktop.

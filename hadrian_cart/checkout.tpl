@@ -1,7 +1,7 @@
 {*
  * hadrian_cart/checkout.tpl
  *
- * Apple visual shell over standard_cart's exact checkout contract.
+ * Hadrian visual shell over standard_cart's exact checkout contract.
  *
  * Checkout is the most contract-heavy template in the cart flow —
  * every field name and id is wired into scripts.min.js, the gateway
@@ -12,7 +12,7 @@
  *
  * This file therefore PRESERVES THE STANDARD_CART MARKUP VERBATIM
  * for the form body, and ONLY swaps the page-level chrome (header,
- * help banner, .secondary-cart-sidebar trust strip). The Apple visual
+ * help banner, .secondary-cart-sidebar trust strip). The Hadrian visual
  * comes from the CSS shim in core-layout.css (which already styles
  * #order-standard_cart's .sub-heading, .form-group.prepend-icon,
  * .panel-addon, .alert-*, .radio, .btn-*, etc.).
@@ -67,7 +67,7 @@
  *         .checkout-error-feedback, .vat-error
  *
  * Visual sources used by core-layout.css to skin this content:
- *   - apple-client-area/cart.html (right-rail summary patterns)
+ *   - the v18 client-area cart mockup (right-rail summary patterns)
  *   - the broad cart-flow CSS shim (#order-standard_cart .form-group
  *     .prepend-icon, .sub-heading, .alert, .btn, .radio, …)
  *}
@@ -198,13 +198,13 @@
 /* Page-local checkout frame spacing */
 .content-area { padding-top: 10px; padding-bottom: 10px; }
 
-/* ── Apple checkout chrome (.co-*) ──
+/* ── Checkout chrome (.co-*) ──
    Page-level wrapper around standard_cart's checkout form. Form body
    classes (.form-group prepend-icon, .sub-heading, .alert, .btn etc)
    are styled separately by core-layout.css's cart-flow CSS shim --
    we only own the OUTER layout (page header, 5-step strip, 2-col
    split, sticky summary card on the right). Mirrors
-   apple-client-area/checkout.html. */
+   the v18 client-area checkout mockup. */
 .co-page-header { margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; }
 .co-page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
 .co-page-header .co-sub { font-size: 14px; color: var(--color-text-tertiary); letter-spacing: -0.008em; margin: 0; }
@@ -288,14 +288,14 @@
 .co-trust-strip .item { display: inline-flex; align-items: center; gap: 6px; }
 .co-trust-strip .item i { color: var(--color-green-text, #34c759); width: 12px; flex-shrink: 0; }
 
-/* Already-registered toggle row, restyled minimally so it fits the Apple chrome */
+/* Already-registered toggle row, restyled minimally so it fits the checkout chrome */
 .already-registered { padding: 10px 0 14px; }
 .already-registered p { color: var(--color-text-secondary); font-size: 13px; margin: 0; }
 
 /* ── Account section card with Create-account / Sign-in tabs ──
    Wraps WHMCS's #containerExistingUserSignin + #containerNewUserSignup
-   in an Apple-style card with two-tab switcher (mirrors
-   apple-client-area/checkout.html lines 1005-1085). Hidden for
+   in a rounded card with two-tab switcher (mirrors the v18
+   client-area checkout mockup, lines 1005-1085). Hidden for
    logged-in users via the .only-out gate. */
 .co-account-card {
     padding: 0;
@@ -559,7 +559,7 @@
     font: inherit;
 }
 
-/* Bootstrap-era form rows -- compact Apple-style inputs */
+/* Bootstrap-era form rows -- compact rounded inputs */
 .co-left .row { margin: 0 -7px; }
 .co-left .row > [class*="col-"] { padding: 0 7px; margin-bottom: 12px; }
 .co-left .form-group { margin: 0; }
@@ -705,7 +705,7 @@
    renders these as bare <label class="radio"> rows; left unstyled they
    read as plain, low-contrast paragraphs with no visible selector, so
    the choice looks like static fine-print rather than a control (and
-   feels non-functional). Restyle as Apple option cards with a CSS-drawn
+   feels non-functional). Restyle as rounded option cards with a CSS-drawn
    radio (the .ac-radio span) driven by :has(input:checked) -- the same
    iCheck-proof pattern the .co-pay gateway radios use above. The native
    input is hidden (and any iCheck sprite wrapper neutralised) so the
@@ -793,7 +793,7 @@
 }
 #order-standard_cart #applyCreditContainer label.radio:last-child { margin-bottom: 0 !important; }
 
-/* Payment method radios -- matches apple-client-area/checkout.html while
+/* Payment method radios -- matches the v18 client-area checkout mockup while
    preserving WHMCS's native paymentmethod radio contract. */
 #paymentGatewaysContainer.co-pay-gateways { margin: 0 0 14px; }
 #paymentGatewaysContainer .co-pay-list { display: flex; flex-direction: column; gap: 10px; }
@@ -919,7 +919,7 @@
 /* -- Saved payment methods (#existingCardsContainer) --
    5 sibling .paymethod-info cells per card (radio | brand | name | desc |
    expiry -- order is fixed; scripts.min.js iterates them by index, so no
-   wrapper is allowed). Lay them out as one selectable Apple row via grid; the
+   wrapper is allowed). Lay them out as one selectable card row via grid; the
    init() JS toggles .pm-selected on the 5 cells sharing the chosen card's
    data-paymethod-id so the whole row highlights. The ccinfo radio is
    iCheck-wrapped (sprite 404s), so the visible dot is drawn on the
@@ -965,7 +965,7 @@
     background: var(--color-accent-light);
     border-color: var(--color-accent);
 }
-/* iCheck radio wrapper -> Apple dot */
+/* iCheck radio wrapper -> themed dot */
 #existingCardsContainer .iradio_square-blue {
     position: relative;
     width: 18px;
@@ -1157,7 +1157,7 @@
 .checkout-footer .checkbox input { margin-top: 3px; accent-color: var(--color-accent); flex-shrink: 0; }
 /* The cart's scripts.min.js iCheck-wraps the TOS checkbox in
    .icheckbox_square-blue, whose sprite 404s on this install -- leaving NO
-   visible checkbox. Style the wrapper as an Apple checkbox; iCheck keeps its
+   visible checkbox. Style the wrapper as a custom checkbox; iCheck keeps its
    .checked class in sync so the tick reflects state (clicks still toggle via
    iCheck's label/overlay, untouched). */
 .checkout-footer .icheckbox_square-blue {
@@ -1303,10 +1303,10 @@
 /* Captcha block */
 .co-captcha-card { padding: 18px 22px; text-align: center; }
 
-/* ─── intl-tel-input override -- Apple-style ─────────────────────
+/* ─── intl-tel-input override -- themed ──────────────────────────
    intl-tel-input ships with its own greyish chrome that clashes
-   with the Apple look. Restyle the flag/dial-code button + dropdown
-   so it reads as a real Apple-style segment of the phone field.
+   with the theme's look. Restyle the flag/dial-code button + dropdown
+   so it reads as a real, native-looking segment of the phone field.
    .has-iti hides the absolute .field-icon (the FA phone glyph) on
    the phone form-group so we don't double-decorate the input. */
 .form-group.prepend-icon.has-iti .field-icon { display: none; }
@@ -1384,7 +1384,7 @@
 }
 
 /* ─── Generate-Password modal (.modal-generate-password) ─────────
-   Apple-language modal that opens when the user clicks
+   Themed modal that opens when the user clicks
    .generate-password (security.tpl). Bootstrap modal scaffolding
    (.modal / .modal-dialog / .modal-content) handles show/hide; the
    visual chrome (rounded card, header + body + footer, pill buttons,
@@ -1543,7 +1543,7 @@
 }
 
 /* Generate-password trigger button in security.tpl is the standard_cart
-   .btn-default.generate-password. Restyle to match the Apple pill so it
+   .btn-default.generate-password. Restyle to match the theme's pill so it
    doesn't read as a stray grey rectangle next to the password meter. */
 .generate-password.btn-default,
 button.generate-password {
@@ -1770,7 +1770,7 @@ button.generate-password:hover {
         <div class="co-split">
         <div class="co-left">
 
-            {* The Apple-style account card (tabs: Create / Sign in) lives
+            {* The account card (tabs: Create / Sign in) lives
                inside account.tpl. We keep the original toggle buttons as
                hidden no-ops so scripts.min.js can still find them if it
                wires programmatic .click() calls. *}
@@ -1816,7 +1816,7 @@ button.generate-password:hover {
 
                 {* ─── Last-chance offers (3rd-party hookOutput) ───
                    Wrap whatever the merchant's checkout-hook integrations
-                   render in an Apple .co-lastchance card so it doesn't
+                   render in a .co-lastchance card so it doesn't
                    bleed raw markup into the page. *}
                 {if $hookOutput}
                     <div class="co-lastchance" style="margin-bottom: 16px;">
@@ -1856,7 +1856,7 @@ button.generate-password:hover {
                 {* ─── Payment details (Total Due Today banner, apply-credit, gateway radios, CC fields) ─── *}
                 {include file="orderforms/$carttpl/includes/checkout/payment.tpl"}
 
-                {* ─── Order notes (Apple .co-notes card) ───
+                {* ─── Order notes (.co-notes card) ───
                    Keeps the textarea name="notes" field so WHMCS still
                    captures order notes server-side. *}
                 {if $shownotesfield}
@@ -1869,7 +1869,7 @@ button.generate-password:hover {
                     </div>
                 {/if}
 
-                {* ─── Marketing opt-in (Apple .co-mailing card with toggle switch) ───
+                {* ─── Marketing opt-in (.co-mailing card with toggle switch) ───
                    Keeps the checkbox name="marketingoptin" so the WHMCS
                    server still receives the opt-in flag. The toggle UI is
                    pure CSS over the underlying checkbox -- no scripts.js
@@ -1895,7 +1895,7 @@ button.generate-password:hover {
 
                 {* ─── TOS only ───
                    The Complete Order button has been moved into the
-                   summary aside (mirrors apple-client-area/checkout.html).
+                   summary aside (mirrors the v18 client-area checkout mockup).
                    This footer keeps only the TOS checkbox so users
                    tick it inline with the form before navigating up
                    to the sticky aside button. *}
@@ -2041,7 +2041,7 @@ button.generate-password:hover {
         btnExisting.on('click', showLogin);
         btnNew.on('click', showSignup);
 
-        /* Apple-style tab clicks. The .co-auth-panel data-apanel value
+        /* Tab clicks. The .co-auth-panel data-apanel value
            determines which container we surface -- "create" -> signup
            panel, "signin" -> existing-login panel. We funnel through
            showLogin/showSignup so WHMCS's hidden inputCustType + the
@@ -2067,7 +2067,7 @@ button.generate-password:hover {
            sets a random password into both inputs and slides the
            container up so the user never sees what was generated. That
            leaves the user without a copy of their own password. Mirror
-           the hostnodes-apple flow instead: clicking .generate-password
+           the v18 client-area mockup flow instead: clicking .generate-password
            opens a modal that lets the user pick a length, see the
            generated password, copy it, and only then insert it into
            the password fields. */

@@ -3,7 +3,7 @@
  *
  * Replaces standard_cart's "silent prefill" behaviour (which just dumps a
  * random password into the password inputs and slides the section up so
- * the user never sees it). Instead, mirrors hostnodes-apple's pattern --
+ * the user never sees it). Instead, mirrors the v18 mockups' pattern --
  * click .generate-password, modal opens, user picks length, sees the
  * generated password, copies it AND inserts it into the target fields.
  *

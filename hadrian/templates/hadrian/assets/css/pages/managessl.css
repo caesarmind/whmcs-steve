@@ -1,5 +1,5 @@
-/* Manage SSL certificates (Apple-style) -- certificate list.
-   Ported from apple-client-area/managessl.html. Self-contained table. Prefix: .ssl-* */
+/* Manage SSL certificates -- certificate list.
+   Ported from the v18 client-area mockups. Self-contained table. Prefix: .ssl-* */
 
 .page-header { margin: 8px 0 24px; }
 .page-header .page-eyebrow { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 6px; }

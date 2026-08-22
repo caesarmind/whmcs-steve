@@ -1,4 +1,4 @@
-{* Hostnodes - Access denied (Apple-style): generic permission-denied notice.
+{* Hostnodes - Access denied: generic permission-denied notice.
    Optional WHMCS variable: $errormessage (specific reason).
 *}
 {assign var=dashIsEmpty value='full'}

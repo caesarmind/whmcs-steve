@@ -1,4 +1,4 @@
-{* Hostnodes — Security Settings (Apple-style) — clientarea.php?action=security.
+{* Hostnodes — Security Settings — clientarea.php?action=security.
 
    In WHMCS 9 this page carries ONLY Single Sign-On + third-party linked accounts
    (verified: nexus/clientareasecurity.tpl renders SSO only; lagom2 adds linked

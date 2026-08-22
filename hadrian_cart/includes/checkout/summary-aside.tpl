@@ -15,7 +15,7 @@
  * The Complete Order button uses HTML5 form="frmCheckout" attribute
  * to submit the form that lives in .co-left -- the button itself
  * sits outside the <form> in the DOM. Matches
- * apple-client-area/checkout.html.
+ * the v18 client-area checkout mockup.
  *}
 
 <aside>
@@ -77,7 +77,7 @@
         {/if}
 
         {* Complete Order lives inside the sticky summary card (mirrors
-           apple-client-area/checkout.html). The form= attribute binds
+           the v18 client-area checkout mockup). The form= attribute binds
            the button to the form even though it sits outside the
            <form> in the DOM. *}
         <div class="co-summary-footer">

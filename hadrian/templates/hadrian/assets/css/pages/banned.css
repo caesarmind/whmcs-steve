@@ -1,4 +1,4 @@
-/* Error / notice (Apple-style) -- IP-block page. Prefix: .err-*
+/* Error / notice -- IP-block page. Prefix: .err-*
    access-denied.css carries its own copy of the shared .err-* rules; this page
    diverged because it renders full-bleed (see core/pages/banned/default/default.php).
 

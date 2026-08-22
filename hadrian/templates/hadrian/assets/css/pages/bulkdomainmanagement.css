@@ -1,4 +1,4 @@
-/* Bulk domain management (Apple-style). Reuses global .card / .form-* / .btn-*.
+/* Bulk domain management. Reuses global .card / .form-* / .btn-*.
    Prefix: .bdm-* */
 
 .page-header { margin: 8px 0 20px; }

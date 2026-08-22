@@ -1,4 +1,4 @@
-{* Hostnodes — Get EPP / Transfer Code (Apple-style).
+{* Hostnodes — Get EPP / Transfer Code.
 
    WHMCS variables:
      $domain, $domainid

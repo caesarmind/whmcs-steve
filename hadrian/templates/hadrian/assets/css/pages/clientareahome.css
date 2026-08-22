@@ -1,5 +1,5 @@
 
-        /* --- Dashboard page heading (Apple) --- */
+        /* --- Dashboard page heading --- */
         .dash-heading { font-size: var(--text-h3); font-weight: var(--fw-semibold); letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 24px; }
 
         /* --- Two-column split layout -- main left, aside right (matches services pattern) --- */
@@ -117,7 +117,7 @@
         .shortcut-row:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
         .shortcut-row svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
 
-        /* --- Inline notice (Apple-subtle: surface-secondary + accent-tinted icon) --- */
+        /* --- Inline notice (subtle: surface-secondary + accent-tinted icon) --- */
         .notice { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-radius: var(--radius-md); background: var(--color-surface-secondary); border: 1px solid var(--color-border); font-size: var(--text-base); color: var(--color-text-primary); }
         .notice-ico { width: 22px; height: 22px; border-radius: 50%; background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
         .notice-ico svg { width: 12px; height: 12px; }
@@ -191,7 +191,7 @@
         body[data-data="empty"] .tile-c.red .tile-c-value,
         body[data-data="empty"] .tile-c.orange .tile-c-value { color: var(--color-text-tertiary); }
 
-        /* --- Tiles -- Variant D (single card, stacked rows -- Apple Settings feel) --- */
+        /* --- Tiles -- Variant D (single card, stacked rows -- grouped settings-list feel) --- */
         .tile-d-card { background: var(--color-surface); border: 1px solid var(--color-border-card); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-card); }
         .tile-d-row {
             display: flex; align-items: center; gap: 14px;
@@ -253,7 +253,7 @@
         body[data-data="empty"] .tile-f-ico.red,
         body[data-data="empty"] .tile-f-ico.orange { background: var(--color-surface-secondary); color: var(--color-text-tertiary); }
 
-        /* --- Tiles -- Variant E (progress ring, Apple Fitness-inspired) --- */
+        /* --- Tiles -- Variant E (progress ring, activity-tracker style) --- */
         .tiles-row-e { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
         @media (max-width: 880px) { .tiles-row-e { grid-template-columns: repeat(2, 1fr); } }
         .tile-e {

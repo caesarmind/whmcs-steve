@@ -1,5 +1,5 @@
 {* Store landing - E-mail Services (SpamExperts).
-   Ported from apple-client-area/email-services.html (Public/Marketing landing).
+   Ported from the v18 Email Services mockup (Public/Marketing landing).
    header.tpl/footer.tpl provide the shell + .content-area, so we emit only the
    inner content (page-header + when-full marketing + when-empty offline state).
 

@@ -1,4 +1,4 @@
-{* Hostnodes - User permissions (Apple-style).
+{* Hostnodes - User permissions.
 
    WHMCS v9 data (verified against Lagom/Nexus account-user-permissions.tpl):
      $user            - the sub-user being edited: ->id, ->email

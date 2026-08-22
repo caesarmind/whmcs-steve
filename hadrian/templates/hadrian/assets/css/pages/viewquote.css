@@ -1,5 +1,5 @@
-/* View quote (Apple-style) -- quote document + accept flow.
-   Ported from apple-client-area/viewquote.html. Prefix: .vq-* */
+/* View quote -- quote document + accept flow.
+   Ported from the v18 client-area mockups. Prefix: .vq-* */
 
 .page-header { margin: 8px 0 24px; }
 .page-header h1 { font-size: var(--text-h4); font-weight: var(--fw-semibold); letter-spacing: -0.025em; color: var(--color-text-primary); margin: 0 0 6px; line-height: 1.2; }

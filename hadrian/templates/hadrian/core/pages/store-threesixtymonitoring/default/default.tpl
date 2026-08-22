@@ -1,5 +1,5 @@
 {* Store landing - 360 Monitoring (site + server).
-   Ported from apple-client-area/monitoring-360.html (Public/Marketing landing).
+   Ported from the v18 360 Monitoring mockup (Public/Marketing landing).
    header.tpl/footer.tpl provide the shell + .content-area, so we emit only the
    inner content (page-header + when-full marketing + when-empty offline state).
 

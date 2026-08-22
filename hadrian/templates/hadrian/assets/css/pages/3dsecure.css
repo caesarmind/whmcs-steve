@@ -1,4 +1,4 @@
-/* 3D Secure verification (Apple-style) -- gateway 3DS iframe wrapper. Prefix: .tds-* */
+/* 3D Secure verification -- gateway 3DS iframe wrapper. Prefix: .tds-* */
 
 .page-header { margin: 8px 0 16px; text-align: center; }
 .page-header .page-eyebrow { font-size: var(--text-xs); font-weight: var(--fw-semibold); color: var(--color-text-tertiary); text-transform: uppercase; letter-spacing: 0.06em; margin: 0 0 6px; }

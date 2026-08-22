@@ -1,4 +1,4 @@
-{* Hostnodes - Email history (Apple-style): emails sent to the client.
+{* Hostnodes - Email history: emails sent to the client.
 
    WHMCS variables (cross-checked against Lagom clientareaemails.tpl):
      $emails - each: id, date, normalisedDate, subject, attachmentCount

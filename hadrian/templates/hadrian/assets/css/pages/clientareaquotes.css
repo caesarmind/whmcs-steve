@@ -101,7 +101,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 .q-main > .filter-tabs { margin-bottom: 8px; margin-top: 4px; flex-wrap: wrap; }
 .q-main .filter-tab { white-space: nowrap; }
 
-/* Stage-specific status pills (override apple-theme defaults) */
+/* Stage-specific status pills (override core-theme defaults) */
 .status-pill.draft     { background: var(--color-surface-secondary); color: var(--color-text-tertiary); }
 .status-pill.delivered { background: var(--color-blue-bg); color: var(--color-blue-text); }
 .status-pill.on-hold   { background: var(--color-orange-bg); color: var(--color-orange-text); }

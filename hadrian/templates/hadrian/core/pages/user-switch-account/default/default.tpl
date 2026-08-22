@@ -1,4 +1,4 @@
-{* Hostnodes — Switch Account (Apple-style).
+{* Hostnodes — Switch Account.
 
    WHMCS v9 data (verified against Nexus user-switch-account.tpl):
      $accounts                 — Eloquent Collection of WHMCS\Client\Client

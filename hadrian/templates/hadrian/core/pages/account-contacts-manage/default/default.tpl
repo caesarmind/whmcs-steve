@@ -1,4 +1,4 @@
-{* Hostnodes — Contacts (Apple-style).
+{* Hostnodes — Contacts.
 
    WHMCS v9 data (verified against Nexus account-contacts-manage.tpl):
      $contacts                 — Collection / array of { .id, .name, .email }

@@ -24,10 +24,10 @@
  *     Class names + nested .header > .cta > .price / .btn-add structure
  *     are queried by selector and CANNOT be renamed.
  *
- * Apple visual layer:
+ * Visual layer:
  *   - Modal surface restyled in style.min.css (rounded 14px, light
  *     border, subtle backdrop).
- *   - Heading typography lifted to Apple font-weight 600 / -0.024em.
+ *   - Heading typography lifted to font-weight 600 / -0.024em.
  *   - Inline .product-recommendation cards reuse the same shell as
  *     the inline ones in product-recommendations.tpl.
  *}

@@ -38,12 +38,12 @@
  *     toggles a parent class to flip between the two states).
  *   - .addon-renewals child wrapper with its own data-is-renewable.
  *
- * Apple visual layer:
+ * Visual layer:
  *   - Card surface, hairline border, light shadow inherited from
  *     style.min.css's .service-renewal restyling.
  *   - Status labels (.label-info / .label-warning) re-coloured as
- *     soft Apple status pills.
- *   - "Add to cart" button is restyled to the Apple secondary CTA.
+ *     soft themed status pills.
+ *   - "Add to cart" button is restyled to the theme's secondary CTA.
  *}
 
 {foreach $renewableItems as $renewableItem}

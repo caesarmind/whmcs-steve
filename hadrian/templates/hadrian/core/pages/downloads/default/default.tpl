@@ -1,6 +1,6 @@
-{* Hostnodes - Downloads (Apple-style): category browser + popular files.
+{* Hostnodes - Downloads: category browser + popular files.
 
-   Rendered in the Hostnodes Apple visual language; content model from the WHMCS
+   Rendered in the Hostnodes visual language; content model from the WHMCS
    standard downloads vars (cross-checked against Lagom downloads.tpl).
 
    WHMCS standard variables expected:

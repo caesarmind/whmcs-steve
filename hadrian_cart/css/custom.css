@@ -1,5 +1,5 @@
 /*
- * hadrian_cart -- Apple-themed Order-form / Cart theme for WHMCS 9
+ * hadrian_cart -- Hadrian Order-form / Cart theme for WHMCS 9
  * --------------------------------------------------------------
  * Inherits the Nexus cart SPA (Vue.js) and only overrides the
  * Shadow-DOM CSS variables it exposes (`--vl-*`).
@@ -54,7 +54,7 @@
     --vl-info-lifted:           var(--color-blue-bg, rgba(0, 113, 227, 0.08));
     --vl-info-accented:         var(--color-link, #0066cc);
 
-    /* Notice (Apple purple/indigo). NOT bridged, in either mode: the theme's
+    /* Notice (purple/indigo). NOT bridged, in either mode: the theme's
        status palette is green/orange/red/blue/gray only, and its purples
        (--color-icon-indigo, --color-block-1) are a sidebar icon tile and a
        free dashboard-block slot -- neither is a notice colour. */
@@ -109,7 +109,7 @@
     --vl-bg-accented:           var(--color-accent-light, rgba(0, 113, 227, 0.08));
     --vl-bg-inverted:           var(--color-text-primary, #1d1d1f);          /* inverted bg */
 
-    /* Typography sizes (Apple-tight scale) */
+    /* Typography sizes (tight scale) */
     --vl-text-xs:               11.5px;
     --vl-text-sm:               12.5px;
     --vl-text-md:               13.5px;
@@ -120,7 +120,7 @@
     --vl-outline-md:            12px;
     --vl-outline-lg:            16px;
 
-    /* Rounding (Apple uses soft 12-14px corners) */
+    /* Rounding (soft 12-14px corners) */
     --vl-rounding-sm:           8px;
     --vl-rounding-md:           12px;
     --vl-rounding-lg:           14px;
@@ -161,7 +161,7 @@
 /* Wrapper-page styling. The Nexus cart SPA renders inside
    #order-standard_cart, but the page chrome around it (header,
    breadcrumb, footer from standard_cart/common.tpl) is regular DOM.
-   Style it with the same Apple tokens so the seam between SPA and
+   Style it with the same theme tokens so the seam between SPA and
    wrapper is invisible. */
 body {
     font-family: system-ui, 'Helvetica Neue', Helvetica, Arial, sans-serif;
@@ -176,7 +176,7 @@ body {
     background: var(--vl-bg);
 }
 
-/* Apple-style links inside the wrapper */
+/* Themed links inside the wrapper */
 a {
     color: var(--vl-primary);
     text-decoration: none;
@@ -186,7 +186,7 @@ a:hover {
     color: var(--vl-primary-accented);
 }
 
-/* Apple-style focus ring on tabbable inputs */
+/* Accent focus ring on tabbable inputs */
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,

@@ -1,4 +1,4 @@
-{* Hostnodes - Ticket submitted (Apple-style): post-submit confirmation.
+{* Hostnodes - Ticket submitted: post-submit confirmation.
    WHMCS variables (Lagom supportticketsubmit-confirm.tpl): $tid (ticket id/mask), $c (verification hash).
 *}
 {assign var=tkTid value=$tid|default:''}

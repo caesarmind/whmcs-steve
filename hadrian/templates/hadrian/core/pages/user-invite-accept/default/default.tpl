@@ -1,4 +1,4 @@
-{* Hostnodes — Accept Sub-User Invitation (Apple-style), wired to the WHMCS invite flow.
+{* Hostnodes — Accept Sub-User Invitation, wired to the WHMCS invite flow.
 
    WHMCS standard variables on the invite route:
      $invite             — invitation object: ->getClientName(), ->getSenderName(), ->token

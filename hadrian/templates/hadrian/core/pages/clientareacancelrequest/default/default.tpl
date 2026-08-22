@@ -1,4 +1,4 @@
-{* Hostnodes - Cancel service request (Apple-style).
+{* Hostnodes - Cancel service request.
 
    WHMCS variables (cross-checked against Lagom clientareacancelrequest.tpl):
      $invalid    - bool: invalid product

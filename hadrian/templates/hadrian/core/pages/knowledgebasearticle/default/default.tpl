@@ -1,4 +1,4 @@
-{* Hostnodes — Knowledgebase Article (Apple-style).
+{* Hostnodes — Knowledgebase Article.
 
    WHMCS standard variables expected:
      $kbarticle        — the article: id, title, text, views, parentlink

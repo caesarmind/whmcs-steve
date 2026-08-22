@@ -1,4 +1,4 @@
-{* Hostnodes — Knowledgebase root (Apple-style).
+{* Hostnodes — Knowledgebase root.
 
    WHMCS standard variables expected:
      $kbcats     — array of top-level categories: id, name, description, numarticles

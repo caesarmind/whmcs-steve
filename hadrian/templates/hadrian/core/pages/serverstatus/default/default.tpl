@@ -1,7 +1,7 @@
-{* Hostnodes - Server Status (Apple-style status page).
+{* Hostnodes - Server Status (status page).
 
    Combines the WHMCS standard "six" theme + Lagom data model, rendered in the
-   Hostnodes Apple visual language.
+   Hostnodes visual language.
 
    WHMCS standard variables expected:
      $servers      - array keyed by $num, each: name, phpinfourl
@@ -306,7 +306,7 @@
 (function () {
     // Self-contained port + stats checks against the standard WHMCS serverstatus
     // endpoints (same request params as WHMCS's own checkPort/getStats), rendered
-    // as Apple-style status dots. hadrian loads no jQuery/scripts.js, so the
+    // as themed status dots. hadrian loads no jQuery/scripts.js, so the
     // checkPort/getStats globals don't exist here -- reimplement them in vanilla JS.
 
     // WHMCS's ping response varies by version (plain text, on/off gif, or a Font

@@ -1,4 +1,4 @@
-{* Hostnodes - View email (Apple-style): standalone popup window.
+{* Hostnodes - View email: standalone popup window.
 
    viewemail.php opens in a popup and does NOT load the client-area chrome, so this
    tpl emits its own HTML document (like Lagom's viewemail.tpl) and loads core-theme.css

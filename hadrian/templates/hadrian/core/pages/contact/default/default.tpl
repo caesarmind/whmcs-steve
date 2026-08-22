@@ -1,4 +1,4 @@
-{* Hostnodes — Contact Us (Apple-style).
+{* Hostnodes — Contact Us.
 
    WHMCS standard variables on /contact.php:
      $departments  — array of public departments (id, name)

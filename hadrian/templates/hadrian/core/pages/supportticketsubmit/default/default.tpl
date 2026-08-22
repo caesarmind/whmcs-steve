@@ -1,4 +1,4 @@
-{* Hostnodes — Submit a Ticket (Apple-style).
+{* Hostnodes — Submit a Ticket.
 
    WHMCS standard variables on /submitticket.php:
      $departments        — array of departments (id, name, description)

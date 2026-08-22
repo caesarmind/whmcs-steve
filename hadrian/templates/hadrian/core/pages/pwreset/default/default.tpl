@@ -1,4 +1,4 @@
-{* Hostnodes — Password Reset (Apple-style), wired to WHMCS's ROUTED reset flow.
+{* Hostnodes — Password Reset, wired to WHMCS's ROUTED reset flow.
 
    WHMCS renders the `password-reset-container` shell template and exposes:
      $innerTemplate    — current step: 'email-prompt' | 'security-prompt' | 'change-prompt'

@@ -1,4 +1,4 @@
-{* Hostnodes - Configure SSL, complete (Apple-style): submission result + validation steps.
+{* Hostnodes - Configure SSL, complete: submission result + validation steps.
 
    WHMCS variables (cross-checked against Lagom configuressl-complete.tpl):
      $errormessage - error HTML (if configuration failed)

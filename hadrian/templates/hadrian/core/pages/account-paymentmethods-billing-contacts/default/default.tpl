@@ -1,4 +1,4 @@
-{* Hostnodes - Billing contacts (Apple-style): recipients copied on billing emails.
+{* Hostnodes - Billing contacts: recipients copied on billing emails.
 
    WHMCS exposes billing contacts through the account contacts system. We iterate
    $contacts (id, name, email) defensively and fall back to the empty state.

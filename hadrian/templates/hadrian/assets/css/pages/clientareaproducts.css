@@ -1,10 +1,10 @@
 /* ----------------------------------------------------------------------
-   clientareaproducts.css -- extracted from apple-client-area/clientareaproducts.html
+   clientareaproducts.css -- extracted from the v18 client-area mockups
    Loaded by core/pages/clientareaproducts/default/default.tpl
    ---------------------------------------------------------------------- */
 
 
-/* Page header -- Apple-leaning: bigger, tighter title, no uppercase eyebrow, subtle CTA */
+/* Page header -- bigger, tighter title, no uppercase eyebrow, subtle CTA */
 .page-header { margin: 8px 0 32px; }
 .page-header h1 {
     font-size: var(--text-h2); font-weight: var(--fw-semibold); letter-spacing: -0.028em;
@@ -143,7 +143,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .svc-search input:focus {
     background: var(--color-surface); border-color: var(--color-accent);
 }
-/* Minimal filter-select styled like an Apple text-button with chevron */
+/* Minimal filter-select styled like a borderless text-button with chevron */
 .svc-view-select {
     height: 32px; padding: 0 26px 0 12px; margin: 0;
     font: inherit; font-size: var(--text-base); font-weight: var(--fw-medium);
@@ -324,7 +324,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .svc-menu-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
 .svc-menu-item:hover svg { color: var(--color-accent); }
 
-/* Pagination footer -- transparent, borderless, Apple-faithful */
+/* Pagination footer -- transparent, borderless */
 .svc-footer {
     display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
     padding: 12px 20px;

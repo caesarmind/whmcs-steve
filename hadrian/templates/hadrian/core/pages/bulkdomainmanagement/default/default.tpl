@@ -1,4 +1,4 @@
-{* Hostnodes - Bulk domain management (Apple-style).
+{* Hostnodes - Bulk domain management.
 
    WHMCS variables (cross-checked against Lagom bulkdomainmanagement.tpl):
      $update    - 'nameservers' | 'autorenew' | 'reglock' | 'contactinfo'

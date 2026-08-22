@@ -15,7 +15,7 @@
  *   - Express-checkout branch ({else}) emits $expressCheckoutOutput
  *     verbatim so the gateway's own checkout button renders.
  *
- * Outer .co-payment-card class applies Apple chrome via the CSS in
+ * Outer .co-payment-card class applies the card chrome via the CSS in
  * checkout.tpl. Mirrors lagom2's /includes/viewcart/form-payment-gateway.tpl.
  *}
 
@@ -28,7 +28,7 @@
     {$LANG.ordertotalduetoday}: &nbsp; <strong id="totalCartPrice">{$total}</strong>
 </div>
 
-{* Apply-credit choice -- rendered as Apple option cards (.ac-radio circle +
+{* Apply-credit choice -- rendered as rounded option cards (.ac-radio circle +
    .ac-text); the visual lives in #applyCreditContainer CSS in checkout.tpl. *}
 <div id="applyCreditContainer" class="apply-credit-container{if !$canUseCreditOnCheckout} w-hidden{/if}" data-apply-credit="{$applyCredit}">
     <p>{lang key='cart.availableCreditBalance' amount=$creditBalance}</p>

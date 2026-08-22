@@ -1,5 +1,5 @@
 {* Store landing - SSL Certificates.
-   Ported from apple-client-area/ssl-certificates.html (Public/Marketing
+   Ported from the v18 SSL Certificates mockup (Public/Marketing
    landing). The source is a full standalone page; header.tpl/footer.tpl
    already provide html/head/nav/breadcrumb/footer + the .content-area
    wrapper, so we emit only the inner content (page-header + when-full

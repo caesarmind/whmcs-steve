@@ -1,5 +1,5 @@
 {* Store landing - Website Backup (CodeGuard).
-   Ported from apple-client-area/website-backup.html (Public/Marketing
+   Ported from the v18 Website Backup mockup (Public/Marketing
    landing). header.tpl/footer.tpl provide the shell + .content-area, so we
    emit only the inner content (page-header + when-full marketing + when-empty
    offline state).

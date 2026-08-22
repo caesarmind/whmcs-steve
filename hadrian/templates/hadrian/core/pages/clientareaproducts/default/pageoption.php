@@ -6,7 +6,7 @@
  */
 return [
     'display_name' => 'Default',
-    'description'  => 'Service grid with status filters sidebar and Apple-style cards.',
+    'description'  => 'Service grid with status filters sidebar and themed cards.',
     'preview'      => 'thumb.png',
     'settings'     => [
         'viewMode' => [

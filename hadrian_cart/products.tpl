@@ -74,7 +74,7 @@
  * minor versions returned arrays here while newer ones return models.
  *
  * CSS: every class used here lives in hadrian_cart/css/style.min.css
- * (.st-* tokens) which is loaded by common.tpl. The Apple primitives
+ * (.st-* tokens) which is loaded by common.tpl. The shared primitives
  * `.card`, `.btn-primary`, `.btn-secondary` live in the same sheet.
  *}
 

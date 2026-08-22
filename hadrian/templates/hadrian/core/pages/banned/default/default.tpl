@@ -1,4 +1,4 @@
-{* Hostnodes - Account banned (Apple-style): ban notification.
+{* Hostnodes - Account banned: ban notification.
    Optional WHMCS variables: $banreason, $banexpires.
 *}
 {assign var=dashIsEmpty value='full'}

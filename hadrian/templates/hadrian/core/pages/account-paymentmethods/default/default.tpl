@@ -1,4 +1,4 @@
-{* Hostnodes — Payment Methods (Apple-style).
+{* Hostnodes — Payment Methods.
 
    WHMCS v9 data (verified against Nexus account-paymentmethods.tpl):
      $client                   — WHMCS\Client\Client model; payment methods live

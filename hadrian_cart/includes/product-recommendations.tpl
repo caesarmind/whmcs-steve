@@ -35,7 +35,7 @@
  *   - Pricing string emitted via $price->price()->toFull() or
  *     $price->breakdownPrice() depending on cycle.
  *
- * Apple visual layer comes from style.min.css restyling
+ * The visual layer comes from style.min.css restyling
  * .product-recommendation, .product-added-panel, .btn-add. No new
  * class hooks are required here.
  *}

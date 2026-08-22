@@ -6,7 +6,7 @@
  *
  * WHAT A STYLE IS, IN THIS SET
  * A palette and nothing more. Every value below comes from the v18 mockup's own
- * html[data-palette="slate"] block in apple-client-area/css/apple-layout.css,
+ * html[data-palette="slate"] block in its layout stylesheet,
  * read by the generator rather than retyped, so the brand colour a buyer picks
  * here is exactly the one they saw in the demo.
  *

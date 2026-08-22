@@ -1,4 +1,4 @@
-{* Hostnodes — User Security / Two-Factor (Apple-style) — /user/security.
+{* Hostnodes — User Security / Two-Factor — /user/security.
 
    This is the REAL account-security page (unlike clientarea.php?action=security,
    which only carries SSO + linked accounts). WHMCS feeds 2FA + security-question

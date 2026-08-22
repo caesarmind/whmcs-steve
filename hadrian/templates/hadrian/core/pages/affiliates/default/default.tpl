@@ -1,7 +1,7 @@
-{* Hostnodes - Affiliate dashboard (Apple-style).
+{* Hostnodes - Affiliate dashboard.
 
    Combines the WHMCS standard "six" theme + Lagom data model, rendered in the
-   Hostnodes Apple visual language.
+   Hostnodes visual language.
 
    WHMCS standard variables expected:
      $inactive             - affiliate program disabled

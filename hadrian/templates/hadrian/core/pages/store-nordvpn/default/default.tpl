@@ -1,5 +1,5 @@
 {* Store landing - NordVPN.
-   Ported from apple-client-area/nordvpn.html (Public/Marketing landing).
+   Ported from the v18 NordVPN mockup (Public/Marketing landing).
    header.tpl/footer.tpl provide the shell + .content-area, so we emit only the
    inner content (page-header + when-full marketing + when-empty offline state).
 

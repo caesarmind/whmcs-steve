@@ -1,4 +1,4 @@
-{* Hostnodes — User Management (Apple-style), Lagom-parity UX.
+{* Hostnodes — User Management, Lagom-parity UX.
 
    WHMCS v9 data (verified against Nexus + Lagom):
      $users        — Eloquent Collection of WHMCS\User\User models

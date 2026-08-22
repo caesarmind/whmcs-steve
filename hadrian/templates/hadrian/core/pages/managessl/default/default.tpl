@@ -1,4 +1,4 @@
-{* Hostnodes - Manage SSL certificates (Apple-style): certificate list.
+{* Hostnodes - Manage SSL certificates: certificate list.
 
    WHMCS variables (cross-checked against Nexus managessl.tpl, WHMCS 9):
      $sslProducts  - collection of SslProduct objects, each:

@@ -1,4 +1,4 @@
-{* Hostnodes — My Domains list (Apple-style).
+{* Hostnodes — My Domains list.
 
    WHMCS standard variables expected:
      $domains          — array, each: id, domain, registrationdate, expirydate,

@@ -17,7 +17,7 @@
     margin: 0 auto; max-width: 440px;
 }
 
-/* Auth card -- centered Apple-style panel */
+/* Auth card -- centered panel */
 .auth-card-wrap { max-width: 440px; margin: 8px auto 32px; }
 .auth-card {
     background: var(--color-surface);

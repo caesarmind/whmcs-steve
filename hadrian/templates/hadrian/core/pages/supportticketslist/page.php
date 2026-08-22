@@ -7,5 +7,5 @@ return [
     'group'        => 'Support',
     'type'         => 'client-area',
     'listDisplay'  => true,
-    'description'  => 'Client support ticket list with status filters and Apple-style rows.',
+    'description'  => 'Client support ticket list with status filters and themed rows.',
 ];

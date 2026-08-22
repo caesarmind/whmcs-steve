@@ -1,4 +1,4 @@
-{* Hostnodes - Configure SSL, step 1 (Apple-style): server type + CSR + admin contact.
+{* Hostnodes - Configure SSL, step 1: server type + CSR + admin contact.
 
    WHMCS SSL-configuration variables (cross-checked against Lagom configuressl-stepone.tpl):
      $status          - cert state; the form shows on 'Awaiting Configuration'

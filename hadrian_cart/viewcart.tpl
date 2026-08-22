@@ -1,7 +1,7 @@
 {*
- * hadrian_cart/viewcart.tpl -- Apple visual rebuild
+ * hadrian_cart/viewcart.tpl -- Hadrian visual rebuild
  *
- * Visual source: apple-client-area/cart.html
+ * Visual source: the v18 client-area cart mockup
  *   Shell    = .content-area > header.page-header + .ct-steps + .ct-split
  *              .ct-split (1fr / 360px grid):
  *                LEFT  .card.ct-product per cart line (head, addon rows,
@@ -63,8 +63,8 @@
     <script type="text/javascript" src="{$BASE_PATH_JS}/StatesDropdown.js"></script>
 
     <style>{literal}
-    /* ─── Page-local Apple skin for /cart.php?a=view ───────────────────
-       Mirrors apple-client-area/cart.html's inline <style>. Kept inline
+    /* ─── Page-local skin for /cart.php?a=view ─────────────────────────
+       Mirrors the v18 client-area cart mockup's inline <style>. Kept inline
        so it cannot conflict with hadrian's global style.min.css and so
        a stale CSS cache can't strand the page in the old Bootstrap look. */
 
@@ -508,7 +508,7 @@
     .ct-hookout { margin-top: 12px; }
 
     /* "Recommended for you" offers card (mockup .ct-recommend-*) -- wraps
-       the third-party $hookOutput so it sits in an Apple card with a
+       the third-party $hookOutput so it sits in a themed card with a
        proper header strip instead of bleeding raw HTML into the layout. */
     .ct-recommend { padding: 0; }
     .ct-recommend-head {
@@ -749,7 +749,7 @@
        The TPL uses Bootstrap's .modal markup but the hadrian bundle
        doesn't ship Bootstrap's modal positioning, so the dialog used
        to drop in-flow at the bottom of the page. Re-implement just
-       enough to render it as a centered overlay with the same Apple
+       enough to render it as a centered overlay with the same rounded
        card chrome used elsewhere -- backdrop blur, soft shadow, no
        chrome-borrowed icons. Bootstrap's JS (jQuery.modal) already
        toggles `.show` / inline `display: block` and inserts the
@@ -1322,7 +1322,7 @@
                 </div>
 
                 {* ─── Hook output (3rd-party additions to the cart body) ───
-                   Wrapped in the Apple .ct-recommend offers card so the
+                   Wrapped in the .ct-recommend offers card so the
                    third-party HTML sits inside a styled "Recommended for
                    you" panel instead of bleeding raw markup into the
                    layout. The hook content itself stays untouched -- it

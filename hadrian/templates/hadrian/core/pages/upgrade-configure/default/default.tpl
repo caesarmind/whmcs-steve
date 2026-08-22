@@ -1,4 +1,4 @@
-{* Hostnodes - Configure upgrade (Apple-style): pick target plan + see proration.
+{* Hostnodes - Configure upgrade: pick target plan + see proration.
 
    NOTE: 'upgrade-configure' is not a standard WHMCS templatefile (WHMCS drives the
    upgrade flow through 'upgrade' + 'upgradesummary'). This page renders the design

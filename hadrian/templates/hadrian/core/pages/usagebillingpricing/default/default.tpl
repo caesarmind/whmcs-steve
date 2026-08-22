@@ -1,4 +1,4 @@
-{* Hostnodes - Usage billing pricing (Apple-style): metered resource rates.
+{* Hostnodes - Usage billing pricing: metered resource rates.
 
    WHMCS variables: Lagom exposes usagebillingpricing.tpl as a per-metric modal
    ($metric: displayName, unitName, pricing[] {from, price_per_unit},

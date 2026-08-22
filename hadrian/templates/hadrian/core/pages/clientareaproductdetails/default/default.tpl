@@ -1,4 +1,4 @@
-{* Hostnodes — Service Details (Apple-style).
+{* Hostnodes — Service Details.
 
    WHMCS exposes the service variables as TOP-LEVEL (not as a $service or
    $product object). Verified against Nexus and Lagom — these are the
@@ -28,7 +28,7 @@
                                                  array only exists on upgradesummary)
 
    Layout: single stacked column of standard settings-group / card sections
-   (parity with the apple-client-area mockup). settings-group + card respond
+   (parity with the v18 client-area mockups). settings-group + card respond
    to the preview chip's Controls inside/outside (core-layout.css svc-layout).
 *}
 
@@ -104,7 +104,7 @@
    (Information / Addons / Change Password / Downloads) and "Service Details
    Actions" (Login to cPanel / Webmail, Change Password, Cancel, Upgrade,
    Renew) — the exact menus Lagom iterates in includes/sidebar.tpl. We render
-   them Apple-styled; WHMCS's tab-toggle items (built for a tabbed page) are
+   them restyled; WHMCS's tab-toggle items (built for a tabbed page) are
    remapped to hadrian's stacked-section anchors. If the theme context doesn't
    expose a populated $primarySidebar, we fall back to the hand-coded rail so
    the sidebar is never empty. *}
@@ -250,7 +250,7 @@
 {* ── License Details (Software Licensing module output) ──────────────────
    hadrian replaced the raw $moduleclientarea dump with hosting status-cards
    (see the Manage card below), which hid the licensing module's panel. Render
-   it here for any non-cPanel module service (licensing etc.), Apple-styled. *}
+   it here for any non-cPanel module service (licensing etc.), restyled. *}
 {if !empty($moduleclientarea) && !$pdIsCpanelSvc}
 <style>{literal}
 #pd-license .section-header,#pd-license .section-title{display:none}
@@ -391,7 +391,7 @@
 {/if}
 
 {* ── Quick Shortcuts (cPanel feature launchpad) ──────────────────────
-   Native Apple-styled grid of cPanel feature deep-links via WHMCS single
+   Native theme-styled grid of cPanel feature deep-links via WHMCS single
    sign-on app tokens (dosinglesignon=1&app=<token>), the same tokens the
    cPanel module's own overview.tpl emits. Shown only for active cPanel
    services. Labels are hardcoded English -- the cPanel module's

@@ -23,7 +23,7 @@
  * (Create an account / I already have one). The tab clicks fall
  * through to the same showLogin/showSignup helpers in checkout.tpl's
  * IIFE, so the legacy w-hidden + inputCustType wiring stays intact.
- * Mirrors apple-client-area/checkout.html lines 1005-1085.
+ * Mirrors the v18 client-area checkout mockup, lines 1005-1085.
  *
  * Logged-in users skip the card entirely (the existing-account
  * picker covers their flow).
@@ -85,7 +85,7 @@
 
 {* ─── Account card (guest only): Create-account / Sign-in tabs ───
    Wraps WHMCS's #containerExistingUserSignin and #containerNewUserSignup
-   in an Apple-style card with a two-tab switcher. The tab state mirrors
+   in a rounded card with a two-tab switcher. The tab state mirrors
    the legacy .w-hidden toggle so scripts.min.js stays happy. Logged-in
    users skip the card entirely (the existing-account picker above
    already covers their flow). *}

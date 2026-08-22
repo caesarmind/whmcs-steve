@@ -1,4 +1,4 @@
-{* Hostnodes — Sign in page (Apple-style centered card).
+{* Hostnodes — Sign in page (centered card).
 
    WHMCS standard variables expected:
      $token             — CSRF token for the login form

@@ -10,7 +10,7 @@
  */
 return [
     'display_name' => 'Default',
-    'description'  => 'Forwarder to supporttickets/default — same Apple-style rows + filter sidebar.',
+    'description'  => 'Forwarder to supporttickets/default — same themed rows + filter sidebar.',
     'preview'      => 'thumb.png',
     'settings'     => [],
 ];
