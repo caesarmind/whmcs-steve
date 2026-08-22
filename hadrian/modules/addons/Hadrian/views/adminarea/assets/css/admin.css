@@ -691,16 +691,6 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-affix { position: relative; display: block; }
 .mt-affix .mt-input { padding-right: 32px !important; }
 .mt-affix-unit { position: absolute; right: 11px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--mt-text-3); pointer-events: none; }
-/* Styles > Navigation. A near-twin of .mt-typo-grid rather than a reuse of it,
-   for one measured reason: every field here carries a sentence underneath
-   ("Applies to the Sidebar and Icon Rail layouts. Default 44px.") derived from
-   the layout manifests, and 148px columns wrap that to four lines. 210px fits
-   it in two. The caption is the whole point of the panel -- it is what tells an
-   admin whether the number they are about to change affects the layout they
-   actually run -- so the grid bends to it, not the other way round. */
-.mt-nav-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 14px 14px; }
-.mt-nav-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
-.mt-nav-applies { font-size: 11px; line-height: 1.45; color: var(--mt-text-3); }
 /* Google Font picker -- searchable combobox over the full ~1,900-family
    library (core/config/google-fonts.json).
 

@@ -45,7 +45,7 @@ function Hadrian_config()
         'description' => 'Manages Hadrian client-area templates. <a href="https://your-domain.com/" target="_blank">Learn more</a>',
         'author'      => '<a href="https://your-domain.com" target="_blank">Your Studio</a>',
         'language'    => 'english',
-        'version'     => '1.2.1',
+        'version'     => '1.2.2',
         'fields'      => [
             'dbrollback' => [
                 'FriendlyName' => 'Database Clear',

@@ -32,29 +32,20 @@
     <section class="mt-section">
         {foreach $navigation.groups as $groupName => $fields}
         <div class="mt-typo-group-label">{$groupName|escape}</div>
-        {* Its own grid, not .mt-typo-grid: these fields carry a sentence
-           underneath ("Applies to the Sidebar and Icon Rail layouts") and
-           148px columns wrap it to four lines. *}
-        <div class="mt-nav-grid">
-            {foreach $fields as $f}
-            <div class="mt-nav-field">
-                <label class="mt-typo-field-label" for="nv{$f.var|replace:'--':'_'}">{$f.label|escape}</label>
+        {foreach $fields as $f}
+            {* Derived from which layout manifests name this token in their
+               `sizes` array, NOT typed here -- so it stays true when a layout
+               is added, retired or dropped in. A token no layout claims gets
+               a plain default-only caption rather than an invented one. *}
+            {capture name="mtNavTip"}{if $f.applies}Applies to the {$f.applies} {if $f.plural}layouts{else}layout{/if}. Default {$f.default}px.{else}Default {$f.default}px.{/if}{/capture}
+            <div class="mt-row">
+                <div class="mt-row-label mt-tip-line">{$f.label|escape} {include file="includes/tip.tpl" text=$smarty.capture.mtNavTip article="styles" anchor="navigation"}</div>
                 <span class="mt-affix">
                     <input type="number" id="nv{$f.var|replace:'--':'_'}" name="nav[{$f.var}]" class="mt-input mt-input-compact" value="{$f.value}" data-default="{$f.default}" min="0" max="4000" step="1" inputmode="numeric">
                     <span class="mt-affix-unit">px</span>
                 </span>
-                {* Derived from which layout manifests name this token in their
-                   `sizes` array, NOT typed here -- so it stays true when a
-                   layout is added, retired or dropped in. A token no layout
-                   claims prints no caption rather than an invented one. *}
-                {if $f.applies}
-                    <span class="mt-nav-applies">Applies to the {$f.applies|escape} {if $f.plural}layouts{else}layout{/if}. Default {$f.default}px.</span>
-                {else}
-                    <span class="mt-nav-applies">Default {$f.default}px.</span>
-                {/if}
             </div>
-            {/foreach}
-        </div>
+        {/foreach}
         {/foreach}
     </section>
 
