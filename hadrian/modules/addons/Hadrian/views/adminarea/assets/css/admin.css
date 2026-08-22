@@ -65,7 +65,7 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 
     background: var(--mt-bg);
     color: var(--mt-text);
-    font-family: system-ui, "Open Sans", "Segoe UI", sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Open Sans", "Segoe UI", system-ui, sans-serif;
     font-size: 14px;
     line-height: 1.5;
     -webkit-font-smoothing: antialiased;

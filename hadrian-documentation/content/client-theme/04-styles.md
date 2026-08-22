@@ -171,14 +171,15 @@ One typeface is applied across the whole client area - there is no separate head
 
 The shipped stack, and the only mode that writes no variable at all - the value already in the theme's stylesheet stands.
 
-That value asks for the visitor's own system font first, so each platform uses its native face. Everywhere it does not recognise, it falls through to **Inter**, which ships inside the theme and is already declared, so nothing is fetched over the network.
+That value asks for San Francisco first, so Apple devices use their system face. Everywhere else it falls through to **Inter**, which ships inside the theme and is already declared, so nothing is fetched over the network.
 
 ```css
-system-ui, 'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
-'Helvetica Neue', Helvetica, Arial, sans-serif
+-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text',
+'Inter', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Helvetica Neue',
+Helvetica, Arial, sans-serif
 ```
 
-Leave it here unless you have a brand typeface. It is the fastest of the four and looks native on every platform.
+Leave it here unless you have a brand typeface. It is the fastest of the four and looks native on Apple hardware.
 
 #### System fonts
 
@@ -187,10 +188,10 @@ Leave it here unless you have a brand typeface. It is the fastest of the four an
 Every visitor sees their own operating system's interface font. Segoe UI on Windows, San Francisco on Mac and iOS, the system default on Linux.
 
 ```css
-system-ui, 'Segoe UI', Roboto, sans-serif
+system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif
 ```
 
-`system-ui` is the modern keyword for "whatever this OS uses for its own interface" - the same three faces named above, resolved with one keyword instead of one per platform.
+`system-ui` is the modern keyword for "whatever this OS uses for its own interface". `-apple-system` follows it only as a backstop for older Safari.
 
 No `<link>` and no `@font-face` are emitted, so **nothing downloads at all**.
 
@@ -198,7 +199,7 @@ No `<link>` and no `@font-face` are emitted, so **nothing downloads at all**.
 Text paints on the first frame because there is no font to wait for, and the client area matches the surrounding OS. Pick this when speed matters more than exact brand typography.
 :::
 
-In practice this looks almost identical to **Default** - both lead with `system-ui`, so most visitors see the same face either way. The difference is in the fallback tail: Default's stack ends in Inter, bundled with the theme, for the rare browser that does not recognise `system-ui`; System fonts has no such backstop.
+The difference from **Default** is narrow but real: Default prefers Inter on Windows and Linux, giving you the same face across non-Apple platforms; System fonts gives each platform its own.
 
 #### Google Font
 
@@ -260,13 +261,13 @@ Hadrian looks for `woff2`, `woff`, `ttf` and `otf`, in that order, and uses the 
 The rule declares `font-weight: 100 900`, which is correct for a **variable** font and wrong for a static one. Upload a variable file if you have it. With a static single-weight file the browser will synthesise the other weights, and bold text will look smeared.
 :::
 
-**Keep the device's own system font first** is offered on this mode only. Ticking it puts `system-ui` at the front of the stack, so every visitor's own OS font - San Francisco on Mac and iOS, Segoe UI on Windows, and so on - takes priority everywhere, with your uploaded font as the fallback behind it. Useful when you would rather every platform keep its native feel and only fall back to your brand font where the browser cannot resolve a system font at all.
+**Keep the device's system font on Apple** is offered on this mode only. Ticking it puts `-apple-system, BlinkMacSystemFont` at the front of the stack, so Apple devices keep San Francisco and your face is used everywhere else - useful when your brand font exists mainly to replace the plain Windows default.
 
 #### How it's written into the system
 
 Three of the four modes show this field beneath them - System fonts, Google Font and Self-hosted font. Default has none, because (as above) it writes no variable at all. Where it appears, it is **editable, not a preview**: whatever it contains is exactly what gets written to `--font-family`.
 
-The two halves are independent. The radio button decides what gets **loaded** - the Google stylesheet, the `@font-face`, or nothing. This field decides what gets **applied**. That is what lets the system-font-first trick on Self-hosted font work: the uploaded font still downloads, but the stack asks for the visitor's own OS font first, so only a browser that cannot resolve `system-ui` at all ever falls through to it.
+The two halves are independent. The radio button decides what gets **loaded** - the Google stylesheet, the `@font-face`, or nothing. This field decides what gets **applied**. That is what lets the Apple-first trick work: the font still downloads, but the stack asks for San Francisco first, so only non-Apple devices ever use it.
 
 Edit it if you need a fallback the defaults do not give you - a specific CJK face, say, or a monospace stack. Only letters, digits, spaces, commas, quotes and hyphens ever reach the live page; anything else is silently dropped whenever the front-end page head is built, not when you save the form.
 
