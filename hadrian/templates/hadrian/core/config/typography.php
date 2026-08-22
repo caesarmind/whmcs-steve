@@ -59,6 +59,40 @@ return [
         ],
     ],
 
+    // Line-height tokens (unitless ratios). Same reason the sizes are editable:
+    // a buyer who switches font family gets a different x-height, and the
+    // leading that suited the shipped face is wrong for a taller or shorter one.
+    //
+    // Values MUST mirror the --lh-* ramp in assets/css/core-theme.css :root, and
+    // that ramp was picked to match the leading the theme already used, so the
+    // defaults render exactly as before. `default` is a FLOAT here, not an int:
+    // 1.47059 is body's historical ratio (25px at the 17px root), kept verbatim
+    // rather than rounded to 1.5 so nothing shifts.
+    //
+    // Field shape mirrors 'weights' (flat list, var/label/default) because this
+    // is one ungrouped ramp, not a grouped size table.
+    //
+    // WIRING STATUS: schema only. The admin panel and the emitter both iterate
+    // fixed buckets, so three additions in the addon are needed before the
+    // fields render and emit -- each is the line-height twin of an existing
+    // 'weights' branch:
+    //   1. StylesController::buildTypographyViewModel  -- read a 'lineHeights'
+    //      stored bucket and pass it to the view (guard the cast as float).
+    //   2. StylesController::saveTypographyAction      -- validate against
+    //      lineHeightMin/Max and persist only values differing from default.
+    //   3. Hooks::buildTypographyHead                  -- add 'lineHeights' to
+    //      the ['sizes' => 'px', 'weights' => ''] bucket loop with a '' unit
+    //      AND a float cast; the (int) cast that loop uses today would turn
+    //      1.5 into 1 and collapse every line of text.
+    // Until then the ramp is still useful: the tokens exist in the CSS, so a
+    // buyer can override them from Custom CSS.
+    'lineHeights' => [
+        ['var' => '--lh-tight',   'label' => 'Tight',   'default' => 1.05],
+        ['var' => '--lh-snug',    'label' => 'Snug',    'default' => 1.2],
+        ['var' => '--lh-normal',  'label' => 'Normal',  'default' => 1.47059],
+        ['var' => '--lh-relaxed', 'label' => 'Relaxed', 'default' => 1.6],
+    ],
+
     // Font-weight tokens.
     'weights' => [
         ['var' => '--fw-light',    'label' => 'Light',    'default' => 300],
@@ -72,6 +106,11 @@ return [
     // Validation bounds.
     'sizeMin'       => 8,
     'sizeMax'       => 160,
+    // Line-height bounds. 0.8 is the tightest that keeps ascenders and
+    // descenders from colliding on a display face; 3 is past any editorial
+    // leading, so anything outside the pair is a typo, not a taste choice.
+    'lineHeightMin' => 0.8,
+    'lineHeightMax' => 3.0,
     'weightOptions' => [100, 200, 300, 400, 500, 600, 700, 800, 900],
 
     // The full Google Fonts library, generated into google-fonts.json by

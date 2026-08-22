@@ -116,7 +116,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 .kb-row-ico {
     width: 30px;
     height: 30px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: var(--color-accent-light);
     color: var(--color-accent);
     display: flex;

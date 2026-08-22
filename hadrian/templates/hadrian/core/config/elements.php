@@ -33,6 +33,16 @@ return [
             ['var' => '--card-shadow', 'label' => 'Shadow',  'type' => 'scale', 'scale' => 'shadow', 'default' => 'soft'],
             ['var' => '--card-pad',    'label' => 'Padding', 'type' => 'px',                          'default' => 24],
         ],
+        // NOT REACHING THE REAL PAGERS YET. The only consumer of
+        // --pagination-radius is `.pagination-btn` in core-theme.css, and no
+        // template emits that class. The pagers users see are built by
+        // assets/js/dynamic-tables.js into the per-page `data-dt-pager`
+        // containers and styled per page (.dom-/.em-/.inv-/.svc-/.q-/.tk-pages
+        // button in assets/css/pages/*.css), each hardcoding var(--radius-sm).
+        // Point those six at var(--pagination-radius) and this field goes live;
+        // 'sm' below is deliberately the same value they hardcode, so doing so
+        // is a zero-visual-change swap. Keep the field -- the fix is in the page
+        // CSS, not here.
         'Pagination' => [
             ['var' => '--pagination-radius', 'label' => 'Button radius', 'type' => 'scale', 'scale' => 'radius', 'default' => 'sm'],
         ],

@@ -218,7 +218,7 @@ body[data-svc-layout="outside"] .inv-stack > .inv-footer { padding: 12px 4px; bo
 .inv-id-ico {
     width: 30px;
     height: 30px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: var(--color-surface-secondary);
     color: var(--color-text-tertiary);
     display: inline-flex;

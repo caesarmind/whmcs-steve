@@ -49,8 +49,8 @@
 .uia-pw-reveal.is-on { color: var(--color-accent); border-color: var(--color-accent); }
 .uia-pw-reveal svg { width: 15px; height: 15px; }
 .uia-pwmeter { display: flex; align-items: center; gap: 8px; }
-.uia-pwmeter-track { flex: 1; height: 5px; border-radius: 999px; background: var(--color-surface); border: 0.5px solid var(--color-border); overflow: hidden; }
-.uia-pwmeter-fill { display: block; height: 100%; width: 0; border-radius: 999px; background: var(--color-text-tertiary); transition: width 0.2s ease, background 0.2s ease; }
+.uia-pwmeter-track { flex: 1; height: 5px; border-radius: var(--radius-pill); background: var(--color-surface); border: 0.5px solid var(--color-border); overflow: hidden; }
+.uia-pwmeter-fill { display: block; height: 100%; width: 0; border-radius: var(--radius-pill); background: var(--color-text-tertiary); transition: width 0.2s ease, background 0.2s ease; }
 .uia-pwmeter[data-strength="vweak"] .uia-pwmeter-fill,
 .uia-pwmeter[data-strength="weak"] .uia-pwmeter-fill { background: var(--color-red-text); }
 .uia-pwmeter[data-strength="fair"] .uia-pwmeter-fill { background: var(--color-orange-text); }

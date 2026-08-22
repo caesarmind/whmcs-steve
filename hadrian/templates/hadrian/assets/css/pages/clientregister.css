@@ -113,7 +113,7 @@
 .cr-switch-track {
     flex-shrink: 0;
     width: 46px; height: 28px;
-    border-radius: 999px;
+    border-radius: var(--radius-pill);
     background: var(--color-border);
     transition: background 0.2s ease;
     position: relative;

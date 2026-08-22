@@ -130,7 +130,7 @@
     padding: 14px 16px 14px 44px;
     background: var(--color-surface, var(--color-surface));
     border: 1px solid var(--color-border, var(--color-border));
-    border-radius: 12px;
+    border-radius: var(--radius-lg); /* bordered surface with its own padding -- card rung */
     font-size: var(--text-lg);
     color: var(--color-text, var(--color-text-primary));
 }

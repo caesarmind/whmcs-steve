@@ -200,7 +200,7 @@ body[data-svc-layout="outside"] .q-stack > .q-footer { padding: 12px 4px; border
 .q-id-ico {
     width: 30px;
     height: 30px;
-    border-radius: 8px;
+    border-radius: var(--radius-sm);
     background: var(--color-surface-secondary);
     color: var(--color-text-tertiary);
     display: inline-flex;
