@@ -13,26 +13,26 @@ Open **Hadrian -> Layouts**.
 
 :::shot img/lay-tabs.png The two kinds are separate tabs. Everything on this page belongs to one or the other.
 
-:::info There is no Save button
-Every control on this page applies the moment you use it. Activating a layout, flipping a toggle or changing a width takes effect on the next page load - there is nothing to submit and nothing to lose by navigating away.
+:::info There is no Save button for the page as a whole
+Activating a layout, flipping a toggle or picking an option applies the moment you click it. The two pixel boxes under **Containers** are the exception: type a number, then press the small **Apply** beside it, or the change is lost when you leave the page.
 :::
 
 ## Main menu layouts
 
 :::shot img/lay-cards.png The main-menu cards. **Sidebar** is active here, which is what a new install serves; the **Custom**-badged card is the shipped example custom layout.
 
-Each card carries a wireframe, a one-line description, its activation rows, and - once it is active - its options.
+Each card shows a small wireframe of the arrangement, the layout's name, a short description, the two activation rows, its options once it is active, and a **Live preview** button along the bottom.
 
 ### Top Navigation
 
 :::shot img/fe-top.png Top Navigation on a services page.
 
-A horizontal navbar across the top with content full-width beneath it. No left column, so the content area gets the entire viewport width.
+A horizontal navbar across the top, with the page content beneath it. There is no left-hand navigation column, so nothing pushes the page sideways - the content still sits in the middle of the screen at whatever width you set under **Containers**, and only fills the whole screen if you switch Content width to Full width.
 
 Best for accounts with few sections, and for installs where the client area sits alongside a marketing site that already has a top navbar.
 
 :::info Content is always centered
-Top Navigation is the one layout with no options at all. Alignment, side and the account block are sidebar concepts, so the card says so rather than offering controls that would do nothing.
+Top Navigation has no options at all. Content alignment, Sidebar position and Account block only mean anything when there is a side column, so once this layout is active its card simply says content is always centered rather than offering switches that would do nothing.
 :::
 
 ### Sidebar
@@ -98,9 +98,9 @@ Every option's default emits nothing at all, so an untouched install renders exa
 
 :::shot img/lay-card-top.png Every main-menu card carries a Live preview link.
 
-**Live preview** opens the client area with that layout applied **for your browser session only**. Customers keep seeing whatever is actually activated. It is the safe way to compare all three before committing.
+**Live preview** opens your client area in a new tab with that layout applied, just for you. Customers keep seeing whatever is actually activated. It is the safe way to compare the layouts before committing to one.
 
-The link is `?preview=1&layout=…` on your own client area. Footer cards have no preview link - footers have no equivalent standalone mode to preview.
+Nothing is stored: the preview lives in the web address (`?preview=1&layout=…`), so it lasts only while you stay on that address. Click an ordinary link inside the client area and you are back on the live layout. Every main-menu card has a preview button; footer cards do not, because a footer has no equivalent standalone mode to preview.
 
 :::warn Preview is not activation
 A layout you have only previewed is not live. If it looks right, come back and press **Activate** on the audience you want it for.
@@ -114,7 +114,7 @@ A layout you have only previewed is not live. If it looks right, come back and p
 | Layout | What it renders | Driven by |
 | --- | --- | --- |
 | Default Footer | A single row: copyright, a few links, the locale button | Footer Secondary Menu |
-| Extended Footer | A multi-column site map above that row | Footer Menu - each top-level item becomes a column |
+| Extended Footer | A multi-column site map above that row | Footer Menu - each top-level item becomes a column - plus Footer Secondary Menu for the bottom row |
 | Extended Footer + Info | The columns, plus a brand block with logo, description and social icons | Footer Menu, Branding, Footer Secondary Menu |
 :::
 
@@ -161,7 +161,7 @@ While it is on, the sidebar scrolls away with the page, so the main menu is only
 
 ## Containers
 
-:::shot img/lay-containers.png Content width, then four exact measurements in pixels.
+:::shot img/lay-containers.png Content width, then the two measurements of the content column - nothing else lives here now.
 
 **Content width** is the mode: **Boxed** centres the content column at a fixed maximum, **Full width** uses the whole viewport. Boxed keeps long-form pages readable; full width suits data-dense dashboards.
 
@@ -170,19 +170,19 @@ While it is on, the sidebar scrolls away with the page, so the main menu is only
 | --- | --- | --- |
 | Maximum width | 1120px | 640-2400 |
 | Side padding | 48px | 0-160 |
-| Sidebar width | 260px | 0-4000 |
-| Topbar height | 44px | 0-4000 |
 :::
+
+Both are number boxes with their own **Apply** button, and they are the only controls on this page that need one - a box that saved on every keystroke would store half-typed numbers. Type the value, then press Apply.
 
 :::warn Maximum width does nothing unless Boxed is selected
 Switch Content width to Full width and the field is ignored - the page says **Currently overridden** next to it rather than letting you wonder.
 :::
 
-:::info Topbar height applies to Sidebar and Icon Rail, not Top Navigation
-The inner topbar is rendered for every layout *except* Top Navigation, which has its own navbar instead. The admin derives that line from the layouts themselves, so it is right even though it reads backwards.
-:::
-
 Side padding applies per side, in both modes.
+
+:::info Sidebar width, topbar height and the rest are in the Style Manager
+The measurements of the *menu* - sidebar width, topbar height, rail width, logo and icon sizing - moved to **Hadrian -> Styles -> Customize -> Navigation**. This section is only the content column. Values saved here before the move came across automatically.
+:::
 
 ## Overriding a layout for one page
 
@@ -195,29 +195,3 @@ Layouts are site-wide, but a single page can opt out. In **Pages**, open a page 
 :::
 
 A per-page override beats the global choice for that page, including the per-audience one. Useful for a checkout that should lose the sidebar, or a landing page that wants the extended footer when nothing else does.
-
-## Common problems
-
-### A layout's options are missing
-
-Options only render on a card that is active for at least one audience. Activate it first, then the controls appear.
-
-### The layout changed for me but not for customers
-
-You used **Live preview**, which is scoped to your browser session. Press **Activate** on the audience you want.
-
-### Maximum width does nothing
-
-Content width is set to Full width, which ignores it. Switch to **Boxed**.
-
-### Guests and clients both changed when I only meant one
-
-Only the *layout choice* is per-audience. Options, Header flags, Containers and Footer options are global - see [the warning above](/client-theme/layout-manager/#guests-and-existing-clients).
-
-### One page ignores the layout entirely
-
-It has a per-page override. Check **Pages -> that page -> Custom layout** and set both selects back to **- Inherit -**.
-
-### The footer has only one column
-
-Extended Footer builds its columns from the Footer Menu's top-level items. Add more under **Menu -> Footer**.
