@@ -8,7 +8,12 @@
    entirely rather than rendered empty. *}
 {assign var=mtLangOn value=(!$hadrian.addonSettings.hide_language_switcher)}
 {assign var=mtCurrOn value=(!$hadrian.addonSettings.hide_currency_selector)}
-{assign var=mtShowCurrencyInLocale value=($mtCurrOn && (!isset($currencies) || $currencies|@count > 1))}
+{* $currencies is NOT always an array. On contact.php (and any page that does not
+   run the currency lookup) WHMCS assigns it as an empty string, and on PHP 8
+   count('') is a fatal TypeError, not PHP 7's warning -- the whole page 500s.
+   Treat a non-array the same as unset: we cannot count the currencies, so fall
+   back to the admin's hide_currency_selector setting alone. *}
+{assign var=mtShowCurrencyInLocale value=($mtCurrOn && (!isset($currencies) || !($currencies|@is_array) || $currencies|@count > 1))}
 {if $mtLangOn || $mtShowCurrencyInLocale}
 <button type="button" class="locale-btn" aria-label="{$hadrianLang.common.localeChoose}" data-locale-open>
     <span class="flag">{$hadrian.localeFlag|default:'&#127482;&#127480;'}</span>

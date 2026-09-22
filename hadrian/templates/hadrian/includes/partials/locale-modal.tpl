@@ -69,10 +69,13 @@
                currency configured. We keep it visible when $currencies isn't
                populated on a page so the modal still feels complete. The admin
                toggle is an additional gate on top of that. *}
-            {if !$hadrian.addonSettings.hide_currency_selector && (!isset($currencies) || $currencies|@count > 1)}
+            {* $currencies is not always an array -- WHMCS assigns an empty string on
+               pages that skip the currency lookup (contact.php), and on PHP 8
+               count('') is a fatal TypeError. Guard with is_array before counting. *}
+            {if !$hadrian.addonSettings.hide_currency_selector && (!isset($currencies) || !($currencies|@is_array) || $currencies|@count > 1)}
             <div class="locale-modal-section-label">{$LANG.choosecurrency}</div>
             <div class="locale-grid" role="radiogroup" aria-label="{$LANG.choosecurrency}">
-                {if isset($currencies) && $currencies|@count > 0}
+                {if isset($currencies) && $currencies|@is_array && $currencies|@count > 0}
                     {foreach $currencies as $cur}
                         <button type="button" data-currency="{$cur.code|lower|escape}" data-currency-id="{$cur.id|escape}"{if isset($activeCurrency.id) && isset($cur.id) && $activeCurrency.id == $cur.id} class="active"{/if}>{$cur.prefix|default:''|escape} {$cur.code|escape}</button>
                     {/foreach}

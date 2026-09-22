@@ -264,7 +264,10 @@ final class Presets
                 // collects the following non-header siblings underneath it.
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navhostingproducts', 'Hosting'),
-                 'config' => ['dropdown_style' => 'mega'],
+                 // Without an icon the sidebar renders its dot placeholder
+                 // (the {else} branch of mtSidebarIcon), so every top-level
+                 // item carries one. Names come from Menu\Icons::all().
+                 'config' => ['dropdown_style' => 'mega', 'icon' => 'server'],
                  'children' => [
                     ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Web Hosting'),     'config' => []],
                     self::customLink('', 'Shared Hosting',    'cart.php?gid=shared'),
@@ -283,19 +286,19 @@ final class Presets
                  ]],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navdomains', 'Domains'),
-                 'config' => [],
+                 'config' => ['icon' => 'globe'],
                  'children' => [
-                    self::customLink('domainregister', 'Register a New Domain',  'cart.php?a=add&domain=register'),
-                    self::customLink('domaintransfer', 'Transfer Domains to Us', 'cart.php?a=add&domain=transfer'),
+                    self::customLink('domainregister', 'Register a New Domain',  'cart.php?a=add&domain=register', 'plus-circle'),
+                    self::customLink('domaintransfer', 'Transfer Domains to Us', 'cart.php?a=add&domain=transfer', 'transfer'),
                     ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
                     // /domainchecker.php isn't a client-area templatefile.
                     self::customLink('', 'Domain Pricing', 'domainchecker.php'),
                  ]],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navsupport', 'Support'),
-                 'config' => [],
+                 'config' => ['icon' => 'life-buoy'],
                  'children' => [
-                    self::whmcsPage('contact'),
+                    self::whmcsPage('contact', 'envelope'),
                     ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
                     self::whmcsPage('serverstatus'),
                     self::whmcsPage('knowledgebase'),
