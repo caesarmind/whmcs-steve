@@ -28,10 +28,13 @@
 {else}
     {assign var=dashIsEmpty value='empty'}
 {/if}
-{* WHMCS wraps $status in <span style="color:#XXX">Status</span> markup.
-   Strip the HTML before piping into a class attribute (per §10 trap)
-   AND before using as visible text. *}
-{assign var=tktStatusText value=$status|default:''|strip_tags}
+{* WHMCS wraps $status in <span style="color:#XXX"> Status </span> markup --
+   note the spaces INSIDE the span. Strip the HTML before piping into a class
+   attribute (per §10 trap) AND before using as visible text, then trim:
+   without it " Closed " became "-closed-" below, so the closed checks never
+   matched (closed tickets kept their Close button) and the status pill got a
+   class no CSS rule styles. *}
+{assign var=tktStatusText value=$status|default:''|strip_tags|trim}
 {assign var=tktStatusLower value=$tktStatusText|lower|replace:' ':'-'}
 {assign var=tktPriorityLower value=$priority|default:''|lower}
 
