@@ -291,8 +291,12 @@ final class Presets
                     self::customLink('domainregister', 'Register a New Domain',  'cart.php?a=add&domain=register', 'plus-circle'),
                     self::customLink('domaintransfer', 'Transfer Domains to Us', 'cart.php?a=add&domain=transfer', 'transfer'),
                     ['type' => ItemTypes::DIVIDER, 'label' => self::label('', ''), 'config' => []],
-                    // /domainchecker.php isn't a client-area templatefile.
-                    self::customLink('', 'Domain Pricing', 'domainchecker.php'),
+                    // WHMCS 8+ has a real Domain Pricing page (domain-pricing.tpl)
+                    // at rp=/domain/pricing. Never link domainchecker.php: it is
+                    // POST-only in practice and a bare GET 302s to itself for
+                    // guests ("too many redirects") - see the note in
+                    // includes/partials/rail-panels.tpl.
+                    self::customLink('', 'Domain Pricing', 'index.php?rp=/domain/pricing'),
                  ]],
                 ['type' => ItemTypes::DROPDOWN_PARENT,
                  'label' => self::label('navsupport', 'Support'),
@@ -316,7 +320,8 @@ final class Presets
 
                     ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Status'), 'config' => []],
                     self::whmcsPage('serverstatus', 'status'),
-                    self::customLink('', 'Network map',   '/network',   'globe'),
+                    // (A "Network map" -> /network link used to sit here. WHMCS
+                    // has no such page, so it 404'd on every install.)
 
                     ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Connect'), 'config' => []],
                     self::whmcsPage('contact',  'envelope'),
@@ -361,7 +366,7 @@ final class Presets
                     ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Register'),      'config' => []],
                     self::customLink('domainregister', 'Register a domain',  'cart.php?a=add&domain=register'),
                     self::customLink('',               'Bulk domain search', 'cart.php?a=add&domain=register'),
-                    self::customLink('',               'Domain pricing',     'domainchecker.php'),
+                    self::customLink('',               'Domain pricing',     'index.php?rp=/domain/pricing'),
 
                     ['type' => ItemTypes::HEADER, 'label' => self::label('', 'Transfer'),      'config' => []],
                     self::customLink('domaintransfer', 'Transfer a domain',  'cart.php?a=add&domain=transfer'),
