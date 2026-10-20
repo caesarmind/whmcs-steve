@@ -326,7 +326,9 @@ final class Presets
                  'config' => ['position_side' => 'right', 'style' => 'primary']],
                 ['type' => ItemTypes::WHMCS_PAGE,
                  'label' => self::label('register', 'Register'),
-                 'config' => ['page' => 'clientregister', 'position_side' => 'right']],
+                 // Same icon as the guest WHMCS-defaults preset below; without
+                 // one the sidebar falls back to its placeholder dot.
+                 'config' => ['page' => 'clientregister', 'position_side' => 'right', 'icon' => 'user']],
                 ['type' => ItemTypes::LANGUAGE, 'label' => self::label('chooselanguage', 'Language'),
                  'config' => ['position_side' => 'right']],
             ],
