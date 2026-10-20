@@ -244,7 +244,7 @@
 
 {/if}
 
-<script>var _localLang = {'copied': '{$hadrianLang.common.copied|escape:"javascript"}'};</script>
+<script>var _localLang = { 'copied': '{$hadrianLang.common.copied|escape:"javascript"}' };</script>
 <script>
 {literal}
 function affCopyLink(btn) {

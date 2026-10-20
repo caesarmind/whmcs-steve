@@ -193,7 +193,7 @@
    JS, so this is a self-contained vanilla modal that AJAX-loads the fragment with the
    CSRF token, re-executes any inline scripts it carries, and drives its step forms. *}
 {if $tfaAvail}
-<script>var _localLang = {'close': '{$LANG.close|escape:"javascript"}', 'tfaError': '{$hadrianLang.account.tfaModalError|escape:"javascript"}'};</script>
+<script>var _localLang = { 'close': '{$LANG.close|escape:"javascript"}', 'tfaError': '{$hadrianLang.account.tfaModalError|escape:"javascript"}' };</script>
 <script>{literal}
 (function () {
     var triggers = document.querySelectorAll('[data-tfa-open]');
