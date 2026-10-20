@@ -1,0 +1,72 @@
+#!/bin/sh
+# Hadrian pre-push gate.
+#
+# A push to main IS the deploy (.github/workflows/main.yml uploads changed theme
+# files straight to the live server). So when this push carries any file the
+# deploy ships, run the local test suite first and refuse the push if it fails.
+# Pushes that only touch docs, tooling or tests are not gated.
+#
+# Installed by:  git config core.hooksPath .githooks
+# Bypass once:   git push --no-verify     (you are then deploying untested)
+
+DEPLOY_PATHS="hadrian/templates/hadrian hadrian/modules/addons/Hadrian hadrian_cart"
+Z40=0000000000000000000000000000000000000000
+changed=""
+
+while read local_ref local_sha remote_ref remote_sha; do
+    [ "$local_sha" = "$Z40" ] && continue                 # deleting a ref
+    if [ "$remote_sha" = "$Z40" ]; then                    # new ref: compare with main
+        base=$(git merge-base "$local_sha" origin/main 2>/dev/null) || base=""
+        range="${base:+$base..}$local_sha"
+    else
+        range="$remote_sha..$local_sha"
+    fi
+    files=$(git diff --name-only "$range" -- $DEPLOY_PATHS 2>/dev/null)
+    [ -n "$files" ] && changed="$changed$files
+"
+done
+
+[ -z "$changed" ] && exit 0
+
+n=$(printf '%s' "$changed" | grep -c .)
+echo ""
+echo "[pre-push] $n deployable file(s) in this push - running the Hadrian test gate"
+echo "[pre-push] (node tests/run.mjs --gate, against the local stack)"
+
+# The suite tests the WORKING TREE (the local site serves this checkout through
+# junctions). Uncommitted edits in a deploy path mean the gate would test
+# something other than what is being pushed.
+# Untracked files count too - a new template you forgot to `git add` passes
+# locally and is missing on the server. The one exemption is the branding
+# upload directory, which the Hadrian addon creates and writes at RUNTIME
+# (through the local stack's junction): it is never source.
+dirty=$(git status --porcelain -- $DEPLOY_PATHS 2>/dev/null | grep -v 'hadrian/templates/hadrian/assets/img/')
+if [ -n "$dirty" ]; then
+    echo ""
+    echo "[pre-push] REFUSED: uncommitted changes in deploy paths - the tests would not"
+    echo "[pre-push] match what is being pushed. Commit or stash them first:"
+    printf '%s\n' "$dirty" | sed 's/^/             /'
+    exit 1
+fi
+
+if [ ! -d tests/node_modules/@playwright/test ]; then
+    echo "[pre-push] installing test dependencies (npm --prefix tests install)..."
+    npm --prefix tests install --no-audit --no-fund >/dev/null 2>&1 || { echo "[pre-push] npm install failed"; exit 1; }
+fi
+
+node tests/run.mjs --gate
+status=$?
+if [ $status -eq 0 ]; then
+    echo "[pre-push] gate passed - pushing."
+    exit 0
+fi
+echo ""
+if [ $status -eq 2 ]; then
+    echo "[pre-push] REFUSED: the local stack is not ready (see Preflight above)."
+    echo "[pre-push] Start it with scripts/local-stack/START-SERVER.bat and push again."
+else
+    echo "[pre-push] REFUSED: the gate failed. Nothing was deployed."
+    echo "[pre-push] Report: tests/reports/index.html"
+fi
+echo "[pre-push] To push anyway (untested deploy): git push --no-verify"
+exit 1

@@ -1,0 +1,22 @@
+{
+  "name": "hadrian-tests",
+  "private": true,
+  "description": "Test suite for the Hadrian WHMCS theme, run against the local WHMCS stack (scripts/local-stack).",
+  "type": "module",
+  "scripts": {
+    "test": "node run.mjs",
+    "gate": "node run.mjs --gate",
+    "static": "node run.mjs --tier static,compile",
+    "smoke": "node run.mjs --tier smoke",
+    "browser": "node run.mjs --tier browser",
+    "visual": "node run.mjs --tier visual",
+    "visual:approve": "node run.mjs --tier visual --approve",
+    "report": "playwright show-report reports/playwright"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.0"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

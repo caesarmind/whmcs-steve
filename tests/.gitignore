@@ -1,0 +1,5 @@
+# Local, machine-specific test state: credentials, fixture ids, reports, browser baselines.
+.local/
+reports/
+node_modules/
+test-results/

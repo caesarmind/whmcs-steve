@@ -1,0 +1,128 @@
+# Hadrian test suite
+
+Automated checks that the theme (`hadrian/templates/hadrian`), the order form
+(`hadrian_cart`) and the admin addon (`hadrian/modules/addons/Hadrian`) work -
+run against the **real local WHMCS** from [`scripts/local-stack`](../scripts/local-stack/README.md).
+
+```bash
+node tests/run.mjs
+```
+
+Or double-click **`tests/TEST.bat`** - it runs everything and opens the report.
+Start the stack first (`scripts/local-stack/START-SERVER.bat`).
+
+| Result | Meaning |
+|---|---|
+| exit 0, `PASSED` | nothing blocking failed |
+| exit 1, `FAILED` | a blocking check failed - the report says which and why |
+| exit 2 | the **environment** is not ready (preflight) - a setup problem, not a theme bug; the message names the fix |
+
+The report is `tests/reports/index.html` (summary) with a link to the detailed
+Playwright report (screenshots, traces, the HTML of every failing page).
+
+## Tiers
+
+| Tier | What it checks | Needs the site | Time |
+|---|---|---|---|
+| **preflight** | the stack is up, serves *this* checkout, the template is `hadrian`, the addon's hooks load, data is seeded, a gateway is active | yes | ~5 s |
+| **static** | 26 checkers: CSS is ASCII-only, PHP parses, Smarty balance, every `$hadrianLang` key resolves, colour defaults match the CSS, the three "Free" implementations agree, admin JS parses, docs anchors, ... | no | ~30 s |
+| **compile** | every one of the 314 templates compiled by **WHMCS's own Smarty** (its modifiers + security policy) | WHMCS files | ~12 s |
+| **smoke** | every page x persona over HTTP, every Hadrian admin screen, and a crawl that follows every link the theme renders | yes | ~3 min |
+| **browser** | real Chromium: every key page in 3 layouts x light/dark + phone width; JS errors, failed assets, layout geometry, unreadable text; six user flows | yes | ~3 min |
+| **visual** | screenshots compared against approved baselines - **advisory**, never fails the run | yes | ~2 min |
+
+```bash
+node tests/run.mjs --tier static,compile   # no site needed
+node tests/run.mjs --tier smoke
+node tests/run.mjs --gate                  # every blocking tier (what pre-push runs)
+node tests/run.mjs --approve               # accept today's look as the visual baseline
+```
+
+## What counts as broken
+
+A page can return HTTP 200 and still be broken. Each rule below is a bug that
+actually shipped; the suite found most of them on its first run.
+
+| Oracle | Bug it encodes |
+|---|---|
+| a template must compile with WHMCS's Smarty | Security Settings and Affiliates rendered **blank** for months: `{'close': ...}` in a `<script>` is a Smarty tag, the compile failed, WHMCS returned 200 with an empty content area |
+| the content area must not be empty | same - and any future swallowed compile error |
+| no WHMCS error screen, no PHP/Smarty error text | `count('')` fatal on PHP 8 took down contact.php and the cart |
+| `<body data-tpl>` must be the page we asked for | stale routes that silently redirect to the dashboard |
+| headings and the locale button must carry text | `$hadrianLang` renders empty when the addon's hooks do not load |
+| no sidebar item draws the placeholder dot | menu presets seeded without icons |
+| no class name with a stray hyphen | `" Closed "` became `-closed-`: closed tickets kept their Close button, status pills went unstyled |
+| following a link must not sign the customer out | the Close Ticket link had no CSRF token: WHMCS signed the customer out instead |
+| no broken link or redirect loop in the navigation | Domain Pricing pointed at `domainchecker.php` (a redirect loop); Network map was a 404 |
+| judged on the variant the visitor sees (`when-full` vs `when-empty`) | a missing ticket showed a stray `#` and a Close button for no ticket above "Ticket not available" |
+| a new customer can check out | the phone field was rewritten to E.164, which WHMCS refuses: every valid number was "not valid" |
+| checkout survives the CDN being blocked | the order form loads jQuery, Bootstrap and intl-tel-input from third-party CDNs |
+
+## Personas and data
+
+`tests/php/fixtures.php` runs in the preflight. It **ensures** records exist and
+never resets them, so it is safe against a local install you have been
+clicking around in:
+
+| Persona | Who |
+|---|---|
+| `guest` | not signed in |
+| `full` | Mara Okonkwo: services, domains, invoices, an open ticket; an affiliate |
+| `empty` | Erin Empty: an active client with nothing - every page's when-empty state |
+| `suspended` | the seeded client whose service is Suspended |
+| `admin` | `hadrian-test`, a dedicated test admin (not your login) |
+
+Credentials are generated locally into `tests/.local/credentials.json`
+(gitignored) and never printed. It also activates the Offline Credit Card
+gateway, without which WHMCS hides the payment-methods pages. Records the
+flows create (customers `flow+<n>@demo.hadrian.test`, tickets titled
+`[flow] ...`) are removed on the next run.
+
+The demo data itself comes from `scripts/local-stack/seed-demo-data.php`.
+
+## The pre-push gate
+
+`.githooks/pre-push` runs `node tests/run.mjs --gate` when a push carries any
+file the deploy Action ships, and refuses the push if it fails - because a push
+to main *is* the deploy. It also refuses when deploy paths have uncommitted
+changes (the suite tests the working tree, so it would be testing something
+other than what is pushed). Docs/tooling-only pushes are not gated.
+
+```bash
+git config core.hooksPath .githooks
+```
+
+Bypass once with `git push --no-verify` - you are then deploying untested.
+
+## Known issues
+
+`tests/e2e/known-issues.mjs` lists real bugs that are understood but not fixed
+yet. They are reported on every run without failing it, so one open bug cannot
+block every other fix at the gate. Entries clean themselves up: if a listed
+issue stops occurring, the run fails asking for the entry to be removed.
+
+## Adding coverage
+
+- **A new page:** add a line to `ROUTES` in `tests/e2e/routes.mjs` with its URL,
+  the personas that should see it and the `data-tpl` it must render. The crawl
+  will usually have found it already; the route makes it explicit.
+- **A new admin screen:** add its `action=` to `ADMIN_ACTIONS` in the same file.
+  Menu, style and page editors are discovered automatically.
+- **A new checker script:** declare it in `tests/lib/registry.mjs` - where it
+  lives, how to run it, and whether a failure should block.
+- **A new kind of bug:** add an oracle to `tests/e2e/oracles.mjs`, then prove it
+  catches the bug by running it against the broken version first.
+
+## Things worth knowing
+
+- **Windows + a cold template cache.** Smarty cannot replace a compiled
+  template atomically on Windows, so parallel requests against a cold or just-
+  edited template can get truncated pages (Linux production is not affected).
+  `tests/lib/warmup.mjs` compiles sequentially before the workers start, but
+  only when the cache is cold or a template changed - otherwise it costs nothing.
+- **`.dashbuild/` is not in git.** 19 of the static checks live there; on a
+  fresh checkout they are skipped with a note rather than failing.
+- **Visual baselines are per machine** (fonts, GPU) and live in
+  `tests/.local/visual`. A difference is a question, not a failure.
+- **What it cannot test:** anything that only exists in production - licence
+  enforcement against the licence server, cPanel SSO, real payment gateways.

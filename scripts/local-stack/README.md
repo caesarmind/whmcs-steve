@@ -139,3 +139,12 @@ powershell -ExecutionPolicy Bypass -File scripts/local-stack/down.ps1
 then remove `C:\laragon\www\whmcs` (`rmdir` on the three junctions first, or
 `Remove-Item` - a junction removal never touches the repo), drop the `whmcs`
 database, and repeat the copy + `mklink /J` + installer steps above.
+
+## Testing
+
+The test suite runs against this stack - see [`tests/README.md`](../../tests/README.md).
+Double-click `tests/TEST.bat`, or:
+
+```bash
+node tests/run.mjs
+```
