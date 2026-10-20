@@ -54,8 +54,11 @@
     {if $tktStatusLower != 'closed'}
     {* WHMCS expects closeticket=true as a URL parameter on a simple GET
        (verified against Nexus). Not a POST with name="action" value="close" —
-       that path triggers "An invalid request was made". *}
-    <a href="{$WEB_ROOT}/viewticket.php?tid={$tid|escape}{if isset($c) && $c}&c={$c|escape}{/if}&closeticket=true"
+       that path triggers "An invalid request was made".
+       The token is REQUIRED on WHMCS 9: without it the request fails the CSRF
+       check, the ticket stays open and the customer is signed out. Nexus is
+       older and omits it; WHMCS 9's own twenty-one sends &token={$token}. *}
+    <a href="{$WEB_ROOT}/viewticket.php?tid={$tid|escape}{if isset($c) && $c}&c={$c|escape}{/if}&closeticket=true&token={$token|escape}"
        class="tk-close-btn"
        onclick="return confirm('{$LANG.confirmcloseticket|default:'Close this ticket?'}');">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
