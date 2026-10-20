@@ -2168,18 +2168,43 @@ button.generate-password:hover {
                 }
             });
 
-            /* On form submit, replace the input value with the
-               canonical E.164 number so WHMCS stores a normalised
-               phone. Bind in the capture phase so we beat the form's
-               submit handlers. */
+            /* Submit what WHMCS expects: the NATIONAL number in the
+               visible field plus the dial code in a hidden
+               country-calling-code-phonenumber field -- the contract of
+               WHMCS's own assets/js/TelephoneCountryCodeDropdown.js.
+
+               Do NOT rewrite the field to E.164 (+15551234567). WHMCS
+               refuses that with "Your phone number is not valid", and
+               this handler used to do exactly that whenever utils.js had
+               loaded -- i.e. for every customer who took more than a
+               couple of seconds -- so new-account checkout was refused
+               for any valid phone number. Capture phase, so this runs
+               before the form's other submit handlers. */
             var form = document.getElementById('frmCheckout');
             if (form) {
+                var dialField = form.querySelector('input[name="country-calling-code-phonenumber"]');
+                if (!dialField) {
+                    dialField = document.createElement('input');
+                    dialField.type = 'hidden';
+                    dialField.name = 'country-calling-code-phonenumber';
+                    form.appendChild(dialField);
+                }
+                var syncDialCode = function () {
+                    var d = (typeof iti.getSelectedCountryData === 'function' && iti.getSelectedCountryData()) || {};
+                    dialField.value = d.dialCode || '';
+                };
+                syncDialCode();
+                phoneEl.addEventListener('countrychange', syncDialCode);
+
                 form.addEventListener('submit', function () {
-                    if (typeof iti.isValidNumber === 'function' && iti.isValidNumber()) {
-                        phoneEl.value = iti.getNumber();
-                    } else if (typeof iti.getNumber === 'function') {
-                        var n = iti.getNumber();
-                        if (n) phoneEl.value = n;
+                    syncDialCode();
+                    /* Like WHMCS: if the customer typed the international
+                       prefix of the selected country, drop it so the field
+                       stays national. */
+                    var v = (phoneEl.value || '').trim();
+                    var prefix = dialField.value ? '+' + dialField.value : '';
+                    if (prefix && v.indexOf(prefix) === 0) {
+                        phoneEl.value = v.slice(prefix.length).trim();
                     }
                 }, true);
             }
