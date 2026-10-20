@@ -90,7 +90,7 @@ final class Presets
             'audience' => 'client',
             'active'   => true,
             'items'    => [
-                self::whmcsPage('clientareahome'),
+                self::whmcsPage('clientareahome', 'home'),
                 // First mega — Services. Manage / Order / Shop layout that
                 // mirrors the WHMCS Defaults preset, so the client primary
                 // nav has a flagship mega next to the standard quick links.
@@ -111,10 +111,10 @@ final class Presets
                     self::customLink('', 'VPS & Dedicated',  'cart.php?gid=vps',    'server'),
                     self::customLink('', 'SSL Certificates', 'cart.php?gid=ssl',    'lock'),
                  ]],
-                self::whmcsPage('clientareaproducts'),
-                self::whmcsPage('clientareadomains'),
-                self::whmcsPage('clientareainvoices'),
-                self::whmcsPage('supportticketslist'),
+                self::whmcsPage('clientareaproducts', 'server'),
+                self::whmcsPage('clientareadomains', 'globe'),
+                self::whmcsPage('clientareainvoices', 'invoice'),
+                self::whmcsPage('supportticketslist', 'support'),
                 // Second mega — Resources. Three-column panel with
                 // documentation / tools / status groupings so admins can
                 // see two megas living together in the same menu.
