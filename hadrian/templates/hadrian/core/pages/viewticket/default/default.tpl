@@ -49,7 +49,11 @@
 })();
 </script>
 
-<header class="tk-page-head">
+{* .when-full: a missing ticket (deleted, merged, a stale email link) shows the
+   "Ticket not available" state below - the id, title and Close button belong to
+   a real ticket only. Without it the page showed a stray "#" and a Close button
+   for viewticket.php?tid= (no ticket). *}
+<header class="tk-page-head when-full">
     <div style="flex: 1; min-width: 0;">
         <p class="tk-page-head-id">#{$tid|default:$ticketid|escape}</p>
         <h1>{$subject|escape}</h1>
