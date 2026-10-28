@@ -2111,6 +2111,25 @@ body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
 }
 .dp-panel-hint strong { color: var(--color-text-primary); font-weight: var(--fw-medium, 500); }
 
+/* Register / transfer with no TLDs to offer: a notice in place of the search row. */
+.dp-unavailable {
+    display: flex; align-items: flex-start; gap: 10px;
+    padding: 14px 16px;
+    margin-bottom: 18px;
+    max-width: 640px;
+    border-radius: var(--radius-md, 10px);
+    background: var(--color-accent-light);
+    color: var(--color-text-secondary);
+}
+.dp-unavailable svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; color: var(--color-accent); }
+.dp-unavailable p {
+    margin: 0;
+    font-size: var(--text-base, 13px); line-height: 1.5;
+    letter-spacing: -0.004em;
+}
+.dp-unavailable a { color: var(--color-accent); font-weight: var(--fw-medium, 500); text-decoration: none; white-space: nowrap; }
+.dp-unavailable a:hover { text-decoration: underline; }
+
 /* Search / input row */
 .dp-search-row {
     display: flex; gap: 8px; flex-wrap: wrap;
@@ -2325,6 +2344,10 @@ body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
     text-decoration: none;
 }
 .dp-continue:hover { background: var(--color-accent-hover); color: #fff; }
+/* Arrow icons had no size of their own: the back chevron picked up 20px from a
+   broader svg rule and the continue chevron collapsed to 0 inside the button. */
+.dp-back svg,
+.dp-continue svg { width: 14px; height: 14px; flex-shrink: 0; }
 
 /* ===============================================================
    CONFIGURE PRODUCT (.cp-*) -- configureproduct.tpl layout.

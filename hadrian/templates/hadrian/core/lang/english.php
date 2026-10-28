@@ -986,6 +986,9 @@ return [
         'registerPanelHint'       => '<strong>Search by domain.</strong> We\'ll check availability across our registrar partners.',
         'registerSldPlaceholder'  => 'example',
         'freeDomainOn'            => 'Free domain on:',
+        // Shown instead of the search row when no TLD is priced (no registrar set up).
+        'registerUnavailable'     => 'Domain registration isn&rsquo;t available online yet. Get in touch and we&rsquo;ll register one for you, or use a domain you already own.',
+        'transferUnavailable'     => 'Domain transfers aren&rsquo;t available online yet. Get in touch and we&rsquo;ll move your domain for you, or keep it where it is and point it at us.',
         'transferPanelHint'       => '<strong>Transfer your domain from another registrar.</strong> Most transfers add a <strong>free extra year</strong> to your registration.',
         'transferSldPlaceholder'  => 'mydomain',
         'transferRequirements'    => 'Before transferring: domain must be <strong>unlocked</strong>, registered for at least <strong>60 days</strong>, and you\'ll need the <strong>auth / EPP code</strong> from your current registrar.',

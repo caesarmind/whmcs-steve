@@ -87,7 +87,13 @@
 
                     <div class="card" style="padding: 0;">
 
-                        {* ─── Option radio cards ─── *}
+                        {* ─── Option radio cards ───
+                           Selected on arrival: what WHMCS passes (it defaults to
+                           register), except that Register with no TLD priced can never
+                           be completed, so a customer who can bring their own domain
+                           starts there instead. *}
+                        {$_opt = $domainoption|default:'register'}
+                        {if $_opt eq 'register' && !$registertlds && $owndomainenabled}{$_opt = 'owndomain'}{/if}
                         <div class="dp-options" role="radiogroup" aria-label="{$hadrianLang.cart.domainOptionGroupLabel}">
 
                             {if $incartdomains}
@@ -106,7 +112,7 @@
                             {/if}
 
                             {if $registerdomainenabled}
-                                {$_chk = (!$domainoption || $domainoption eq "register")}
+                                {$_chk = ($_opt eq "register")}
                                 <label class="dp-option">
                                     <input type="radio" name="domainoption" value="register"{if $_chk} checked{/if}>
                                     <span class="dp-option-check">
@@ -136,7 +142,7 @@
                             {/if}
 
                             {if $owndomainenabled}
-                                {$_chk = ($domainoption eq "owndomain")}
+                                {$_chk = ($_opt eq "owndomain")}
                                 <label class="dp-option">
                                     <input type="radio" name="domainoption" value="owndomain"{if $_chk} checked{/if}>
                                     <span class="dp-option-check">
@@ -184,7 +190,16 @@
                         {/if}
 
                         {if $registerdomainenabled}
-                            <div class="dp-panel{if !$domainoption || $domainoption eq "register"} is-active{/if}" data-panel="register">
+                            <div class="dp-panel{if $_opt eq "register"} is-active{/if}" data-panel="register">
+                                {* No TLDs priced for registration (no registrar set up yet): an
+                                   empty extension list reads as broken, so say why and where to
+                                   go instead. *}
+                                {if !$registertlds}
+                                    <div class="dp-unavailable" role="status">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                        <p>{$hadrianLang.cart.registerUnavailable} <a href="{$WEB_ROOT}/contact.php">{$LANG.contactUs}</a></p>
+                                    </div>
+                                {else}
                                 <p class="dp-panel-hint">{$hadrianLang.cart.registerPanelHint}</p>
                                 <div class="dp-search-row">
                                     <div class="dp-input-wrap">
@@ -206,11 +221,18 @@
                                         <strong>{$hadrianLang.cart.freeDomainOn}</strong> {$freedomaintlds}
                                     </p>
                                 {/if}
+                                {/if}
                             </div>
                         {/if}
 
                         {if $transferdomainenabled}
                             <div class="dp-panel{if $domainoption eq "transfer"} is-active{/if}" data-panel="transfer">
+                                {if !$transfertlds}
+                                    <div class="dp-unavailable" role="status">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                        <p>{$hadrianLang.cart.transferUnavailable} <a href="{$WEB_ROOT}/contact.php">{$LANG.contactUs}</a></p>
+                                    </div>
+                                {else}
                                 <p class="dp-panel-hint">{$hadrianLang.cart.transferPanelHint}</p>
                                 <div class="dp-search-row">
                                     <div class="dp-input-wrap">
@@ -227,6 +249,7 @@
                                 <p class="dp-example">
                                     {$hadrianLang.cart.transferRequirements}
                                 </p>
+                                {/if}
                             </div>
                         {/if}
 
@@ -237,7 +260,7 @@
                                <select> populated from $registertlds / $transfertlds because those
                                flows are restricted to TLDs we actually sell.
                                JS submit handler joins sld + '.' + tld into resultDomain. *}
-                            <div class="dp-panel{if $domainoption eq "owndomain"} is-active{/if}" data-panel="owndomain">
+                            <div class="dp-panel{if $_opt eq "owndomain"} is-active{/if}" data-panel="owndomain">
                                 <p class="dp-panel-hint">{$hadrianLang.cart.owndomainPanelHint}</p>
                                 <div class="dp-search-row">
                                     <div class="dp-input-wrap">
