@@ -22,7 +22,7 @@
  *}
 
 {* Hadrian design-language stylesheet -- owns all cart-page typography, layout, components *}
-<link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/style.min.css?v={$hadrian.assetVersion|default:'22'}">
+<link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/style.min.css?v={$hadrian.assetVersion|default:'23'}">
 
 {* --vl-* token overrides (safety net -- applies inside any Vue Shadow DOM that loads) *}
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/custom.css?v={$hadrian.assetVersion|default:'21'}">
@@ -118,10 +118,11 @@
         for (var i = 0; i < nodes.length; i++) convertOwnText(nodes[i]);
 
         // configureproduct's cycle cards are split into .currency/.amount/
-        // .period spans by an inline script; when the amount is (or has
-        // already been converted to) the label, blank the siblings so the
-        // card reads "Free", not "$Free/mo".
-        var cards = document.querySelectorAll('.cp-cycle-price');
+        // .period spans by an inline script, and products.tpl renders its
+        // plan prices that way; when the amount is (or has already been
+        // converted to) the label, blank the siblings so the card reads
+        // "Free", not "$Free/mo".
+        var cards = document.querySelectorAll('.cp-cycle-price, .st-plan-price');
         for (var j = 0; j < cards.length; j++) {
             var amt = cards[j].querySelector('.amount');
             if (!amt) continue;

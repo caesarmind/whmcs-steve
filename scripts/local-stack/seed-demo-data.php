@@ -2,9 +2,10 @@
 /**
  * Hadrian local stack - demo data seeder.
  *
- *   php scripts/local-stack/seed-demo-data.php            # seed
- *   php scripts/local-stack/seed-demo-data.php --force    # re-seed over existing demo data
- *   php scripts/local-stack/seed-demo-data.php --wipe     # remove demo data, seed nothing
+ *   php scripts/local-stack/seed-demo-data.php              # seed
+ *   php scripts/local-stack/seed-demo-data.php --force      # re-seed over existing demo data
+ *   php scripts/local-stack/seed-demo-data.php --wipe       # remove demo data, seed nothing
+ *   php scripts/local-stack/seed-demo-data.php --catalogue  # refresh product groups/products in place
  *
  * Fills a freshly installed local WHMCS with plausible catalogue and customer
  * data so the theme can be exercised against real pages: populated tables,
@@ -15,7 +16,8 @@
  * records, invoice items and totals are built by WHMCS itself rather than by
  * hand-written INSERTs that would drift from the schema. Only objects with no
  * API - product groups, ticket departments, announcements - are inserted
- * directly.
+ * directly, plus the product fields AddProduct does not take (tagline, sort
+ * order) and the in-place updates --catalogue makes, which WHMCS has no API for.
  *
  * ALL PEOPLE AND COMPANIES BELOW ARE FICTIONAL. The client logins exist so the
  * client area can be viewed with data in it; they are local fixtures and the
@@ -28,6 +30,7 @@ declare(strict_types=1);
 $whmcsRoot = 'C:/laragon/www/whmcs';
 $force = in_array('--force', $argv, true);
 $wipe  = in_array('--wipe', $argv, true);
+$catalogueOnly = in_array('--catalogue', $argv, true);
 
 // Fixture password for the demo client logins. Local-only.
 const DEMO_CLIENT_PASSWORD = 'HadrianDemo!2026';
@@ -86,6 +89,32 @@ function api(string $command, array $values = []): array
 /** Demo rows are identified by the marker below, so a wipe never eats real data. */
 const DEMO_MARKER = 'hadrian-demo';
 
+/**
+ * Product groups have no notes column, and their tagline is shown on the store
+ * page, so the demo group ids are recorded in a tblconfiguration row instead.
+ * Groups seeded before that carried the marker as their tagline; both count.
+ */
+const DEMO_GROUPS_SETTING = 'HadrianDemoProductGroups';
+
+function demoGroupIds(): array
+{
+    $recorded = json_decode((string) Capsule::table('tblconfiguration')
+        ->where('setting', DEMO_GROUPS_SETTING)->value('value'), true) ?: [];
+    return Capsule::table('tblproductgroups')
+        ->whereIn('id', array_map('intval', $recorded))
+        ->orWhere('tagline', 'like', '%' . DEMO_MARKER . '%')
+        ->orderBy('order')->pluck('id')->map(fn ($id) => (int) $id)->all();
+}
+
+function recordDemoGroupIds(array $ids): void
+{
+    $now = date('Y-m-d H:i:s');
+    Capsule::table('tblconfiguration')->updateOrInsert(
+        ['setting' => DEMO_GROUPS_SETTING],
+        ['value' => json_encode(array_values($ids)), 'created_at' => $now, 'updated_at' => $now]
+    );
+}
+
 function wipeDemo(): void
 {
     $clientIds = Capsule::table('tblclients')->where('notes', 'like', '%' . DEMO_MARKER . '%')->pluck('id')->all();
@@ -108,115 +137,284 @@ function wipeDemo(): void
         Capsule::table('tblusers')->where('email', 'like', '%@demo.hadrian.test')->delete();
         echo 'wiped ' . count($clientIds) . " demo clients and their records\n";
     }
-    $groupIds = Capsule::table('tblproductgroups')->where('tagline', 'like', '%' . DEMO_MARKER . '%')->pluck('id')->all();
+    $groupIds = demoGroupIds();
     if ($groupIds) {
         $productIds = Capsule::table('tblproducts')->whereIn('gid', $groupIds)->pluck('id')->all();
         if ($productIds) {
             Capsule::table('tblpricing')->where('type', 'product')->whereIn('relid', $productIds)->delete();
+            Capsule::table('tblproducts_slugs')->whereIn('product_id', $productIds)->delete();
             Capsule::table('tblproducts')->whereIn('id', $productIds)->delete();
         }
         Capsule::table('tblproductgroups')->whereIn('id', $groupIds)->delete();
         echo 'wiped ' . count($groupIds) . " demo product groups\n";
     }
+    Capsule::table('tblconfiguration')->where('setting', DEMO_GROUPS_SETTING)->delete();
     Capsule::table('tblannouncements')->where('announcement', 'like', '%' . DEMO_MARKER . '%')->delete();
 }
 
 if ($wipe) { wipeDemo(); echo "done (wipe only)\n"; exit(0); }
 
-if (Capsule::table('tblproducts')->exists() && !$force) {
-    fwrite(STDERR, "Products already exist. Re-run with --force to wipe demo data and re-seed.\n");
-    exit(1);
+if (!$catalogueOnly) {
+    if (Capsule::table('tblproducts')->exists() && !$force) {
+        fwrite(STDERR, "Products already exist. Re-run with --force to wipe demo data and re-seed,\n"
+            . "or --catalogue to refresh just the product groups and products.\n");
+        exit(1);
+    }
+    if ($force) { wipeDemo(); }
 }
-if ($force) { wipeDemo(); }
 
 // ---------------------------------------------------------------- catalogue
 /**
- * Product groups and their products. Prices are plain monthly/annual figures;
- * annual is deliberately ~10 months of monthly so the cart's "save" maths has
- * something real to show.
+ * Product groups and their products, written the way an admin fills them in
+ * so the order form has real content to lay out (Shared Hosting mirrors the
+ * apple-client-area store.html mockup):
+ *
+ *   group tagline     -> the line under the category title
+ *   product tagline   -> the line under the plan name. It opens the Description,
+ *                        ahead of the list: WHMCS 9.0 passes the product's own
+ *                        Tagline field to order forms empty, so hadrian_cart
+ *                        reads the text before the list. The Tagline field is
+ *                        filled too, for when WHMCS does pass it.
+ *   features          -> the rest of the Description, a <ul><li> list the cart
+ *                        renders with check marks. true = included, false =
+ *                        shown muted (not in this plan).
+ *
+ * Shared Hosting's annual price is 20% under twelve months of monthly, so the
+ * cart's "Save 20%" pill is true there; the other groups' annual price is ~10
+ * months of monthly. Taglines use HTML entities because this file stays ASCII.
  */
 $catalogue = [
     [
         'name' => 'Shared Hosting',
-        'headline' => 'Fast, managed hosting for sites that need to just work',
+        'tagline' => 'Hosting is what makes your site visible on the web.',
         'products' => [
-            ['Starter',      'Single site, 10 GB NVMe, free SSL, daily backups.',            4.00,  40.00,  0.00],
-            ['Professional', '10 sites, 50 GB NVMe, staging areas, priority support.',       9.00,  90.00,  0.00],
-            ['Business',     'Unlimited sites, 150 GB NVMe, dedicated IP, 24/7 support.',   19.00, 190.00, 15.00],
+            ['name' => 'Single', 'tagline' => 'Everything you need to launch your first site.',
+             'features' => ['<strong>1</strong> website' => true, '<strong>10 GB</strong> SSD storage' => true,
+                            'Unlimited bandwidth' => true, 'Free domain included' => true,
+                            'Free SSL certificate' => true, 'Daily backups' => false],
+             'pricing' => ['monthly' => 3.74, 'annually' => 35.88, 'biennially' => 66.96]],
+            ['name' => 'Professional', 'tagline' => 'Built for growing businesses with multiple sites.',
+             'features' => ['<strong>10</strong> websites' => true, '<strong>25 GB</strong> SSD storage' => true,
+                            'Unlimited bandwidth' => true, 'Free domain included' => true,
+                            'Free SSL certificate' => true, 'Daily backups' => true],
+             'pricing' => ['monthly' => 6.24, 'annually' => 59.88, 'biennially' => 107.76]],
+            ['name' => 'Business', 'tagline' => 'No limits &mdash; perfect for agencies and large catalogues.',
+             'features' => ['<strong>Unlimited</strong> websites' => true, '<strong>100 GB</strong> SSD storage' => true,
+                            'Unlimited bandwidth' => true, 'Free domain included' => true,
+                            'Free SSL certificate' => true, 'Daily backups &middot; Priority support' => true],
+             'pricing' => ['monthly' => 12.49, 'annually' => 119.88, 'biennially' => 215.76]],
         ],
     ],
     [
         'name' => 'VPS Hosting',
-        'headline' => 'Root access, NVMe storage, deployed in under a minute',
+        'tagline' => 'Root access, NVMe storage, deployed in under a minute.',
         'products' => [
-            ['VPS 2 GB',  '2 vCPU, 2 GB RAM, 50 GB NVMe, 2 TB transfer.',    12.00, 120.00, 0.00],
-            ['VPS 4 GB',  '4 vCPU, 4 GB RAM, 100 GB NVMe, 4 TB transfer.',   24.00, 240.00, 0.00],
-            ['VPS 8 GB',  '8 vCPU, 8 GB RAM, 200 GB NVMe, 8 TB transfer.',   48.00, 480.00, 0.00],
+            ['name' => 'VPS 2 GB', 'tagline' => 'For side projects and staging servers.',
+             'features' => ['<strong>2</strong> vCPU' => true, '<strong>2 GB</strong> RAM' => true,
+                            '<strong>50 GB</strong> NVMe storage' => true, '<strong>2 TB</strong> transfer' => true,
+                            'Full root access' => true],
+             'pricing' => ['monthly' => 12.00, 'annually' => 120.00]],
+            ['name' => 'VPS 4 GB', 'tagline' => 'Room for production apps and databases.',
+             'features' => ['<strong>4</strong> vCPU' => true, '<strong>4 GB</strong> RAM' => true,
+                            '<strong>100 GB</strong> NVMe storage' => true, '<strong>4 TB</strong> transfer' => true,
+                            'Full root access' => true],
+             'pricing' => ['monthly' => 24.00, 'annually' => 240.00]],
+            ['name' => 'VPS 8 GB', 'tagline' => 'For busy sites and heavier workloads.',
+             'features' => ['<strong>8</strong> vCPU' => true, '<strong>8 GB</strong> RAM' => true,
+                            '<strong>200 GB</strong> NVMe storage' => true, '<strong>8 TB</strong> transfer' => true,
+                            'Full root access' => true],
+             'pricing' => ['monthly' => 48.00, 'annually' => 480.00]],
         ],
     ],
     [
         'name' => 'Dedicated Servers',
-        'headline' => 'Single-tenant hardware with full IPMI access',
+        'tagline' => 'Single-tenant hardware with full IPMI access.',
         'products' => [
-            ['DS Entry', 'Xeon E-2336, 32 GB ECC, 2 x 960 GB NVMe.',        89.00,  890.00, 49.00],
-            ['DS Pro',   'Dual Xeon Silver 4314, 128 GB ECC, 4 x 2 TB NVMe.', 219.00, 2190.00, 99.00],
+            ['name' => 'DS Entry', 'tagline' => 'A whole server for one workload.',
+             'features' => ['<strong>Xeon</strong> E-2336' => true, '<strong>32 GB</strong> ECC RAM' => true,
+                            '<strong>2 x 960 GB</strong> NVMe' => true, 'IPMI access' => true],
+             'pricing' => ['monthly' => 89.00, 'annually' => 890.00, 'msetupfee' => 49.00, 'asetupfee' => 49.00]],
+            ['name' => 'DS Pro', 'tagline' => 'Dual-socket power for demanding stacks.',
+             'features' => ['<strong>Dual Xeon</strong> Silver 4314' => true, '<strong>128 GB</strong> ECC RAM' => true,
+                            '<strong>4 x 2 TB</strong> NVMe' => true, 'IPMI access' => true],
+             'pricing' => ['monthly' => 219.00, 'annually' => 2190.00, 'msetupfee' => 99.00, 'asetupfee' => 99.00]],
         ],
     ],
     [
         'name' => 'SSL Certificates',
-        'headline' => 'Issued and installed for you',
+        'tagline' => 'Issued and installed for you.',
         'products' => [
-            ['DV SSL',       'Domain-validated certificate, issued in minutes.',  0.00,  15.00, 0.00],
-            ['Wildcard SSL', 'Covers a domain and every first-level subdomain.',  0.00,  95.00, 0.00],
+            ['name' => 'DV SSL', 'tagline' => 'Domain-validated, issued in minutes.',
+             'features' => ['<strong>1</strong> domain' => true, 'Issued in minutes' => true,
+                            'Browser padlock' => true, 'Installed for you' => true],
+             'pricing' => ['annually' => 15.00]],
+            ['name' => 'Wildcard SSL', 'tagline' => 'One certificate for every subdomain.',
+             'features' => ['<strong>Unlimited</strong> subdomains' => true, 'Issued in minutes' => true,
+                            'Browser padlock' => true, 'Installed for you' => true],
+             'pricing' => ['annually' => 95.00]],
         ],
     ],
     [
         'name' => 'Managed WordPress',
-        'headline' => 'WordPress with updates, caching and backups handled',
+        'tagline' => 'WordPress with updates, caching and backups handled.',
         'products' => [
-            ['WP Personal', 'One WordPress site, managed updates, CDN.',        7.00,  70.00, 0.00],
-            ['WP Agency',   '25 WordPress sites, staging, white-label reports.', 39.00, 390.00, 0.00],
+            ['name' => 'WP Personal', 'tagline' => 'One WordPress site, fully managed.',
+             'features' => ['<strong>1</strong> WordPress site' => true, 'Managed updates' => true,
+                            'Built-in CDN' => true, 'Daily backups' => true],
+             'pricing' => ['monthly' => 7.00, 'annually' => 70.00]],
+            ['name' => 'WP Agency', 'tagline' => 'For studios running client sites.',
+             'features' => ['<strong>25</strong> WordPress sites' => true, 'Staging environments' => true,
+                            'White-label reports' => true, 'Daily backups' => true],
+             'pricing' => ['monthly' => 39.00, 'annually' => 390.00]],
         ],
     ],
 ];
 
-echo "== catalogue ==\n";
-$productIds = [];   // name => id
-$order = 0;
-foreach ($catalogue as $group) {
-    $gid = (int) Capsule::table('tblproductgroups')->insertGetId([
-        'name'        => $group['name'],
-        'slug'        => strtolower(str_replace(' ', '-', $group['name'])),
-        'headline'    => $group['headline'],
-        'tagline'     => DEMO_MARKER,
-        'orderfrmtpl' => '',
-        'disabledgateways' => '',   // NOT NULL, no default
-        'hidden'      => 0,
-        'order'       => $order++,
-        'created_at'  => date('Y-m-d H:i:s'),
-        'updated_at'  => date('Y-m-d H:i:s'),
-    ]);
-    echo "  group: {$group['name']} (#{$gid})\n";
-
-    foreach ($group['products'] as [$name, $desc, $monthly, $annually, $setup]) {
-        $values = [
-            'type'        => 'hostingaccount',
-            'gid'         => $gid,
-            'name'        => $name,
-            'description' => $desc,
-            'paytype'     => $monthly > 0 ? 'recurring' : 'onetime',
-            'hidden'      => false,
-            'showdomainoptions' => in_array($group['name'], ['Shared Hosting', 'Managed WordPress'], true),
-        ];
-        if ($monthly > 0) {
-            $values['pricing'] = [$currencyId => ['monthly' => $monthly, 'annually' => $annually, 'msetupfee' => $setup]];
-        } else {
-            $values['pricing'] = [$currencyId => ['annually' => $annually]];
-        }
-        $r = api('AddProduct', $values);
-        $productIds[$name] = (int) $r['pid'];
-        echo "    product: {$name} (#{$r['pid']})  \$" . number_format($monthly, 2) . "/mo\n";
+/** The product Description: the tagline, then one <li> per feature, muted when not included. */
+function productDescription(string $tagline, array $features): string
+{
+    $items = [];
+    foreach ($features as $html => $included) {
+        $items[] = ($included ? '<li>' : '<li class="muted">') . $html . '</li>';
     }
+    return $tagline . "\n<ul>\n" . implode("\n", $items) . "\n</ul>";
+}
+
+/**
+ * A full tblpricing row: every cycle the product does not offer is -1.00
+ * (WHMCS's "disabled"), every setup fee not given is 0.00.
+ */
+function pricingRow(array $pricing): array
+{
+    $row = [];
+    foreach (['monthly', 'quarterly', 'semiannually', 'annually', 'biennially', 'triennially'] as $cycle) {
+        $row[$cycle] = $pricing[$cycle] ?? -1.00;
+    }
+    foreach (['msetupfee', 'qsetupfee', 'ssetupfee', 'asetupfee', 'bsetupfee', 'tsetupfee'] as $fee) {
+        $row[$fee] = $pricing[$fee] ?? 0.00;
+    }
+    return $row;
+}
+
+/**
+ * Create the catalogue, or bring an existing demo catalogue up to date in
+ * place. Groups match by name; products match by position within their group
+ * (creation order), so a renamed plan keeps its id and the services, invoices
+ * and tickets that point at it. Returns product name => id.
+ */
+function syncCatalogue(array $catalogue, int $currencyId): array
+{
+    $now = date('Y-m-d H:i:s');
+    $existing = demoGroupIds();
+    $groupIds = [];
+    $productIds = [];
+
+    // Slug rows of products that no longer exist only block the plain slugs.
+    Capsule::table('tblproducts_slugs')
+        ->whereNotIn('product_id', Capsule::table('tblproducts')->select('id'))->delete();
+
+    foreach ($catalogue as $gi => $group) {
+        $groupRow = [
+            'name'       => $group['name'],
+            'headline'   => null,   // the store page then titles the category with its name
+            'tagline'    => $group['tagline'],
+            'order'      => $gi,
+            'updated_at' => $now,
+        ];
+        $gid = (int) Capsule::table('tblproductgroups')->whereIn('id', $existing)
+            ->where('name', $group['name'])->value('id');
+        if ($gid) {
+            Capsule::table('tblproductgroups')->where('id', $gid)->update($groupRow);
+            echo "  group: {$group['name']} (#{$gid}, updated)\n";
+        } else {
+            $gid = (int) Capsule::table('tblproductgroups')->insertGetId($groupRow + [
+                'slug'        => strtolower(str_replace(' ', '-', $group['name'])),
+                'orderfrmtpl' => '',
+                'disabledgateways' => '',   // NOT NULL, no default
+                'hidden'      => 0,
+                'created_at'  => $now,
+            ]);
+            echo "  group: {$group['name']} (#{$gid})\n";
+        }
+        $groupIds[] = $gid;
+
+        $current = Capsule::table('tblproducts')->where('gid', $gid)->orderBy('id')->pluck('id')->all();
+        foreach ($group['products'] as $pi => $product) {
+            $fields = [
+                'name'        => $product['name'],
+                'tagline'     => $product['tagline'],
+                'description' => productDescription($product['tagline'], $product['features']),
+                'paytype'     => 'recurring',
+                'order'       => $pi,
+            ];
+            if (isset($current[$pi])) {
+                $pid = (int) $current[$pi];
+                Capsule::table('tblproducts')->where('id', $pid)->update($fields);
+                syncProductSlug($pid, $gid, $product['name']);
+                $verb = 'updated';
+            } else {
+                $r = api('AddProduct', [
+                    'type'        => 'hostingaccount',
+                    'gid'         => $gid,
+                    'name'        => $product['name'],
+                    'description' => $fields['description'],
+                    'paytype'     => 'recurring',
+                    'hidden'      => false,
+                    'showdomainoptions' => in_array($group['name'], ['Shared Hosting', 'Managed WordPress'], true),
+                    'pricing'     => [$currencyId => $product['pricing']],
+                ]);
+                $pid = (int) $r['pid'];
+                // AddProduct takes no tagline or sort order.
+                Capsule::table('tblproducts')->where('id', $pid)->update($fields);
+                $verb = 'created';
+            }
+            Capsule::table('tblpricing')->updateOrInsert(
+                ['type' => 'product', 'currency' => $currencyId, 'relid' => $pid],
+                pricingRow($product['pricing'])
+            );
+            $productIds[$product['name']] = $pid;
+            $from = $product['pricing']['monthly'] ?? $product['pricing']['annually'];
+            echo "    product: {$product['name']} (#{$pid}, {$verb})  \$" . number_format($from, 2)
+                . (isset($product['pricing']['monthly']) ? '/mo' : '/yr') . "\n";
+        }
+    }
+    recordDemoGroupIds($groupIds);
+    return $productIds;
+}
+
+/**
+ * Point a product's store URL at its current name (/store/shared-hosting/single).
+ * WHMCS keeps earlier slugs as inactive rows and links only the active one, and
+ * appends "-1" when the plain slug is taken - which the leftover slug rows of
+ * wiped products used to cause.
+ */
+function syncProductSlug(int $pid, int $gid, string $name): void
+{
+    $slug = trim((string) preg_replace('/[^a-z0-9]+/', '-', strtolower($name)), '-');
+    $active = Capsule::table('tblproducts_slugs')->where('product_id', $pid)->where('active', 1)->value('slug');
+    if ($active === null || $active === $slug) { return; }
+    $groupSlug = (string) Capsule::table('tblproductgroups')->where('id', $gid)->value('slug');
+    $taken = Capsule::table('tblproducts_slugs')->where('group_slug', $groupSlug)->where('slug', $slug)
+        ->where('product_id', '!=', $pid)->exists();
+    if ($taken) { return; }
+    $now = date('Y-m-d H:i:s');
+    Capsule::table('tblproducts_slugs')->where('product_id', $pid)->update(['active' => 0, 'updated_at' => $now]);
+    $reused = Capsule::table('tblproducts_slugs')->where('product_id', $pid)->where('slug', $slug)
+        ->update(['active' => 1, 'updated_at' => $now]);
+    if (!$reused) {
+        Capsule::table('tblproducts_slugs')->insert([
+            'product_id' => $pid, 'group_id' => $gid, 'group_slug' => $groupSlug, 'slug' => $slug,
+            'active' => 1, 'clicks' => 0, 'created_at' => $now, 'updated_at' => $now,
+        ]);
+    }
+}
+
+echo "== catalogue ==\n";
+$productIds = syncCatalogue($catalogue, $currencyId);
+
+if ($catalogueOnly) {
+    echo "done (catalogue refreshed; clients, services and invoices untouched)\n";
+    exit(0);
 }
 
 // ---------------------------------------------------------------- clients
@@ -280,19 +478,19 @@ $plan = [
     [1,  'Professional',  'annually',  'nordlys.se',             'Active',      96],
     [2,  'DS Pro',        'monthly',   '',                       'Active',       6],
     [2,  'Wildcard SSL',  'annually',  'kestrelanalytics.com',   'Active',     301],
-    [3,  'Starter',       'monthly',   'estudiomirador.es',      'Active',      21],
+    [3,  'Single',        'monthly',   'estudiomirador.es',      'Active',      21],
     [4,  'WP Agency',     'annually',  'klitbureau.dk',          'Active',     144],
     [5,  'VPS 8 GB',      'monthly',   '',                       'Active',      28],
     [6,  'WP Personal',   'monthly',   'ameliafrost.au',         'Suspended',  -12],
     [7,  'Professional',  'monthly',   'atlascloud.fr',          'Active',       3],
     [8,  'VPS 2 GB',      'monthly',   'werkstattneun.de',       'Active',      17],
-    [9,  'Starter',       'annually',  'nunobarreto.pt',         'Cancelled',  -64],
+    [9,  'Single',        'annually',  'nunobarreto.pt',         'Cancelled',  -64],
     [10, 'DS Entry',      'monthly',   'pontedigitale.it',       'Active',      11],
     [11, 'Business',      'monthly',   'poldermedia.nl',         'Active',      25],
     [12, 'Professional',  'annually',  'kingsleyco.ca',          'Terminated', -148],
     [0,  'DV SSL',        'annually',  'riverbendstudio.co.uk',  'Active',     188],
     [2,  'VPS 2 GB',      'monthly',   '',                       'Pending',     30],
-    [5,  'Starter',       'monthly',   '',                       'Active',       9],
+    [5,  'Single',        'monthly',   '',                       'Active',       9],
 ];
 
 $createdInvoices = [];
@@ -442,7 +640,7 @@ $deptIds = Capsule::table('tblticketdepartments')->pluck('id')->all();
 $tickets = [
     [0,  'SSL certificate not renewing automatically', 'The wildcard certificate on riverbendstudio.co.uk expired last night even though auto-renew is on. Can you take a look?', 'Open',     'High'],
     [2,  'Increase disk on DS Pro',                    'We are at 84% on the primary array. What are the options for adding a pair of 2 TB NVMe drives?',                        'Answered', 'Medium'],
-    [3,  'Migrate from old host',                      'I have a cPanel backup from my previous provider, about 6 GB. Can you restore it onto the Starter plan?',                'Open',     'Medium'],
+    [3,  'Migrate from old host',                      'I have a cPanel backup from my previous provider, about 6 GB. Can you restore it onto the Single plan?',                 'Open',     'Medium'],
     [7,  'Invoice 1042 paid twice',                    'It looks like the bank transfer went through twice this month. Could you credit the second one?',                        'Customer-Reply', 'Medium'],
     [10, 'IPMI console keeps dropping',                'The remote console disconnects after roughly 30 seconds. Firmware is current.',                                          'In Progress', 'High'],
     [1,  'Add a staging site',                         'How do I spin up a staging copy on the Professional plan?',                                                              'Closed',   'Low'],

@@ -10,7 +10,7 @@
  *                + .st-split (240px sidebar  |  main card)
  *                  ├── sidebar-categories.tpl  (Categories + Actions rail)
  *                  └── .card
- *                        ├── .st-cat-head (icon · title · tagline · billing pills)
+ *                        ├── .st-cat-head (title · tagline · billing pills)
  *                        ├── .cart-plans-grid (renamed from .when-full to
  *                        │     ├── Variant A — 3-up feature-list cards   (default)
  *                        │     ├── Variant B — 4-up minimal cards
@@ -166,13 +166,6 @@
                 {* ── Category header ─────────────────────────── *}
                 <div class="st-cat-head">
                     <div class="st-cat-head-row">
-                        <div class="st-cat-head-ico" aria-hidden="true">
-                            {if $_image}
-                                <img src="{$_image|escape}" alt="">
-                            {else}
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
-                            {/if}
-                        </div>
                         <div class="st-cat-head-meta">
                             <h2 class="st-cat-head-title" id="cat-title">
                                 {if $_headline}{$_headline}
@@ -185,10 +178,24 @@
                             {/if}
                         </div>
 
-                        {* Billing cycle pill switcher — wired to inline JS below.
-                           Pills render unconditionally; the JS click handler is
-                           a no-op when no card has data for the picked cycle. *}
-                        <div class="st-cycle" role="tablist" aria-label="Billing cycle" data-cycle-switcher>
+                        {* Billing cycle pill switcher — wired to inline JS below,
+                           which hides a pill no product in the group offers and
+                           starts on Annual when any product has an annual price.
+                           The billed-line strings and the currency ride along as
+                           attributes so their entities (&middot;, &euro;) arrive
+                           decoded; escape's 4th argument keeps them from being
+                           double-encoded. *}
+                        <div class="st-cycle" role="tablist" aria-label="Billing cycle" data-cycle-switcher
+                             data-cur-prefix="{$currency.prefix|escape:'html':'UTF-8':false}"
+                             data-cur-suffix="{$currency.suffix|escape:'html':'UTF-8':false}"
+                             data-cur-code="{$currency.code|escape}"
+                             data-cur-format="{$currency.format|escape}"
+                             data-setup-label="{$LANG.ordersetupfee|escape:'html':'UTF-8':false}"
+                             data-billed-quarterly="{$hadrianLang.cart.planBilledQuarterly|escape:'html':'UTF-8':false}"
+                             data-billed-semiannually="{$hadrianLang.cart.planBilledSemiannually|escape:'html':'UTF-8':false}"
+                             data-billed-annually="{$hadrianLang.cart.planBilledAnnually|escape:'html':'UTF-8':false}"
+                             data-billed-biennially="{$hadrianLang.cart.planBilledBiennially|escape:'html':'UTF-8':false}"
+                             data-billed-triennially="{$hadrianLang.cart.planBilledTriennially|escape:'html':'UTF-8':false}">
                             <button type="button" data-cycle="monthly">{$hadrianLang.cart.cycleMonthly}</button>
                             <button type="button" data-cycle="annually" class="active">{$hadrianLang.cart.cycleAnnual} <span class="st-cycle-saving">{$hadrianLang.cart.cycleSaving}</span></button>
                             <button type="button" data-cycle="biennially">{$hadrianLang.cart.cycleBiennial}</button>
@@ -229,25 +236,50 @@
                                         <span class="st-plan-badge">{$hadrianLang.cart.mostPopular}</span>
                                     {/if}
                                     <h3 class="st-plan-name" id="{$idPrefix}-name">{$product.name}</h3>
-                                    {if $product.featuresdesc}
-                                        <p class="st-plan-tag" id="{$idPrefix}-description">{$product.featuresdesc|strip_tags|truncate:80}</p>
-                                    {elseif $product.description}
-                                        <p class="st-plan-tag" id="{$idPrefix}-description">{$product.description|strip_tags|truncate:80}</p>
-                                    {else}
-                                        <p class="st-plan-tag">&nbsp;</p>
-                                    {/if}
 
+                                    {* Card copy. The tag line under the name is $product.tagLine
+                                       when WHMCS passes one (the product's Tagline field; WHMCS
+                                       9.0 hands it over empty, even to its own comparison order
+                                       forms). The body is the Description:
+                                         - with an HTML list (<ul><li>...</li></ul>), the text
+                                           before the list is the tag line and only the list
+                                           renders in the body. The <br />s WHMCS adds for every
+                                           newline are stripped, or they leak between the <li>s
+                                           as blank lines no CSS can erase.
+                                         - anything else renders once, in the body. It used to
+                                           print twice, as the tag and again as the body. Line
+                                           breaks in plain text are kept; only the <br />s right
+                                           after a block tag (</p>, </div>...) are dropped.
+                                           ($product.features is not used: WHMCS turns any line
+                                           with a colon into a "feature", which garbles an
+                                           ordinary sentence such as "Includes: cPanel".) *}
+                                    {$_desc = $product.description|regex_replace:'/<br\s*\/?>/i':''}
+                                    {$_lead = $_desc|regex_replace:'/<(ul|ol)[\s>][\s\S]*$/i':''}
+                                    {$_listBody = ''}
+                                    {$_tag = ''}
+                                    {if $_lead != $_desc}
+                                        {$_listBody = $_desc|regex_replace:'/^[\s\S]*?(?=<(ul|ol)[\s>])/i':''}
+                                        {$_tag = $_lead|strip_tags|regex_replace:'/^\s+|\s+$/':''}
+                                    {/if}
+                                    {if $product.tagLine}{$_tag = $product.tagLine}{/if}
+                                    <p class="st-plan-tag" id="{$idPrefix}-description">{if $_tag}{$_tag|truncate:80}{else}&nbsp;{/if}</p>
+
+                                    {* Price. data-raw-<cycle> carries WHMCS's numeric price per
+                                       cycle; the switcher script below uses it to show a
+                                       multi-month cycle as its per-month equivalent and to fill
+                                       the "Billed annually" line under it. Without JS the card
+                                       keeps the server-rendered starting price. *}
                                     <div class="st-plan-price"
                                          id="{$idPrefix}-price"
                                          data-price-host
                                          data-price-min="{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}"
                                          data-cycle-min="{$product.pricing.minprice.cycle|escape}"
-                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
-                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
-                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
-                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
-                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}
-                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" {/if}>
+                                         {if $product.pricing.monthly}data-price-monthly="{$product.pricing.monthly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" data-raw-monthly="{$product.pricing.rawpricing.monthly|escape}" data-setup-monthly="{$product.pricing.rawpricing.msetupfee|escape}" {/if}
+                                         {if $product.pricing.quarterly}data-price-quarterly="{$product.pricing.quarterly|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" data-raw-quarterly="{$product.pricing.rawpricing.quarterly|escape}" data-setup-quarterly="{$product.pricing.rawpricing.qsetupfee|escape}" {/if}
+                                         {if $product.pricing.semiannually}data-price-semiannually="{$product.pricing.semiannually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" data-raw-semiannually="{$product.pricing.rawpricing.semiannually|escape}" data-setup-semiannually="{$product.pricing.rawpricing.ssetupfee|escape}" {/if}
+                                         {if $product.pricing.annually}data-price-annually="{$product.pricing.annually|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" data-raw-annually="{$product.pricing.rawpricing.annually|escape}" data-setup-annually="{$product.pricing.rawpricing.asetupfee|escape}" {/if}
+                                         {if $product.pricing.biennially}data-price-biennially="{$product.pricing.biennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" data-raw-biennially="{$product.pricing.rawpricing.biennially|escape}" data-setup-biennially="{$product.pricing.rawpricing.bsetupfee|escape}" {/if}
+                                         {if $product.pricing.triennially}data-price-triennially="{$product.pricing.triennially|regex_replace:'/\s+[A-Z]{3}.*$/':''|escape}" data-raw-triennially="{$product.pricing.rawpricing.triennially|escape}" data-setup-triennially="{$product.pricing.rawpricing.tsetupfee|escape}" {/if}>
                                         {if $product.bid}
                                             {if $product.displayprice}
                                                 <span class="amount" data-price-display>{$product.displayprice|regex_replace:'/\s+[A-Z]{3}.*$/':''}</span>
@@ -257,24 +289,20 @@
                                             {if $product.pricing.hasconfigoptions}
                                                 <span class="period" style="margin-right: 4px;">{$LANG.startingfrom}</span>
                                             {/if}
-                                            <span class="amount" data-price-display>{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}</span>
+                                            {if $currency.prefix && $product.pricing.minprice.price}
+                                                <span class="currency" data-currency-display>{$currency.prefix}</span>
+                                                <span class="amount" data-price-display>{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''|replace:$currency.prefix:''}</span>
+                                            {else}
+                                                <span class="amount" data-price-display>{$product.pricing.minprice.price|regex_replace:'/\s+[A-Z]{3}.*$/':''}</span>
+                                            {/if}
                                             <span class="period" data-period-display>{if $product.pricing.minprice.cycle eq "monthly"}{$hadrianLang.cart.cycleShortMonthly}{elseif $product.pricing.minprice.cycle eq "quarterly"}{$hadrianLang.cart.cycleShortQuarterly}{elseif $product.pricing.minprice.cycle eq "semiannually"}{$hadrianLang.cart.cycleShortSemiannually}{elseif $product.pricing.minprice.cycle eq "annually"}{$hadrianLang.cart.cycleShortAnnually}{elseif $product.pricing.minprice.cycle eq "biennially"}{$hadrianLang.cart.cycleShortBiennially}{elseif $product.pricing.minprice.cycle eq "triennially"}{$hadrianLang.cart.cycleShortTriennially}{/if}</span>
                                         {/if}
                                     </div>
-                                    {if $product.pricing.minprice.setupFee}
-                                        <div class="st-plan-price-sub">+ {$product.pricing.minprice.setupFee->toPrefixed()} {$LANG.ordersetupfee}</div>
-                                    {/if}
+                                    <div class="st-plan-price-sub" data-billed-display hidden></div>
+                                    <div class="st-plan-price-sub" data-setup-display{if !$product.pricing.minprice.setupFee} hidden{/if}>{if $product.pricing.minprice.setupFee}+ {$product.pricing.minprice.setupFee->toPrefixed()} {$LANG.ordersetupfee}{/if}</div>
 
-                                    {* Description body — admin writes <ul><li>...</li></ul> in
-                                       the WHMCS product description. Same wrapper class used by
-                                       Variants B and G so a single bit of HTML in the description
-                                       renders consistently regardless of which variant is active.
-                                       regex_replace strips WHMCS's auto-nl2br: WHMCS converts every
-                                       newline in $product.description to <br />, which then leaks
-                                       between <ul>/<li> and creates visible blank lines that no
-                                       CSS rule can erase. *}
                                     <div class="st-plan-features">
-                                        {if $product.description}{$product.description|regex_replace:'/<br\s*\/?>/i':''}{/if}
+                                        {if $_listBody}{$_listBody}{elseif $product.description}{$product.description|regex_replace:'/(<\/?(?:p|div|h[1-6]|table|tr|td|blockquote)\b[^>]*>)\s*<br\s*\/?>/i':'$1'}{/if}
                                     </div>
 
                                     {if $product.stockControlEnabled}
@@ -701,15 +729,10 @@
                        a different product-list variant, never something this
                        link revealed.
 
-                       "Change currency" now carries data-locale-open — the
-                       attribute the locale modal actually listens for. It had
-                       data-currency-toggle, which nothing reads, so the link
-                       only jumped to the top of the page. The modal handles
-                       currency and ships on cart pages via footer.tpl. *}
+                       "Prices in USD · Change currency" removed too: the link
+                       did not change the currency. *}
                     <div class="st-compare">
                         <span>{$hadrianLang.cart.comparePlans}</span>
-                        <span class="spacer"></span>
-                        <span>{$hadrianLang.cart.pricesIn} {$currency.code|default:'USD'} · <a href="#" data-locale-open>{$LANG.changecurrency|default:'Change currency'}</a></span>
                     </div>
 
                 </div>{* /.cart-plans-grid *}
@@ -826,9 +849,12 @@
 
 {* ──────────────────────────────────────────────────────────────────
    Billing-cycle pill swap.
-   Reads data-price-<cycle> from every [data-price-host] currently in
-   the DOM and substitutes the [data-price-display] text. When a card
-   has no data for the picked cycle, falls back to data-price-min.
+   Cards that carry data-raw-<cycle> (the shipped layout, Variant A)
+   show the picked cycle as its per-month equivalent - "$4.99 /mo" plus
+   "Billed annually · $59.88/year" - formatted with the WHMCS currency
+   settings. Other cards read data-price-<cycle> and substitute the
+   [data-price-display] text. Either way a card with no price for the
+   picked cycle falls back to its starting (data-cycle-min) price.
    Inert when the page has no .st-cycle pills (defensive).
    ────────────────────────────────────────────────────────────────── *}
 <script>
@@ -841,10 +867,60 @@
         biennially:   '{$hadrianLang.cart.cycleShortBiennially|escape:"javascript"}',
         triennially:  '{$hadrianLang.cart.cycleShortTriennially|escape:"javascript"}'
     };
+    var MONTHS = { monthly: 1, quarterly: 3, semiannually: 6, annually: 12, biennially: 24, triennially: 36 };
 
     var switcher = document.querySelector('[data-cycle-switcher]');
     if (!switcher) return;
     var pills = switcher.querySelectorAll('button[data-cycle]');
+
+    var PREFIX = switcher.getAttribute('data-cur-prefix') || '';
+    var SUFFIX = switcher.getAttribute('data-cur-suffix') || '';
+    // A suffix that only repeats the ISO code is dropped ("$4.99", not
+    // "$4.99 USD"), like the regex_replace on every server-rendered price.
+    if (SUFFIX.replace(/^\s+|\s+$/g, '') === switcher.getAttribute('data-cur-code')) SUFFIX = '';
+
+    // WHMCS currency formats: 1 = 1234.56, 2 = 1,234.56, 3 = 1.234,56, 4 = 1,234
+    function formatNumber(n) {
+        var f = parseInt(switcher.getAttribute('data-cur-format'), 10) || 1;
+        var parts = n.toFixed(f === 4 ? 0 : 2).split('.');
+        var thousands = f === 3 ? '.' : (f === 2 || f === 4 ? ',' : '');
+        // Three \d rather than a brace quantifier: this script is not
+        // wrapped in a Smarty literal block, so Smarty would read the brace.
+        if (thousands) parts[0] = parts[0].replace(/\B(?=(\d\d\d)+(?!\d))/g, thousands);
+        return parts.join(f === 3 ? ',' : '.');
+    }
+
+    // Only a product that can also be billed monthly is shown per month; one
+    // sold yearly only (an SSL certificate) keeps "$15.00 /yr".
+    function renderPerMonth(host, cycle, total) {
+        var amountEl = host.querySelector('[data-price-display]');
+        var currencyEl = host.querySelector('[data-currency-display]');
+        var periodEl = host.querySelector('[data-period-display]');
+        var billedEl = host.parentNode.querySelector('[data-billed-display]');
+        var perMonth = host.hasAttribute('data-raw-monthly');
+        var months = perMonth ? (MONTHS[cycle] || 1) : 1;
+        var free = total === 0 && window.hnFreePrice;
+        var billed = months > 1 && !free ? switcher.getAttribute('data-billed-' + cycle) : '';
+
+        amountEl.textContent = free
+            ? window.hnFreePrice.label
+            : (currencyEl ? '' : PREFIX) + formatNumber(total / months) + SUFFIX;
+        if (currencyEl) currencyEl.textContent = free ? '' : PREFIX;
+        if (periodEl) periodEl.textContent = free ? '' : (perMonth ? CYCLE_LABEL.monthly : CYCLE_LABEL[cycle] || '');
+        if (billedEl) {
+            billedEl.textContent = billed ? billed.replace('%s', PREFIX + formatNumber(total) + SUFFIX) : '';
+            billedEl.hidden = !billed;
+        }
+        // WHMCS prices the setup fee per cycle, so it follows the pill too.
+        var setupEl = host.parentNode.querySelector('[data-setup-display]');
+        if (setupEl) {
+            var setup = parseFloat(host.getAttribute('data-setup-' + cycle));
+            setupEl.textContent = setup > 0
+                ? '+ ' + PREFIX + formatNumber(setup) + SUFFIX + ' ' + switcher.getAttribute('data-setup-label')
+                : '';
+            setupEl.hidden = !(setup > 0);
+        }
+    }
 
     function applyCycle(cycle) {
         pills.forEach(function (p) {
@@ -855,6 +931,15 @@
             var amountEl = host.querySelector('[data-price-display]');
             var periodEl = host.querySelector('[data-period-display]');
             if (!amountEl) return;
+            var own = host.hasAttribute('data-price-' + cycle) ? cycle : host.getAttribute('data-cycle-min');
+            var raw = parseFloat(host.getAttribute('data-raw-' + own));
+            if (!isNaN(raw)) {
+                renderPerMonth(host, own, raw);
+                return;
+            }
+            // A Variant A card with no cycle prices (one-time or free) has only
+            // the price the server rendered, already split around the currency.
+            if (host.querySelector('[data-currency-display]')) return;
             var price = host.getAttribute('data-price-' + cycle);
             if (price) {
                 /* Route through the shared "0.00" -> "Free" test when the admin
@@ -883,5 +968,18 @@
             applyCycle(this.getAttribute('data-cycle'));
         });
     });
+
+    // Hide a pill no product in the group offers, then start on the
+    // server-marked pill (Annual) if it survived, else the first that did.
+    // .st-cycle button sets display, so the hidden attribute alone would
+    // not hide it.
+    var start = null;
+    pills.forEach(function (p) {
+        var c = p.getAttribute('data-cycle');
+        var offered = !!document.querySelector('[data-price-' + c + ']');
+        if (!offered) p.style.display = 'none';
+        if (offered && (!start || p.classList.contains('active'))) start = c;
+    });
+    if (start) applyCycle(start); else switcher.style.display = 'none';
 })();
 </script>

@@ -126,6 +126,17 @@ php scripts/local-stack/seed-demo-data.php --force
 php scripts/local-stack/seed-demo-data.php --wipe
 ```
 
+The catalogue is written the way an admin fills it in, so the order form has
+real content to lay out: each product's Description is its tagline followed by
+a `<ul><li>` feature list, and Shared Hosting carries the plans, prices and
+features of the `apple-client-area/store.html` mockup. To bring an existing
+install's product groups and products up to date without touching clients,
+services, invoices or tickets:
+
+```bash
+php scripts/local-stack/seed-demo-data.php --catalogue
+```
+
 The demo client logins are local fixtures - `<handle>@demo.hadrian.test` with a
 shared password the script prints when it finishes - so the client area can be
 viewed with real data in it.

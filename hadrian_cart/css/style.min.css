@@ -831,15 +831,6 @@ body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
 .st-cat-head-row {
     display: flex; align-items: flex-start; gap: 16px; flex-wrap: wrap;
 }
-.st-cat-head-ico {
-    width: 48px; height: 48px; border-radius: 12px;
-    background: var(--color-accent-light);
-    color: var(--color-accent);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-}
-.st-cat-head-ico svg { width: 22px; height: 22px; }
-.st-cat-head-ico img { width: 28px; height: 28px; object-fit: contain; }
 .st-cat-head-meta { flex: 1; min-width: 0; }
 .st-cat-head-title {
     font-size: 22px; font-weight: var(--fw-semibold, 600);
@@ -882,10 +873,9 @@ body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
 }
 .st-cycle-saving {
     display: inline-flex; align-items: center;
-    padding: 1px 6px; border-radius: var(--radius-pill);
-    background: var(--color-green-bg); color: var(--color-green-text);
-    font-size: 9.5px; font-weight: var(--fw-bold, 700); letter-spacing: 0.04em;
-    text-transform: uppercase;
+    color: var(--color-accent);
+    font-size: var(--text-xs, 11px); font-weight: var(--fw-semibold, 600);
+    letter-spacing: -0.004em;
 }
 
 /* -- Plan grid (Variant A -- 3 cards w/ feature list) -------
@@ -930,7 +920,7 @@ body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
 }
 .st-plan.featured {
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 1px var(--color-accent);
+    box-shadow: var(--shadow-card-hover);
 }
 .st-plan-badge {
     position: absolute; top: 0; right: 22px;
@@ -939,8 +929,8 @@ body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
     border-radius: var(--radius-pill);
     background: var(--color-accent);
     color: #fff;
-    font-size: 10px; font-weight: var(--fw-semibold, 600);
-    letter-spacing: 0.04em; text-transform: uppercase;
+    font-size: var(--text-xs, 11px); font-weight: var(--fw-semibold, 600);
+    letter-spacing: -0.004em;
 }
 .st-plan-name {
     font-size: var(--text-lg, 15px); font-weight: var(--fw-semibold, 600);
@@ -1004,10 +994,12 @@ body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
 .st-plan-features ol {
     list-style: none; padding: 0;
 }
+/* Rows sit flush (no gap), one line-height apart, as the store mockup's own
+   feature lists render. */
 .st-plan-features ul,
 .st-plan-features ol {
     margin: 0;
-    display: flex; flex-direction: column; gap: 9px;
+    display: flex; flex-direction: column;
 }
 .st-plan-features li {
     display: flex; align-items: flex-start; gap: 9px;
@@ -1015,20 +1007,20 @@ body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
 }
 .st-plan-features li > svg {
     width: 14px; height: 14px;
-    color: var(--color-green-text);
+    color: var(--color-accent);
     flex-shrink: 0;
     margin-top: 1px;
 }
-/* Green checkmark bullet for plain-text <li> (no inline svg). Mask-image lets
-   the bullet color follow --color-green-text in light + dark mode. */
+/* Accent checkmark bullet for plain-text <li> (no inline svg). Mask-image lets
+   the bullet color follow --color-accent in light + dark mode. */
 .st-plan-features li:not(:has(> svg))::before {
     content: '';
     display: block;
     width: 14px; height: 14px;
     flex-shrink: 0; margin-top: 1px;
-    background-color: var(--color-green-text);
-    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
-            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 16.17l-4.17-4.17-1.42 1.41L9 19 21 7l-1.41-1.41z'/%3E%3C/svg%3E") no-repeat center / contain;
+    background-color: var(--color-accent);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") no-repeat center / contain;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='20 6 9 17 4 12'/%3E%3C/svg%3E") no-repeat center / contain;
 }
 .st-plan-features li strong,
 .st-plan-features li b {
@@ -1086,12 +1078,6 @@ body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
     font-size: var(--text-sm, 12px);
     color: var(--color-text-tertiary);
     letter-spacing: -0.004em;
-}
-.st-compare .spacer { flex: 1; }
-.st-compare a {
-    color: var(--color-accent);
-    text-decoration: none;
-    font-weight: var(--fw-medium, 500);
 }
 
 /* -- Guarantees strip (3 trust cards below the grid) ------ */

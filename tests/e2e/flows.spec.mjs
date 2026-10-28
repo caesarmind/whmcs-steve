@@ -29,8 +29,7 @@ test('a new customer buys a product through the order form', async ({ page }) =>
   test.setTimeout(3 * 60_000);
   const errors = watchErrors(page);
 
-  // Store -> product. Business has a setup fee, so the invoice total proves
-  // pricing made it all the way through.
+  // Store -> product: the first plan of the first store group.
   await page.goto(`/index.php?rp=/store/${id.productGroupSlug}`);
   expect(await tpl(page)).toBe('products');
   await page.locator('a[id^=product]').first().click();
