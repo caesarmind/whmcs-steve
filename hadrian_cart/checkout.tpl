@@ -250,6 +250,17 @@
 .co-summary-line.divider { border-top: 0.5px solid var(--color-border); padding-top: 12px; margin-top: 4px; }
 .co-summary-total { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding: 18px 24px; border-top: 0.5px solid var(--color-border); background: var(--color-surface-tertiary); font-variant-numeric: tabular-nums; }
 .co-summary-total .label { font-size: 15px; font-weight: 600; color: var(--color-text-primary) !important; letter-spacing: -0.01em; background: transparent !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; line-height: 1.2; display: inline; white-space: normal; vertical-align: baseline; }
+/* The summary amount shares id="totalDueToday" with the payment card's
+   total banner (CartTotalUpdater.js updates every match), so the client
+   theme's banner styling (core-layout.css, nested under body[data-tpl=..])
+   boxed it in a bordered card inside the summary. This outranks that
+   nested rule for the summary amount only. */
+body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
+    background: transparent !important; border: 0 !important; border-radius: 0 !important;
+    padding: 0 !important; margin: 0; text-align: right;
+    font-size: 24px; font-weight: 600; letter-spacing: -0.025em;
+    color: var(--color-text-primary) !important;
+}
 .co-summary-total .value { font-size: 24px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.025em; white-space: nowrap; background: transparent !important; padding: 0 !important; border: 0 !important; border-radius: 0 !important; }
 .co-summary-cycle { font-size: 11px; color: var(--color-text-tertiary); padding: 10px 20px 14px; letter-spacing: -0.004em; margin: 0; }
 .co-summary-footer {
@@ -476,11 +487,12 @@
 
 /* Last-chance offers card (wraps $hookOutput on checkout) */
 .co-lastchance { padding: 0; background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: 14px; }
+/* Head matches the cart page's "Last chance" card (cart mockup
+   .ct-recommend-head): accent pill, title, subtitle pushed right. */
 .co-lastchance-head { padding: 16px 22px; border-bottom: 0.5px solid var(--color-border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.co-lastchance-badge { padding: 3px 10px; border-radius: 999px; background: var(--color-orange-bg, #fff7e6); color: var(--color-orange-text, #b25c00); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.co-lastchance-badge { padding: 3px 10px; border-radius: var(--radius-pill, 999px); background: var(--color-accent-light); color: var(--color-accent); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
 .co-lastchance-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.012em; }
 .co-lastchance-sub { font-size: 11.5px; color: var(--color-text-tertiary); margin-left: auto; letter-spacing: -0.004em; }
-.co-lastchance-body { padding: 14px 22px 18px; }
 .co-lastchance-body > div + div { margin-top: 10px; }
 .co-lastchance-body img { max-width: 100%; height: auto; }
 
@@ -653,20 +665,31 @@
 }
 #existingLoginMessage.w-hidden { display: none; }
 #existingLoginMessage:empty { display: none; }
-#btnExistingLogin {
-    margin-top: 8px;
-    height: 42px;
-    padding: 0 22px;
-    background: var(--color-accent);
-    color: #fff;
-    border: 0;
-    border-radius: 999px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: filter 0.15s;
+/* Sign-in panel layout, from the checkout mockup: stacked label rows
+   and a full-width pill button. */
+#containerExistingUserSignin .co-form { display: flex; flex-direction: column; gap: 18px; }
+#containerExistingUserSignin .co-row { display: flex; flex-direction: column; gap: 6px; }
+#containerExistingUserSignin .co-signin-row { margin-bottom: 0; }
+#containerExistingUserSignin .co-label {
+    margin: 0;
+    font-size: var(--text-sm, 12px); font-weight: var(--fw-medium, 500);
+    color: var(--color-text-secondary);
+    letter-spacing: -0.004em;
 }
-#btnExistingLogin:hover { filter: brightness(0.95); }
+#btnExistingLogin.co-signin-btn {
+    height: 44px; width: 100%;
+    padding: 0 20px;
+    background: var(--color-accent); color: #fff;
+    border: 0; border-radius: var(--radius-pill, 999px);
+    font-size: 13.5px; font-weight: var(--fw-medium, 500);
+    letter-spacing: -0.008em;
+    font-family: inherit; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    transition: background var(--transition-fast, 0.15s);
+}
+#btnExistingLogin.co-signin-btn:hover { background: var(--color-accent-hover); }
+#btnExistingLogin.co-signin-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+#btnExistingLogin .w-hidden { display: none; }
 
 /* Password-strength meter */
 .password-strength-meter { margin-top: 4px; }
@@ -1873,7 +1896,7 @@ button.generate-password:hover {
                    bootstrap-switch widget here, which means we don't need
                    the .toggle-switch-success / no-icheck classes. *}
                 {if $showMarketingEmailOptIn}
-                    <div class="co-mailing" style="margin-bottom: 16px;">
+                    <div class="co-mailing marketing-email-optin" style="margin-bottom: 16px;">
                         <div class="co-mailing-icon" aria-hidden="true">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
                         </div>
@@ -2005,6 +2028,34 @@ button.generate-password:hover {
         var btnExisting = $('#btnAlreadyRegistered');
         var btnNew = $('#btnNewUserSignup');
         var custType = $('#inputCustType');
+        var security = $('#containerNewUserSecurity');
+        var optin = $('.marketing-email-optin');
+
+        /* The tabs call showLogin/showSignup directly, so standard_cart's
+           #btnAlreadyRegistered / #btnNewUserSignup handlers never run.
+           These mirror what those handlers do besides swapping the two
+           containers: the password + security-question block belongs to a
+           new account only, the state <select> StatesDropdown.js marks
+           required must not block an existing customer's submit while it
+           is hidden, and the mailing opt-in is a new-signup choice. */
+        function toggleNewUserExtras(isNew) {
+            var state = $('#stateselect');
+            if (isNew) {
+                if (!$.trim($('#passwdFeedback').text()) && !security.is('[data-keep-hidden]')) {
+                    security.removeClass('w-hidden').show();
+                }
+                if (state.hasClass('requiredAttributeRemoved')) {
+                    state.attr('required', 'required').removeClass('requiredAttributeRemoved');
+                }
+                optin.show();
+            } else {
+                security.hide();
+                if (state.attr('required')) {
+                    state.removeAttr('required').addClass('requiredAttributeRemoved');
+                }
+                optin.hide();
+            }
+        }
 
         function setActiveTab(key) {
             $('.co-auth-tab').each(function () {
@@ -2025,6 +2076,7 @@ button.generate-password:hover {
             btnExisting.addClass('w-hidden');
             btnNew.removeClass('w-hidden');
             if (custType.length) custType.val('existing');
+            toggleNewUserExtras(false);
             setActiveTab('signin');
         }
         function showSignup() {
@@ -2033,6 +2085,7 @@ button.generate-password:hover {
             btnNew.addClass('w-hidden');
             btnExisting.removeClass('w-hidden');
             if (custType.length) custType.val('new');
+            toggleNewUserExtras(true);
             setActiveTab('create');
         }
         btnExisting.on('click', showLogin);

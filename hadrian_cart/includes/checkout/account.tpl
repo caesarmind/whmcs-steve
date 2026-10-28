@@ -301,32 +301,26 @@
             <div class="alert alert-danger w-hidden" id="existingLoginMessage">
             </div>
 
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="form-group prepend-icon">
-                        <label for="inputLoginEmail" class="field-icon">
-                            <i class="fas fa-envelope"></i>
-                        </label>
-                        <input type="text" name="loginemail" id="inputLoginEmail" class="field form-control" placeholder="{$LANG.orderForm.emailAddress}" value="{$loginemail}">
-                    </div>
+            {* Stacked label rows + full-width button, as in the checkout
+               mockup's sign-in panel. The ids and names are WHMCS's
+               (scripts.min.js posts #inputLoginEmail / #inputLoginPassword
+               from #btnExistingLogin and swaps the two button spans). *}
+            <div class="co-form">
+                <div class="co-row">
+                    <label class="co-label" for="inputLoginEmail">{$LANG.orderForm.emailAddress}</label>
+                    <input type="text" name="loginemail" id="inputLoginEmail" class="field form-control" value="{$loginemail}" autocomplete="email">
                 </div>
-                <div class="col-sm-6">
-                    <div class="form-group prepend-icon">
-                        <div class="co-signin-row">
-                            <label for="inputLoginPassword" class="field-icon">
-                                <i class="fas fa-lock"></i>
-                            </label>
-                            <a href="{$WEB_ROOT}/pwreset.php" class="co-forgot-link">{$LANG.forgotpw}</a>
-                        </div>
-                        <input type="password" name="loginpassword" id="inputLoginPassword" class="field form-control" placeholder="{$LANG.clientareapassword}">
+                <div class="co-row">
+                    <div class="co-signin-row">
+                        <label class="co-label" for="inputLoginPassword">{$LANG.clientareapassword}</label>
+                        <a href="{$WEB_ROOT}/pwreset.php" class="co-forgot-link">{$LANG.forgotpw}</a>
                     </div>
+                    <input type="password" name="loginpassword" id="inputLoginPassword" class="field form-control" autocomplete="current-password">
                 </div>
-            </div>
-
-            <div class="text-center">
-                <button type="button" id="btnExistingLogin" class="btn btn-primary btn-md">
+                <button type="button" id="btnExistingLogin" class="co-signin-btn">
                     <span id="existingLoginButton">{lang key='login'}</span>
                     <span id="existingLoginPleaseWait" class="w-hidden">{lang key='pleasewait'}</span>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="9 18 15 12 9 6"/></svg>
                 </button>
             </div>
 

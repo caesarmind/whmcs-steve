@@ -19,7 +19,7 @@
 
 {if !$loggedin}
 
-    <div id="containerNewUserSecurity"{if (!$loggedin && $custtype eq "existing") || ($remote_auth_prelinked && !$securityquestions)} class="w-hidden"{/if}>
+    <div id="containerNewUserSecurity"{if (!$loggedin && $custtype eq "existing") || ($remote_auth_prelinked && !$securityquestions)} class="w-hidden"{/if}{if $remote_auth_prelinked && !$securityquestions} data-keep-hidden{/if}>
 
         <div class="sub-heading">
             <span class="primary-bg-color">{$LANG.orderForm.accountSecurity}</span>
