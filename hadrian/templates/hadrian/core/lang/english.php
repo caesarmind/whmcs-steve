@@ -961,7 +961,6 @@ return [
         'summaryReassurance' => 'Cancel anytime - 30-day money-back guarantee.',
         'reviewCart'        => 'Review cart',
         'backToDomain'      => 'Back to domain',
-        'securedNote'       => 'Secured by 256-bit SSL - PCI-DSS Level 1',
         // pw-strength meter (js-string).
         'pwWeak'            => 'Weak',
         'pwModerate'        => 'Moderate',
