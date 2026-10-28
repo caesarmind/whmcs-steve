@@ -1,16 +1,16 @@
 // Every static checker the suite runs, declared IN PLACE.
 //
-// The existing checkers stay where they live (hadrian/scripts, .dashbuild):
-// their own headers, the docs and older notes all refer to those paths, and
-// moving them would rot every one of those references. This file only says
-// how to run each one and whether a failure should block.
+// Two homes. hadrian/scripts holds the theme's own checkers, whose headers and
+// docs refer to that path. tests/static holds the ones written for the suite,
+// plus the seventeen that lived in the untracked .dashbuild/ scratch folder
+// until 2026-10-28 - a fresh checkout used to skip those with a note, which
+// left 17 of the 25 static checks visible on one machine only. Every checker
+// is tracked now; this file only says how to run each one and whether a
+// failure should block.
 //
 //   blocking: true   - a failure fails the run (and the pre-push gate)
 //   blocking: false  - reported, never fails the run (heuristics that flag
 //                      things for a human, e.g. "class used but not defined")
-//   optional: true   - skipped with a note when the file is missing.
-//                      .dashbuild/ is not tracked in git, so a fresh checkout
-//                      has none of those; the suite must still run there.
 
 import path from 'node:path';
 import fs from 'node:fs';
@@ -18,6 +18,7 @@ import { REPO_ROOT, PHP, TESTS_DIR } from './env.mjs';
 
 const node = process.execPath;
 const HADRIAN = path.join(REPO_ROOT, 'hadrian');
+const STATIC = f => path.join(TESTS_DIR, 'static', f);
 
 const tplFiles = () => {
   const out = [];
@@ -33,10 +34,10 @@ const tplFiles = () => {
 };
 
 export const CHECKS = [
-  // --- new in tests/ -------------------------------------------------------
-  { id: 'css-ascii', title: 'CSS files are ASCII-only', cmd: [node, path.join(TESTS_DIR, 'static', 'css-ascii.mjs')], cwd: REPO_ROOT,
+  // --- tests/static ----------------------------------------------------------
+  { id: 'css-ascii', title: 'CSS files are ASCII-only', cmd: [node, STATIC('css-ascii.mjs')], cwd: REPO_ROOT,
     blocking: true, why: 'Unicode box-drawing in a CSS comment makes Chrome drop whole sections on this install.' },
-  { id: 'php-lint', title: 'Addon + theme PHP parses', cmd: [node, path.join(TESTS_DIR, 'static', 'php-lint.mjs')], cwd: REPO_ROOT,
+  { id: 'php-lint', title: 'Addon + theme PHP parses', cmd: [node, STATIC('php-lint.mjs')], cwd: REPO_ROOT,
     blocking: true, why: 'A parse error in the addon takes out the admin and every client page that runs its hooks.' },
 
   // --- hadrian/scripts (tracked) --------------------------------------------
@@ -47,10 +48,14 @@ export const CHECKS = [
   { id: 'html-balance', title: 'Container tags balance (heuristic)', cmd: [node, 'scripts/check-html-balance.mjs'], cwd: HADRIAN, blocking: false },
   { id: 'css-classes', title: 'Classes used are defined (heuristic)', cmd: [node, 'scripts/check-css-classes.mjs'], cwd: HADRIAN, blocking: false },
 
-  // --- .dashbuild (untracked, optional) --------------------------------------
-  { id: 'smarty-lint', title: 'Admin templates: Smarty safety lint', cmd: [node, '.dashbuild/smarty-lint.mjs'], cwd: REPO_ROOT, blocking: true, optional: '.dashbuild/smarty-lint.mjs' },
-  { id: 'admin-js', title: 'Admin inline JS parses', cmd: [node, '.dashbuild/check-admin-js.mjs'], cwd: REPO_ROOT, blocking: true, optional: '.dashbuild/check-admin-js.mjs' },
-  { id: 'doc-anchors', title: 'Admin tooltips link to real doc anchors', cmd: [node, '.dashbuild/check-doc-anchors.mjs'], cwd: REPO_ROOT, blocking: true, optional: '.dashbuild/check-doc-anchors.mjs' },
+  // --- tests/static, moved in from .dashbuild on 2026-10-28 ------------------
+  // Four of these (colors-panel, login-styles, savebar-rollout, creating-pages)
+  // render through the Smarty that `composer install -d tests/static` provides;
+  // the preflight checks for it.
+  { id: 'smarty-lint', title: 'Admin templates: Smarty safety lint', cmd: [node, STATIC('smarty-lint.mjs')], cwd: REPO_ROOT, blocking: true },
+  { id: 'admin-js', title: 'Admin inline JS parses', cmd: [node, STATIC('check-admin-js.mjs')], cwd: REPO_ROOT, blocking: true },
+  { id: 'doc-anchors', title: 'Admin tooltips link to real doc anchors', cmd: [node, STATIC('check-doc-anchors.mjs')], cwd: REPO_ROOT, blocking: true,
+    why: 'Rebuilds hadrian-documentation/dist first, so a renamed heading fails here instead of dropping the reader at the top of the page.' },
   ...[
     ['announcements', 'Announcements page model'],
     ['colors-panel', 'Colours admin panel'],
@@ -64,9 +69,9 @@ export const CHECKS = [
     ['settings-doc-coverage', 'Every setting is documented'],
     ['style-seed', 'Style seed'],
     ['style-swatch', 'Style swatches'],
-  ].map(([id, title]) => ({ id, title, cmd: [PHP, `.dashbuild/check-${id}.php`], cwd: REPO_ROOT, blocking: true, optional: `.dashbuild/check-${id}.php` })),
-  { id: 'creating-pages', title: 'Custom page creation', cmd: [PHP, '.dashbuild/test-creating-pages.php'], cwd: REPO_ROOT, blocking: true, optional: '.dashbuild/test-creating-pages.php' },
-  { id: 'visibility-gate', title: 'Page visibility gate', cmd: [PHP, '.dashbuild/test-visibility-gate.php'], cwd: REPO_ROOT, blocking: true, optional: '.dashbuild/test-visibility-gate.php' },
+  ].map(([id, title]) => ({ id, title, cmd: [PHP, STATIC(`check-${id}.php`)], cwd: REPO_ROOT, blocking: true })),
+  { id: 'creating-pages', title: 'Custom page creation', cmd: [PHP, STATIC('test-creating-pages.php')], cwd: REPO_ROOT, blocking: true },
+  { id: 'visibility-gate', title: 'Page visibility gate', cmd: [PHP, STATIC('test-visibility-gate.php')], cwd: REPO_ROOT, blocking: true },
 ];
 
 // Tier 2 lives here too so run.mjs treats it like any other check.

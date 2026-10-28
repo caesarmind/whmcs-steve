@@ -170,7 +170,7 @@ as a three-layer per-key merge, later layers winning:
 `/^[a-z][a-z0-9_-]*$/` (it is interpolated into a path). Overlay files load
 inside try/catch — a syntax error means "layer ignored", not a white screen.
 Customer-facing doc: `hadrian-documentation/content/client-theme/08b-languages.md`.
-Verify with `php .dashbuild/check-lang-loading.php` (18 assertions on the real
+Verify with `php tests/static/check-lang-loading.php` (18 assertions on the real
 loader).
 
 ## Add a hook

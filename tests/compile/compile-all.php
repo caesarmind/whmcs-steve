@@ -4,7 +4,7 @@
  *
  *   php tests/compile/compile-all.php [--json]
  *
- * Why this and not .dashbuild/smarty-lint.mjs: the lint is a regex over the
+ * Why this and not tests/static/smarty-lint.mjs: the lint is a regex over the
  * source ("we can't compile Smarty without WHMCS"). With the local stack we
  * can, so this asks the real compiler - WHMCS\Smarty, carrying WHMCS's custom
  * modifiers and its security policy. A template that passes here is one

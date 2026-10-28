@@ -73,3 +73,16 @@ export async function preflight({ ensureFixtures = true } = {}) {
 
   return { ok: checks.every(c => c.ok), checks, state: s };
 }
+
+// The static tier's one environment need. Four checkers (the colours panel,
+// the login variants, the save-bar rollout, the page-creation recipe) render
+// real templates through a Smarty that Composer installs into
+// tests/static/vendor - the gitignored twin of tests/node_modules. Without it
+// each would die on its require with a PHP fatal that reads like a theme bug.
+export function staticPreflight() {
+  const autoload = path.join(TESTS_DIR, 'static', 'vendor', 'autoload.php');
+  const ok = fs.existsSync(autoload);
+  return [{ name: 'Smarty for the static checkers', ok,
+    detail: ok ? path.relative(REPO_ROOT, autoload).replace(/\\/g, '/') : 'tests/static/vendor/autoload.php missing',
+    fix: 'composer install -d tests/static' }];
+}

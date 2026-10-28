@@ -1,0 +1,6 @@
+{
+    "description": "Smarty for the static checkers that render admin and theme templates outside WHMCS: check-colors-panel, check-login-styles, check-savebar-rollout and test-creating-pages. Install once per checkout with `composer install -d tests/static`; vendor/ is gitignored.",
+    "require": {
+        "smarty/smarty": "^4"
+    }
+}
