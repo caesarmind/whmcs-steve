@@ -1838,7 +1838,11 @@ button.generate-password:hover {
                    Wrap whatever the merchant's checkout-hook integrations
                    render in a .co-lastchance card so it doesn't
                    bleed raw markup into the page. *}
-                {if $hookOutput}
+                {* Only when a hook returned real markup: an array of blank strings (a
+                   module whose hook returns nothing) would otherwise draw an empty card. *}
+                {$_hasHookOutput = false}
+                {foreach $hookOutput as $_ho}{if $_ho|regex_replace:'/\s+/':''}{$_hasHookOutput = true}{/if}{/foreach}
+                {if $_hasHookOutput}
                     <div class="co-lastchance" style="margin-bottom: 16px;">
                         <div class="co-lastchance-head">
                             <span class="co-lastchance-badge">{$hadrianLang.cart.lastChance}</span>

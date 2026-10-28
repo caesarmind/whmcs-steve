@@ -1297,7 +1297,11 @@
                    layout. The hook content itself stays untouched -- it
                    may render its own grid / cards / banner depending on
                    what the merchant has installed. *}
-                {if $hookOutput}
+                {* Only when a hook returned real markup: an array of blank strings (a
+                   module whose hook returns nothing) would otherwise draw an empty card. *}
+                {$_hasHookOutput = false}
+                {foreach $hookOutput as $_ho}{if $_ho|regex_replace:'/\s+/':''}{$_hasHookOutput = true}{/if}{/foreach}
+                {if $_hasHookOutput}
                     <div class="card ct-recommend">
                         <div class="ct-recommend-head">
                             <span class="ct-recommend-badge">{$hadrianLang.cart.lastChance}</span>
