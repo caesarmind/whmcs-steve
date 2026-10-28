@@ -106,14 +106,6 @@
         padding: 22px 24px 18px;
         border-bottom: 0.5px solid var(--color-border);
     }
-    .ct-product-ico {
-        width: 48px; height: 48px; border-radius: 12px;
-        background: var(--color-accent-light);
-        color: var(--color-accent);
-        display: flex; align-items: center; justify-content: center;
-        flex-shrink: 0;
-    }
-    .ct-product-ico svg { width: 22px; height: 22px; }
     .ct-product-meta { flex: 1; min-width: 0; }
     .ct-product-eyebrow {
         font-size: 10.5px; font-weight: 600;
@@ -934,9 +926,6 @@
                     {foreach $products as $num => $product}
                         <div class="card ct-product" data-cart-item="product-{$num}">
                             <div class="ct-product-head">
-                                <div class="ct-product-ico">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M20 4H4a2 2 0 00-2 2v12a2 2 0 002 2h16a2 2 0 002-2V6a2 2 0 00-2-2z"/><circle cx="12" cy="12" r="4"/></svg>
-                                </div>
                                 <div class="ct-product-meta">
                                     <div class="ct-product-eyebrow">{$product.productinfo.groupname}</div>
                                     <h2 class="ct-product-title">{$product.productinfo.name}</h2>
@@ -1036,9 +1025,6 @@
                     {foreach $addons as $num => $addon}
                         <div class="card ct-product" data-cart-item="addon-{$num}">
                             <div class="ct-product-head">
-                                <div class="ct-product-ico">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                                </div>
                                 <div class="ct-product-meta">
                                     <div class="ct-product-eyebrow">{$LANG.orderaddon}</div>
                                     <h2 class="ct-product-title">{$addon.name}</h2>
@@ -1075,9 +1061,6 @@
                     {foreach $domains as $num => $domain}
                         <div class="card ct-product" data-cart-item="domain-{$num}">
                             <div class="ct-product-head">
-                                <div class="ct-product-ico">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-                                </div>
                                 <div class="ct-product-meta">
                                     <div class="ct-product-eyebrow">{if $domain.type eq "register"}{$LANG.orderdomainregistration}{else}{$LANG.orderdomaintransfer}{/if}</div>
                                     <h2 class="ct-product-title">{$domain.domain}</h2>
@@ -1127,7 +1110,6 @@
                     {foreach $renewalsByType['services'] as $num => $service}
                         <div class="card ct-product" data-cart-item="srvrenew-{$num}">
                             <div class="ct-product-head">
-                                <div class="ct-product-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg></div>
                                 <div class="ct-product-meta">
                                     <div class="ct-product-eyebrow">{lang key='renewService.titleAltSingular'}</div>
                                     <h2 class="ct-product-title">{$service.name}</h2>
@@ -1151,7 +1133,6 @@
                     {foreach $renewalsByType['addons'] as $num => $service}
                         <div class="card ct-product" data-cart-item="addonrenew-{$num}">
                             <div class="ct-product-head">
-                                <div class="ct-product-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/><path d="M3 21v-5h5"/></svg></div>
                                 <div class="ct-product-meta">
                                     <div class="ct-product-eyebrow">{lang key='renewServiceAddon.titleAltSingular'}</div>
                                     <h2 class="ct-product-title">{$service.name}</h2>
@@ -1175,7 +1156,6 @@
                     {foreach $renewalsByType['domains'] as $num => $domain}
                         <div class="card ct-product" data-cart-item="domrenew-{$num}">
                             <div class="ct-product-head">
-                                <div class="ct-product-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg></div>
                                 <div class="ct-product-meta">
                                     <div class="ct-product-eyebrow">{$LANG.domainrenewal}</div>
                                     <h2 class="ct-product-title">{$domain.domain}</h2>
@@ -1205,7 +1185,6 @@
                     {foreach $upgrades as $num => $upgrade}
                         <div class="card ct-product" data-cart-item="upgrade-{$num}">
                             <div class="ct-product-head">
-                                <div class="ct-product-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg></div>
                                 <div class="ct-product-meta">
                                     <div class="ct-product-eyebrow">{$LANG.upgrade}</div>
                                     <h2 class="ct-product-title">
