@@ -1154,6 +1154,148 @@
                     </div>
 
                 </div>
+            </div>
+
+            <!-- Promo / taxes tabs -->
+            <div class="card ct-tabs-card">
+                <div class="ct-tabs" role="tablist">
+                    <button type="button" class="ct-tab active" data-tab="promo">Apply promo code</button>
+                    <button type="button" class="ct-tab" data-tab="tax">Estimate taxes</button>
+                </div>
+                <div class="ct-tab-panel is-active" data-panel="promo">
+                    <div class="ct-promo-row">
+                        <div class="ct-promo-input-wrap">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 01-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 00-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
+                            <input type="text" class="ct-promo-input" placeholder="Enter promo code if you have one">
+                        </div>
+                        <button type="button" class="ct-promo-apply">Apply</button>
+                    </div>
+                </div>
+                <div class="ct-tab-panel" data-panel="tax">
+                    <div class="ct-tax-grid">
+                        <div class="ct-tax-row">
+                            <label class="ct-tax-label" for="ct-tax-country">Country</label>
+                            <select id="ct-tax-country" class="ct-tax-input">
+                                <option>United States</option>
+                                <option>United Kingdom</option>
+                                <option>Germany</option>
+                                <option>Georgia</option>
+                            </select>
+                        </div>
+                        <div class="ct-tax-row">
+                            <label class="ct-tax-label" for="ct-tax-state">State / region</label>
+                            <input id="ct-tax-state" type="text" class="ct-tax-input" placeholder="California">
+                        </div>
+                    </div>
+                    <div class="ct-tax-grid">
+                        <div class="ct-tax-row">
+                            <label class="ct-tax-label" for="ct-tax-city">City</label>
+                            <input id="ct-tax-city" type="text" class="ct-tax-input" placeholder="San Francisco">
+                        </div>
+                        <div class="ct-tax-row">
+                            <label class="ct-tax-label" for="ct-tax-zip">Postcode</label>
+                            <input id="ct-tax-zip" type="text" class="ct-tax-input" placeholder="94103">
+                        </div>
+                    </div>
+                    <button type="button" class="ct-promo-apply is-active" style="width: 100%;">Estimate taxes</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ══ RIGHT: sticky summary ══ -->
+        <aside>
+            <div class="card ct-summary-card">
+                <div class="ct-summary-head">
+                    <h2>Order summary</h2>
+                    <span class="count">1 item</span>
+                </div>
+
+                <!-- Product row -->
+                <div class="ct-summary-product">
+                    <div class="ct-summary-product-meta">
+                        <div class="ct-summary-product-name">WordPress Hosting / Pro Plan</div>
+                        <div class="ct-summary-product-sub">Monthly renewal · gogia.com</div>
+                    </div>
+                    <div class="ct-summary-product-price">$20.00</div>
+                </div>
+
+                <!-- Totals -->
+                <div class="ct-totals">
+                    <div class="ct-totals-row">
+                        <span class="label">Recurring <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" title="Amount billed on each renewal"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></span>
+                        <span class="value">$20.00 USD</span>
+                    </div>
+                    <div class="ct-totals-row">
+                        <span class="label">Subtotal</span>
+                        <span class="value">$20.00 USD</span>
+                    </div>
+                </div>
+
+                <!-- Grand total -->
+                <div class="ct-summary-total">
+                    <span class="label">Total</span>
+                    <span class="value">$20.00 USD</span>
+                </div>
+
+                <div class="ct-summary-footer">
+                    <a href="checkout.html" class="ct-checkout-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                        Checkout — $20.00 USD
+                    </a>
+                    <a href="store.html" class="ct-continue-shop">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        Continue shopping
+                    </a>
+                </div>
+            </div>
+        </aside>
+    </div>
+
+    <!-- Empty state -->
+    <div class="when-empty">
+        <div class="card ct-empty">
+            <div class="ct-empty-ico">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+            </div>
+            <h2 class="ct-empty-title">Your cart is empty</h2>
+            <p class="ct-empty-desc">Browse our plans and add something to get started.</p>
+            <div class="ct-empty-actions">
+                <a href="store.html" class="btn-primary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    Browse plans
+                </a>
+                <a href="cart-domain-register.html" class="btn-secondary">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                    Register a domain
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="hp-footer only-top">
+    <div class="hp-footer-inner">
+        <div class="hp-footer-cols">
+            <div class="hp-footer-col"><h4>Shop &amp; Learn</h4><ul><li><a href="cloud-hosting.html">Cloud Hosting</a></li><li><a href="vps.html">VPS</a></li><li><a href="domains.html">Domains</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Support</h4><ul><li><a href="knowledgebase.html">Knowledgebase</a></li><li><a href="contact.html">Contact us</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Account</h4><ul><li><a href="login.html">Sign in</a></li></ul></div>
+            <div class="hp-footer-col"><h4>About Hostnodes</h4><ul><li><a href="#">Careers</a></li></ul></div>
+            <div class="hp-footer-col"><h4>Security</h4><ul><li><a href="ssl-certificates.html">SSL Certificates</a></li></ul></div>
+        </div>
+        <div class="hp-footer-bottom">
+            <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                <button type="button" class="locale-btn" aria-label="Choose language and currency" data-locale-open><span class="flag">🇺🇸</span><span>English</span><span class="sep">/</span><span>$ USD</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg></button>
+                <span>Copyright &copy; 2026 Hostnodes. All rights reserved.</span>
+            </div>
+            <div class="hp-footer-bottom-links"><a href="#">Privacy</a><a href="#">Terms</a></div>
+        </div>
+    </div>
+</footer>
+
+<div data-include="partials/sidebar-footer.html"></div>
+
+</div><!-- /.ph-main-wrap -->
+<div data-include="partials/locale-modal.html"></div>
 
 <script src="js/apple-theme.js?v=12"></script>
 <script src="js/apple-layout.js?v=17"></script>
