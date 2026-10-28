@@ -13,24 +13,30 @@
  * Contract preserved: removeItem('r', id, type) inline handlers,
  * #cartServiceRenewal{id}, #cartServiceAddonRenewal{id},
  * #cartDomainRenewal{id}, #linkCartRemoveServiceRenewal{id}, etc.,
- * .product-name / .product-group / .summary-totals / .total-due-today
- * / .amt class hooks.
+ * .summary-totals / .total-due-today / .amt class hooks (the promo sync
+ * in configureproduct.tpl reads these). .product-name / .product-group
+ * now appear only in the renewals branch.
  *}
 
 {if $producttotals}
-    <span class="product-name">{if $producttotals.allowqty && $producttotals.qty > 1}{$producttotals.qty} x {/if}{$producttotals.productinfo.name}</span>
-    <span class="product-group">{$producttotals.productinfo.groupname}</span>
+    {* Product branch follows the configure-page mockup's line list: no
+       name + group header (the first line already names the plan), the
+       billing cycle beside the plan name, no trailing colons, and no ISO
+       code after prices ("$6.24", as on the plan cards). The renewal
+       branch below keeps its .product-name section titles. *}
+    {$_cycle = ''}
+    {foreach $producttotals.pricing.recurringexcltax as $_c => $_r}{if !$_cycle}{$_cycle = $_c}{/if}{/foreach}
 
     <div class="clearfix summary-row">
-        <span class="pull-left float-left">{$producttotals.productinfo.name}</span>
-        <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$producttotals.pricing.baseprice}</span>
+        <span class="pull-left float-left">{if $producttotals.allowqty && $producttotals.qty > 1}{$producttotals.qty} x {/if}{$producttotals.productinfo.name}{if $_cycle} &middot; {$_cycle|lower}{/if}</span>
+        <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=($producttotals.pricing.baseprice|regex_replace:'/\s+[A-Z]{3}$/':'')}</span>
     </div>
 
     {foreach $producttotals.configoptions as $configoption}
         {if $configoption}
             <div class="clearfix summary-row summary-row-sub">
                 <span class="pull-left float-left">&nbsp;&raquo; {$configoption.name}: {$configoption.optionname}</span>
-                <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$configoption.recurring}{if $configoption.setup} + {$configoption.setup} {$LANG.ordersetupfee}{/if}</span>
+                <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=($configoption.recurring|regex_replace:'/\s+[A-Z]{3}$/':'')}{if $configoption.setup} + {$configoption.setup} {$LANG.ordersetupfee}{/if}</span>
             </div>
         {/if}
     {/foreach}
@@ -38,7 +44,7 @@
     {foreach $producttotals.addons as $addon}
         <div class="clearfix summary-row summary-row-sub">
             <span class="pull-left float-left">+ {$addon.name}</span>
-            <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$addon.recurring}</span>
+            <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=($addon.recurring|regex_replace:'/\s+[A-Z]{3}$/':'')}</span>
         </div>
     {/foreach}
 
@@ -46,33 +52,33 @@
         <div class="summary-totals">
             {if $producttotals.pricing.setup}
                 <div class="clearfix summary-row">
-                    <span class="pull-left float-left">{$LANG.cartsetupfees}:</span>
-                    <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$producttotals.pricing.setup}</span>
+                    <span class="pull-left float-left">{$LANG.cartsetupfees}</span>
+                    <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=($producttotals.pricing.setup|regex_replace:'/\s+[A-Z]{3}$/':'')}</span>
                 </div>
             {/if}
             {foreach from=$producttotals.pricing.recurringexcltax key=cycle item=recurring}
                 <div class="clearfix summary-row">
-                    <span class="pull-left float-left">{$cycle}:</span>
-                    <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$recurring}</span>
+                    <span class="pull-left float-left">{$cycle}</span>
+                    <span class="pull-right float-right">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=($recurring|regex_replace:'/\s+[A-Z]{3}$/':'')}</span>
                 </div>
             {/foreach}
             {if $producttotals.pricing.tax1}
                 <div class="clearfix summary-row">
-                    <span class="pull-left float-left">{$carttotals.taxname} @ {$carttotals.taxrate}%:</span>
-                    <span class="pull-right float-right">{$producttotals.pricing.tax1}</span>
+                    <span class="pull-left float-left">{$carttotals.taxname} @ {$carttotals.taxrate}%</span>
+                    <span class="pull-right float-right">{$producttotals.pricing.tax1|regex_replace:'/\s+[A-Z]{3}$/':''}</span>
                 </div>
             {/if}
             {if $producttotals.pricing.tax2}
                 <div class="clearfix summary-row">
-                    <span class="pull-left float-left">{$carttotals.taxname2} @ {$carttotals.taxrate2}%:</span>
-                    <span class="pull-right float-right">{$producttotals.pricing.tax2}</span>
+                    <span class="pull-left float-left">{$carttotals.taxname2} @ {$carttotals.taxrate2}%</span>
+                    <span class="pull-right float-right">{$producttotals.pricing.tax2|regex_replace:'/\s+[A-Z]{3}$/':''}</span>
                 </div>
             {/if}
         </div>
     {/if}
 
     <div class="total-due-today">
-        <span class="amt">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$producttotals.pricing.totaltoday}</span>
+        <span class="amt">{include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=($producttotals.pricing.totaltoday|regex_replace:'/\s+[A-Z]{3}$/':'')}</span>
         <span>{$LANG.ordertotalduetoday}</span>
     </div>
 

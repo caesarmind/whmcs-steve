@@ -562,7 +562,7 @@ var _localLang = {
 
                         {* WHMCS injects line items + subtotals + Due Today
                            into #producttotal via recalctotals(). CSS styles
-                           the emitted .product-name / .clearfix / .summary-totals
+                           the emitted .clearfix / .summary-totals
                            / .total-due-today in place. *}
                         <div class="summary-container" id="producttotal"></div>
 
@@ -575,7 +575,7 @@ var _localLang = {
 
                         <div class="cp-promo-row">
                             <input type="text" class="cp-promo-input" id="promocode" name="promocode" placeholder="{lang key="orderPromoCodePlaceholder"}" value="{if $promocode}{$promocode|escape}{/if}">
-                            <button type="button" class="cp-promo-apply" onclick="applyPromoCode();">{$LANG.orderpromovalidatebutton}</button>
+                            <button type="button" class="cp-promo-apply" onclick="applyPromoCode();">{$LANG.applyPromoCode}</button>
                         </div>
 
                         <div class="cp-summary-footer">

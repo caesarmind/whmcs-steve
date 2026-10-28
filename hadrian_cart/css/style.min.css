@@ -2705,8 +2705,10 @@ body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
 
 /* -- Promo code row ------------------------------------ */
 .cp-promo-row { display: flex; gap: 8px; align-items: center; padding: 12px 22px 16px; flex-wrap: wrap; }
+/* min-width 0, not 200px: in the 340px summary column a 200px floor pushed the
+   button onto a second line; the mockup keeps both on one row. */
 .cp-promo-input {
-    flex: 1; min-width: 200px; height: 34px;
+    flex: 1; min-width: 0; height: 34px;
     padding: 0 14px;
     border: 0.5px solid var(--color-border);
     border-radius: var(--radius-pill);
@@ -2747,7 +2749,14 @@ body[data-subnav-side="left"] .dp-split > aside { grid-column: 1; grid-row: 1; }
 /* Product name + group eyebrow at the very top of the summary body.
    Each row owns its own horizontal padding (20px) since #producttotal
    is now a direct child of the padding:0 .cp-summary-card. */
-#producttotal { padding: 0; }
+/* Two ids, to outrank the client theme's #order-standard_cart .summary-container
+   card rule (core-layout.css), which boxed the summary as a card inside the
+   card: its own border, radius, 18px/20px padding and margin. */
+#order-standard_cart #producttotal {
+    padding: 0; margin: 0;
+    border: 0; border-radius: 0;
+    background: none;
+}
 #producttotal .product-name {
     display: block;
     padding: 14px 20px 2px;
