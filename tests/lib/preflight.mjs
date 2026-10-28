@@ -21,7 +21,9 @@ export async function preflight({ ensureFixtures = true } = {}) {
   // 1. Is anything listening?
   let up = false;
   try {
-    const r = await fetch(BASE_URL + '/', { redirect: 'manual', signal: AbortSignal.timeout(15000) });
+    // 90s, not 15: the first request after Apache starts cold boots WHMCS and
+    // compiles templates, and took longer than 15s right after START-SERVER.
+    const r = await fetch(BASE_URL + '/', { redirect: 'manual', signal: AbortSignal.timeout(90000) });
     up = r.status > 0;
     add('stack reachable', up, `${BASE_URL} -> HTTP ${r.status}`, 'Start it: scripts/local-stack/START-SERVER.bat');
   } catch (e) {
