@@ -768,18 +768,9 @@
 
             </div>{* /.card *}
 
-            {* ── Guarantees strip — 3 trust cards below the main card ── *}
+            {* ── Guarantees strip — 2 trust cards below the main card ── *}
             {if $productCount > 0}
                 <div class="st-guarantees">
-                    <div class="card st-guarantee">
-                        <div class="st-guarantee-ico">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M1 4h22v16H1z"/><path d="M1 12h22"/><path d="M15 4v16"/></svg>
-                        </div>
-                        <div>
-                            <div class="st-guarantee-title">{$hadrianLang.cart.moneyBack}</div>
-                            <div class="st-guarantee-sub">{$hadrianLang.cart.moneyBackSub}</div>
-                        </div>
-                    </div>
                     <div class="card st-guarantee">
                         <div class="st-guarantee-ico">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>

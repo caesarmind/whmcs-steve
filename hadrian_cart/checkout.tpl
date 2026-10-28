@@ -284,9 +284,6 @@
     margin-top: 2px;
 }
 .co-summary-footer .co-back-link:hover { color: var(--color-accent); }
-.co-trust-strip { padding: 14px 20px 16px; border-top: 0.5px solid var(--color-border); display: flex; flex-direction: column; gap: 6px; font-size: 11px; color: var(--color-text-tertiary); letter-spacing: -0.004em; }
-.co-trust-strip .item { display: inline-flex; align-items: center; gap: 6px; }
-.co-trust-strip .item i { color: var(--color-green-text, #34c759); width: 12px; flex-shrink: 0; }
 
 /* Already-registered toggle row, restyled minimally so it fits the checkout chrome */
 .already-registered { padding: 10px 0 14px; }

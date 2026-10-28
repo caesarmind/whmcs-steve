@@ -492,16 +492,6 @@
     .ct-continue-shop:hover { color: var(--color-accent); }
     .ct-continue-shop svg { width: 11px; height: 11px; }
 
-    /* Trust strip */
-    .ct-trust {
-        padding: 12px 20px 16px;
-        display: flex; flex-direction: column; gap: 6px;
-        font-size: 11px; color: var(--color-text-tertiary);
-        letter-spacing: -0.004em;
-    }
-    .ct-trust-item { display: inline-flex; align-items: center; gap: 6px; }
-    .ct-trust-item svg { width: 12px; height: 12px; color: var(--color-green-text); flex-shrink: 0; }
-
     /* Express-checkout + gateway hook strip (server-rendered HTML, just gives it some breathing room) */
     .ct-express-row { padding: 0 20px 14px; display: flex; flex-direction: column; gap: 8px; }
     .ct-express-row .separator { text-align: center; font-size: 11px; color: var(--color-text-quaternary); letter-spacing: 0.05em; }
@@ -1519,11 +1509,6 @@
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                             {$LANG.orderForm.continueShopping}
                         </a>
-                    </div>
-
-                    <div class="ct-trust">
-                        <span class="ct-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>{$hadrianLang.cart.trustSsl}</span>
-                        <span class="ct-trust-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>{$hadrianLang.cart.trustMoneyBack}</span>
                     </div>
                 </div>
             </aside>

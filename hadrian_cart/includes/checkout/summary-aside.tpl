@@ -10,7 +10,6 @@
  *   .co-summary-total  -> Total Due Today (also #totalDueToday)
  *   .co-summary-cycle  -> recurring price line (#totalCartPrice)
  *   .co-summary-footer -> Complete Order pill + Back to cart link
- *   .co-trust-strip    -> static SSL + money-back row
  *
  * The Complete Order button uses HTML5 form="frmCheckout" attribute
  * to submit the form that lives in .co-left -- the button itself
@@ -94,11 +93,6 @@
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 {$hadrianLang.cart.backToCart}
             </a>
-        </div>
-
-        <div class="co-trust-strip">
-            <span class="item"><i class="fas fa-lock"></i> {$hadrianLang.cart.trustSsl}</span>
-            <span class="item"><i class="fas fa-check"></i> {$hadrianLang.cart.trustMoneyBack}</span>
         </div>
     </div>
 </aside>

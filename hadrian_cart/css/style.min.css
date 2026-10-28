@@ -1084,10 +1084,10 @@ body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
     letter-spacing: -0.004em;
 }
 
-/* -- Guarantees strip (3 trust cards below the grid) ------ */
+/* -- Guarantees strip (2 trust cards below the grid) ------ */
 .st-guarantees {
     margin-top: 20px;
-    display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px;
+    display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
 }
 @media (max-width: 720px) { .st-guarantees { grid-template-columns: 1fr; } }
 .st-guarantee {

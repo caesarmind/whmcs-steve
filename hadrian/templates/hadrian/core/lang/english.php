@@ -917,9 +917,7 @@ return [
         'lastChance'        => 'Last chance',
         'lastChanceTitle'   => 'Protect your services and add value',
         'oneClickAdd'       => 'One-click add. Remove anytime.',
-        'trustSsl'          => '256-bit SSL - PCI-DSS Level 1',
-        'trustMoneyBack'    => '30-day money-back guarantee',
-        'emptySub'          => 'Browse our plans and add something to get started. Everything comes with a 30-day money-back guarantee.',
+        'emptySub'          => 'Browse our plans and add something to get started.',
         'registerDomain'    => 'Register a domain',
         // Sidebar fallback labels (low-conf; may be real WHMCS keys - see notes).
         'categories'        => 'Categories',
@@ -958,7 +956,7 @@ return [
         'serverInfoSub'     => 'Set the hostname, root password, and nameserver prefixes for your server.',
         'configOptionsSub'  => 'Customize storage, CPU, region, and other options for this plan.',
         'addonsSub'         => 'Optional extras to enhance your plan. Add or remove anytime.',
-        'summaryReassurance' => 'Cancel anytime - 30-day money-back guarantee.',
+        'summaryReassurance' => 'Cancel anytime.',
         'reviewCart'        => 'Review cart',
         'backToDomain'      => 'Back to domain',
         // pw-strength meter (js-string).
@@ -1018,7 +1016,7 @@ return [
         'searchDomainHint'     => 'Type a domain name in the search box above to check availability.',
 
         // products (B04).
-        'orderServicesTagline' => 'Browse our plans and add the ones you need to your cart. All plans come with a 30-day money-back guarantee.',
+        'orderServicesTagline' => 'Browse our plans and add the ones you need to your cart.',
         'plansHeading'         => 'Available plans',
         'cycleMonthly'         => 'Monthly',
         'cycleAnnual'          => 'Annual',
@@ -1044,14 +1042,12 @@ return [
         'emptyGroupDesc'       => 'We\'re preparing plans for this service. Browse another category or get in touch -- our team can put together a custom quote for you.',
         'requestQuote'         => 'Request a quote',
         'browseAll'            => 'Browse all categories',
-        'moneyBack'            => '30-day money back',
-        'moneyBackSub'         => 'Full refund if you\'re not happy -- no questions asked.',
         'support247'           => '24/7 support',
         'support247Sub'        => 'Reach a human engineer any time via chat or ticket.',
         'uptime'               => '99.99% uptime SLA',
         'uptimeSub'            => 'Backed by global anycast and redundant power.',
         'pickCategoryTitle'    => 'Choose a category to get started',
-        'pickCategoryDesc'     => 'Browse our plans by service. All plans come with a 30-day money-back guarantee.',
+        'pickCategoryDesc'     => 'Browse our plans by service.',
         'viewPlans'            => 'View plans',
     ],
 
