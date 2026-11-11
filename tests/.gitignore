@@ -3,3 +3,5 @@
 reports/
 node_modules/
 test-results/
+# Smarty for the four static checkers that render templates (composer install -d tests/static).
+static/vendor/

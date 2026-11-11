@@ -17,7 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn, execFileSync } from 'node:child_process';
 import { CHECKS, COMPILE } from './lib/registry.mjs';
-import { preflight } from './lib/preflight.mjs';
+import { preflight, staticPreflight } from './lib/preflight.mjs';
 import { REPO_ROOT, TESTS_DIR, REPORTS_DIR, BASE_URL, PHP, readJson } from './lib/env.mjs';
 import { KNOWN_ISSUES } from './e2e/known-issues.mjs';
 
@@ -56,15 +56,20 @@ const lastLine = s => (s.trim().split('\n').filter(l => l.trim()).pop() || '').r
 console.log(bold(`Hadrian test suite`) + dim(`  ${[...tiers].join(' + ')}  @ ${summary.commit || '?'}  ${BASE_URL}`));
 
 // ------------------------------------------------------------- preflight
+// The static tier needs no site, but four of its checkers need the Smarty that
+// `composer install -d tests/static` provides; every other tier needs the local
+// stack. Both are environment problems, not theme bugs: exit 2, with the fix.
 const needsSite = ['compile', 'smoke', 'browser', 'visual'].some(t => tiers.has(t));
-if (needsSite) {
+if (needsSite || tiers.has('static')) {
   console.log('\n' + bold('Preflight'));
-  const pf = await preflight({ ensureFixtures: ['smoke', 'browser', 'visual'].some(t => tiers.has(t)) });
-  for (const ch of pf.checks) console.log(`  ${ch.ok ? green('ok  ') : red('FAIL')}  ${ch.name.padEnd(36)} ${dim(ch.detail.slice(0, 80))}`);
-  summary.sections.push({ name: 'Preflight', blocking: true, ok: pf.ok, items: pf.checks.map(ch => ({ name: ch.name, ok: ch.ok, detail: ch.detail, fix: ch.fix })) });
-  if (!pf.ok) {
+  const checks = tiers.has('static') ? staticPreflight() : [];
+  if (needsSite) checks.push(...(await preflight({ ensureFixtures: ['smoke', 'browser', 'visual'].some(t => tiers.has(t)) })).checks);
+  const pfOk = checks.every(ch => ch.ok);
+  for (const ch of checks) console.log(`  ${ch.ok ? green('ok  ') : red('FAIL')}  ${ch.name.padEnd(36)} ${dim(ch.detail.slice(0, 80))}`);
+  summary.sections.push({ name: 'Preflight', blocking: true, ok: pfOk, items: checks.map(ch => ({ name: ch.name, ok: ch.ok, detail: ch.detail, fix: ch.fix })) });
+  if (!pfOk) {
     console.log('\n' + red('Environment not ready - nothing was tested.'));
-    for (const ch of pf.checks.filter(x => !x.ok)) console.log(`  ${ch.name}: ${yellow(ch.fix)}`);
+    for (const ch of checks.filter(x => !x.ok)) console.log(`  ${ch.name}: ${yellow(ch.fix)}`);
     writeReport(); process.exit(2);
   }
 }
@@ -77,10 +82,6 @@ async function runChecks(title, list) {
   const worker = async () => {
     while (queue.length) {
       const ch = queue.shift();
-      if (ch.optional && !fs.existsSync(path.join(REPO_ROOT, ch.optional))) {
-        items.push({ ...ch, ok: true, skipped: true, detail: `skipped - ${ch.optional} not present (.dashbuild is untracked)` });
-        continue;
-      }
       const [cmd, ...args] = typeof ch.cmd === 'function' ? ch.cmd() : ch.cmd;
       const r = await run(cmd, args, { cwd: ch.cwd });
       items.push({ ...ch, ok: r.code === 0, ms: r.ms, detail: lastLine(r.out), output: r.out.replace(/\x1b\[[0-9;]*m/g, '').slice(-6000) });

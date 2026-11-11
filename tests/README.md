@@ -9,7 +9,15 @@ node tests/run.mjs
 ```
 
 Or double-click **`tests/TEST.bat`** - it runs everything and opens the report.
-Start the stack first (`scripts/local-stack/START-SERVER.bat`).
+Start the stack first (`scripts/local-stack/START-SERVER.bat`), and once per
+checkout install the Smarty that four of the static checkers render with:
+
+```bash
+composer install -d tests/static
+```
+
+(On a Laragon machine without Composer on the PATH:
+`php C:\laragon\bin\composer\composer.phar install -d tests/static`.)
 
 | Result | Meaning |
 |---|---|
@@ -25,7 +33,7 @@ Playwright report (screenshots, traces, the HTML of every failing page).
 | Tier | What it checks | Needs the site | Time |
 |---|---|---|---|
 | **preflight** | the stack is up, serves *this* checkout, the template is `hadrian`, the addon's hooks load, data is seeded, a gateway is active | yes | ~5 s |
-| **static** | 26 checkers: CSS is ASCII-only, PHP parses, Smarty balance, every `$hadrianLang` key resolves, colour defaults match the CSS, the three "Free" implementations agree, admin JS parses, docs anchors, ... | no | ~30 s |
+| **static** | 25 checkers: CSS is ASCII-only, PHP parses, Smarty balance, every `$hadrianLang` key resolves, colour defaults match the CSS, the three "Free" implementations agree, admin JS parses, docs anchors, ... | no | ~30 s |
 | **compile** | every one of the 314 templates compiled by **WHMCS's own Smarty** (its modifiers + security policy) | WHMCS files | ~12 s |
 | **smoke** | every page x persona over HTTP, every Hadrian admin screen, and a crawl that follows every link the theme renders | yes | ~3 min |
 | **browser** | real Chromium: every key page in 3 layouts x light/dark + phone width; JS errors, failed assets, layout geometry, unreadable text; six user flows | yes | ~3 min |
@@ -108,8 +116,8 @@ issue stops occurring, the run fails asking for the entry to be removed.
   will usually have found it already; the route makes it explicit.
 - **A new admin screen:** add its `action=` to `ADMIN_ACTIONS` in the same file.
   Menu, style and page editors are discovered automatically.
-- **A new checker script:** declare it in `tests/lib/registry.mjs` - where it
-  lives, how to run it, and whether a failure should block.
+- **A new checker script:** put it in `tests/static/` and declare it in
+  `tests/lib/registry.mjs` - how to run it, and whether a failure should block.
 - **A new kind of bug:** add an oracle to `tests/e2e/oracles.mjs`, then prove it
   catches the bug by running it against the broken version first.
 
@@ -120,8 +128,18 @@ issue stops occurring, the run fails asking for the entry to be removed.
   edited template can get truncated pages (Linux production is not affected).
   `tests/lib/warmup.mjs` compiles sequentially before the workers start, but
   only when the cache is cold or a template changed - otherwise it costs nothing.
-- **`.dashbuild/` is not in git.** 19 of the static checks live there; on a
-  fresh checkout they are skipped with a note rather than failing.
+- **Every static checker is tracked.** Until 2026-10-28, 17 of the 25 lived in
+  the untracked `.dashbuild/` scratch folder and a fresh checkout skipped them
+  with a note; they are in `tests/static/` now. The four that render templates
+  through Smarty need `composer install -d tests/static` once (into the
+  gitignored `tests/static/vendor/`) - without it the run stops in the
+  preflight with exit 2 and that command.
+- **The doc-anchors check builds the docs first** (`node scripts/build-docs.mjs
+  --base=`, into the gitignored `hadrian-documentation/dist`), so it judges the
+  current source rather than whatever an earlier build left behind. Three
+  checkers also write the pages they rendered to `tests/.local/adminpreview/`
+  for a human to look at: the colours panel, the colour-scope leak probe and
+  the login variants.
 - **Visual baselines are per machine** (fonts, GPU) and live in
   `tests/.local/visual`. A difference is a question, not a failure.
 - **What it cannot test:** anything that only exists in production - licence
