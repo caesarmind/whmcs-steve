@@ -397,6 +397,8 @@ return [
         'cpUnavailableTerminated'   => 'This service has been %s; control-panel access is no longer available.',
         'cpUnavailableStatus'       => 'Control-panel access (cPanel / Webmail) is unavailable while this service is %s.',
         'cpPayOverdue'              => 'Pay the overdue invoice to reactivate it.',
+        'licenseDetails'            => 'License Details',
+        'controlPanel'              => 'Control Panel',
         'upgradeSublabel'           => 'Change your hosting plan',
         'renewSublabel'             => 'Extend your service term',
         'changePwSublabel'          => 'Set a new control-panel password',

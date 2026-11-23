@@ -247,10 +247,12 @@
    disk/bandwidth bars show only when the server module has reported usage
    ($lastupdate, set on the last sync); otherwise a short note. Bar width
    uses the real $diskpercent / $bwpercent (e.g. "12%"); values are in MB. *}
-{* ── License Details (Software Licensing module output) ──────────────────
+{* ── Module output (any non-cPanel server module) ─────────────────────────
    hadrian replaced the raw $moduleclientarea dump with hosting status-cards
-   (see the Manage card below), which hid the licensing module's panel. Render
-   it here for any non-cPanel module service (licensing etc.), restyled. *}
+   (see the Manage card below), which hid other modules' panels. Render it
+   here for any non-cPanel module service, restyled. Software Licensing keeps
+   its "License Details" title; every other module (OpenPanel, Plesk, a VPS
+   panel...) gets "Control Panel", since its output is usually a login button. *}
 {if !empty($moduleclientarea) && !$pdIsCpanelSvc}
 <style>{literal}
 #pd-license .section-header,#pd-license .section-title{display:none}
@@ -266,7 +268,7 @@
 #pd-license .label-danger{background:#fbe0e0;color:#b00020}
 {/literal}</style>
 <div class="card" id="pd-license">
-    <div class="card-header"><h2 class="card-title">License Details</h2></div>
+    <div class="card-header"><h2 class="card-title">{if $module == 'licensing'}{$hadrianLang.services.licenseDetails}{else}{$hadrianLang.services.controlPanel}{/if}</h2></div>
     <div class="card-body">{$moduleclientarea}</div>
 </div>
 {/if}
