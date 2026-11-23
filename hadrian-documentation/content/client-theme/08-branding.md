@@ -155,29 +155,3 @@ Four things people reasonably look for here and will not find:
 | Custom CSS | **Styles -> Custom CSS** |
 | Email logo | Not part of the theme. WHMCS email templates carry their own branding |
 :::
-
-## Common problems
-
-### My logo is not showing
-
-Check which slot the active layout uses. The Icon Rail reads the **square** logo, not the full one, so an install with only a full logo shows the rail's placeholder. The sidebar and top navigation read the full logo.
-
-### The logo disappears in dark mode
-
-Only one variant is uploaded and it is dark ink. Upload a light-coloured version into the **dark backgrounds** slot - that slot is for the logo you want shown *on* dark, not a darker logo.
-
-### The rail shows a grey placeholder
-
-That is the square-logo slot being empty. The rail does not fall back to text on purpose.
-
-### My social icons are not in the footer
-
-Three things to check, in order: the **Extended Footer + Info** layout is active, **Hide Footer Social Links** is off, and the URL is a full `https://` address rather than a handle.
-
-### My SVG was rejected
-
-It contains scripting. See [the warning above](/client-theme/branding/#uploading-replacing-and-removing) - re-export without scripts.
-
-### The file is too large
-
-The caps differ per slot: 2 MB for full logos, 1 MB for square logos, 256 KB for the favicon. A favicon over 256 KB is almost always a full-size PNG that should be scaled down first.

@@ -252,20 +252,3 @@ Renewing is done from the same service in our billing area that carries the
 reissue button. Nothing in your installation needs to change afterwards - the
 next check picks up the new expiry on its own, and the reminder on the admin
 dashboard clears.
-
-## Common problems
-
-| What you see | What it usually is |
-| --- | --- |
-| "No license key" after entering one | The save did not go through; re-open the screen and confirm the field holds the key. |
-| Went unverified right after a migration | Domain, IP or directory changed. [Reissue](#moving-to-another-server-or-domain). |
-| Still unverified a day after reissuing | The result is cached; press **Save & check** to force a fresh check. |
-| Unverified, and nothing changed here | Outbound HTTPS from your server is blocked, or cURL is missing. |
-| A 503 naming a specific file | [File integrity](#file-integrity) - re-upload that file from the release archive. |
-| Client area went back to the stock theme | The license reverted it. Fix the status, then re-check; the theme is restored automatically. |
-
-:::warn Buy only from us
-Hadrian licenses are sold by Caesarthemes and through the WHMCS Marketplace. We
-have no resellers. A key bought anywhere else is not a license we can support or
-reissue.
-:::

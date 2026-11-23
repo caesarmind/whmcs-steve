@@ -56,6 +56,11 @@ const CASES = [
     input: ':::\n\n## After\n',
     want: (o) => o.toc.length === 1 },
 
+  { name: 'toc nests h3 under h2, skips h4', mode: 'block',
+    input: '## Section\n\n### Sub\n\n#### Detail\n',
+    want: (o) => o.toc.length === 2
+      && o.toc[0][2] === 2 && o.toc[1][1] === 'Sub' && o.toc[1][2] === 3 },
+
   // --- wrong output ------------------------------------------------------
   { name: 'multi-parameter link href is escaped once', mode: 'inline',
     input: '[pay](https://x.com/a?b=1&c=2)',

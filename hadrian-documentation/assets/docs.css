@@ -561,6 +561,9 @@ body {
   position: sticky; top: 60px; align-self: flex-start;
   padding: 40px 20px;
   display: flex; flex-direction: column; gap: 2px;
+  /* With h3 entries the rail can outgrow the viewport (Settings lists ~30);
+     it scrolls within itself instead of pinning its tail off-screen. */
+  max-height: calc(100vh - 60px); overflow-y: auto;
 }
 .doc-toc-head {
   font-size: 11px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
@@ -580,6 +583,11 @@ body {
   border-left-color: var(--color-accent);
   color: var(--color-accent);
   font-weight: 600;
+}
+/* Sub-section (h3) entries: indented under their section, one border line. */
+.doc-toc a.doc-toc-l3 {
+  padding-left: 24px;
+  font-size: 12.5px;
 }
 
 /* -- responsive -----------------------------------------------------------
