@@ -9,27 +9,16 @@
 //     Close Ticket link (8f7e5f2): a state-changing GET without its CSRF
 //     token, which WHMCS answers by destroying the session.
 //
-// Links that change state on purpose are never followed - see SKIP. Anything
-// carrying a token= is skipped too: a CSRF token in a link means "this does
-// something", and the crawl must never do things to the fixtures.
+// Which links are followed (and which never are) lives in crawl-rules.mjs,
+// shared with the coverage runner.
 
 import { test, expect } from '@playwright/test';
 import { BASE_URL } from '../lib/env.mjs';
 import { session } from './helpers.mjs';
 import { inspect } from './oracles.mjs';
 import { triage } from './known-issues.mjs';
+import { linksOf } from './crawl-rules.mjs';
 
-const SKIP = [
-  /logout|dologout/i,            // ends the session by design
-  /[?&]token=/i,                  // carries a CSRF token => mutates something
-  /closeticket|markasread|dismiss|regenerate/i,
-  /[?&]a=(add|remove|empty|update|checkout)/i, /sub=(delete|remove|save)/i,
-  /[?&](language|currency)=/i,   // flips session settings for later pages
-  /switchaccount|\/user\/accounts\/\d/i,
-  /dl\.php|\.pdf$|dosinglesignon|\/sso|aff\.php|link\.php|\/admin/i,
-  /action=cancel|paynow|masspay|[?&]download/i,
-];
-const ASSET = /\.(css|js|png|jpe?g|gif|svg|ico|webp|woff2?|ttf|xml|txt|zip)$/i;
 const MAX_PAGES = Number(process.env.HADRIAN_CRAWL_MAX || 150);
 
 for (const persona of ['guest', 'full']) {
@@ -65,21 +54,7 @@ for (const persona of ['guest', 'full']) {
         break; // everything after this would be judged as the wrong persona
       }
 
-      // Resolve the way a browser does: against <base href> when the page has
-      // one (header.tpl always emits it), not against the page's own URL.
-      // Ignoring it turns every relative link on a path-style route such as
-      // /index.php/user/security into a phantom 404.
-      const baseHref = (html.match(/<base\s+href="([^"]+)"/i) || [])[1];
-      const resolveFrom = baseHref ? new URL(baseHref.replace(/&amp;/g, '&'), BASE_URL + url).href : BASE_URL + url;
-      for (const m of html.matchAll(/<a\b[^>]*\bhref="([^"#][^"]*)"/g)) {
-        const raw = m[1].replace(/&amp;/g, '&');
-        if (/^(mailto|tel|javascript|data):/i.test(raw)) continue;
-        let u;
-        try { u = new URL(raw, resolveFrom); } catch { continue; }
-        if (u.origin !== BASE_URL || ASSET.test(u.pathname)) continue;
-        const next = u.pathname + u.search;
-        if (!seen.has(next) && !SKIP.some(re => re.test(next))) queue.push([next, url]);
-      }
+      for (const next of linksOf(html, url, BASE_URL)) if (!seen.has(next)) queue.push([next, url]);
     }
     await ctx.dispose();
 

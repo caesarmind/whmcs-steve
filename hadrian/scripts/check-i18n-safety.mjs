@@ -12,6 +12,22 @@ const files = process.argv.slice(2);
 const LANGF = 'hadrian/templates/hadrian/core/lang/english.php';
 const langRaw = fs.readFileSync(LANGF, 'utf8');
 const haveKey = k => new RegExp(`'${k}'\\s*=>`).test(langRaw);
+// group.key pairs. haveKey() alone accepted a key from ANY group: the services
+// list's aria-label read $hadrianLang.services.rowsPerPage, which does not
+// exist (only common.rowsPerPage / domains.rowsPerPage do), and rendered empty.
+// Top-level groups sit at 4 spaces, their keys at 8 (deeper nesting is rare and
+// only ever reached as group.key.sub, which the 2-level reference below skips).
+const groupKeys = new Set();
+{
+  let group = null;
+  for (const line of langRaw.split(/\r?\n/)) {
+    const g = line.match(/^    '([A-Za-z0-9_]+)'\s*=>\s*\[/);
+    if (g) { group = g[1]; continue; }
+    const k = line.match(/^        '([A-Za-z0-9_]+)'\s*=>/);
+    if (k && group) groupKeys.add(`${group}.${k[1]}`);
+  }
+}
+const haveGroupKey = (g, k) => groupKeys.has(`${g}.${k}`);
 
 let fail = 0, n = 0;
 for (const f of files) {
@@ -45,6 +61,7 @@ for (const f of files) {
   }
   for (const m of raw.matchAll(/hadrianLang\.([a-zA-Z]+)\.([a-zA-Z0-9]+)/g)) {
     if (!haveKey(m[2])) { console.log(`BADREF     ${f}: $hadrianLang.${m[1]}.${m[2]} (key '${m[2]}' not in lang file)`); fail = 1; }
+    else if (!haveGroupKey(m[1], m[2])) { console.log(`BADGROUP   ${f}: $hadrianLang.${m[1]}.${m[2]} (key '${m[2]}' exists, but not in group '${m[1]}' - renders empty)`); fail = 1; }
   }
 }
 console.log(`--- checked ${n} changed .tpl file(s); ` + (fail ? 'ISSUES FOUND (above)' : 'OK: internally balanced + all hadrianLang refs resolve'));

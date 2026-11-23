@@ -88,6 +88,11 @@ if ($flowTickets) {
     Capsule::table('tblticketreplies')->whereIn('tid', $flowTickets)->delete();
     Capsule::table('tbltickets')->whereIn('id', $flowTickets)->delete();
 }
+// Replies the reply flow added to a SEEDED ticket (the ticket itself stays,
+// back in the status the reply moved it out of).
+$repliedTo = Capsule::table('tblticketreplies')->where('message', 'like', '[flow] reply%')->pluck('tid')->unique()->all();
+Capsule::table('tblticketreplies')->where('message', 'like', '[flow] reply%')->delete();
+if ($repliedTo) Capsule::table('tbltickets')->whereIn('id', $repliedTo)->where('status', 'Customer-Reply')->update(['status' => 'Open']);
 // ...and their notification emails, which otherwise keep linking (in the
 // client's email history) to tickets that no longer exist.
 Capsule::table('tblemails')->where('subject', 'like', '%[flow]%')->delete();
@@ -151,6 +156,11 @@ if (!Capsule::table('tblaffiliates')->where('clientid', $full->id)->exists()) {
     }
 }
 
+// ------------------------------------------------------- scenario data
+// KB, downloads, domain pricing, config options, quotes, sub-users... the
+// records the seeder never creates. See scenarios.php.
+require __DIR__ . '/scenarios.php';
+
 // ------------------------------------------------------- ids the routes need
 $uid = (int) $full->id;
 $firstId = fn(string $table, array $where, string $col = 'id') =>
@@ -171,7 +181,7 @@ $ids = [
     'productPath'    => ($s = Capsule::table('tblproducts_slugs')->where('active', 1)->orderByDesc('id')->first()) ? $s->group_slug . '/' . $s->slug : null,
     'deptId'         => Capsule::table('tblticketdepartments')->orderBy('order')->value('id'),
     'suspendedServiceId' => $susp ? Capsule::table('tblhosting')->where('userid', $susp->id)->where('domainstatus', 'Suspended')->value('id') : null,
-];
+] + $scenarioIds;
 
 // Users (the login identities) are separate from clients in WHMCS 8+.
 $loginOf = fn(?object $c) => $c ? (string) Capsule::table('tblusers')->where('email', $c->email)->value('email') : null;
@@ -182,7 +192,7 @@ $creds = [
         'full'      => ['email' => $loginOf($full),  'password' => DEMO_CLIENT_PASSWORD, 'clientId' => (int) $full->id],
         'empty'     => ['email' => $loginOf($empty), 'password' => DEMO_CLIENT_PASSWORD, 'clientId' => (int) $empty->id],
         'suspended' => $susp ? ['email' => $loginOf($susp), 'password' => DEMO_CLIENT_PASSWORD, 'clientId' => (int) $susp->id] : null,
-    ],
+    ] + $scenarioPersonas,
 ];
 file_put_contents($credFile, json_encode($creds, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 file_put_contents($localDir . '/fixtures.json', json_encode([

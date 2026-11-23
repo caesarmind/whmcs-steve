@@ -15,6 +15,10 @@ export const BASE_URL = (process.env.HADRIAN_BASE_URL || 'http://localhost:8088'
 export const WHMCS_ROOT = process.env.WHMCS_ROOT || 'C:/laragon/www/whmcs';
 export const PHP = process.env.HADRIAN_PHP || 'C:/laragon/bin/php/php-8.3.30-Win32-vs16-x64/php.exe';
 export const MYSQL_BIN = process.env.HADRIAN_MYSQL_BIN || 'C:/laragon/bin/mysql/mysql-8.4.3-winx64/bin';
+// Mailpit catches the mail WHMCS sends (php.ini sendmail_path -> mailpit sendmail
+// -> SMTP :1025). The flows read password-reset and verification links from it.
+export const MAILPIT_BIN = process.env.HADRIAN_MAILPIT_BIN || 'C:/laragon/bin/mailpit/1.22.3/mailpit.exe';
+export const MAILPIT_URL = (process.env.HADRIAN_MAILPIT_URL || 'http://localhost:8025').replace(/\/$/, '');
 
 // The three directories the local install serves from this checkout. If a
 // junction points anywhere else (another worktree, a stale copy), every test

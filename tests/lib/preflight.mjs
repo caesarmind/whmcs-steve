@@ -4,13 +4,14 @@
 
 import fs from 'node:fs';
 import { spawnSync } from 'node:child_process';
-import { BASE_URL, PHP, JUNCTIONS, TESTS_DIR, REPO_ROOT } from './env.mjs';
+import { BASE_URL, PHP, JUNCTIONS, TESTS_DIR, REPO_ROOT, MAILPIT_BIN, MAILPIT_URL } from './env.mjs';
+import { spawn } from 'node:child_process';
 import path from 'node:path';
 
 const same = (a, b) => path.resolve(a).toLowerCase() === path.resolve(b).toLowerCase();
 
-function php(script) {
-  const r = spawnSync(PHP, [path.join(TESTS_DIR, 'php', script)], { encoding: 'utf8', cwd: REPO_ROOT });
+function php(script, args = []) {
+  const r = spawnSync(PHP, [path.join(TESTS_DIR, 'php', script), ...args], { encoding: 'utf8', cwd: REPO_ROOT });
   return { status: r.status, out: (r.stdout || '').trim(), err: (r.stderr || '').trim() };
 }
 
@@ -26,6 +27,13 @@ export async function preflight({ ensureFixtures = true } = {}) {
     const r = await fetch(BASE_URL + '/', { redirect: 'manual', signal: AbortSignal.timeout(90000) });
     up = r.status > 0;
     add('stack reachable', up, `${BASE_URL} -> HTTP ${r.status}`, 'Start it: scripts/local-stack/START-SERVER.bat');
+    // A coverage run (tests/coverage/run.mjs) serves instrumented templates
+    // while it runs, and compiled leftovers can outlive it. Testing against
+    // them would fail on markers, not on the theme.
+    const marked = /@@hc:\d+@@/.test(await r.text());
+    add('serves uninstrumented templates', !marked, marked ? 'coverage markers (@@hc:N@@) in the home page' : 'ok',
+      'A coverage run is going or left compiled leftovers: wait for it, or run node tests/coverage/run.mjs --restore');
+    if (marked) return { ok: false, checks };
   } catch (e) {
     add('stack reachable', false, `${BASE_URL} -> ${e.cause?.code || e.message}`, 'Start it: scripts/local-stack/START-SERVER.bat');
   }
@@ -64,7 +72,24 @@ export async function preflight({ ensureFixtures = true } = {}) {
   add('a payment gateway is active', s.paymentGateways.length > 0, s.paymentGateways.join(',') || '(none - checkout cannot complete)',
     'Activate banktransfer (scripts/local-stack/README.md)');
 
-  // 4. Personas + ids. Idempotent: ensures, never resets.
+  // 4. Mailpit, for the flows that follow an emailed link. Started here when
+  //    it is not running: it is part of the local stack, like MySQL.
+  const mailUp = async () => { try { return (await fetch(MAILPIT_URL + '/api/v1/info', { signal: AbortSignal.timeout(3000) })).ok; } catch { return false; } };
+  let mail = await mailUp();
+  if (!mail && fs.existsSync(MAILPIT_BIN)) {
+    spawn(MAILPIT_BIN, [], { detached: true, stdio: 'ignore', windowsHide: true }).unref();
+    for (let i = 0; i < 20 && !mail; i++) { await new Promise(r => setTimeout(r, 500)); mail = await mailUp(); }
+  }
+  add('mail catcher (Mailpit) running', mail, mail ? MAILPIT_URL : `not reachable at ${MAILPIT_URL}`, `Start ${MAILPIT_BIN}`);
+
+  // 5. A settings test that died halfway left its snapshot behind: put the
+  //    settings it changed back before anything is judged against them.
+  if (fs.existsSync(path.join(TESTS_DIR, '.local', 'settings-snapshot.json'))) {
+    const r = php('settings.php', ['restore']);
+    add('settings restored from an interrupted run', r.status === 0, r.out || r.err, 'php tests/php/settings.php restore');
+  }
+
+  // 6. Personas + ids. Idempotent: ensures, never resets.
   if (ensureFixtures && checks.every(c => c.ok)) {
     const f = php('fixtures.php');
     add('fixtures ensured', f.status === 0, f.status === 0 ? f.out.split('\n').slice(0, 4).join(' | ') : (f.err || f.out).slice(0, 300),

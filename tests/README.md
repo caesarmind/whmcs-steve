@@ -33,7 +33,7 @@ Playwright report (screenshots, traces, the HTML of every failing page).
 | Tier | What it checks | Needs the site | Time |
 |---|---|---|---|
 | **preflight** | the stack is up, serves *this* checkout, the template is `hadrian`, the addon's hooks load, data is seeded, a gateway is active | yes | ~5 s |
-| **static** | 25 checkers: CSS is ASCII-only, PHP parses, Smarty balance, every `$hadrianLang` key resolves, colour defaults match the CSS, the three "Free" implementations agree, admin JS parses, docs anchors, ... | no | ~30 s |
+| **static** | 26 checkers: every page is tested or has a stated reason why not, CSS is ASCII-only, PHP parses, Smarty balance, every `$hadrianLang` key resolves, colour defaults match the CSS, the three "Free" implementations agree, admin JS parses, docs anchors, ... | no | ~30 s |
 | **compile** | every one of the 314 templates compiled by **WHMCS's own Smarty** (its modifiers + security policy) | WHMCS files | ~12 s |
 | **smoke** | every page x persona over HTTP, every Hadrian admin screen, and a crawl that follows every link the theme renders | yes | ~3 min |
 | **browser** | real Chromium: every key page in 3 layouts x light/dark + phone width; JS errors, failed assets, layout geometry, unreadable text; six user flows | yes | ~3 min |
@@ -120,6 +120,43 @@ issue stops occurring, the run fails asking for the entry to be removed.
   `tests/lib/registry.mjs` - how to run it, and whether a failure should block.
 - **A new kind of bug:** add an oracle to `tests/e2e/oracles.mjs`, then prove it
   catches the bug by running it against the broken version first.
+
+## Coverage
+
+Two questions, two tools.
+
+**Is every page tested at all?** `tests/e2e/coverage.mjs` lists every page
+folder, variant and cart template that no test renders yet, each with a status
+(`todo` and the plan step that closes it, `inner`, `local`, `legacy`) and a
+reason. The static check `check-coverage.mjs` fails when something is in
+neither place, and when an entry goes stale because a test now renders it.
+
+```bash
+node tests/static/check-coverage.mjs --list
+```
+
+**How much of each template runs?** The coverage runner measures template
+branch coverage: every `{if}`, `{elseif}`, `{else}`, `{foreach}` and the
+implicit "condition false" / "list empty" sides of them.
+
+```bash
+node tests/coverage/run.mjs
+```
+
+There is no PHP coverage driver on this stack, so it instruments a copy of
+the templates with markers that only reach the HTML when a branch runs,
+points the local install at the copy for the length of the run, visits every
+route and crawls as guest and full, then puts the junctions back and clears
+the compiled cache. Each swap waits out PHP's realpath cache (120 s), because
+Apache threads keep reading the old directory until it expires, so a run costs
+about 4 minutes more than the page loads themselves. Report: `tests/reports/coverage/index.html`, worst files
+first, each missed branch with its line and condition. Don't run it at the
+same time as `run.mjs`. If it is killed halfway, `node tests/coverage/run.mjs
+--restore` puts the junctions back (the preflight will otherwise fail on them).
+
+It only measures over HTTP: markers inside `<script>` would break the page in
+a browser, so the flows don't count towards it yet. `{capture}` blocks are not
+instrumented, because templates test captured output for emptiness.
 
 ## Things worth knowing
 

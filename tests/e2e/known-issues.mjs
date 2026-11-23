@@ -9,22 +9,6 @@
 // otherwise hide the bug if it ever came back.
 
 export const KNOWN_ISSUES = [
-  {
-    id: 'billing-contacts-fragment',
-    match: /paymentmethods-billing-contacts.*empty <h1>/,
-    seenBy: 'crawl as full',   // the one test that reaches it, for the staleness check
-    since: '2026-10-21',
-    what:
-      'account-paymentmethods-billing-contacts.tpl is built as a full "billing contacts" page over $contacts. ' +
-      'In WHMCS it is an AJAX FRAGMENT: <div id="innerBillingContactsContainer"> with a name="billingcontact" ' +
-      'radio list (the client + each contact, from $client / $payMethod / $selectedContactId) that the ' +
-      'add/edit payment-method form {include}s and reloads. Hadrian links to it as a separate page instead, so ' +
-      'that link opens an unstyled fragment with an empty heading, and the payment-method form has no ' +
-      'billing-contact chooser.',
-    fix:
-      'Rebuild the fragment to the WHMCS contract (see templates/twenty-one/account-paymentmethods-billing-contacts.tpl) ' +
-      'and include it inside account-paymentmethods-manage\'s form, with the reload after "add contact".',
-  },
 ];
 
 /** Split findings into new problems and known ones; report stale entries. */

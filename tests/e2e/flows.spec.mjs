@@ -54,6 +54,9 @@ test('a new customer buys a product through the order form', async ({ page }) =>
   // Checkout as a brand new customer.
   await page.locator('#checkout').click();
   await page.waitForURL(/a=checkout/);
+  // WHMCS renders the checkout through viewcart.tpl's $checkout branch, which
+  // includes checkout.tpl - so data-tpl stays "viewcart". The form is the proof.
+  await expect(page.locator('#frmCheckout'), 'the checkout form').toBeAttached();
   const f = page.locator('#frmCheckout');
   const email = `flow+${Date.now()}@demo.hadrian.test`;
   await f.locator('[name=firstname]').fill('Flo');
@@ -167,6 +170,7 @@ test('a customer opens a ticket and closes it from the ticket page', async ({ pa
   const view = page.locator('.content-area a[href*="viewticket.php"]').first();
   await expect(view, 'confirmation links to the new ticket').toBeVisible({ timeout: 30_000 });
   await expect(page.locator('.content-area')).toContainText(/Ticket Created/i);
+  expect(await tpl(page)).toBe('supportticketsubmit-confirm');
   await view.click();
   await page.waitForURL(/viewticket/);
   expect(await tpl(page)).toBe('viewticket');

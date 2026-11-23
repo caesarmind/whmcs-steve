@@ -14,6 +14,7 @@
 import { test, expect } from '@playwright/test';
 import { BASE_URL } from '../lib/env.mjs';
 import { fx, loginClient } from './helpers.mjs';
+import { measure } from './page-checks.mjs';
 
 const id = fx.ids;
 const PAGES = {
@@ -36,41 +37,6 @@ const LAYOUTS = ['side', 'top', 'rail'];
 const THEMES = ['light', 'dark'];
 
 const withParams = (url, params) => url + (url.includes('?') ? '&' : '?') + new URLSearchParams(params);
-
-/** Everything measured in the page, in one round trip. */
-const measure = () => {
-  const box = sel => {
-    const e = document.querySelector(sel);
-    if (!e) return null;
-    const cs = getComputedStyle(e), r = e.getBoundingClientRect();
-    return cs.display === 'none' || cs.visibility === 'hidden' || r.width === 0
-      ? null : { width: Math.round(r.width), left: Math.round(r.left), right: Math.round(r.right) };
-  };
-  const rgb = s => (s.match(/[\d.]+/g) || []).map(Number);
-  const lum = ([r, g, b]) => [r, g, b].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; })
-    .reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0);
-  const bgOf = el => {
-    for (let e = el; e; e = e.parentElement) {
-      const c = rgb(getComputedStyle(e).backgroundColor);
-      if (c.length >= 3 && (c[3] === undefined || c[3] > 0.5)) return c;
-    }
-    return document.documentElement.dataset.theme === 'dark' ? [0, 0, 0] : [255, 255, 255];
-  };
-  const contrastOf = sel => {
-    const el = [...document.querySelectorAll(sel)].find(e => e.textContent.trim().length > 2 && e.getBoundingClientRect().width > 0);
-    if (!el) return null;
-    const a = lum(rgb(getComputedStyle(el).color)), b = lum(bgOf(el));
-    return { sel, text: el.textContent.trim().slice(0, 40), ratio: Math.round(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)) * 100) / 100 };
-  };
-  return {
-    layout: document.body.dataset.layout,
-    theme: document.documentElement.dataset.theme,
-    sidebar: box('.sidebar'), rail: box('.ph-rail'), content: box('.content-area'),
-    topVisible: [...document.querySelectorAll('.only-top')].some(e => e.getBoundingClientRect().width > 0),
-    overflowX: document.documentElement.scrollWidth - innerWidth,
-    contrast: [contrastOf('.content-area h1, .page-header h1, h1'), contrastOf('.content-area p, .content-area td, .content-area label')].filter(Boolean),
-  };
-};
 
 for (const [persona, pages] of Object.entries(PAGES)) {
   test.describe(persona, () => {

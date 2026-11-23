@@ -46,7 +46,12 @@ export default defineConfig({
     { name: 'setup', testMatch: /auth\.setup\.mjs/ },
     { name: 'smoke', testMatch: /(smoke|admin|links)\.spec\.mjs/, dependencies: ['setup'] },
     {
-      name: 'browser', testMatch: /(browser|flows)\.spec\.mjs/, dependencies: ['setup'],
+      name: 'browser', testMatch: /(browser|flows|flows-more|sweep)\.spec\.mjs/, dependencies: ['setup'],
+      use: { ...devices['Desktop Chrome'], userAgent: USER_AGENT, viewport: { width: 1280, height: 860 } },
+    },
+    {
+      // Mutates the site's settings: run.mjs runs it on its own, never beside smoke/browser.
+      name: 'settings', testMatch: /settings\.spec\.mjs/, dependencies: ['setup'],
       use: { ...devices['Desktop Chrome'], userAgent: USER_AGENT, viewport: { width: 1280, height: 860 } },
     },
     {

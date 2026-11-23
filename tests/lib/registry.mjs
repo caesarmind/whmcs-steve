@@ -39,6 +39,14 @@ export const CHECKS = [
     blocking: true, why: 'Unicode box-drawing in a CSS comment makes Chrome drop whole sections on this install.' },
   { id: 'php-lint', title: 'Addon + theme PHP parses', cmd: [node, STATIC('php-lint.mjs')], cwd: REPO_ROOT,
     blocking: true, why: 'A parse error in the addon takes out the admin and every client page that runs its hooks.' },
+  { id: 'foreach-props', title: 'Loop properties name a foreach item', cmd: [node, STATIC('check-foreach-props.mjs')], cwd: REPO_ROOT,
+    blocking: true, why: '$key@iteration is undefined: the plan cards never applied their "first 4 features" cap, and WHMCS logged a warning per feature.' },
+  { id: 'whmcs-lang-keys', title: 'WHMCS $LANG keys exist as used', cmd: [PHP, STATIC('check-whmcs-lang-keys.php')], cwd: REPO_ROOT,
+    blocking: true, why: 'A missing key prints nothing and a group prints Array: the markdown guide asked for flat keys and all 27 of its strings were blank.' },
+  { id: 'form-contracts', title: 'Forms post what WHMCS reads (vs stock)', cmd: [node, STATIC('check-form-contracts.mjs')], cwd: REPO_ROOT,
+    blocking: true, why: 'The 2FA challenge posted to itself (405: nobody with 2FA could sign in); the card form used field names WHMCS ignores.' },
+  { id: 'coverage-manifest', title: 'Every page/variant/cart tpl is tested or listed', cmd: [node, STATIC('check-coverage.mjs')], cwd: REPO_ROOT,
+    blocking: true, why: 'A new page or variant must not ship without a decision on how it is tested (tests/e2e/coverage.mjs).' },
 
   // --- hadrian/scripts (tracked) --------------------------------------------
   { id: 'smarty-balance', title: 'Smarty block tags balance', cmd: [node, 'scripts/check-smarty-balance.mjs'], cwd: HADRIAN, blocking: true },
