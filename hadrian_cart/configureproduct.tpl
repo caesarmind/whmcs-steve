@@ -427,7 +427,7 @@ var _localLang = {
                                                     {foreach key=num2 item=options from=$configoption.options}
                                                         <label class="cp-opt-radio">
                                                             <input type="radio" name="configoption[{$configoption.id}]" value="{$options.id}"{if $configoption.selectedvalue eq $options.id} checked{/if}>
-                                                            <span>{if $options.name}{$options.name}{else}{$LANG.enable}{/if}</span>
+                                                            <span>{if $options.name}{$options.name}{else}{$LANG.enable|default:'Enable'}{/if}</span>
                                                         </label>
                                                     {/foreach}
                                                 </div>

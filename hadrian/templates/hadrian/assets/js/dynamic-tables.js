@@ -227,7 +227,11 @@
         ],
 
         domains: [
-            { data: 'domain', render: function (d) { return '<span class="domain-name">' + esc(d) + '</span>'; } },
+            { data: 'domain', render: function (d, t, row) {
+                /* Same bulk checkbox as the server-rendered row (clientareadomains #domainForm). */
+                return '<label class="dom-check" onclick="event.stopPropagation()"><input type="checkbox" name="domids[]" value="' + esc(String(row.id)) + '" aria-label="' + esc(d) + '"></label>'
+                    + '<span class="domain-name">' + esc(d) + '</span>';
+            } },
             { data: 'registered', render: textCell },
             { data: 'expiry', render: textCell },
             { data: 'status', render: function (d, t, row) { return pill(d, row.statusSlug); } },

@@ -52,3 +52,22 @@
 .pm-empty-ico svg { width: 22px; height: 22px; }
 .pm-empty-title { font-size: var(--text-xl); font-weight: var(--fw-semibold); color: var(--color-text-primary); margin: 0 0 6px; }
 .pm-empty-sub { font-size: var(--text-md); color: var(--color-text-secondary); margin: 0 auto 20px; max-width: 380px; line-height: 1.5; }
+
+/* -- Payment type, billing-address chooser, field errors (2026-11-23 rebuild to the WHMCS contract) -- */
+.pm-types { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
+.pm-type { display: inline-flex; align-items: center; gap: 8px; padding: 10px 14px; border: 0.5px solid var(--color-border); border-radius: var(--radius-md); background: var(--color-bg-primary); font-size: var(--text-base); color: var(--color-text-primary); cursor: pointer; }
+.pm-type:has(input:checked) { border-color: var(--color-accent); box-shadow: 0 0 0 1px var(--color-accent) inset; }
+.pm-type input, .pm-bc-option input { accent-color: var(--color-accent); width: 15px; height: 15px; margin: 0; }
+.pm-optional { font-weight: var(--fw-regular); color: var(--color-text-tertiary); }
+.pm-loading { margin: 0 0 16px; color: var(--color-text-secondary); font-size: var(--text-base); }
+.pm-bc-list { display: flex; flex-direction: column; gap: 8px; }
+.pm-bc-option { display: flex; align-items: flex-start; gap: 10px; padding: 12px 14px; border: 0.5px solid var(--color-border); border-radius: var(--radius-md); cursor: pointer; }
+.pm-bc-option:has(input:checked) { border-color: var(--color-accent); }
+.pm-bc-option input { margin-top: 3px; flex-shrink: 0; }
+.pm-bc-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: var(--text-base); color: var(--color-text-primary); }
+.pm-bc-addr { color: var(--color-text-secondary); font-size: var(--text-sm); overflow-wrap: anywhere; }
+.pm-bc-add { margin: 10px 0 0; font-size: var(--text-sm); }
+.pm-bc-add a { color: var(--color-accent); text-decoration: none; }
+.field-error-msg { display: block; margin-top: 6px; font-size: var(--text-sm); color: var(--color-red-text); }
+.field-error-msg[hidden] { display: none; }
+.frm-credit-card-input [aria-invalid="true"] { border-color: var(--color-red, #ff3b30); }

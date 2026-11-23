@@ -226,7 +226,7 @@
             <div class="svc-footer">
                 <div class="svc-page-size">
                     {$LANG.show|default:'Show'}
-                    <select aria-label="{$hadrianLang.services.rowsPerPage}" data-dt-length data-mt-for="svcTable">
+                    <select aria-label="{$hadrianLang.common.rowsPerPage}" data-dt-length data-mt-for="svcTable">
                         <option>10</option>
                         <option>25</option>
                         <option>50</option>

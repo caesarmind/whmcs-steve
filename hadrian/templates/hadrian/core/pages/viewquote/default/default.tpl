@@ -194,7 +194,7 @@
                 </div>
 
                 {if $canAccept}
-                <form method="post" action="{$WEB_ROOT}/viewquote.php?id={$quoteid|default:''|escape}&amp;action=accept">
+                <form method="post" id="accept" action="{$WEB_ROOT}/viewquote.php?id={$quoteid|default:''|escape}&amp;action=accept">
                     <div class="vq-accept">
                         {if isset($tosurl) && $tosurl}
                         <label class="vq-tos">

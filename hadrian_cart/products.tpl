@@ -385,7 +385,7 @@
                                     <div class="st-row-specs">
                                         {if $product.features}
                                             {foreach $product.features as $feature => $value}
-                                                {if $feature@iteration <= 4}
+                                                {if $value@iteration <= 4}
                                                     <span class="st-row-spec">
                                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                                         <strong>{$value}</strong> {$feature}
@@ -514,7 +514,7 @@
                                             {if $product.features}
                                                 <div class="st-bento-hero-specs">
                                                     {foreach $product.features as $feature => $value}
-                                                        {if $feature@iteration <= 5}
+                                                        {if $value@iteration <= 5}
                                                             <span><strong>{$value}</strong> {$feature}</span>
                                                         {/if}
                                                     {/foreach}
@@ -558,7 +558,7 @@
                                         {if $product.features}
                                             <ul class="st-bento-mini-specs">
                                                 {foreach $product.features as $feature => $value}
-                                                    {if $feature@iteration <= 4}
+                                                    {if $value@iteration <= 4}
                                                         <li><strong>{$value}</strong> {$feature}</li>
                                                     {/if}
                                                 {/foreach}
@@ -602,7 +602,7 @@
                                     {if $product.features}
                                         <ul class="st-seg-specs">
                                             {foreach $product.features as $feature => $value}
-                                                {if $feature@iteration <= 5}
+                                                {if $value@iteration <= 5}
                                                     <li><strong>{$value}</strong> {$feature}</li>
                                                 {/if}
                                             {/foreach}

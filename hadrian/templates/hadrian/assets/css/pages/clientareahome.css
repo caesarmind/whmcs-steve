@@ -467,8 +467,10 @@ body[data-min-title="inside"] .min-list {
    composed rather than a stack of identical bars. align-items:start lets the
    tall left column sit beside two shorter stacked blocks without stretching. */
 .min-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 34px 24px; align-items: start; margin-top: 34px; }
-@media (max-width: 720px) { .min-grid { grid-template-columns: 1fr; gap: 30px; } }
-.min-gcol { display: flex; flex-direction: column; gap: 30px; }
+/* minmax(0, 1fr), not 1fr: a bare 1fr is minmax(auto, 1fr), and the widest row
+   inside then forced the single column past a phone screen (80px overflow at 375px). */
+@media (max-width: 720px) { .min-grid { grid-template-columns: minmax(0, 1fr); gap: 30px; } }
+.min-gcol { display: flex; flex-direction: column; gap: 30px; min-width: 0; }
 .min-grid .min-section { margin-top: 0; }
 
 /* --- Overflow ----------------------------------------------------------

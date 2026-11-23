@@ -57,7 +57,7 @@
                                     <div class="product-desc product-desc-full-width">
                                         <p>{$addon.description|nl2br}</p>
                                         <div class="form-group">
-                                            <select name="productid" id="inputProductId{$num}" class="field form-control">
+                                            <select name="productid" id="inputProductId{$num}" class="field form-control" aria-label="{$LANG.orderproduct|escape}">
                                                 {foreach $addon.productids as $product}
                                                     <option value="{$product.id}">
                                                         {$product.product}{if $product.domain} - {$product.domain}{/if}

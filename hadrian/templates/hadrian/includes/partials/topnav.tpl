@@ -116,7 +116,10 @@
            ever listened for [data-switcher], so language/currency menu items
            were links that did nothing. The locale modal (which covers both) is
            opened by [data-locale-open]. *}
+        {* Same admin switches as the header's locale button (see sidebar.tpl). *}
+        {if ($mtType == 'language' && !$hadrian.addonSettings.hide_language_switcher) || ($mtType == 'currency' && !$hadrian.addonSettings.hide_currency_selector)}
         <a href="#" class="nav-switcher{$sideRight}" data-locale-open data-switcher="{$mtType|escape}">{$item.label|escape}</a>
+        {/if}
     {else}
         <a href="{$item.uri|escape}" class="nav-item{$sideRight}"{if $item.target} target="{$item.target|escape}"{/if}>
             {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}

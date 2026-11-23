@@ -331,3 +331,12 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
     .dom-footer { align-items: flex-start; flex-direction: column; }
     .dom-pages { align-self: flex-end; }
 }
+
+/* Bulk management (2026-11-23): a checkbox in the domain cell, a toolbar while any is ticked. */
+.dom-check { display: inline-flex; align-items: center; margin-right: 10px; vertical-align: middle; cursor: pointer; }
+.dom-check input { width: 15px; height: 15px; margin: 0; accent-color: var(--color-accent); }
+.dom-bulk { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 12px; margin-bottom: 12px; border-radius: var(--radius-md); background: var(--color-fill-tertiary, rgba(120,120,128,.08)); }
+.dom-bulk[hidden] { display: none; }
+.dom-bulk-count { font-size: var(--text-sm); color: var(--color-text-secondary); margin-right: 4px; }
+.dom-bulk-btn { font: inherit; font-size: var(--text-sm); padding: 6px 12px; border-radius: 999px; border: 0.5px solid var(--color-border); background: var(--color-bg-primary); color: var(--color-text-primary); cursor: pointer; }
+.dom-bulk-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }

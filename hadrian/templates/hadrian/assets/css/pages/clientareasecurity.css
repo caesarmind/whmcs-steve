@@ -421,3 +421,6 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
     .page-header h1 { font-size: var(--text-h4); }
     .sec-row { flex-wrap: wrap; }
 }
+/* Footer button: WHMCS's 2FA steps carry no submit button of their own (2026-11-23). */
+.tfa-modal-foot { display: flex; justify-content: flex-end; gap: 10px; padding: 14px 20px; border-top: 0.5px solid var(--color-border); }
+.tfa-modal-foot[hidden] { display: none; }

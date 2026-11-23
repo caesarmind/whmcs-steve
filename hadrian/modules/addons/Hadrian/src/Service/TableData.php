@@ -225,6 +225,7 @@ final class TableData
             $id        = (int)$r->id;
             $href      = $web . '/clientarea.php?action=domaindetails&id=' . $id;
             $data[] = [
+                'id'         => $id,
                 'domain'     => (string)$r->domain,
                 'registered' => self::fmtDate($r->registrationdate),
                 'expiry'     => self::fmtDate($r->expirydate),
@@ -233,9 +234,9 @@ final class TableData
                 'autorenew'  => empty($r->donotrenew),
                 'urls'       => [
                     'manage'      => $href,
-                    'nameservers' => $href . '&modop=custom&a=nameservers',
+                    'nameservers' => $href . '#tabNameservers',   // the details page's tab, not a registrar custom function
                     'contacts'    => $web . '/clientarea.php?action=domaincontacts&domainid=' . $id,
-                    'autorenew'   => $href,
+                    'autorenew'   => $href . '#tabAutorenew',
                     'renew'       => $web . '/cart.php?gid=renewals',
                 ],
                 'DT_RowClass' => 'domain-row',

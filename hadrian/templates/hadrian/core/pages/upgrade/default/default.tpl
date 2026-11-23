@@ -96,25 +96,25 @@
                         <div>
                             <div class="up-cfg-col-label">{$LANG.upgradecurrentconfig}</div>
                             {if $cfg.optiontype == 1 || $cfg.optiontype == 2}
-                                <input class="form-input" type="text" value="{$cfg.selectedname|default:''|escape}" disabled>
+                                <input class="form-input" type="text" value="{$cfg.selectedname|default:''|escape}" aria-label="{$cfg.optionname|escape}" disabled>
                             {elseif $cfg.optiontype == 3}
-                                <input class="form-input" type="text" value="{if $cfg.selectedqty}{$hadrianLang.services.enabledState}{else}{$hadrianLang.services.disabledState}{/if}" disabled>
+                                <input class="form-input" type="text" value="{if $cfg.selectedqty}{$hadrianLang.services.enabledState}{else}{$hadrianLang.services.disabledState}{/if}" aria-label="{$cfg.optionname|escape}" disabled>
                             {elseif $cfg.optiontype == 4}
-                                <input class="form-input" type="text" value="{$cfg.selectedqty|default:0|escape}" disabled>
+                                <input class="form-input" type="text" value="{$cfg.selectedqty|default:0|escape}" aria-label="{$cfg.optionname|escape}" disabled>
                             {/if}
                         </div>
                         <div>
                             <div class="up-cfg-col-label">{$LANG.upgradenewconfig}</div>
                             {if $cfg.optiontype == 1 || $cfg.optiontype == 2}
-                                <select name="configoption[{$cfg.id}]" class="form-select">
+                                <select name="configoption[{$cfg.id}]" class="form-select" aria-label="{$cfg.optionname|escape}">
                                     {foreach $cfg.options as $opt}
                                         <option value="{$opt.id}"{if !empty($opt.selected)} selected{/if}>{$opt.nameonly|default:$opt.name|escape}{if isset($opt.price) && $opt.price} - {$opt.price}{/if}</option>
                                     {/foreach}
                                 </select>
                             {elseif $cfg.optiontype == 3}
-                                <label style="display:flex;align-items:center;gap:10px;padding:8px 0;cursor:pointer;"><input type="checkbox" name="configoption[{$cfg.id}]" value="1"{if $cfg.selectedqty} checked{/if}> <span>{$LANG.enable}</span></label>
+                                <label style="display:flex;align-items:center;gap:10px;padding:8px 0;cursor:pointer;"><input type="checkbox" name="configoption[{$cfg.id}]" value="1"{if $cfg.selectedqty} checked{/if}> <span>{$LANG.enable|default:'Enable'}</span></label>
                             {elseif $cfg.optiontype == 4}
-                                <input class="form-input" type="number" name="configoption[{$cfg.id}]" value="{$cfg.selectedqty|default:0|escape}" min="{$cfg.qtyminimum|default:0|escape}"{if isset($cfg.qtymaximum) && $cfg.qtymaximum > 0} max="{$cfg.qtymaximum|escape}"{/if}>
+                                <input class="form-input" type="number" name="configoption[{$cfg.id}]" aria-label="{$cfg.optionname|escape}" value="{$cfg.selectedqty|default:0|escape}" min="{$cfg.qtyminimum|default:0|escape}"{if isset($cfg.qtymaximum) && $cfg.qtymaximum > 0} max="{$cfg.qtymaximum|escape}"{/if}>
                             {/if}
                         </div>
                     </div>
@@ -157,7 +157,7 @@
                        option already shows its per-term price (e.g. "$50.00 USD Monthly
                        / mo"), so there's no separate price headline above it (that line
                        just duplicated the amount + cycle). *}
-                    <select name="billingcycle" class="form-select st-plan-cycle">
+                    <select name="billingcycle" class="form-select st-plan-cycle" aria-label="{$LANG.orderbillingcycle|escape}">
                         {if $pkg.pricing.monthly}<option value="monthly">{include file="`$template`/includes/common/price.tpl" hPrice=$pkg.pricing.monthly hEscape=false} / {$hadrianLang.services.cycleMonthlyShort}</option>{/if}
                         {if $pkg.pricing.quarterly}<option value="quarterly">{include file="`$template`/includes/common/price.tpl" hPrice=$pkg.pricing.quarterly hEscape=false} / {$hadrianLang.services.cycleQuarterlyShort}</option>{/if}
                         {if $pkg.pricing.semiannually}<option value="semiannually">{include file="`$template`/includes/common/price.tpl" hPrice=$pkg.pricing.semiannually hEscape=false} / {$hadrianLang.services.cycleSemiannuallyShort}</option>{/if}

@@ -40,7 +40,7 @@
 
     <div class="panel-body card-body card-subnav-body">
         <form role="form">
-            <select class="form-control custom-select" onchange="selectChangeNavigate(this)">
+            <select class="form-control custom-select" onchange="selectChangeNavigate(this)" aria-label="{$LANG.ordercategories|escape}">
                 {assign var='hasCurrent' value=false}
                 {foreach $panel->getChildren() as $child}
                     <option menuItemName="{$child->getName()|escape}" value="{$child->getUri()|escape}" class="list-group-item"{if $child->isCurrent()} selected="selected"{/if}>

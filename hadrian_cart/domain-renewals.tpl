@@ -167,7 +167,7 @@
                                                     {if $renewalData.inGracePeriod || $renewalData.inRedemptionGracePeriod}*{/if}
                                                 </label>
                                                 <div class="col-sm-6 col-md-7 domain-renewal-period-control">
-                                                    <select class="form-control select-renewal-pricing"
+                                                    <select class="form-control select-renewal-pricing" aria-label="{$LANG.domainrenewalprice|escape}"
                                                             id="renewalPricing{$renewalData.id}"
                                                             data-domain-id="{$renewalData.id}">
                                                         {foreach $renewalData.renewalOptions as $renewalOption}

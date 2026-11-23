@@ -57,7 +57,7 @@
                                     <input type="text" name="dnsrecordhost[]" value="{$rec.hostname|default:''|escape}" class="dns-input dns-input-host" placeholder="@">
                                 </td>
                                 <td>
-                                    <select name="dnsrecordtype[]" class="dns-input dns-input-type">
+                                    <select name="dnsrecordtype[]" class="dns-input dns-input-type" aria-label="{$LANG.domaindnsrecordtype|escape}">
                                         <option value="A"     {if $rec.type eq 'A'} selected{/if}>A</option>
                                         <option value="AAAA"  {if $rec.type eq 'AAAA'} selected{/if}>AAAA</option>
                                         <option value="CNAME" {if $rec.type eq 'CNAME'} selected{/if}>CNAME</option>
@@ -71,7 +71,7 @@
                                 <td><input type="text" name="dnsrecordaddress[]" value="{$rec.address|default:''|escape}" class="dns-input dns-input-addr" placeholder="—"></td>
                                 <td>
                                     {if $rec.type eq 'MX'}
-                                        <input type="text" name="dnsrecordpriority[]" value="{$rec.priority|default:''|escape}" class="dns-input dns-input-prio">
+                                        <input type="text" name="dnsrecordpriority[]" value="{$rec.priority|default:''|escape}" class="dns-input dns-input-prio" aria-label="{$LANG.domaindnspriority|escape}">
                                     {else}
                                         <input type="hidden" name="dnsrecordpriority[]" value="N/A">
                                         <span class="dns-na">—</span>
@@ -85,7 +85,7 @@
                         <tr class="dns-row dns-row-new" data-type="A">
                             <td><input type="text" name="dnsrecordhost[]" class="dns-input dns-input-host" placeholder="@"></td>
                             <td>
-                                <select name="dnsrecordtype[]" class="dns-input dns-input-type">
+                                <select name="dnsrecordtype[]" class="dns-input dns-input-type" aria-label="{$LANG.domaindnsrecordtype|escape}">
                                     <option value="A">A</option>
                                     <option value="AAAA">AAAA</option>
                                     <option value="CNAME">CNAME</option>
@@ -97,7 +97,7 @@
                                 </select>
                             </td>
                             <td><input type="text" name="dnsrecordaddress[]" class="dns-input dns-input-addr" placeholder="—"></td>
-                            <td><input type="text" name="dnsrecordpriority[]" class="dns-input dns-input-prio" placeholder="—"></td>
+                            <td><input type="text" name="dnsrecordpriority[]" class="dns-input dns-input-prio" aria-label="{$LANG.domaindnspriority|escape}" placeholder="—"></td>
                         </tr>
                     </tbody>
                 </table>

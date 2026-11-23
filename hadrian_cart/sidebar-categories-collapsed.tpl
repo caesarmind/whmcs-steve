@@ -38,7 +38,7 @@
         <div class="currency-picker-form pull-right float-right form-inline">
             <form method="post" action="{$WEB_ROOT}/cart.php{if $action}?a={$action|escape}{if $domain}&domain={$domain|escape}{/if}{elseif $gid}?gid={$gid|escape}{/if}">
                 <label for="cartCurrencyCollapsed" class="sr-only">{$LANG.choosecurrency}</label>
-                <select id="cartCurrencyCollapsed" name="currency" onchange="submit()" class="form-control custom-select">
+                <select id="cartCurrencyCollapsed" name="currency" onchange="submit()" class="form-control custom-select" aria-label="{$LANG.choosecurrency|escape}">
                     <option value="">{$LANG.choosecurrency}</option>
                     {foreach from=$currencies item=listcurr}
                         <option value="{$listcurr.id}"{if $listcurr.id == $activeCurrency.id} selected{/if}>{$listcurr.code|escape}</option>

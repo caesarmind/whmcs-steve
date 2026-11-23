@@ -442,7 +442,7 @@
         a.addEventListener('click', function(e){ e.preventDefault(); go(a.getAttribute('data-dd-jump')); window.scrollTo({top:0,behavior:'smooth'}); });
     });
     // Open hash-targeted tab on load (e.g. #tabNameservers)
-    var h = (location.hash || '').toLowerCase();
+    var h = (location.hash || '').replace(/^#/, '').toLowerCase();   // was compared WITH the "#": no tab ever opened
     if (h.indexOf('tabname') === 0) go('nameservers');
     else if (h.indexOf('tabreglock') === 0) go('reglock');
     else if (h.indexOf('tabauto')   === 0) go('autorenew');

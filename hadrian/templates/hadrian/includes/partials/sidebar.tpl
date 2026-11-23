@@ -79,10 +79,15 @@
     {elseif $mtType == 'language' || $mtType == 'currency'}
         {* data-locale-open, NOT data-switcher — see the same fix in topnav.tpl.
            Nothing listens for [data-switcher], so this was a dead link. *}
+        {* Follows the same admin switches as the header's locale button
+           (Layouts -> Header): a hidden chooser must not come back through a
+           menu item, and with both hidden the modal it opens would be empty. *}
+        {if ($mtType == 'language' && !$hadrian.addonSettings.hide_language_switcher) || ($mtType == 'currency' && !$hadrian.addonSettings.hide_currency_selector)}
         <a href="#" class="sidebar-item sidebar-item-switcher" data-locale-open data-switcher="{$mtType|escape}">
             <div class="sidebar-item-icon gray">{mtSidebarIcon iconName=($mtIconName|default:'globe')}</div>
             {$item.label|escape}
         </a>
+        {/if}
     {else}
         {* whmcs_page, custom_link, account_dropdown (no children) *}
         <a href="{$item.uri|escape}" class="sidebar-item" data-nav="{$item.name|escape}"{if $item.target} target="{$item.target|escape}"{/if}>

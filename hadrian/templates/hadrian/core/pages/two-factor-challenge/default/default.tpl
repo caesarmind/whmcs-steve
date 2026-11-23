@@ -6,6 +6,9 @@
      $usingBackup    — bool, user toggled the backup-code flow
      $incorrect      — bool, last submitted code was wrong
      $newbackupcode  — bool, user just consumed a backup code and got new ones
+   Both forms POST to WHMCS's verify routes. Without an action they posted to the
+   challenge page itself (/login/challenge), which WHMCS answers with 405 Method
+   Not Allowed - nobody with two-factor turned on could sign in.
      $error          — string error message (if any)
 *}
 
@@ -26,11 +29,11 @@
             <p class="tfac-sub">{$LANG.twofa2ndfactorreq}</p>
         {/if}
 
-        <form method="post" id="frmTwoFactorChallenge" class="tfac-form{if $usingBackup} tfac-hidden{/if}">
+        <form method="post" action="{routePath('login-two-factor-challenge-verify')}" id="frmTwoFactorChallenge" class="tfac-form{if $usingBackup} tfac-hidden{/if}">
             <div class="tfac-challenge">{$challenge}</div>
         </form>
 
-        <form method="post" id="frmTwoFactorBackup" class="tfac-form{if !$usingBackup} tfac-hidden{/if}">
+        <form method="post" action="{routePath('login-two-factor-challenge-backup-verify')}" id="frmTwoFactorBackup" class="tfac-form{if !$usingBackup} tfac-hidden{/if}">
             <label class="form-label" for="tfac-backup">{$LANG.twofabackupcodelogin}</label>
             <input type="text" name="twofabackupcode" id="tfac-backup" class="form-input tfac-backup-input" placeholder="{$hadrianLang.auth.backupCodePlaceholder}" autocomplete="one-time-code">
             <button type="submit" class="btn-primary tfac-submit">{$LANG.loginbutton}</button>

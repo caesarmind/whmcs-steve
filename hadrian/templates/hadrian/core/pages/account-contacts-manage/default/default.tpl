@@ -124,7 +124,7 @@
                                 <input type="text" name="postcode" id="ct-zip" class="ct-input" value="{$formdata.postcode|default:''|escape}" autocomplete="postal-code">
                             </div>
                             <div class="ct-form-row">
-                                <label class="ct-label">{$LANG.clientareacountry}</label>
+                                <label class="ct-label" for="country">{$LANG.clientareacountry}</label>
                                 <div class="ct-countries">{if isset($countriesdropdown)}{$countriesdropdown}{/if}</div>
                             </div>
                         </div>

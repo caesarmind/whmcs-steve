@@ -31,6 +31,17 @@
 </div>
 {/if}
 
+{* ICANN IRTP: a registrant change on a gTLD is pending verification, or locks
+   the domain for 60 days. WHMCS passes $domainInformation (registrar module
+   data) and $irtpFields (which contact fields trigger it). Ported from
+   twenty-one; the opt-out is asked inline instead of in a Bootstrap modal. *}
+{if isset($domainInformation) && $domainInformation && empty($pending) && $domainInformation->getIsIrtpEnabled() && $domainInformation->isContactChangePending()}
+<div class="ci-alert ci-alert-info">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <div>{if $domainInformation->getPendingSuspension()}<strong>{$LANG.domains.verificationRequired}</strong><br>{$LANG.domains.newRegistration}{else}<strong>{$LANG.domains.contactChangePending}</strong><br>{$LANG.domains.contactsChanged}{/if}</div>
+</div>
+{/if}
+
 {if !empty($error)}
 <div class="ci-alert ci-alert-error">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
@@ -69,7 +80,7 @@
 
                     <div class="ci-contact-select" data-ci-cat-select="{$category|escape}" hidden>
                         <label class="ci-label">{$LANG.domaincontactchoose}</label>
-                        <select name="sel[{$category|escape}]" class="ci-input">
+                        <select name="sel[{$category|escape}]" class="ci-input" aria-label="{$LANG.domaincontactchoose|escape}">
                             <option value="u{$clientsdetails.userid|escape}">{$LANG.domaincontactprimary}</option>
                             {if isset($contacts) && $contacts|@count > 0}
                                 {foreach $contacts as $contact}
@@ -84,7 +95,7 @@
                             {foreach $values as $fieldName => $fieldValue}
                                 <div class="ci-field {if $fieldName eq 'address1' or $fieldName eq 'address2' or $fieldName eq 'fullphonenumber'}ci-field-wide{/if}">
                                     <label class="ci-label">{$contactdetailstranslations[$fieldName]|default:$fieldName|escape}</label>
-                                    <input type="text" name="contactdetails[{$category|escape}][{$fieldName|escape}]" value="{$fieldValue|default:''|escape}" class="ci-input">
+                                    <input type="text" name="contactdetails[{$category|escape}][{$fieldName|escape}]" value="{$fieldValue|default:''|escape}" data-original-value="{$fieldValue|default:''|escape}" aria-label="{$category|escape}: {$contactdetailstranslations[$fieldName]|default:$fieldName|escape}" class="ci-input{if !empty($irtpFields) && array_key_exists($category, $irtpFields) && in_array($fieldName, $irtpFields[$category])} irtp-field{/if}">
                                 </div>
                             {/foreach}
                         </div>
@@ -92,6 +103,19 @@
                 </div>
             {/foreach}
 
+            {if isset($domainInformation) && $domainInformation && !empty($irtpFields)}
+                <input id="irtpOptOut" type="hidden" name="irtpOptOut" value="0">
+                <input id="irtpOptOutReason" type="hidden" name="irtpOptOutReason" value="">
+                <div class="ci-alert ci-alert-info ci-irtp" id="ciIrtpConfirm" hidden>
+                    <div>
+                        <strong>{$LANG.domains.importantReminder}</strong>
+                        <p>{$LANG.domains.irtpNotice}</p>
+                        <label class="ci-irtp-opt"><input type="checkbox" id="ciIrtpOptOut" value="1"> {$LANG.domains.optOut}</label>
+                        <label class="ci-label" for="ciIrtpReason">{$LANG.domains.optOutReason}</label>
+                        <input type="text" id="ciIrtpReason" class="ci-input" autocomplete="off">
+                    </div>
+                </div>
+            {/if}
             <div class="ci-actions">
                 <button type="submit" class="btn-primary">{$LANG.clientareasavechanges}</button>
                 <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="btn-secondary">{$LANG.clientareacancel}</a>
@@ -119,6 +143,20 @@
 </div>
 
 <script>{literal}
+/* IRTP: when a lock-relevant field changed, show the reminder + opt-out once
+   before saving, and carry the answer in the hidden fields WHMCS reads. */
+(function () {
+    var form = document.getElementById('frmDomainContactModification');
+    var panel = document.getElementById('ciIrtpConfirm');
+    if (!form || !panel) { return; }
+    form.addEventListener('submit', function (e) {
+        var changed = Array.prototype.some.call(form.querySelectorAll('.irtp-field'), function (i) { return i.value !== i.getAttribute('data-original-value'); });
+        if (!changed) { return; }
+        if (panel.hidden) { e.preventDefault(); panel.hidden = false; panel.scrollIntoView({ block: 'center' }); return; }
+        document.getElementById('irtpOptOut').value = document.getElementById('ciIrtpOptOut').checked ? '1' : '0';
+        document.getElementById('irtpOptOutReason').value = document.getElementById('ciIrtpReason').value;
+    });
+})();
 (function(){
     // Tab switching
     var tabs = document.querySelectorAll('[data-ci-tab]');

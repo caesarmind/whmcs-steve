@@ -150,7 +150,7 @@
    pages so it never touches the cart's *-split grids (shared class names, e.g.
    cp-split). Consumed by core-layout.css ([class$="-split"]). *}
 {assign var=mt_isOrder value=false}
-{if ($inShoppingCart|default:false) || in_array($templatefile|default:'', ['cart','viewcart','configureproduct','configureproductdomain','configuredomains','checkout','products','domainregister','domaintransfer','domainoptions','ordersummary','addons','complete','fraudcheck']) || (($templatefile|default:'')|strstr:'store')}
+{if ($inShoppingCart|default:false) || in_array($templatefile|default:'', ['cart','viewcart','configureproduct','configureproductdomain','configuredomains','checkout','products','domainregister','domaintransfer','domainoptions','ordersummary','addons','complete','fraudcheck','domain-renewals','service-renewals']) || (($templatefile|default:'')|strstr:'store')}
     {assign var=mt_isOrder value=true}
 {/if}
 {assign var=mt_subnavWebsite value=''}
@@ -362,7 +362,9 @@
          · $.fn.tab       (Bootstrap)
          · $.fn.multiselect  (Bootstrap-Multiselect — separate plugin)
          · csrfToken (top-level global, injected inline below) ── *}
-    {if in_array($templatefile, ['cart','viewcart','configureproduct','configureproductdomain','configuredomains','checkout','products','domainregister','domaintransfer','domainoptions','ordersummary','addons','complete','fraudcheck'])}
+    {* Every order-form page, incl. the renewal pages (they threw "jQuery is not
+       defined" until 2026-11-23: they were missing from this list). *}
+    {if ($inShoppingCart|default:false) || in_array($templatefile, ['cart','viewcart','configureproduct','configureproductdomain','configuredomains','checkout','products','domainregister','domaintransfer','domainoptions','ordersummary','addons','complete','fraudcheck','domain-renewals','service-renewals'])}
         {* Globals that classic WHMCS themes inject inline before the cart
            scripts run. standard_cart's scripts.min.js references these
            directly as globals (not via window.X), so they need to be

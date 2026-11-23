@@ -261,7 +261,7 @@
                                 <div class="default-captcha default-captcha-register-margin">
                                     <p>{lang key="cartSimpleCaptcha"}</p>
                                     <div>
-                                        <img id="inputCaptchaImage" src="{$systemurl}includes/verifyimage.php" align="middle" />
+                                        <img id="inputCaptchaImage" src="{$systemurl}includes/verifyimage.php" align="middle" alt="{$LANG.captchatitle|escape}" />
                                         <input id="inputCaptcha" type="text" name="code" maxlength="6" form="frmDomainChecker" class="form-control input-sm" data-toggle="tooltip" data-placement="right" data-trigger="manual" title="{lang key='orderForm.required'}" />
                                     </div>
                                 </div>

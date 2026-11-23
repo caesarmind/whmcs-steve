@@ -110,9 +110,9 @@
                 </div>
                 <div class="tfa-cta" data-tfa-token="{$token|default:''|escape}">
                     {if $tfaOn}
-                    <button type="button" class="btn-secondary" data-tfa-open data-tfa-url="{routePath('account-security-two-factor-disable')}" data-tfa-title="{$LANG.twofadisable}">{$LANG.twofadisable}</button>
+                    <button type="button" class="btn-secondary" data-tfa-open data-tfa-url="{routePath('account-security-two-factor-disable')}" data-tfa-title="{$LANG.twofadisable}" data-tfa-submit-label="{$LANG.twofadisable}">{$LANG.twofadisable}</button>
                     {else}
-                    <button type="button" class="btn-primary" data-tfa-open data-tfa-url="{routePath('account-security-two-factor-enable')}" data-tfa-title="{$LANG.twofaenable}">{$LANG.twofaenable}</button>
+                    <button type="button" class="btn-primary" data-tfa-open data-tfa-url="{routePath('account-security-two-factor-enable')}" data-tfa-title="{$LANG.twofaenable}" data-tfa-submit-label="{$LANG.continue}">{$LANG.twofaenable}</button>
                     {/if}
                 </div>
             </div>
@@ -193,14 +193,14 @@
    JS, so this is a self-contained vanilla modal that AJAX-loads the fragment with the
    CSRF token, re-executes any inline scripts it carries, and drives its step forms. *}
 {if $tfaAvail}
-<script>var _localLang = { 'close': '{$LANG.close|escape:"javascript"}', 'tfaError': '{$hadrianLang.account.tfaModalError|escape:"javascript"}' };</script>
+<script>var _localLang = { 'close': '{$LANG.close|escape:"javascript"}', 'submit': '{$LANG.submit|escape:"javascript"}', 'tfaError': '{$hadrianLang.account.tfaModalError|escape:"javascript"}' };</script>
 <script>{literal}
 (function () {
     var triggers = document.querySelectorAll('[data-tfa-open]');
     if (!triggers.length) { return; }
     var holder = document.querySelector('[data-tfa-token]');
     var token = holder ? (holder.getAttribute('data-tfa-token') || '') : '';
-    var modal, body, titleEl;
+    var modal, body, titleEl, foot, footBtn, submitLabel = _localLang.submit;
 
     function build() {
         modal = document.createElement('div');
@@ -210,10 +210,17 @@
             '<div class="tfa-modal-dialog" role="dialog" aria-modal="true">' +
             '<div class="tfa-modal-head"><span class="tfa-modal-title"></span>' +
             '<button type="button" class="tfa-modal-x" data-tfa-close aria-label="' + _localLang.close + '">&times;</button></div>' +
-            '<div class="tfa-modal-body"></div></div>';
+            '<div class="tfa-modal-body"></div>' +
+            '<div class="tfa-modal-foot" hidden><button type="button" class="btn-primary" data-tfa-submit></button></div></div>';
         document.body.appendChild(modal);
         body = modal.querySelector('.tfa-modal-body');
         titleEl = modal.querySelector('.tfa-modal-title');
+        foot = modal.querySelector('.tfa-modal-foot');
+        footBtn = modal.querySelector('[data-tfa-submit]');
+        footBtn.addEventListener('click', function () {
+            if (footBtn.getAttribute('data-mode') === 'close') { hide(); window.location.reload(); return; }
+            window.dialogSubmit();
+        });
         modal.addEventListener('click', function (e) { if (e.target.closest('[data-tfa-close]')) { hide(); } });
         document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { hide(); } });
     }
@@ -261,10 +268,18 @@
                 post(f.getAttribute('action') || window.location.href, new URLSearchParams(new FormData(f)).toString());
             });
         });
-        // No further form + an end signal => the flow is done; refresh the status card.
-        if (!forms.length && /success|enabled|disabled|complete|backup code|turned on|turned off/i.test(body.textContent)) {
-            setTimeout(function () { window.location.reload(); }, 1800);
-        }
+        // WHMCS's steps put no submit button in their forms: its own modal draws one
+        // in the footer (data-btn-submit-label on the twenty-one trigger). Without
+        // it the method picker was a dead end - nobody could turn 2FA on. A step
+        // that has a form but no button of its own gets the footer button.
+        var needsButton = forms.length && !body.querySelector('form [type=submit], form button:not([type=button])');
+        // The last step (no form left) is where the BACKUP CODE is shown. It used to
+        // reload the page 1.8 s later, taking the code away before anyone could
+        // save it. It now waits for the customer to close it.
+        var done = !forms.length && /success|enabled|disabled|complete|backup code|turned on|turned off/i.test(body.textContent);
+        foot.hidden = !(needsButton || done);
+        footBtn.setAttribute('data-mode', done ? 'close' : 'submit');
+        footBtn.textContent = done ? _localLang.close : submitLabel;
     }
     function inject(html) {
         body.innerHTML = html;
@@ -299,6 +314,7 @@
     }
     Array.prototype.forEach.call(triggers, function (t) {
         t.addEventListener('click', function () {
+            submitLabel = t.getAttribute('data-tfa-submit-label') || _localLang.submit;
             show(t.getAttribute('data-tfa-title'));
             post(t.getAttribute('data-tfa-url'), 'token=' + encodeURIComponent(token));
         });

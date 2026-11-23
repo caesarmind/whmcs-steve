@@ -17,5 +17,5 @@
     {* WHMCS built-in image CAPTCHA — distorted-text image + the answer box. *}
     <p class="mt-captcha-verify">{$LANG.captchaverify}</p>
     <img class="mt-captcha-img" src="{$WEB_ROOT}/includes/verifyimage.php" alt="CAPTCHA">
-    <input class="mt-captcha-code" type="text" name="code" maxlength="6" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" required>
+    <input class="mt-captcha-code" type="text" name="code" aria-label="{$LANG.captchatitle|escape}" maxlength="6" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" required>
 {/if}

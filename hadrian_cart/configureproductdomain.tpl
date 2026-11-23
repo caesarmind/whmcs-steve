@@ -179,7 +179,7 @@
                             <div class="dp-panel{if $domainoption eq "incart"} is-active{/if}" data-panel="incart">
                                 <p class="dp-panel-hint">{$hadrianLang.cart.incartPanelHint}</p>
                                 <div class="dp-search-row">
-                                    <select class="dp-input no-ico" data-input="incartsld">
+                                    <select class="dp-input no-ico" data-input="incartsld" aria-label="{$LANG.orderdomain|escape}">
                                         {foreach $incartdomains as $incartdomain}
                                             <option value="{$incartdomain}">{$incartdomain}</option>
                                         {/foreach}
@@ -206,7 +206,7 @@
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                                         <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{$hadrianLang.cart.registerSldPlaceholder}" autocomplete="off" autocapitalize="none">
                                     </div>
-                                    <select class="dp-input no-ico" data-input="tld" style="flex: 0 0 130px;">
+                                    <select class="dp-input no-ico" data-input="tld" aria-label="{$LANG.tld|escape}" style="flex: 0 0 130px;">
                                         {foreach from=$registertlds item=listtld}
                                             <option value="{$listtld}"{if $listtld eq $tld} selected{/if}>{$listtld}</option>
                                         {/foreach}
@@ -239,7 +239,7 @@
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
                                         <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{$hadrianLang.cart.transferSldPlaceholder}" autocomplete="off" autocapitalize="none">
                                     </div>
-                                    <select class="dp-input no-ico" data-input="tld" style="flex: 0 0 130px;">
+                                    <select class="dp-input no-ico" data-input="tld" aria-label="{$LANG.tld|escape}" style="flex: 0 0 130px;">
                                         {foreach from=$transfertlds item=listtld}
                                             <option value="{$listtld}"{if $listtld eq $tld} selected{/if}>{$listtld}</option>
                                         {/foreach}
@@ -278,7 +278,7 @@
                                 <p class="dp-panel-hint">{$hadrianLang.cart.subdomainPanelHint}</p>
                                 <div class="dp-search-row">
                                     <input type="text" class="dp-input no-ico" data-input="sld" value="{$sld}" placeholder="{$hadrianLang.cart.subdomainSldPlaceholder}" autocomplete="off" autocapitalize="none">
-                                    <select class="dp-input no-ico" data-input="tld" style="flex: 0 0 200px;">
+                                    <select class="dp-input no-ico" data-input="tld" aria-label="{$LANG.tld|escape}" style="flex: 0 0 200px;">
                                         {foreach $subdomains as $subid => $subdomain}
                                             <option value="{$subdomain}">.{$subdomain}</option>
                                         {/foreach}

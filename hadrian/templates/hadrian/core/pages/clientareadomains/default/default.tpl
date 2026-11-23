@@ -102,9 +102,23 @@
                 {if $domCount > 0}
                 <div class="when-full">
                     <div class="card-body">
+                        {* Bulk management, WHMCS's contract (twenty-one #domainForm): tick
+                           domains, pick an action; WHMCS renders bulkdomainmanagement.
+                           Renew goes to the domain-renewal cart instead. *}
+                        <form id="domainForm" method="post" action="{$WEB_ROOT}/clientarea.php?action=bulkdomain">
+                        <input type="hidden" name="token" value="{$token|default:''|escape}">
+                        <input id="bulkaction" name="update" type="hidden">
+                        <div class="dom-bulk" id="bulk" hidden>
+                            <span class="dom-bulk-count"><span data-dom-count>0</span> &middot; {$LANG.withselected}</span>
+                            <button type="button" class="dom-bulk-btn" data-bulk="nameservers">{$LANG.domainmanagens}</button>
+                            <button type="button" class="dom-bulk-btn" data-bulk="contactinfo">{$LANG.domaincontactinfoedit}</button>
+                            <button type="button" class="dom-bulk-btn" data-bulk="autorenew">{$LANG.domainautorenewstatus}</button>
+                            <button type="button" class="dom-bulk-btn" data-bulk="reglock">{$LANG.domainreglockstatus}</button>
+                            {if !empty($allowrenew)}<button type="button" class="dom-bulk-btn" data-bulk="renewDomains" data-bulk-action="{$WEB_ROOT}/index.php?rp=/cart/domain/renew">{$LANG.domainmassrenew}</button>{/if}
+                        </div>
                         <table id="domTable" class="dom-table" data-mt-type="domains" data-mt-order="0:asc" data-mt-length="10" data-mt-filter-col="3"{if $mtAjaxTables} data-mt-action="tableDomains" data-mt-endpoint="{$WEB_ROOT}/clientarea.php"{/if}>
                             <thead><tr class="dom-list-head-row">
-                                <th>{$LANG.domain|default:'Domain'}</th>
+                                <th><label class="dom-check" onclick="event.stopPropagation()"><input type="checkbox" data-dom-all aria-label="{$LANG.withselected|escape}"></label>{$LANG.domain|default:'Domain'}</th>
                                 <th>{$LANG.registered}</th>
                                 <th>{$hadrianLang.domains.expires}</th>
                                 <th>{$LANG.domainstatus}</th>
@@ -116,7 +130,7 @@
                                 {foreach $domList as $d}
                                 {assign var=statusLower value=$d.status|lower}
                                 <tr class="domain-row" data-href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}">
-                                    <td><span class="domain-name">{$d.domain|escape}</span></td>
+                                    <td><label class="dom-check" onclick="event.stopPropagation()"><input type="checkbox" name="domids[]" value="{$d.id|escape}" aria-label="{$d.domain|escape}"></label><span class="domain-name">{$d.domain|escape}</span></td>
                                     <td class="domain-date">{$d.registrationdate|escape}</td>
                                     <td class="domain-date">{$d.expirydate|escape}</td>
                                     <td><span class="status-pill {$statusLower}">{$d.status|escape}</span></td>
@@ -131,7 +145,7 @@
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
                                                     {$LANG.managedomain}
                                                 </a>
-                                                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}&modop=custom&a=nameservers" class="dom-menu-item" role="menuitem">
+                                                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}#tabNameservers" class="dom-menu-item" role="menuitem">
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="8" rx="1"/><rect x="2" y="13" width="20" height="8" rx="1"/><line x1="6" y1="7" x2="6.01" y2="7"/><line x1="6" y1="17" x2="6.01" y2="17"/></svg>
                                                     {$LANG.domainmanagens}
                                                 </a>
@@ -139,7 +153,7 @@
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                                                     {$LANG.domaincontactinfoedit}
                                                 </a>
-                                                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}" class="dom-menu-item" role="menuitem">
+                                                <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$d.id}#tabAutorenew" class="dom-menu-item" role="menuitem">
                                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 0115-6.7L21 8"/><path d="M3 22v-6h6"/><path d="M21 12a9 9 0 01-15 6.7L3 16"/></svg>
                                                     {$LANG.domainautorenewstatus}
                                                 </a>
@@ -155,6 +169,7 @@
                                 {/if}
                             </tbody>
                         </table>
+                        </form>
                     </div>
                 </div>
                 {/if}
@@ -223,7 +238,7 @@
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 014-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 01-4 4H3"/></svg>
                 {$LANG.transferadomain|default:'Transfer a Domain'}
             </a>
-            <a href="{$WEB_ROOT}/clientarea.php?action=bulkdomainmanagement" class="subnav-item">
+            <a href="{$WEB_ROOT}/clientarea.php?action=domains#bulk" class="subnav-item" data-dom-bulk-link>
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                 {$hadrianLang.domains.bulkManagement}
             </a>
@@ -238,3 +253,32 @@
         </div>
     </aside>
 </div>{* /.dom-split *}
+
+<script>{literal}
+/* Bulk domain management: show the toolbar while domains are ticked and post
+   WHMCS's #domainForm with update=<action> (twenty-one's setBulkAction). */
+(function () {
+    var form = document.getElementById('domainForm');
+    var bar = document.getElementById('bulk');
+    if (!form || !bar) { return; }
+    var boxes = function () { return form.querySelectorAll('input[name="domids[]"]'); };
+    var sync = function () {
+        var n = Array.prototype.filter.call(boxes(), function (b) { return b.checked; }).length;
+        bar.hidden = n === 0; bar.querySelector('[data-dom-count]').textContent = n;
+    };
+    form.addEventListener('change', function (e) {
+        if (e.target.hasAttribute('data-dom-all')) { boxes().forEach(function (b) { b.checked = e.target.checked; }); }
+        sync();
+    });
+    bar.addEventListener('click', function (e) {
+        var btn = e.target.closest('[data-bulk]'); if (!btn) { return; }
+        var id = btn.getAttribute('data-bulk');
+        if (btn.hasAttribute('data-bulk-action')) { form.action = btn.getAttribute('data-bulk-action'); }
+        else { document.getElementById('bulkaction').value = id; }
+        form.submit();
+    });
+    /* The sub-nav's Bulk Management link: point at the checkboxes. */
+    if (location.hash === '#bulk') { var all = form.querySelector('[data-dom-all]'); if (all) { all.focus(); } bar.hidden = false; }
+    sync();
+})();
+{/literal}</script>
