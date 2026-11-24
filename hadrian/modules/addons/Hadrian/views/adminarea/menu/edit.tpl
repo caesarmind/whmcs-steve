@@ -67,7 +67,7 @@
         {if $flash == 'empty-payload-rejected'}
             <span class="mt-flash mt-flash-warn">
                 Save refused — the browser sent zero items so we didn't wipe your menu.
-                <a href="?module=Hadrian&action=menu&sub=seed" style="text-decoration:underline">Re-seed presets</a>
+                <a href="?module=Hadrian&action=menu&sub=seed&amp;token={$csrfToken|escape:'url'}" style="text-decoration:underline">Re-seed presets</a>
                 if you want the defaults back.
             </span>
         {/if}

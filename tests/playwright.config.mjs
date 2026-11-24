@@ -53,7 +53,9 @@ export default defineConfig({
       // Mutates the site's settings: run.mjs runs it on its own, never beside smoke/browser.
       // email.spec.mjs belongs here for the same reason: it switches the header
       // of every email the install sends, and the flows tier reads that inbox.
-      name: 'settings', testMatch: /(settings|email)\.spec\.mjs/, dependencies: ['setup'],
+      // admin-uploads.spec.mjs too: a logo upload changes every client page.
+      // admin-csrf.spec.mjs saves real settings through the admin screens.
+      name: 'settings', testMatch: /(settings|email|admin-uploads|admin-csrf)\.spec\.mjs/, dependencies: ['setup'],
       use: { ...devices['Desktop Chrome'], userAgent: USER_AGENT, viewport: { width: 1280, height: 860 } },
     },
     {

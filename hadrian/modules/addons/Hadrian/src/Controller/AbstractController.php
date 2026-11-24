@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Hadrian\Controller;
 
+use Hadrian\Helpers\AdminAjax;
+use Hadrian\Helpers\AdminCsrf;
 use Hadrian\View\ViewHelper;
 
 /**
@@ -33,6 +35,24 @@ abstract class AbstractController
 
     public function adminArea(): string
     {
+        // Every write needs the WHMCS admin token, checked here once before
+        // any controller runs. WHMCS does not check it for an addon. See
+        // Helpers\AdminCsrf.
+        $sub     = (string)($_GET['sub'] ?? $_POST['sub'] ?? '');
+        $refusal = AdminCsrf::check($this->action, $sub, (string)($_SERVER['REQUEST_METHOD'] ?? 'GET'));
+        if ($refusal !== null) {
+            if (AdminCsrf::isJsonRoute($this->action, $sub)) {
+                AdminAjax::refuse('Your session expired. Reload the page and try again.', 403);
+            }
+            http_response_code(403);
+            $known = method_exists($this, lcfirst($this->action) . 'Action');
+            return $this->view('error', [
+                'title'   => 'Not saved',
+                'error'   => $refusal,
+                'backUrl' => (new ViewHelper())->url($known ? $this->action : 'index'),
+            ]);
+        }
+
         $method = lcfirst($this->action) . 'Action';
         if (!method_exists($this, $method)) {
             $method = 'indexAction';
@@ -47,6 +67,9 @@ abstract class AbstractController
             'currentAction' => $this->action,
             // Tabs for separately installed extension modules; see Helpers\Extensions.
             'mtExtensions'  => \Hadrian\Helpers\Extensions::all(),
+            // For the few GET links that change state (AdminCsrf::GET_WRITES):
+            // they carry it as &token=. POST forms get it from WHMCS itself.
+            'csrfToken'     => AdminCsrf::token(),
             ...$vars,
         ]);
         return (string)$this->smarty->fetch($template . '.tpl');

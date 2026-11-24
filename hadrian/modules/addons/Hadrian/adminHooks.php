@@ -18,11 +18,9 @@ if (!$user->isAuthenticatedAdmin()) {
     return;
 }
 
-// NB: the Branding AJAX intercept previously lived here. It moved to
-// hooks.php because adminHooks.php wasn't reliably auto-loaded for AJAX
-// POSTs on every WHMCS 9 install — the request would fall through to
-// the normal addonmodules.php flow and return HTML chrome, breaking the
-// JS JSON.parse. hooks.php is guaranteed to be auto-loaded.
+// NB: the Branding AJAX intercept once lived here, then in hooks.php. Both
+// ran before WHMCS's admin login check. It is now an ordinary route in
+// MainController, reached through Hadrian_output(); see the note in hooks.php.
 
 // ============================================================================
 // configgeneral.php POST guard: rewrite license-disabled template to 'six'

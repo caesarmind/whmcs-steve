@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Hadrian\Controller\Admin;
 
 use Hadrian\Controller\AbstractController;
+use Hadrian\Helpers\AdminAjax;
 use Hadrian\Helpers\Uploader;
 use Hadrian\Models\Settings;
 
@@ -20,11 +21,14 @@ use Hadrian\Models\Settings;
  *   ?action=branding               → GET render, POST handle uploads
  *   ?action=branding&sub=remove    → POST remove a single field
  *
- * Security posture is documented in Uploader.php. Notably: we do NOT use a
- * CSRF token here to match the rest of the Hadrian admin controllers (none
- * of them do — WHMCS gates /admin/addonmodules.php). The upload-side
- * validation (MIME triple-check, size cap, hashed filenames, sidecar
- * .htaccess) is the security boundary.
+ *   ?action=branding&sub=upload-ajax   → POST, JSON (the normal upload path)
+ *   ?action=branding&sub=remove-ajax   → POST, JSON
+ *
+ * Security posture of the files themselves is documented in Uploader.php
+ * (MIME triple-check, size cap, hashed filenames, sidecar .htaccess). Every
+ * route here that changes something needs the WHMCS admin CSRF token:
+ * AdminCsrf::check() enforces it for all of them before this controller is
+ * reached, and the two JSON routes check again in AdminAjax::guard().
  */
 final class BrandingController extends AbstractController
 {
@@ -258,9 +262,10 @@ final class BrandingController extends AbstractController
      * AJAX sub-route: handles one field's upload in isolation. Returns
      * JSON, exits without touching the WHMCS admin chrome.
      *
-     * Routed from adminHooks.php which fires BEFORE WHMCS starts echoing
-     * the admin header. Going through MainController would land us inside
-     * the admin body and corrupt the JSON with leading HTML.
+     * Routed through Hadrian_output() -> MainController::brandingAction, so
+     * WHMCS has checked the admin login first. _output() output is buffered
+     * by WHMCS, and respondJson() discards that buffer before answering, so
+     * no admin HTML reaches the JSON.
      *
      * Request shape:
      *   POST ?module=Hadrian&action=branding&sub=upload-ajax
@@ -274,6 +279,7 @@ final class BrandingController extends AbstractController
      */
     public function uploadAjaxAction(): never
     {
+        AdminAjax::guard();
         $field = (string)($_POST['field'] ?? '');
         if (!array_key_exists($field, self::FIELDS)) {
             $this->respondJson(['ok' => false, 'error' => 'Unknown branding field.'], 400);
@@ -321,6 +327,7 @@ final class BrandingController extends AbstractController
      */
     public function removeAjaxAction(): never
     {
+        AdminAjax::guard();
         $field = (string)($_POST['field'] ?? '');
         if (!array_key_exists($field, self::FIELDS)) {
             $this->respondJson(['ok' => false, 'error' => 'Unknown branding field.'], 400);
@@ -457,10 +464,10 @@ final class BrandingController extends AbstractController
     }
 
     /**
-     * JSON response with clean output buffer. The AJAX endpoints are
-     * dispatched from adminHooks.php BEFORE WHMCS renders chrome, so the
-     * output buffer should be empty here — but flush defensively in case
-     * any hook earlier in the chain echoed something.
+     * JSON response with a clean output buffer. The AJAX endpoints run inside
+     * Hadrian_output(), whose output WHMCS buffers to place inside the admin
+     * page; discarding every buffer level first is what keeps that HTML out
+     * of the JSON.
      */
     private function respondJson(array $payload, int $code = 200): never
     {

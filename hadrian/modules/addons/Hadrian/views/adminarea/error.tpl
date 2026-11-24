@@ -1,7 +1,7 @@
 {include file="includes/header.tpl"}
 
 <header class="mt-page-header">
-    <h1 class="mt-page-title">Error</h1>
+    <h1 class="mt-page-title">{$title|default:'Error'|escape}</h1>
 </header>
 
 <div class="mt-panel pad">
@@ -11,6 +11,10 @@
     </div>
 </div>
 
-<a href="{$viewHelper->url('index')}" class="mt-btn mt-btn-secondary">Back to templates</a>
+{if $backUrl|default:''}
+    <a href="{$backUrl|escape}" class="mt-btn mt-btn-secondary">Go back</a>
+{else}
+    <a href="{$viewHelper->url('index')}" class="mt-btn mt-btn-secondary">Back to templates</a>
+{/if}
 
 {include file="includes/footer.tpl"}

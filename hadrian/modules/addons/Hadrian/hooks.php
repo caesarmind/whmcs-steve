@@ -40,102 +40,23 @@ use Hadrian\Models\Configuration;
 use Hadrian\Service\Hooks as HookService;
 
 // ============================================================================
-// Branding AJAX intercept — runs BEFORE WHMCS renders admin chrome
-// ============================================================================
-// Previously lived in adminHooks.php, but adminHooks.php isn't reliably
-// auto-loaded on all WHMCS 9 installs for AJAX POSTs (observed: request
-// fell through to the normal addonmodules.php → MainController flow,
-// which redirected and returned HTML, breaking the JS JSON.parse).
-// hooks.php IS reliably auto-loaded for every request, so moving the
-// intercept here guarantees it fires. The admin-auth gate below means
-// non-admin requests can't reach the upload endpoint by URL guessing.
-// ADMINAREA is defined by /admin/addonmodules.php BEFORE init.php is
-// included. init.php then does the admin auth check and exit()s with a
-// login redirect if the user isn't authenticated -- BEFORE reaching
-// the hooks loader. So if this code is executing AND ADMINAREA is
-// defined, the user is already verified by WHMCS. No need to repeat
-// the session check ourselves (and observed: $_SESSION['adminid'] and
-// \WHMCS\Authentication\CurrentUser::isAuthenticatedAdmin() both
-// returned empty/false at this lifecycle point on a real WHMCS 9
-// install, because the canonical admin-session shape varies across
-// versions and init phases).
-if (
-    defined('ADMINAREA')
-    && $_SERVER['REQUEST_METHOD'] === 'POST'
-    && ($_GET['module'] ?? '') === 'Hadrian'
-    && ($_GET['action'] ?? '') === 'branding'
-    && in_array($_GET['sub'] ?? '', ['upload-ajax', 'remove-ajax'], true)
-) {
-    try {
-        $_mtBrandingCtl = new \Hadrian\Controller\Admin\BrandingController();
-        if ($_GET['sub'] === 'upload-ajax') {
-            $_mtBrandingCtl->uploadAjaxAction();   // never returns
-        }
-        $_mtBrandingCtl->removeAjaxAction();        // never returns
-    } catch (\Throwable $_mtAjaxEx) {
-        error_log('Hadrian branding AJAX: ' . $_mtAjaxEx->getMessage()
-            . ' at ' . $_mtAjaxEx->getFile() . ':' . $_mtAjaxEx->getLine());
-        while (ob_get_level() > 0) { @ob_end_clean(); }
-        if (!headers_sent()) {
-            http_response_code(500);
-            header('Content-Type: application/json; charset=utf-8');
-        }
-        // Surface the real exception message so the admin can diagnose
-        // without grepping the PHP error log. The endpoint is admin-only
-        // (gated above), so leaking internals here is acceptable.
-        echo json_encode([
-            'ok'    => false,
-            'error' => 'Server error: ' . $_mtAjaxEx->getMessage(),
-        ]);
-        exit;
-    }
-}
-
-// ============================================================================
-// Media library AJAX (the image picker behind any [data-mt-media] field).
+// NO ADMIN ENDPOINT IS DISPATCHED FROM THIS FILE.
 //
-// A SEPARATE gate block on purpose. The branding block above dispatches with
-// an else-less fall-through:
-//     if ($sub === 'upload-ajax') { uploadAjaxAction(); }
-//     removeAjaxAction();
-// so any sub added to ITS in_array() that is not 'upload-ajax' silently lands
-// in removeAjaxAction(). Here every arm of the match returns `never`, so
-// there is nothing to fall through to.
+// The branding uploads (action=branding&sub=upload-ajax|remove-ajax) and the
+// media library (action=media&sub=list|upload|delete) used to be answered
+// here, at load time, with an early exit. That was open to anyone on the
+// internet: WHMCS loads this file BEFORE it checks that the visitor is a
+// signed-in admin. `defined('ADMINAREA')` is true for any request to an
+// admin script, signed in or not. (Security review 2026-10, finding C1:
+// measured on WHMCS 9.0.8 before the fix, an anonymous POST listed the media
+// library and reached the upload and delete code.)
 //
-// Same auth posture and the same reason as the branding block above: by the
-// time this runs, WHMCS has already verified the admin (ADMINAREA is only
-// defined inside the admin bootstrap). POST-only, which is why `list` is a
-// POST despite being a read — a GET would fall through to addonmodules.php
-// and return admin HTML that the caller cannot JSON.parse.
-if (
-    defined('ADMINAREA')
-    && $_SERVER['REQUEST_METHOD'] === 'POST'
-    && ($_GET['module'] ?? '') === 'Hadrian'
-    && ($_GET['action'] ?? '') === 'media'
-    && in_array($_GET['sub'] ?? '', ['list', 'upload', 'delete'], true)
-) {
-    try {
-        $_mtMediaCtl = new \Hadrian\Controller\Admin\MediaController();
-        match ($_GET['sub']) {
-            'list'   => $_mtMediaCtl->listAction(),    // never returns
-            'upload' => $_mtMediaCtl->uploadAction(),  // never returns
-            'delete' => $_mtMediaCtl->deleteAction(),  // never returns
-        };
-    } catch (\Throwable $_mtMediaEx) {
-        error_log('Hadrian media AJAX: ' . $_mtMediaEx->getMessage()
-            . ' at ' . $_mtMediaEx->getFile() . ':' . $_mtMediaEx->getLine());
-        while (ob_get_level() > 0) { @ob_end_clean(); }
-        if (!headers_sent()) {
-            http_response_code(500);
-            header('Content-Type: application/json; charset=utf-8');
-        }
-        echo json_encode([
-            'ok'    => false,
-            'error' => 'Server error: ' . $_mtMediaEx->getMessage(),
-        ]);
-        exit;
-    }
-}
+// They are now ordinary routes in MainController, reached through
+// Hadrian_output(), which WHMCS calls only after the login check and this
+// addon's role-permission check. They answer JSON and exit there, before WHMCS
+// prints any admin chrome, and each also runs Helpers\AdminAjax::guard()
+// (POST, signed-in admin, CSRF token). Do not add an early-exit handler here.
+// ============================================================================
 
 // ============================================================================
 // Admin addon page: full-width canvas (no sidebar flash).

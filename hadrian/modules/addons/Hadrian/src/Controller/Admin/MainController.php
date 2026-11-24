@@ -19,7 +19,8 @@ use Hadrian\Controller\AbstractController;
  *   ?action=sitemap          → sitemap.xml + robots.txt (sub=save|generate|preview)
  *   ?action=menu             → menu list
  *   ?action=editMenu         → menu editor (drag-drop tree)
- *   ?action=branding         → logo / favicon uploads
+ *   ?action=branding         → logo / favicon uploads (sub=upload-ajax|remove-ajax: JSON)
+ *   ?action=media            → media library JSON (sub=list|upload|delete)
  *   ?action=extensions       → theme extensions
  *   ?action=tools            → cache, license refresh, htaccess gen
  *   ?action=templates        → list installed templates (rare)
@@ -77,8 +78,24 @@ final class MainController extends AbstractController
         $sub = (string)($_GET['sub'] ?? $_POST['sub'] ?? 'index');
         $ctl = new BrandingController();
         return match ($sub) {
-            'remove' => $ctl->removeAction(),
-            default  => $ctl->indexAction(),
+            'remove'      => $ctl->removeAction(),
+            // JSON endpoints: answer and exit before WHMCS prints the admin
+            // page. Reached only through Hadrian_output(), i.e. after WHMCS
+            // has checked the admin login; see the note in hooks.php.
+            'upload-ajax' => $ctl->uploadAjaxAction(),
+            'remove-ajax' => $ctl->removeAjaxAction(),
+            default       => $ctl->indexAction(),
+        };
+    }
+    /** The media library behind every [data-mt-media] field. JSON only. */
+    public function mediaAction(): string
+    {
+        $ctl = new MediaController();
+        return match ((string)($_GET['sub'] ?? '')) {
+            'list'   => $ctl->listAction(),
+            'upload' => $ctl->uploadAction(),
+            'delete' => $ctl->deleteAction(),
+            default  => \Hadrian\Helpers\AdminAjax::refuse('Unknown media action.', 404),
         };
     }
     public function extensionsAction(): string { return (new ExtensionsController())->indexAction(); }

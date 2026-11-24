@@ -27,9 +27,9 @@
         <h2 class="mt-section-title">{if $tab == 'footer-secondary'}Footer Secondary Menu{elseif $tab == 'footer'}Footer Menu{elseif $tab == 'secondary'}Secondary Menu{else}Main Menu{/if}</h2>
         {include file="includes/doclink.tpl" article="menu-manager" anchor="building-a-menu"}
         <div class="mt-section-tools">
-            <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=Hadrian&action=menu&sub=seed" title="Re-seed any missing preset items (won't overwrite existing items)">Re-seed presets</a>
-            <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=Hadrian&action=menu&sub=reset-defaults" title="Wipe and rebuild the factory preset menus (WHMCS Defaults + Footer Secondary) to match the latest preset" onclick="return confirm('Reset the WHMCS Defaults menus and the Footer Secondary menu? Custom user-curated menus are unaffected.');">Reset WHMCS Defaults</a>
-            <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=Hadrian&action=menu&sub=seed&force=1" title="Rebuild ALL preset menus (main + footer) to exactly match the shipped presets, overwriting their current items with the latest defaults" onclick="return confirm('Force re-sync every preset menu (main + footer) to the shipped defaults? This overwrites their current items.');">Force re-sync to presets</a>
+            <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=Hadrian&action=menu&sub=seed&amp;token={$csrfToken|escape:'url'}" title="Re-seed any missing preset items (won't overwrite existing items)">Re-seed presets</a>
+            <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=Hadrian&action=menu&sub=reset-defaults&amp;token={$csrfToken|escape:'url'}" title="Wipe and rebuild the factory preset menus (WHMCS Defaults + Footer Secondary) to match the latest preset" onclick="return confirm('Reset the WHMCS Defaults menus and the Footer Secondary menu? Custom user-curated menus are unaffected.');">Reset WHMCS Defaults</a>
+            <a class="mt-btn mt-btn-ghost mt-btn-sm" href="?module=Hadrian&action=menu&sub=seed&force=1&amp;token={$csrfToken|escape:'url'}" title="Rebuild ALL preset menus (main + footer) to exactly match the shipped presets, overwriting their current items with the latest defaults" onclick="return confirm('Force re-sync every preset menu (main + footer) to the shipped defaults? This overwrites their current items.');">Force re-sync to presets</a>
             <form method="post" action="?module=Hadrian&action=menu&sub=create" style="display:inline">
                 <input type="hidden" name="location" value="{$tab|escape}">
                 <button type="submit" class="mt-btn mt-btn-primary mt-btn-sm" title="Create a blank menu in this tab and open it for editing">+ New menu</button>
@@ -43,7 +43,7 @@
     {if !$menus}
         <div class="mt-empty">
             <p>No menus yet for this location.</p>
-            <a class="mt-btn mt-btn-primary mt-btn-sm" href="?module=Hadrian&action=menu&sub=seed">Seed the 4 preset menus</a>
+            <a class="mt-btn mt-btn-primary mt-btn-sm" href="?module=Hadrian&action=menu&sub=seed&amp;token={$csrfToken|escape:'url'}">Seed the 4 preset menus</a>
         </div>
     {else}
     <div class="mt-table-wrap">

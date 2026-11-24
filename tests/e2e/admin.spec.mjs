@@ -9,6 +9,7 @@ import { test, expect } from '@playwright/test';
 import { ADMIN_ACTIONS } from './routes.mjs';
 import { session } from './helpers.mjs';
 import { inspect, title } from './oracles.mjs';
+import { BASE_URL, USER_AGENT } from '../lib/env.mjs';
 
 const BASE = '/admin/addonmodules.php?module=Hadrian';
 
@@ -38,6 +39,35 @@ test.describe('admin', () => {
   for (const action of ADMIN_ACTIONS) {
     test(`action=${action}`, async () => { await check(`${BASE}&action=${action}`); });
   }
+
+  // Security review 2026-10, C1: these endpoints were answered from hooks.php,
+  // which WHMCS loads before its admin login check, so anyone could list the
+  // media library and reach the upload and delete code. Each request below is
+  // harmless if it gets through (a read, or a field that does not exist) and
+  // must instead be sent to the login page. A visitor with no login still has
+  // a session and a valid CSRF token, so it is sent too: the token is not
+  // what stops them.
+  test('JSON endpoints turn away a visitor who is not signed in', async ({ playwright }) => {
+    const anon = await playwright.request.newContext({ baseURL: BASE_URL, userAgent: USER_AGENT });
+    try {
+      const login = await (await anon.get('/admin/login.php')).text();
+      const token = (login.match(/name="token" value="([^"]+)"/) || [])[1] || '';
+      const xhr = { 'X-Requested-With': 'XMLHttpRequest' };
+      for (const [sub, form] of [
+        ['action=media&sub=list', { collection: 'library', token }],
+        ['action=media&sub=upload', { collection: 'library', token }],
+        ['action=media&sub=delete', { collection: 'library', token }],
+        ['action=branding&sub=upload-ajax', { field: 'no-such-field', token }],
+        ['action=branding&sub=remove-ajax', { field: 'no-such-field', token }],
+      ]) {
+        const res = await anon.post(`${BASE}&${sub}`, { form, headers: xhr, maxRedirects: 0 });
+        expect.soft(res.status(), `${sub}: an anonymous request must not be answered`).toBe(302);
+        expect.soft(res.headers()['location'] || '', `${sub}: sent to the login page`).toContain('login.php');
+      }
+    } finally {
+      await anon.dispose();
+    }
+  });
 
   test('every menu editor', async () => {
     test.setTimeout(5 * 60_000);   // visits every editor in one session (PHP serialises it)

@@ -3,31 +3,32 @@ declare(strict_types=1);
 
 namespace Hadrian\Controller\Admin;
 
+use Hadrian\Helpers\AdminAjax;
 use Hadrian\Helpers\MediaLibrary;
 use Hadrian\Helpers\Uploader;
 
 /**
  * Admin: media library JSON API behind the image picker.
  *
- * Routes (all POST, dispatched from hooks.php BEFORE WHMCS renders chrome):
+ * Routes (all POST, via Hadrian_output() -> MainController::mediaAction, so
+ * WHMCS has checked the admin login first; each answers and exits before
+ * WHMCS prints the admin page):
  *   ?module=Hadrian&action=media&sub=list     -> browse
  *   ?module=Hadrian&action=media&sub=upload   -> add one file
  *   ?module=Hadrian&action=media&sub=delete   -> remove one or more
  *
- * `list` is a POST despite being semantically a read: the hooks.php intercept
- * is REQUEST_METHOD === 'POST' gated, so a GET falls through to
- * addonmodules.php -> MainController and returns a full page of admin HTML —
- * which surfaces to the caller as the "Server returned a non-JSON response"
- * JSON.parse failure rather than anything diagnosable.
+ * `list` is a POST despite being semantically a read: it carries the CSRF
+ * token like the other two, and AdminAjax::guard() refuses anything else.
  *
  * Deliberately does NOT extend AbstractController: that constructor spins up
  * a Smarty instance (compile + cache dirs) which is pure waste on a JSON
  * route, and it exposes redirect(), a never-returning exit() that must not be
  * reachable from an AJAX action.
  *
- * Auth: defined('ADMINAREA') is the gate, matching BrandingController — see
- * the comment block in hooks.php for why a session/token check at this
- * lifecycle point was observed non-functional on real WHMCS 9.
+ * Auth: WHMCS's own admin login check (these run inside _output), and
+ * AdminAjax::guard() at the start of boot(): POST, signed-in admin, CSRF
+ * token. The X-Requested-With check after it is not an auth control; it only
+ * turns a plain form post into a clear error.
  */
 final class MediaController
 {
@@ -164,9 +165,11 @@ final class MediaController
 
     // ------------------------------------------------------------- internals
 
-    /** Shared preamble: header check, collection resolution, storage priming. */
+    /** Shared preamble: auth, header check, collection resolution, storage priming. */
     private function boot(): void
     {
+        AdminAjax::guard();
+
         if (($_SERVER['HTTP_X_REQUESTED_WITH'] ?? '') !== self::REQUIRED_HEADER) {
             // Named in the message so a proxy stripping the header is
             // self-diagnosing rather than a mystery 400.

@@ -123,7 +123,7 @@
         Saving the settings above also regenerates the files.
     </p>
     <div style="display:flex; gap:8px; flex-wrap:wrap;">
-        <a class="mt-btn mt-btn-primary mt-btn-sm" href="?module=Hadrian&action=sitemap&sub=generate">Generate now</a>
+        <a class="mt-btn mt-btn-primary mt-btn-sm" href="?module=Hadrian&action=sitemap&sub=generate&amp;token={$csrfToken|escape:'url'}">Generate now</a>
         <a class="mt-btn mt-btn-secondary mt-btn-sm" href="?module=Hadrian&action=sitemap&sub=preview">Preview XML</a>
     </div>
 </section>
