@@ -336,7 +336,13 @@ final class Hooks
         try {
             if (function_exists('routePath')) {
                 $p = (string)routePath($route);
-                if ($p !== '') {
+                // WHMCS does not throw for a name it has no route for: it
+                // answers with the address of its "route not defined" page.
+                // 'login' and 'page-not-found' are paths, not route names, so
+                // that is what came back for both, and a gated visitor landed
+                // on a 404 instead of the sign-in page. Keep the ?rp= form
+                // for those; it is the address WHMCS serves them at.
+                if ($p !== '' && !str_contains($p, 'route-not-defined')) {
                     $path = '/' . ltrim($p, '/');
                 }
             }
