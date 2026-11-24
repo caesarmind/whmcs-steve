@@ -212,6 +212,8 @@ if (AddonHelper::isActive()) {
                 $themeMode = $cookie;
             }
         }
+        // The customizer's preview frame shows the mode its toggle is on.
+        $themeMode = Hadrian\Helpers\CustomizePreview::theme() ?? $themeMode;
 
         return [
             'mtIcons'            => Hadrian\Menu\Icons::all(),

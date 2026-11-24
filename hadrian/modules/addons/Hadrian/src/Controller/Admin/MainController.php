@@ -36,6 +36,16 @@ final class MainController extends AbstractController
     public function stylesAction(): string     { return (new StylesController())->indexAction(); }
     public function editStyleAction(): string  { return (new StylesController())->editAction(); }
     public function layoutsAction(): string    { return (new LayoutsController())->indexAction(); }
+    public function customizeAction(): string
+    {
+        $sub = (string)($_GET['sub'] ?? $_POST['sub'] ?? 'index');
+        $ctl = new CustomizeController();
+        return match ($sub) {
+            'preview-ajax' => $ctl->previewAjaxAction(),
+            'save-ajax'    => $ctl->saveAjaxAction(),
+            default        => $ctl->indexAction(),
+        };
+    }
     public function pagesAction(): string
     {
         $sub = (string)($_GET['sub'] ?? $_POST['sub'] ?? 'index');

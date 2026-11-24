@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Hadrian\Service;
 
 use Hadrian\Helpers\AddonHelper;
+use Hadrian\Helpers\CustomizePreview;
 use Hadrian\Helpers\LayoutPointers;
 use Hadrian\Helpers\LocaleHelper;
 use Hadrian\Helpers\PageArea;
@@ -895,6 +896,17 @@ final class Hooks
             (string)Settings::getValue($name . '_active_style', 'default')
         );
 
+        // The customizer's preview frame: draw the unsaved colours the admin
+        // is looking at. The block is printed even when it is empty, because
+        // the customizer rewrites it in place as colours are edited and it
+        // has to sit here, ahead of the Custom CSS.
+        if (CustomizePreview::active()) {
+            return '<style id="hadrian-colors">' . \Hadrian\Helpers\ColorTokens::css(
+                (array)CustomizePreview::colors('light'),
+                (array)CustomizePreview::colors('dark')
+            ) . '</style>';
+        }
+
         // Each style now carries BOTH scopes: light -> :root, dark ->
         // [data-theme="dark"]. Read the per-scope keys, falling back to the
         // pre-refactor keys (_colors_<active> for light, _colors_dark for dark)
@@ -1544,7 +1556,9 @@ final class Hooks
 
     private function clientAreaFooterOutput(array $vars, Template $template): ?string
     {
-        return $this->extensionOutput($template, $vars, slot: 'footerOutput');
+        $out = (string)$this->extensionOutput($template, $vars, slot: 'footerOutput')
+             . CustomizePreview::footerScript();
+        return $out !== '' ? $out : null;
     }
 
     private function clientAreaHomepagePanels(mixed $panels, Template $template): void
@@ -2757,7 +2771,8 @@ final class Hooks
     private function resolveActiveStyle(Template $template): array
     {
         $active   = $template->resolveStyleName(
-            (string)Settings::getValue($template->getName() . '_active_style', 'default')
+            CustomizePreview::style()
+                ?? (string)Settings::getValue($template->getName() . '_active_style', 'default')
         );
         $metaPath = $template->getFullPath() . "/core/styles/{$active}/style.php";
         $meta     = ThemeManifest::loadVariantMeta($metaPath);
@@ -2858,6 +2873,9 @@ final class Hooks
             $this->area ?? PageArea::CLIENT,
             $template->getLayouts($kind)
         );
+        // The customizer's preview frame draws the picks being tried out.
+        $active = CustomizePreview::layout($kind, $audience, $this->area ?? PageArea::CLIENT, $template->getLayouts($kind))
+            ?? $active;
 
         return $this->buildLayoutMeta($template, $kind, $active);
     }

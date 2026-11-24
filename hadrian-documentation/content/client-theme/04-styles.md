@@ -30,6 +30,34 @@ Pinned to the bottom of the window and always visible. It always carries **Cance
 The save bar saves only the section you are looking at. Edit Colors, switch to Typography, press Save typography, and your colour edits are gone. Save before moving between sub-sections.
 :::
 
+## The customizer
+
+The style editor changes the live site the moment you save. The customizer lets you look first. It shows your real site in a frame, with the controls beside it, and nothing you try there reaches a visitor until you press **Save**.
+
+Open **Hadrian -> Styles** and click **Open the customizer**.
+
+| Tab | What you can try |
+| --- | --- |
+| Style | Any of the style presets. The frame redraws with the one you click. |
+| Layouts | The navigation and footer layout, by visitor or by area, exactly as on the [Layouts](/client-theme/layout-manager/) page. |
+| Colours | Every colour variable of the selected style, in the same groups as [Colors](#colors) below. An edit shows in the frame as you make it. |
+
+Above the frame you choose which page to look at, switch between **Light** and **Dark**, and set the width to **Desktop**, **Tablet** or **Phone**. The Light / Dark switch also decides which set of colours the Colours tab edits. Links inside the frame work, so you can click through the site and keep seeing your unsaved changes.
+
+Each colour row has a small reset arrow that appears once the value differs from what the style ships. It puts that one colour back. **Reset all to the style** does the same for every colour in both modes.
+
+**Save** writes everything at once: the selected style becomes the active one, its colours are stored for both modes, and the layout picks are saved. **Discard** goes back to what the site shows now. The customizer writes to the same settings as the Styles and Layouts pages, so anything saved here appears there, and the other way round.
+
+:::info Who sees the unsaved changes
+Only you. The frame carries a token tied to your admin session, and the theme draws unsaved changes only for a signed-in admin whose address carries that token. Visitors, clients, and your own other browser tabs keep seeing the saved site.
+:::
+
+:::tip Previewing client-area pages
+The frame shows the site as a visitor sees it, so the page list starts with public pages. To preview the dashboard, invoices and the rest, use **Login as Client** from a client's profile in the same browser, then reload the customizer. Those pages join the list.
+:::
+
+Typography, buttons, forms and the other shared variables are not in the customizer yet. Edit those in the style editor.
+
 ## Colors
 
 ### Light / Dark scope

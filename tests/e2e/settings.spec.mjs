@@ -584,6 +584,132 @@ test('Menu admin: an area can be given a menu of its own', async ({ page, contex
   }
 });
 
+// ------------------------------------------------------------ the customizer
+// Admin: Styles -> Open the customizer. A scheme, layouts and colours are
+// tried on the real site in a frame; nothing is written until Save, and until
+// then only the admin's own frame shows it.
+const accentOf = page => page.evaluate(() => getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim());
+const siteFacts = async (page, url = '/') => {
+  await page.goto(url);
+  return {
+    preview: await page.evaluate(() => document.documentElement.getAttribute('data-hadrian-preview')),
+    layout: await bodyAttr(page, 'data-layout'),
+    accent: await accentOf(page),
+  };
+};
+
+test('Customizer: changes show in the frame only, and reach the site on Save', async ({ page, context, browser }) => {
+  test.setTimeout(5 * 60_000);
+  set({
+    ...NEVER_BY_AREA,
+    hadrian_active_style: str('default'),
+    hadrian_colors_default_light: null,
+    hadrian_colors_default_dark: null,
+    hadrian_colors_emerald_light: null,
+    hadrian_colors_emerald_dark: null,
+    'hadrian_active_layout_main-menu_guest': str('sidebar'),
+    'hadrian_active_layout_main-menu_client': str('sidebar'),
+  });
+  await loginAdmin(context.request);
+  const guestContext = await browser.newContext({ baseURL: BASE_URL });
+  const guest = await guestContext.newPage();
+  const errors = [];
+  page.on('pageerror', e => errors.push(e.message));
+  // Leaving with unsaved changes asks first; this test leaves on purpose.
+  page.on('dialog', dialog => dialog.accept());
+
+  const idle = () => page.evaluate(() => window.hadrianCustomize.idle());
+  const frame = () => page.evaluate(() => {
+    const d = document.querySelector('[data-cz-frame]').contentDocument;
+    return {
+      preview: d.documentElement.getAttribute('data-hadrian-preview'),
+      theme: d.documentElement.getAttribute('data-theme'),
+      layout: d.body.getAttribute('data-layout'),
+      area: d.body.getAttribute('data-area'),
+      accent: getComputedStyle(d.documentElement).getPropertyValue('--color-accent').trim(),
+    };
+  });
+  const loads = () => page.evaluate(() => window.hadrianCustomize.loads());
+  const save = page.locator('[data-cz-save]');
+
+  try {
+    const live = await siteFacts(guest);
+    expect(live, 'the site before').toEqual({ preview: null, layout: 'side', accent: '#0071e3' });
+
+    await page.goto('/admin/addonmodules.php?module=Hadrian&action=styles');
+    await page.locator('[data-open-customizer]').click();
+    await idle();
+    expect(await frame(), 'the frame opens on what is saved').toMatchObject({ preview: '1', layout: 'side', area: 'website', accent: '#0071e3' });
+    await expect(save, 'nothing to save yet').toBeDisabled();
+
+    // A scheme.
+    await page.locator('[data-cz-scheme="emerald"]').click();
+    await idle();
+    const emerald = (await frame()).accent;
+    expect(emerald, 'the frame draws the scheme being tried').not.toBe('#0071e3');
+    await expect(save).toBeEnabled();
+
+    // A layout.
+    await page.locator('[data-cz-tab="layouts"]').click();
+    await page.locator('[data-cz-layout="main-menu:guest"]').selectOption('top');
+    await idle();
+    expect(await frame(), 'the admin sees the guest layout in the frame').toMatchObject({ layout: 'top', accent: emerald });
+
+    // A colour: repainted in place, no reload.
+    await page.locator('[data-cz-tab="colors"]').click();
+    const before = await loads();
+    const accent = page.locator('[data-cz-token="--color-accent"] input[type="text"]');
+    await accent.fill('#ff2d55');
+    await accent.dispatchEvent('change');
+    expect((await frame()).accent, 'the colour is live at once').toBe('#ff2d55');
+    expect(await loads(), 'without reloading the frame').toBe(before);
+    await idle();
+
+    // Following a link inside the frame stays in the preview.
+    await page.locator('[data-cz-page]').selectOption('cart.php?a=view');
+    await idle();
+    expect(await frame(), 'another page, same unsaved state').toMatchObject({ preview: '1', area: 'order', layout: 'top', accent: '#ff2d55' });
+
+    // Nobody else sees any of it.
+    expect(await siteFacts(guest), 'a visitor still gets the saved site').toEqual(live);
+    const token = await page.evaluate(() => JSON.parse(document.getElementById('mt-cz-data').textContent).token);
+    expect(await siteFacts(guest, `/index.php?hadrian_customize=${token}`), 'the token alone, without the admin session, does nothing').toEqual(live);
+    await page.goto('/');
+    expect(await bodyAttr(page, 'data-layout'), 'the admin, outside the frame, gets the saved site too').toBe('side');
+    expect(await accentOf(page)).toBe('#0071e3');
+    await clean(guest, guestContext, 'guest', ['/']);
+
+    // Reopening starts from what is saved, not from an old try.
+    await page.goto('/admin/addonmodules.php?module=Hadrian&action=customize');
+    await idle();
+    expect(await frame(), 'a fresh visit starts from the saved site').toMatchObject({ layout: 'side', accent: '#0071e3' });
+
+    // Now for real.
+    await page.locator('[data-cz-scheme="emerald"]').click();
+    await page.locator('[data-cz-tab="layouts"]').click();
+    await page.locator('[data-cz-layout="main-menu:guest"]').selectOption('top');
+    await page.locator('[data-cz-tab="colors"]').click();
+    await accent.fill('#ff2d55');
+    await accent.dispatchEvent('change');
+    await idle();
+    await save.click();
+    await expect(page.locator('[data-cz-status]'), 'the save is confirmed').toHaveAttribute('data-kind', 'ok');
+    await expect(save, 'and nothing is left unsaved').toBeDisabled();
+
+    expect(await siteFacts(guest), 'the site now shows it').toEqual({ preview: null, layout: 'top', accent: '#ff2d55' });
+    await clean(guest, guestContext, 'guest', ['/', '/cart.php?a=view']);
+
+    // The Styles and Layouts pages read the same rows.
+    await page.goto('/admin/addonmodules.php?module=Hadrian&action=styles');
+    await expect(page.locator('.mt-sty-card.is-active .mt-sty-title'), 'the Styles page agrees').toHaveText('Emerald');
+    await page.goto('/admin/addonmodules.php?module=Hadrian&action=editStyle&style=emerald&subcat=colors');
+    await expect(page.locator('input[name="c[--color-accent]"]').first(), 'and so does its Colors panel').toHaveValue(/#ff2d55/i);
+    expect(errors, 'no script errors on the way').toEqual([]);
+  } finally {
+    await guestContext.close();
+  }
+});
+
 const FOOTERS = [['default', 'hp-footer-slim'], ['extended', 'hp-footer-extended'], ['extended-info', 'hp-footer-extended-info']];
 for (const [footer, cls] of FOOTERS) {
   test(`footer layout "${footer}"`, async ({ page, context }) => {

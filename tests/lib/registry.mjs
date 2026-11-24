@@ -87,6 +87,10 @@ export const CHECKS = [
     why: 'Which layout is drawn for whom, which area a page is in, and that switching to "by area" starts from what visitors already see.' },
   { id: 'menu-pointers', title: 'Menu picks: by visitor, by area', cmd: [PHP, STATIC('test-menu-pointers.php')], cwd: REPO_ROOT, blocking: true,
     why: 'Which menu a location draws in each area, that an area with no pick still follows the visitor, and that a pick of a deleted menu falls back.' },
+  { id: 'customize', title: 'Customizer: preview gate, state, colour rules', cmd: [PHP, STATIC('test-customize.php')], cwd: REPO_ROOT, blocking: true,
+    why: 'Only a signed-in admin carrying the session token sees unsaved changes; whatever the browser sends is reduced to schemes, layouts and colours that exist.' },
+  { id: 'customize-js', title: 'Customizer script parses', cmd: [node, '--check', 'hadrian/modules/addons/Hadrian/views/adminarea/assets/js/customize.js'], cwd: REPO_ROOT, blocking: true,
+    why: 'The script is inlined into the page by PHP, so check-admin-js never sees its source.' },
 
   // Hadrian Email Templates: a separate addon module (hadrian_email/) that
   // requires Hadrian. Its live checks (takeover, publish, real mail) are in

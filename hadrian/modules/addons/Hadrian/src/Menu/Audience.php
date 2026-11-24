@@ -26,6 +26,13 @@ final class Audience
 
     public static function current(): string
     {
+        // In the customizer's preview frame the admin is looking at the site
+        // as a visitor would. Being signed in to the admin area must not make
+        // them a client there, or the guest layout and menu could never be
+        // previewed; a client session in the same browser still does.
+        if (\Hadrian\Helpers\CustomizePreview::active()) {
+            return !empty($_SESSION['uid']) ? self::CLIENT : self::GUEST;
+        }
         if (!empty($_SESSION['uid']) || !empty($_SESSION['adminid'])) {
             return self::CLIENT;
         }

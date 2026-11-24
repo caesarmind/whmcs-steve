@@ -8,6 +8,13 @@
         <strong>Customize &rsaquo; Colors</strong>. Light vs dark is a <em>mode</em>, set under
         <a href="?module=Hadrian&action=settings">Settings &rsaquo; Enable Dark Mode</a>.
     </p>
+    {* The customizer tries a style, layouts and colours on the real site
+       before anything is saved. It writes the same settings this page and the
+       Layouts page do. *}
+    <p style="margin:14px 0 0">
+        <a class="mt-btn mt-btn-primary mt-btn-sm" data-open-customizer href="?module=Hadrian&action=customize">Open the customizer</a>
+        <span class="mt-field-help" style="margin-left:10px">Preview a style, layouts and colours on the live site before saving.</span>
+    </p>
 </header>
 
 <div class="mt-panel pad">
