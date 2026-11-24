@@ -6,6 +6,32 @@
     <p class="mt-page-subtitle">Optional theme add-ons (module integrations, custom widgets, etc.).</p>
 </header>
 
+{* Extension modules: separate WHMCS addons that registered themselves with
+   Helpers\Extensions. Listed first because they are the ones with a page to
+   open; the theme extensions below are files inside the theme folder. *}
+{if $mtExtensions|default:[]|count}
+<div class="mt-panel pad">
+<section class="mt-section">
+    <header class="mt-section-header"><h2 class="mt-section-title">Modules</h2></header>
+    <div class="mt-grid">
+        {foreach $mtExtensions as $mtExt}
+            <div class="mt-card">
+                <div class="mt-card-thumb">{$mtExt.name|escape|truncate:1:""}</div>
+                <div>
+                    <h3 class="mt-card-title">{$mtExt.name|escape}</h3>
+                    <p class="mt-card-meta">{$mtExt.description|escape}</p>
+                </div>
+                <div class="mt-card-footer">
+                    <span class="mt-badge mt-badge-success">Active{if $mtExt.version} &middot; v{$mtExt.version|escape}{/if}</span>
+                    <a class="mt-btn mt-btn-secondary mt-btn-sm" href="{$mtExt.url|escape}">Open</a>
+                </div>
+            </div>
+        {/foreach}
+    </div>
+</section>
+</div>
+{/if}
+
 <div class="mt-panel pad">
 <section class="mt-section">
     {if $extensions|count}

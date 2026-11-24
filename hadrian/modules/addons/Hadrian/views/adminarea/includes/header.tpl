@@ -66,6 +66,12 @@
                 <a class="mt-topnav-item {if $mt_nav == 'sitemap'}is-active{/if}" href="{$viewHelper->url('sitemap')}">Sitemap</a>
                 <a class="mt-topnav-item {if $mt_nav == 'menu'}is-active{/if}" href="{$viewHelper->url('menu')}">Menu</a>
                 <a class="mt-topnav-item {if $mt_nav == 'branding'}is-active{/if}" href="{$viewHelper->url('branding')}">Branding</a>
+                {* One tab per installed extension module (a separate WHMCS
+                   addon that registered itself; see Helpers\Extensions). On an
+                   extension's own page $currentAction is its nav key. *}
+                {foreach $mtExtensions|default:[] as $mtExt}
+                    <a class="mt-topnav-item {if $mt_nav == $mtExt.nav}is-active{/if}" href="{$mtExt.url|escape}">{$mtExt.label|escape}</a>
+                {/foreach}
                 <a class="mt-topnav-item {if $mt_nav == 'extensions'}is-active{/if}" href="{$viewHelper->url('extensions')}">Extensions</a>
                 <a class="mt-topnav-item {if $mt_nav == 'tools'}is-active{/if}" href="{$viewHelper->url('tools')}">Tools</a>
             </div>

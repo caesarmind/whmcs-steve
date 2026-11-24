@@ -45,6 +45,8 @@ abstract class AbstractController
         $this->smarty->assign([
             'viewHelper'    => new ViewHelper(),
             'currentAction' => $this->action,
+            // Tabs for separately installed extension modules; see Helpers\Extensions.
+            'mtExtensions'  => \Hadrian\Helpers\Extensions::all(),
             ...$vars,
         ]);
         return (string)$this->smarty->fetch($template . '.tpl');

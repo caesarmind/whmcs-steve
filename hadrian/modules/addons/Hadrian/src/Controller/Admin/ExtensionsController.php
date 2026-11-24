@@ -13,6 +13,8 @@ final class ExtensionsController extends AbstractController
         $template = AddonHelper::getTemplate();
         $extensions = $template?->getExtensions() ?? [];
 
+        // $mtExtensions (the separately installed extension modules) reaches
+        // the view through AbstractController::view(), like every page.
         return $this->view('extensions/index', ['extensions' => $extensions]);
     }
 }
