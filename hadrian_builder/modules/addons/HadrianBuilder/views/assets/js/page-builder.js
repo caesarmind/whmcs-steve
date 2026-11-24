@@ -409,23 +409,40 @@
         changed(true);
     }
 
+    /* Groups are collapsed until opened; typing in the filter shows every
+       match with its group open. */
+    var palFilter = '', palOpen = null;
+
     function renderPalette() {
-        var box = byId('hbx-palette'), groups = {}, order = [];
+        var box = byId('hbx-palette'), groups = {}, order = [], shown = 0;
+        var q = palFilter.replace(/^\s+|\s+$/g, '').toLowerCase();
         Object.keys(boot.types).forEach(function (type) {
             var g = boot.types[type].group || 'Other';
             if (!groups[g]) { groups[g] = []; order.push(g); }
             groups[g].push(type);
         });
+        if (palOpen === null) { palOpen = {}; if (order.length) { palOpen[order[0]] = true; } }
         box.textContent = '';
         order.forEach(function (g) {
-            box.appendChild(el('div', { 'class': 'hbx-pal-group', text: g }));
-            groups[g].forEach(function (type) {
-                box.appendChild(el('button', { type: 'button', 'class': 'hbx-pal', onclick: function () { addSection(type); } }, [
+            var types = groups[g].filter(function (type) {
+                var def = boot.types[type];
+                return !q || (def.label + ' ' + def.hint + ' ' + g).toLowerCase().indexOf(q) !== -1;
+            });
+            if (!types.length) { return; }
+            var open = q ? true : !!palOpen[g];
+            box.appendChild(el('button', { type: 'button', 'class': 'hbx-pal-group' + (open ? ' is-open' : ''), 'aria-expanded': String(open),
+                onclick: function () { palOpen[g] = !palOpen[g]; renderPalette(); } },
+                [el('span', { text: g }), el('small', { text: String(types.length) })]));
+            if (!open) { return; }
+            types.forEach(function (type) {
+                shown++;
+                box.appendChild(el('button', { type: 'button', 'class': 'hbx-pal', 'data-type': type, onclick: function () { addSection(type); } }, [
                     el('strong', { text: boot.types[type].label }),
                     el('span', { text: boot.types[type].hint })
                 ]));
             });
         });
+        if (q && !shown) { box.appendChild(el('div', { 'class': 'hbx-out-empty', text: 'No section matches "' + palFilter + '".' })); }
     }
 
     // ------------------------------------------------------------ inspector
@@ -477,6 +494,11 @@
 
             case 'textarea':
                 c = el('textarea', { 'class': 'mt-input', id: id, rows: '3', placeholder: translationHint(f, obj), oninput: onText });
+                c.value = getValue(f, obj) || '';
+                return wrapField(f, id, c);
+
+            case 'lines':
+                c = el('textarea', { 'class': 'mt-input', id: id, rows: '5', placeholder: translationHint(f, obj) || 'One per line', oninput: onText });
                 c.value = getValue(f, obj) || '';
                 return wrapField(f, id, c);
 
@@ -712,6 +734,7 @@
     byId('hbx-undo').addEventListener('click', undo);
     byId('hbx-redo').addEventListener('click', redo);
     byId('hbx-pagebtn').addEventListener('click', function () { select(null, false); });
+    byId('hbx-palfilter').addEventListener('input', function (e) { palFilter = e.target.value; renderPalette(); });
 
     document.addEventListener('keydown', function (e) {
         var t = e.target, typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.isContentEditable);

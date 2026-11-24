@@ -48,6 +48,7 @@
             <button type="button" class="hbx-pagebtn" id="hbx-pagebtn">Page settings</button>
 
             <div class="hbx-h">Add a section</div>
+            <input type="search" class="mt-input hbx-palfilter" id="hbx-palfilter" placeholder="Find a section" aria-label="Find a section" autocomplete="off">
             <div class="hbx-palette" id="hbx-palette"></div>
             <p class="hbx-hint">A new section goes after the selected one, or at the end.</p>
         </aside>

@@ -63,6 +63,15 @@ $catalog = new class {
         ];
         return array_intersect_key($all, array_flip($ids));
     }
+
+    public function announcements(int $limit, string $lang): array
+    {
+        $all = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $all[] = ['id' => $i, 'title' => 'News ' . $i, 'date' => '0' . $i . '/11/2026', 'dateIso' => '2026-11-0' . $i, 'text' => 'Text ' . $i, 'url' => 'announcements.php?id=' . $i];
+        }
+        return array_slice($all, 0, $limit);
+    }
 };
 $ctx = ['lang' => 'english', 'webRoot' => '/billing', 'languages' => $langs, 'catalog' => $catalog, 'compileDir' => $compileDir];
 
@@ -115,7 +124,13 @@ same('an unknown icon prints nothing', Icons::svg('nope'), '');
 // --------------------------------------------------------------- Catalogue
 $section = 'catalogue';
 $types = Sections::types();
-same('the six first sections are found', array_keys($types), ['hero-split', 'feature-cards', 'alternating', 'pricing-cards', 'faq', 'final-cta']);
+foreach (['hero-split', 'feature-cards', 'alternating', 'pricing-cards', 'faq', 'final-cta'] as $first) {
+    check("the first build's {$first} section is still there", isset($types[$first]));
+}
+$orders = array_values(array_column($types, 'order'));
+$sorted = $orders;
+sort($sorted);
+same('sections come in palette order', $orders, $sorted);
 foreach ($types as $name => $def) {
     check("{$name}: has a label, a group and a template", $def['label'] !== '' && $def['group'] !== '' && is_file($def['template']));
     check("{$name}: has fields", count($def['fields']) > 0);
@@ -130,7 +145,15 @@ foreach ($types as $name => $def) {
     sort($files);
     same("{$name}: folder holds its .php and .tpl and nothing else", $files, ["{$name}.php", "{$name}.tpl"]);
 }
-check('the editor copy does not leak server paths', !str_contains(json_encode(Sections::forEditor()), 'template'));
+check('the editor copy does not leak server paths', !str_contains(json_encode(Sections::forEditor()), '"template"'));
+
+// Every section against the whole contract: files, schema, escaping, rendering
+// with default, empty and hostile content. See check-builder-section.php.
+require_once __DIR__ . '/check-builder-section.php';
+foreach (array_keys($types) as $name) {
+    $problems = hbCheckSection($sectionsDir, $name);
+    check("{$name}: meets the section contract", $problems === [], implode("\n      ", $problems));
+}
 
 // A theme folder can replace markup, or add a section of its own.
 $themeDir = $compileDir . '-theme';
@@ -138,8 +161,12 @@ $themeDir = $compileDir . '-theme';
 @mkdir($themeDir . '/theme-only', 0777, true);
 @mkdir($themeDir . '/Bad_Name', 0777, true);
 file_put_contents($themeDir . '/faq/faq.tpl', '<section class="custom-faq">{$s.title|escape}</section>');
-file_put_contents($themeDir . '/theme-only/theme-only.php', '<?php return ["label" => "Mine", "fields" => [["key" => "t", "type" => "text", "label" => "T", "default" => "x"]]];');
-file_put_contents($themeDir . '/theme-only/theme-only.tpl', '<p>{$s.t|escape}</p>');
+file_put_contents($themeDir . '/theme-only/theme-only.php', '<?php return ["label" => "Mine", "data" => ["announcements", "nope"], "fields" => ['
+    . '["key" => "t", "type" => "text", "label" => "T", "default" => "x"],'
+    . '["key" => "points", "type" => "lines", "label" => "P", "translatable" => true, "default" => ["_" => "one\n\n two \nthree"]],'
+    . '["key" => "count", "type" => "number", "label" => "C", "min" => 1, "max" => 10, "default" => 2]]];');
+file_put_contents($themeDir . '/theme-only/theme-only.tpl', '<p>{$s.t|escape}</p><ul>{foreach $s.pointsLines as $line}<li>{$line|escape}</li>{/foreach}</ul>'
+    . '{foreach $data.announcements as $a}<a href="{$a.url|escape}">{$a.title|escape}</a>{/foreach}');
 file_put_contents($themeDir . '/Bad_Name/Bad_Name.php', '<?php return ["label" => "No", "fields" => []];');
 Sections::setDirs([$sectionsDir, $themeDir]);
 Renderer::reset();
@@ -147,6 +174,11 @@ same('a theme template replaces the module one', Sections::type('faq')['template
 check('a theme can add a section', Sections::type('theme-only') !== null && Sections::type('theme-only')['label'] === 'Mine');
 check('a folder with a bad name is ignored', Sections::type('Bad_Name') === null);
 check('the replaced markup is what renders', str_contains(Renderer::page(['sections' => [['type' => 'faq']]], $ctx), 'custom-faq'));
+same('a schema can ask for known WHMCS data only', Sections::type('theme-only')['data'], ['announcements']);
+$mine = Renderer::page(['sections' => [['type' => 'theme-only']]], $ctx);
+check('a lines field reaches the template as a list, blank lines dropped', str_contains($mine, '<li>one</li><li>two</li><li>three</li>'), $mine);
+check('announcements come from the catalogue, as many as its count field says, linked under the install folder',
+    substr_count($mine, '<a href="/billing/announcements.php?id=') === 2 && str_contains($mine, '>News 1</a>'), $mine);
 Sections::setDirs([$sectionsDir]);
 Renderer::reset();
 

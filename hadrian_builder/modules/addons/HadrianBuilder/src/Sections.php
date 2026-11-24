@@ -27,14 +27,23 @@ namespace HadrianBuilder;
  *   toggle    bool                          number    int within min..max
  *   link      a URL or WHMCS-relative path  image     an image address
  *   icon      a name from Icons             product   a WHMCS product id
+ *   lines     plain text, one entry per line; a template also gets `<key>Lines`
  *   list      repeatable items, each with its own `fields` (no list inside a list)
  *
- * text, textarea and rich may be flagged `translatable`; their value is then a
- * language map (see Text).
+ * text, textarea, lines and rich may be flagged `translatable`; their value is
+ * then a language map (see Text).
+ *
+ * A schema may also name WHMCS data the section shows, with `'data' => [...]`.
+ * The one source so far is 'announcements': the template then gets
+ * `$data.announcements`, the newest published announcements (as many as the
+ * section's `count` field says, 6 without one).
  */
 final class Sections
 {
-    private const SCALAR_TYPES = ['text', 'textarea', 'rich', 'select', 'toggle', 'number', 'link', 'image', 'icon', 'product'];
+    private const SCALAR_TYPES = ['text', 'textarea', 'lines', 'rich', 'select', 'toggle', 'number', 'link', 'image', 'icon', 'product'];
+
+    /** WHMCS data a schema may ask for with `data`. */
+    public const DATA_SOURCES = ['announcements'];
 
     /** @var list<string>|null directories searched, later ones win */
     private static ?array $dirs = null;
@@ -153,6 +162,7 @@ final class Sections
             'hint'   => Text::line((string)($raw['hint'] ?? ''), 160),
             'group'  => Text::line((string)($raw['group'] ?? ''), 40) ?: 'Other',
             'order'  => (int)($raw['order'] ?? 500),
+            'data'   => array_values(array_intersect(array_map('strval', (array)($raw['data'] ?? [])), self::DATA_SOURCES)),
             'fields' => $fields,
         ];
     }
@@ -202,7 +212,7 @@ final class Sections
         if (!in_array($type, self::SCALAR_TYPES, true)) {
             return null;
         }
-        $out['translatable'] = in_array($type, ['text', 'textarea', 'rich'], true) && !empty($f['translatable']);
+        $out['translatable'] = in_array($type, ['text', 'textarea', 'lines', 'rich'], true) && !empty($f['translatable']);
         $out['default']      = $f['default'] ?? self::emptyFor($type);
         if ($type === 'select') {
             $options = is_array($f['options'] ?? null) ? $f['options'] : [];
@@ -285,6 +295,7 @@ final class Sections
                     : Text::line($str($value), 500);
 
             case 'textarea':
+            case 'lines':
                 return $f['translatable']
                     ? self::l10n($value, $languages, static fn(string $s): string => Text::block($s, 4000))
                     : Text::block($str($value), 4000);

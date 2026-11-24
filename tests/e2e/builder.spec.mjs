@@ -44,7 +44,13 @@ const settled = page => page.waitForFunction(() => {
 
 const frame = page => page.frameLocator('#hbx-frame');
 const field = (page, label) => page.locator('#hbx-inspector .hbx-field', { has: page.locator('.hbx-label', { hasText: new RegExp(`^${label}`) }) }).first();
-const addSection = async (page, label) => { await page.locator('.hbx-pal', { hasText: label }).click(); await settled(page); };
+// The palette's groups are collapsed; the filter finds a section by its name.
+const addSection = async (page, label) => {
+  await page.locator('#hbx-palfilter').fill(label);
+  await page.locator('.hbx-pal', { has: page.locator('strong', { hasText: new RegExp('^' + label.replace(/[.*+?^$()|[\]\\{}]/g, '\\$&') + '$') }) }).click();
+  await page.locator('#hbx-palfilter').fill('');
+  await settled(page);
+};
 const sectionTypes = page => page.evaluate(() => window.hbBuilder.state.doc.sections.map(s => s.type));
 
 /** Make a page through the list screen and land in its editor. Returns its id. */

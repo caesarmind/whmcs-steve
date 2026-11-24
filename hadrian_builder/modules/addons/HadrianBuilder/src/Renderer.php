@@ -16,6 +16,8 @@ namespace HadrianBuilder;
  *           translatable maps are plain strings, links are ready to print,
  *           an icon field `x` also gives `xSvg`, a product field `x` also
  *           gives `xData` (name, price, features, order link) or null
+ *           and a lines field `x` also gives `xLines`, a list
+ *   $data   WHMCS data the schema asked for (see Sections), e.g. announcements
  *   $id     the section's id
  *   $style  spacing and anchor
  *   $ctx    lang, webRoot, loggedIn
@@ -83,6 +85,7 @@ final class Renderer
             $smarty->clearAllAssign();
             $smarty->assign([
                 's'     => self::resolve($def['fields'], $section['props'], $ctx),
+                'data'  => self::data($def, $section['props'], $ctx),
                 'id'    => $section['id'],
                 'style' => $section['style'],
                 'ctx'   => ['lang' => $ctx['lang'], 'webRoot' => $ctx['webRoot'], 'loggedIn' => $ctx['loggedIn']],
@@ -169,6 +172,13 @@ final class Renderer
                 case 'rich':
                     $out[$key] = Text::pick($value, $ctx['lang']);
                     break;
+                case 'lines':
+                    $out[$key] = Text::pick($value, $ctx['lang']);
+                    $out[$key . 'Lines'] = array_values(array_filter(
+                        array_map('trim', explode("\n", $out[$key])),
+                        static fn(string $line): bool => $line !== ''
+                    ));
+                    break;
                 case 'link':
                     $out[$key] = self::href(is_scalar($value) ? (string)$value : '', $ctx['webRoot']);
                     break;
@@ -194,6 +204,29 @@ final class Renderer
                 default:
                     $out[$key] = $value;
             }
+        }
+        return $out;
+    }
+
+    /**
+     * The WHMCS data a section's schema asked for.
+     *
+     * @param array<string,mixed> $def
+     * @param array<string,mixed> $props
+     * @param array<string,mixed> $ctx
+     * @return array<string,mixed>
+     */
+    private static function data(array $def, array $props, array $ctx): array
+    {
+        $out = [];
+        if (in_array('announcements', $def['data'] ?? [], true)) {
+            $limit = max(1, min(24, (int)($props['count'] ?? 6)));
+            $items = method_exists($ctx['catalog'], 'announcements') ? $ctx['catalog']->announcements($limit, $ctx['lang']) : [];
+            foreach ($items as &$item) {
+                $item['url'] = self::href((string)($item['url'] ?? ''), $ctx['webRoot']);
+            }
+            unset($item);
+            $out['announcements'] = $items;
         }
         return $out;
     }
