@@ -70,6 +70,9 @@ abstract class AbstractController
             // For the few GET links that change state (AdminCsrf::GET_WRITES):
             // they carry it as &token=. POST forms get it from WHMCS itself.
             'csrfToken'     => AdminCsrf::token(),
+            // The theme version in the header pill: the same value the Info
+            // page shows (core/hadrian.php). Empty when the theme can't load.
+            'mtThemeVersion' => \Hadrian\Helpers\AddonHelper::getTemplate()?->getVersion() ?? '',
             ...$vars,
         ]);
         return (string)$this->smarty->fetch($template . '.tpl');

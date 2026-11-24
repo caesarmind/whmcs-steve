@@ -29,7 +29,7 @@
                     <div class="mt-brandname">Caesarthemes</div>
                     <div class="mt-brandversion">Hadrian &middot; Client Theme</div>
                 </div>
-                <span class="mt-brand-ver">v1.0.0</span>
+                {if $mtThemeVersion|default:''}<span class="mt-brand-ver">v{$mtThemeVersion|escape}</span>{/if}
             </div>
             <div class="mt-brandbar-right">
                 <a class="mt-brandbar-link" href="https://docs.hadrianthegreat.com/" target="_blank" rel="noopener">
