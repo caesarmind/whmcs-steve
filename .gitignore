@@ -23,6 +23,13 @@ desktop.ini
 *.swp
 *.swo
 
+# Third-party reference copies (Lagom, WHMCS stock themes). Kept on disk to
+# check behaviour and variable names against; never committed.
+lagom2.3/
+lagom2_cart.zip
+six/
+standard_cart/
+
 # Build output
 dist/
 build/

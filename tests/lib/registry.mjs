@@ -89,6 +89,11 @@ export const CHECKS = [
   { id: 'email-smarty-lint', title: 'Email module: Smarty safety lint', cmd: [node, STATIC('smarty-lint.mjs'), 'hadrian_email/modules/addons/HadrianEmail/views'], cwd: REPO_ROOT, blocking: true },
   { id: 'email-builder-js', title: 'Email module: builder script parses', cmd: [node, '--check', 'hadrian_email/modules/addons/HadrianEmail/views/assets/js/email-builder.js'], cwd: REPO_ROOT, blocking: true,
     why: 'The script is inlined into the page by PHP, so check-admin-js never sees its source.' },
+
+  // Add-on products are written from scratch. Lagom is a behaviour reference
+  // that stays outside the repo; this catches a paste from it.
+  { id: 'no-lagom', title: 'Product modules carry no Lagom code', cmd: [node, STATIC('check-no-lagom.mjs')], cwd: REPO_ROOT, blocking: true,
+    why: 'Lagom\'s namespace, table names and data keys in a product folder mean code was copied instead of written.' },
 ];
 
 // Tier 2 lives here too so run.mjs treats it like any other check.
