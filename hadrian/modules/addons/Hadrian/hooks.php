@@ -85,6 +85,57 @@ add_hook('AdminAreaHeadOutput', 1, function ($vars) {
 });
 
 // ============================================================================
+// Addons menu flyout, on every admin page: hovering Addons > Hadrian opens a
+// submenu with Hadrian's sections (ViewHelper::SECTIONS, the same list as its
+// top nav) and the extension modules registered with
+// Helpers\Extensions, so any page is one click from anywhere in the admin.
+// Lagom does the same for its RS Themes entry. The links go out as JSON and
+// views/adminarea/assets/js/addons-flyout.js builds the submenu; both files
+// are inlined like admin.css above, so nothing depends on the assets folder
+// being web-reachable. Links only: the pages keep their own access checks.
+// ============================================================================
+add_hook('AdminAreaHeadOutput', 2, function ($vars) {
+    try {
+        $assets = __DIR__ . '/views/adminarea/assets/';
+        $js  = is_file($assets . 'js/addons-flyout.js') ? (string) file_get_contents($assets . 'js/addons-flyout.js') : '';
+        $css = is_file($assets . 'css/addons-flyout.css') ? (string) file_get_contents($assets . 'css/addons-flyout.css') : '';
+        if ($js === '') {
+            return '';
+        }
+
+        $view = new \Hadrian\View\ViewHelper();
+        $sections = [];
+        foreach (\Hadrian\View\ViewHelper::SECTIONS as $action => $label) {
+            if ($action !== 'extensions') {
+                $sections[] = ['label' => $label, 'url' => $view->url($action)];
+            }
+        }
+        $modules = [];
+        foreach (\Hadrian\Helpers\Extensions::all() as $ext) {
+            $modules[] = ['label' => $ext['name'], 'url' => $ext['url']];
+        }
+        $data = [
+            'module'     => 'Hadrian',
+            'open'       => ['label' => 'Open Hadrian', 'url' => $view->url('index')],
+            'sections'   => $sections,
+            'extensions' => ['label' => 'Extensions', 'url' => $view->url('extensions'), 'items' => $modules],
+        ];
+        // HEX_TAG etc. keep "</script>" and quotes out of the JSON block.
+        $json = json_encode($data, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES);
+        if (!is_string($json)) {
+            return '';
+        }
+
+        return "<style id=\"hn-addons-flyout-css\">\n" . $css . "\n</style>\n"
+             . "<script type=\"application/json\" id=\"hn-addons-flyout-data\">" . $json . "</script>\n"
+             . "<script id=\"hn-addons-flyout-js\">\n" . $js . "\n</script>";
+    } catch (\Throwable $e) {
+        // Admin chrome: never let the flyout take a page down.
+        return '';
+    }
+});
+
+// ============================================================================
 // Licensing is handled externally by whmcs-licensing-modern
 // (modules/servers/licensing + includes/hooks/hostnodes_theme_license.php).
 //

@@ -23,3 +23,5 @@ The Hadrian addon mirrors the theme's aesthetic inside WHMCS admin: a fixed-widt
 - **Extensions** - the companion modules detected on this install.
 - **Tools** - maintenance actions such as cache clearing.
 - **Info** - version, environment and your license key.
+
+You can reach any section from anywhere in the WHMCS admin. Hover **Addons > Hadrian** in the top menu and a submenu lists every section above, then each installed companion module (such as Email Templates) under **Extensions**. On a narrow screen, tap **Hadrian** to open the same list.

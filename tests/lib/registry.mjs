@@ -62,9 +62,12 @@ export const CHECKS = [
   // the preflight checks for it.
   { id: 'smarty-lint', title: 'Admin templates: Smarty safety lint', cmd: [node, STATIC('smarty-lint.mjs')], cwd: REPO_ROOT, blocking: true },
   { id: 'admin-js', title: 'Admin inline JS parses', cmd: [node, STATIC('check-admin-js.mjs')], cwd: REPO_ROOT, blocking: true },
+  { id: 'addons-flyout-js', title: 'Addons-menu flyout script parses', cmd: [node, '--check', 'hadrian/modules/addons/Hadrian/views/adminarea/assets/js/addons-flyout.js'], cwd: REPO_ROOT, blocking: true,
+    why: 'hooks.php inlines it into the <head> of every WHMCS admin page.' },
   { id: 'doc-anchors', title: 'Admin tooltips link to real doc anchors', cmd: [node, STATIC('check-doc-anchors.mjs')], cwd: REPO_ROOT, blocking: true,
     why: 'Rebuilds hadrian-documentation/dist first, so a renamed heading fails here instead of dropping the reader at the top of the page.' },
   ...[
+    ['admin-nav-sections', 'Admin tabs match the Addons-menu flyout'],
     ['announcements', 'Announcements page model'],
     ['colors-panel', 'Colours admin panel'],
     ['colors-scope-leak', 'Colour tokens do not leak across scopes'],

@@ -16,6 +16,26 @@ use Hadrian\Controller\AbstractController;
  */
 final class ViewHelper
 {
+    /**
+     * Hadrian's own admin sections in tab order: action => label. Tabs for
+     * extension modules go in front of 'extensions'. The Addons-menu flyout
+     * (hooks.php) is built from this list. includes/header.tpl writes the
+     * same tabs out by hand, and tests/static/check-admin-nav-sections.php
+     * fails when the two differ.
+     */
+    public const SECTIONS = [
+        'info'       => 'Info',
+        'settings'   => 'Settings',
+        'styles'     => 'Styles',
+        'layouts'    => 'Layouts',
+        'pages'      => 'Pages',
+        'sitemap'    => 'Sitemap',
+        'menu'       => 'Menu',
+        'branding'   => 'Branding',
+        'extensions' => 'Extensions',
+        'tools'      => 'Tools',
+    ];
+
     /** Build a same-page URL with query params: ?module=Hadrian&action=… */
     public function url(string $action, array $params = []): string
     {

@@ -58,6 +58,10 @@
     <nav class="mt-topnav" aria-label="Hostnodes navigation">
         <div class="mt-topnav-inner">
             <div class="mt-topnav-pill">
+                {* Same sections, labels and order as ViewHelper::SECTIONS, which
+                   the flyout under WHMCS's Addons menu reads (hooks.php).
+                   tests/static/check-admin-nav-sections.php fails when the two
+                   differ: add or rename a tab in both places. *}
                 <a class="mt-topnav-item {if $mt_nav == 'info'}is-active{/if}" href="{$viewHelper->url('info')}">Info</a>
                 <a class="mt-topnav-item {if $mt_nav == 'settings'}is-active{/if}" href="{$viewHelper->url('settings')}">Settings</a>
                 <a class="mt-topnav-item {if $mt_nav == 'styles'}is-active{/if}" href="{$viewHelper->url('styles')}">Styles</a>

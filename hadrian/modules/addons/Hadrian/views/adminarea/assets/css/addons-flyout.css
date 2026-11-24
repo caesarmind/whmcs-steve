@@ -1,0 +1,38 @@
+/* Hadrian: the flyout under WHMCS's Addons > Hadrian menu entry; see
+   assets/js/addons-flyout.js. The admin template's own menu CSS positions
+   and opens it. These rules style the two heading rows ("Open Hadrian" and
+   "Extensions") where the menu is a hover dropdown, and indent the list
+   under Hadrian where it is the dark slide-out menu of narrow screens.
+   Keep this file ASCII-only. */
+@media only screen and (max-width: 1274px) {
+    .navigation ul.hn-addons-flyout li a {
+        padding-left: 36px;
+    }
+}
+@media only screen and (min-width: 1275px) {
+    .navigation ul.hn-addons-flyout {
+        padding-top: 0;
+        overflow: hidden;
+    }
+    .navigation ul.hn-addons-flyout li.hn-flyout-head {
+        height: auto;
+        margin-bottom: 4px;
+        background: #f7f7f8;
+        border-bottom: 1px solid #e9eaec;
+    }
+    .navigation ul.hn-addons-flyout li + li.hn-flyout-head {
+        margin-top: 4px;
+        border-top: 1px solid #e9eaec;
+    }
+    .navigation ul.hn-addons-flyout li.hn-flyout-head a {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-top: 5px;
+        padding-bottom: 5px;
+        line-height: 22px;
+    }
+    .navigation ul.hn-addons-flyout li.hn-flyout-head a i {
+        font-size: 12px;
+    }
+}
