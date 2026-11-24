@@ -187,7 +187,6 @@ return [
         'togglePassword'       => 'Show or hide password',
         'forgotPassword'       => 'Forgot password?',
         'orContinueWith'       => 'or continue with',
-        'continueSso'          => 'Continue',
         'dontHaveAccount'      => 'Don\'t have an account?',
         'createAccountLink'    => 'Create one',
         'loginWelcomeSub'      => 'Manage your services, domains, invoices and support -- all from one control panel.',
@@ -932,9 +931,6 @@ return [
         'backToCart'        => 'Back to cart',
         'includedWithOrder' => 'included with your order',
         'yourAccount'       => 'Your account',
-        'orSignUpWith'      => 'or sign up with',
-        'signupApple'       => 'Sign up with Apple',
-        'signupGoogle'      => 'Sign up with Google',
         'gatewaySubStripe'  => 'Cards are processed securely by Stripe.',
         'gatewaySubCard'    => 'Visa - Mastercard - Amex -- processed securely.',
         'gatewaySubPaypal'  => 'You\'ll be redirected to authorise the charge.',
@@ -948,7 +944,7 @@ return [
         'changePlan'        => 'Change plan',
         'domainIncluded'    => 'Included',
         'changeDomain'      => 'Change',
-        'billingCycleSub'   => 'Longer commitments = bigger discounts. You can upgrade or switch later.',
+        'billingCycleSub'   => 'Choose how often you\'d like to be billed.',
         'billedMonthly'     => 'Billed every month',
         'billedQuarterly'   => 'Billed every 3 months',
         'billedSemiannually' => 'Billed every 6 months',
@@ -958,7 +954,6 @@ return [
         'serverInfoSub'     => 'Set the hostname, root password, and nameserver prefixes for your server.',
         'configOptionsSub'  => 'Customize storage, CPU, region, and other options for this plan.',
         'addonsSub'         => 'Optional extras to enhance your plan. Add or remove anytime.',
-        'summaryReassurance' => 'Cancel anytime.',
         'reviewCart'        => 'Review cart',
         'backToDomain'      => 'Back to domain',
         // pw-strength meter (js-string).
@@ -967,6 +962,8 @@ return [
         'pwStrong'          => 'Strong',
         // promo / network js-strings.
         'savePercent'           => 'Save %s%%',
+        // products listing: plans in the group save different amounts.
+        'saveUpToPercent'       => 'Save up to %s%%',
         'recalculatingPromo'    => 'Recalculating promo...',
         'promoNoLongerApplies'  => 'Promotion no longer applies to this configuration.',
         'promoCodeTitle'        => 'Promo code',
@@ -994,7 +991,6 @@ return [
         'owndomainPanelHint'      => '<strong>I\'ll use my existing domain and update my nameservers.</strong> Tell us which domain you\'d like to use - after checkout we\'ll email you the nameservers to set at your current registrar.',
         'subdomainPanelHint'      => '<strong>Use a subdomain.</strong> Pick a parent domain and enter the prefix you\'d like.',
         'subdomainSldPlaceholder' => 'yourname',
-        'whoisPrivacyNote'        => 'Your domain details stay private -- WHOIS privacy included on every TLD that supports it.',
 
         // configuredomains empty-state (B03).
         'noDomainsToConfigure'    => 'No domains to configure',
@@ -1023,7 +1019,6 @@ return [
         'cycleMonthly'         => 'Monthly',
         'cycleAnnual'          => 'Annual',
         'cycleBiennial'        => 'Biennial',
-        'cycleSaving'          => 'Save 20%',
         'mostPopular'          => 'Most popular',
         // Cycle-short abbreviations (real WHMCS pricingCycleShort.* lacks leading slash - kept custom).
         'cycleShortMonthly'      => '/mo',
@@ -1044,10 +1039,6 @@ return [
         'emptyGroupDesc'       => 'We\'re preparing plans for this service. Browse another category or get in touch -- our team can put together a custom quote for you.',
         'requestQuote'         => 'Request a quote',
         'browseAll'            => 'Browse all categories',
-        'support247'           => '24/7 support',
-        'support247Sub'        => 'Reach a human engineer any time via chat or ticket.',
-        'uptime'               => '99.99% uptime SLA',
-        'uptimeSub'            => 'Backed by global anycast and redundant power.',
         'pickCategoryTitle'    => 'Choose a category to get started',
         'pickCategoryDesc'     => 'Browse our plans by service.',
         'viewPlans'            => 'View plans',

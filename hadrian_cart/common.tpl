@@ -42,7 +42,7 @@
    core-layout.css "outside" rules flatten any bare .card that lacks a
    .card-header/.card-body child -- transparent bg, no border/radius/shadow
    -- which is right for client-area service/billing LIST cards but wrong
-   for the cart, whose cards (.cp-section, .ct-product, .st-guarantee,
+   for the cart, whose cards (.cp-section, .ct-product,
    .cd-domain-card, …) are bespoke solid panels. Left as "outside" the cart
    loses every card background (see configureproduct / viewcart).
 

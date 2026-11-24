@@ -566,13 +566,8 @@ var _localLang = {
                            / .total-due-today in place. *}
                         <div class="summary-container" id="producttotal"></div>
 
-                        {* Renewal note + promo code row sit between the
-                           Due Today strip and the action footer. Renewal
-                           text is hardcoded here as a static reassurance
-                           line (mockup-faithful); WHMCS doesn't expose a
-                           ready-made 'Renews $X every year' string. *}
-                        <p class="cp-summary-cycle">{$hadrianLang.cart.summaryReassurance}</p>
-
+                        {* Promo code row sits between the Due Today strip
+                           and the action footer. *}
                         <div class="cp-promo-row">
                             <input type="text" class="cp-promo-input" id="promocode" name="promocode" placeholder="{lang key="orderPromoCodePlaceholder"}" value="{if $promocode}{$promocode|escape}{/if}">
                             <button type="button" class="cp-promo-apply" onclick="applyPromoCode();">{$LANG.applyPromoCode}</button>

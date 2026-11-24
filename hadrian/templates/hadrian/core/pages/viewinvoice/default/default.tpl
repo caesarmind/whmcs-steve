@@ -10,7 +10,11 @@
      $transactions       — array of payment transactions
      $companyname, $payto
      $clientsdetails     — firstname, lastname, address1, etc.
-     $paymentmethods     — available gateways
+     $paymentbutton      — the selected gateway's pay button / form / instructions
+     $allowchangegateway, $availableGateways (module => name), $selectedGateway,
+     $tokenInput         — the gateway switcher (posts field "gateway")
+     $paymentmethod, $paymethoddisplayname — the fixed method otherwise
+     $paymentSuccess, $paymentFailed, $pendingReview, ... — payment outcome flags
      $token              — CSRF token, required on all POST forms
 *}
 
@@ -49,6 +53,24 @@
         {if $status}<span class="status-pill {$invStatusLower}">{$status|escape}</span>{/if}
     </div>
 </header>
+
+{* Payment outcome, as stock nexus shows it: WHMCS sets one of these flags when
+   the client comes back from a gateway (or a hook sets $customAlert). *}
+{if isset($customAlert) && is_array($customAlert)}
+    {include file="`$template`/includes/panel.tpl" type=$customAlert.type|escape headerTitle=$customAlert.title|escape bodyContent=$customAlert.message|escape}
+{elseif isset($paymentSuccessAwaitingNotification) && $paymentSuccessAwaitingNotification}
+    {include file="`$template`/includes/panel.tpl" type="success" headerTitle=$LANG.success bodyContent=$LANG.invoicePaymentSuccessAwaitingNotify}
+{elseif isset($paymentSuccess) && $paymentSuccess}
+    {include file="`$template`/includes/panel.tpl" type="success" headerTitle=$LANG.success bodyContent=$LANG.invoicepaymentsuccessconfirmation}
+{elseif isset($paymentInititated) && $paymentInititated}
+    {include file="`$template`/includes/panel.tpl" type="info" headerTitle=$LANG.success bodyContent=$LANG.invoicePaymentInitiated}
+{elseif isset($pendingReview) && $pendingReview}
+    {include file="`$template`/includes/panel.tpl" type="info" headerTitle=$LANG.success bodyContent=$LANG.invoicepaymentpendingreview}
+{elseif isset($paymentFailed) && $paymentFailed}
+    {include file="`$template`/includes/panel.tpl" type="danger" headerTitle=$LANG.error bodyContent=$LANG.invoicepaymentfailedconfirmation}
+{elseif isset($offlineReview) && $offlineReview}
+    {include file="`$template`/includes/panel.tpl" type="info" headerTitle=$LANG.success bodyContent=$LANG.invoiceofflinepaid}
+{/if}
 
 <div class="when-full"><div class="inv-split">
 
@@ -196,31 +218,62 @@
             </table>
         </div>
 
-        {* Payment *}
-        {if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue'}
-        <div class="card inv-lines-card">
-            <div class="card-header"><h2>{$LANG.invoicemakepayment|default:'Make a payment'}</h2></div>
-            <form method="post" action="{$WEB_ROOT}/viewinvoice.php?id={$invoiceid}">
-                <input type="hidden" name="token" value="{$token|default:''|escape}">
-                <input type="hidden" name="paynow" value="true">
-                <div class="inv-pay">
-                    <div class="inv-pay-method-list">
-                        {if isset($paymentmethods) && $paymentmethods|@count > 0}
-                            {foreach $paymentmethods as $pm}
-                            <label class="inv-pay-method">
-                                <input type="radio" name="paymentmethod" value="{$pm.module|default:''|escape}"{if $pm@first} checked{/if}>
-                                <span class="inv-pay-method-logo">{$pm.shortname|default:'PAY'|escape|truncate:4:""}</span>
-                                <div class="inv-pay-method-meta">
-                                    <div class="inv-pay-method-name">{$pm.displayname|default:$pm.module|escape}</div>
-                                </div>
-                            </label>
-                            {/foreach}
-                        {/if}
-                    </div>
-                    <button type="submit" class="btn-primary inv-pay-btn">{$LANG.invoicepay|default:'Pay Invoice'} {if isset($total)}{$total|escape}{/if}</button>
-                </div>
-            </form>
+        {* Payment - the stock WHMCS contract (twenty-one / nexus viewinvoice):
+             $allowchangegateway + $availableGateways (module => name) +
+             $selectedGateway: the client may switch gateway; the choice
+             posts field "gateway" with $tokenInput back to this page and
+             WHMCS re-renders with that gateway's button.
+             $paymentbutton: the selected gateway's own output - a PayPal /
+             Stripe / redirect form with its Pay Now button, a card-payment
+             link, or bank-transfer instructions. It IS the way to pay, so it
+             is printed as WHMCS hands it.
+             $paymentmethod / $paymethoddisplayname: the fixed method when
+             switching isn't allowed.
+           (The previous card looped a $paymentmethods variable WHMCS never
+           sets and posted paynow=true, which did nothing.) *}
+        {if $invStatusLower == 'unpaid' || $invStatusLower == 'overdue' || $invStatusLower == 'draft'}
+        <div class="card inv-lines-card" id="inv-payment">
+            <div class="card-header"><h2>{$LANG.paymentmethod}</h2></div>
+            <div class="inv-pay">
+                {if isset($allowchangegateway) && $allowchangegateway && $invStatusLower != 'draft' && isset($availableGateways) && $availableGateways}
+                    <form method="post" action="{$WEB_ROOT}/viewinvoice.php?id={$invoiceid}" class="inv-pay-method-list" id="frmInvGateway">
+                        {$tokenInput}
+                        {foreach $availableGateways as $gatewayModule => $gatewayName}
+                        <label class="inv-pay-method">
+                            <input type="radio" name="gateway" value="{$gatewayModule}"{if $gatewayModule == $selectedGateway} checked{/if}>
+                            <span class="inv-pay-method-logo">{$gatewayName|strip_tags|regex_replace:'/[^A-Za-z0-9]/':''|truncate:2:'':true|upper}</span>
+                            <div class="inv-pay-method-meta">
+                                <div class="inv-pay-method-name">{$gatewayName}</div>
+                            </div>
+                        </label>
+                        {/foreach}
+                        <noscript><button type="submit" class="btn-secondary">{$LANG.clientareasavechanges}</button></noscript>
+                    </form>
+                    <script>{literal}
+                    (function () {
+                        var f = document.getElementById('frmInvGateway');
+                        if (!f) return;
+                        f.addEventListener('change', function (e) {
+                            if (e.target && e.target.name === 'gateway') { f.submit(); }
+                        });
+                    })();
+                    {/literal}</script>
+                {elseif isset($paymentmethod) && $paymentmethod}
+                    <p class="inv-pay-current">{$paymentmethod}{if isset($paymethoddisplayname) && $paymethoddisplayname} ({$paymethoddisplayname}){/if}</p>
+                {/if}
+                {if isset($paymentbutton) && $paymentbutton}
+                    <div class="inv-pay-button">{$paymentbutton}</div>
+                {/if}
+            </div>
         </div>
+        <style>{literal}
+        .inv-pay-current{margin:0 0 14px;font-size:var(--text-md);color:var(--color-text-primary)}
+        .inv-pay-button{margin-top:16px;font-size:var(--text-md);color:var(--color-text-secondary);line-height:1.55}
+        .inv-pay-method-list + .inv-pay-button{padding-top:16px;border-top:.5px solid var(--color-border)}
+        .inv-pay-button form{margin:0}
+        .inv-pay-button input[type=submit],.inv-pay-button button,.inv-pay-button .btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 22px;border:0;border-radius:var(--radius-md);background:var(--btn-primary-bg,var(--color-accent));color:var(--btn-primary-color,#fff);font:inherit;font-weight:var(--fw-semibold);cursor:pointer;text-decoration:none}
+        .inv-pay-button input[type=image]{max-width:100%;height:auto}
+        {/literal}</style>
         {/if}
     </div>
 

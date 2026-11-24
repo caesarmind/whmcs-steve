@@ -4,7 +4,7 @@
    the active variant declares fullPage (see core/pages/login/split/split.php).
 
    WHMCS standard vars (same as core/pages/login/default/default.tpl):
-     $token, $incorrect, $rememberMe, $ssoProviders, $logout,
+     $token, $incorrect, $rememberMe, $linkableProviders, $logout,
      $verifylinkexpired, $passwordResetSuccessful
 
    Featured announcements:
@@ -170,17 +170,8 @@
                 <button type="submit" class="btn-primary btn-lg btn-full{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.loginbutton}</button>
             </form>
 
-            {if $ssoProviders|default:false && $ssoProviders|@count > 0}
-                <div class="auth-divider">{$LANG.or}</div>
-                <div class="auth-sso-row">
-                    {foreach $ssoProviders as $provider}
-                        <a href="{$provider.url|escape}" class="auth-sso-btn">
-                            {if $provider.icon}<img src="{$provider.icon|escape}" alt="">{/if}
-                            <span>{$provider.label|escape|default:$hadrianLang.auth.continueSso}</span>
-                        </a>
-                    {/foreach}
-                </div>
-            {/if}
+            {* WHMCS Signin Integrations ($linkableProviders) - renders nothing when none is enabled. *}
+            {include file="`$template`/includes/linkedaccounts.tpl" linkContext="login"}
 
             <div class="auth-footer">
                 {$LANG.userLogin.notRegistered}

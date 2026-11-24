@@ -220,7 +220,13 @@ German word rather than the English one.
 ### Hide Billing Cycle Discounts
 
 **Off by default.** Removes the "Save X%" pills next to the billing-cycle
-choices when someone configures a product.
+choices when someone configures a product, and the "Save X%" badge on the
+Annual switch above a product group's plans.
+
+Both are worked out from your real prices: a year billed annually against
+twelve monthly payments. On the plans page the badge shows the best saving
+in the group ("Save up to X%" when the plans differ), and it doesn't appear
+at all when no plan is cheaper by the year.
 
 By default, choosing between Monthly, Annually and Biennially shows a small
 badge on the longer cycles telling the customer how much they would save. It is

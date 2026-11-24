@@ -288,12 +288,11 @@
                             </div>
                         {/if}
 
-                        {* ─── Footer: privacy note + Back / Continue ─── *}
+                        {* ─── Footer: Back / Continue ───
+                           No privacy promise here: WHOIS/ID protection is a
+                           per-TLD domain addon the host may charge for or
+                           not offer, so the domain config step shows it. *}
                         <div class="dp-footer">
-                            <span class="dp-footer-note">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                                {$hadrianLang.cart.whoisPrivacyNote}
-                            </span>
                             <span class="spacer"></span>
                             <a href="{$WEB_ROOT}/cart.php" class="dp-back">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>

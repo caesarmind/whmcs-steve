@@ -63,6 +63,23 @@
 </div>
 {/if}
 
+{* Result of a server-module custom button (Reboot, Reset, ... - the module's
+   ClientAreaCustomButtonArray actions in the sidebar). WHMCS sets "success" or
+   the module's error string. *}
+{if isset($modulecustombuttonresult) && $modulecustombuttonresult}
+    {if $modulecustombuttonresult == 'success'}
+    <div class="pd-alert pd-alert-success" id="alertModuleCustomButtonSuccess">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></svg>
+        <div>{$LANG.moduleactionsuccess}</div>
+    </div>
+    {else}
+    <div class="pd-alert pd-alert-error" id="alertModuleCustomButtonFailed">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <div>{$LANG.moduleactionfailed} {$modulecustombuttonresult|strip_tags}</div>
+    </div>
+    {/if}
+{/if}
+
 {* Service-status gating — computed ONCE here, consumed by the sidebar AND the
    Manage / Quick Shortcuts cards below (so keep this above .pd-split):
      $pdIsCpanelSvc = cPanel module regardless of status (keeps cards visible,
@@ -86,7 +103,11 @@
    only exists on upgradesummary.tpl, so the old $upgrades|@count check here was
    always false → the button never showed.) *}
 {assign var=pdHasUpgrades value=false}
+{assign var=pdUpgradeUrl value=$WEB_ROOT|cat:'/upgrade.php?type=package&id='|cat:$id}
 {if isset($packagesupgrade) && $packagesupgrade}{assign var=pdHasUpgrades value=true}{/if}
+{* WHMCS 9 dynamic (MarketConnect) services upgrade through their own route;
+   WHMCS hands the URL in $dynamicUpgradeUrl, as stock Nexus uses it. *}
+{if isset($dynamicUpgradeUrl) && $dynamicUpgradeUrl}{assign var=pdHasUpgrades value=true}{assign var=pdUpgradeUrl value=$dynamicUpgradeUrl}{/if}
 {assign var=pdHasActions value=false}
 {if $pdIsCpanel || $pdHasUpgrades || $modulechangepassword || $pdCanCancel}{assign var=pdHasActions value=true}{/if}
 {* This page emits a <base href="…/"> (header.tpl), so a bare "#anchor" link
@@ -171,6 +192,24 @@
             {$LANG.clientareahostingaddons}
         </a>
         {/if}
+        {if isset($configurableoptions) && $configurableoptions}
+        <a class="subnav-item" href="{$pdSelfUrl}#pd-configoptions">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="9" cy="6" r="2"/><circle cx="15" cy="12" r="2"/><circle cx="8" cy="18" r="2"/></svg>
+            {$LANG.orderconfigpackage}
+        </a>
+        {/if}
+        {if isset($customfields) && $customfields}
+        <a class="subnav-item" href="{$pdSelfUrl}#pd-customfields">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><line x1="8" y1="8" x2="16" y2="8"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="8" y1="16" x2="12" y2="16"/></svg>
+            {$LANG.additionalInfo}
+        </a>
+        {/if}
+        {if isset($metricStats) && $metricStats}
+        <a class="subnav-item" href="{$pdSelfUrl}#pd-metrics">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4v15a1 1 0 001 1h15"/><polyline points="7 14 11 10 14 13 19 7"/></svg>
+            {$LANG.metrics.title}
+        </a>
+        {/if}
         <a class="subnav-item" href="{$pdSelfUrl}#pd-billing">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
             {$LANG.billingOverview}
@@ -192,7 +231,7 @@
         </a>
         {/if}
         {if $pdHasUpgrades}
-        <a class="subnav-item" href="{$WEB_ROOT}/upgrade.php?type=package&id={$id|default:0|escape}">
+        <a class="subnav-item" href="{$pdUpgradeUrl}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="8 8 12 4 16 8"/><polyline points="8 16 12 20 16 16"/></svg>
             {$LANG.upgrade}
         </a>
@@ -240,6 +279,11 @@
     {elseif !empty($ns1) || !empty($ns2)}
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.domainnameservers}</div></div><div class="settings-item-action"><span class="settings-item-value" style="font-size:13px;">{$ns1|default:''|escape}{if !empty($ns2)}<br>{$ns2|escape}{/if}</span></div></div>
     {/if}
+    {* SSL state WHMCS last recorded for the service domain. A state that
+       needs a resync is skipped: stock fills it in with JS Hadrian doesn't load. *}
+    {if !empty($domain) && isset($sslStatus) && $sslStatus && !$sslStatus->needsResync()}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.sslState.sslStatus}</div>{if $sslStatus->isActive() && $sslStatus->expiryDate}<div class="settings-item-sublabel">{$LANG.sslState.expiryDate}: {$sslStatus->expiryDate->toClientDateFormat()}</div>{/if}</div><div class="settings-item-action"><span class="settings-item-value">{$sslStatus->getStatusDisplayLabel()}</span></div></div>
+    {/if}
 </div>
 
 {* ── Resource usage ──────────────────────────────────────────────────
@@ -253,21 +297,28 @@
    here for any non-cPanel module service, restyled. Software Licensing keeps
    its "License Details" title; every other module (OpenPanel, Plesk, a VPS
    panel...) gets "Control Panel", since its output is usually a login button. *}
-{if !empty($moduleclientarea) && !$pdIsCpanelSvc}
+{* Shared reset for markup a server module renders itself (Bootstrap 3/4
+   panels, rows, labels): $moduleclientarea below and the replacement
+   overview of any module without a Hadrian override further down. *}
+{if (!empty($moduleclientarea) && !$pdIsCpanelSvc) || (!empty($tplOverviewTabOutput) && !in_array($module, ['cpanel','plesk','wpsquared']))}
 <style>{literal}
-#pd-license .section-header,#pd-license .section-title{display:none}
-#pd-license .panel,#pd-license .section{border:0;box-shadow:none;background:transparent;margin:0;padding:0}
-#pd-license .panel-body{padding:0}
-#pd-license h6{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--color-text-tertiary,#86868b);margin:16px 0 6px;font-weight:600}
-#pd-license h6:first-child{margin-top:0}
-#pd-license .form-control{width:100%;font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.5;padding:10px 12px;border:1px solid var(--color-border,#e3e8ee);border-radius:8px;background:var(--color-bg-subtle,#f7f8fa);color:var(--color-text,#1d1d1f);resize:vertical}
-#pd-license .label{display:inline-block;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:600}
-#pd-license .label-success{background:#d4f4dd;color:#1a7f37}
-#pd-license .label-info{background:#d6e9ff;color:#0b5cad}
-#pd-license .label-warning{background:#fdf0c9;color:#9a6700}
-#pd-license .label-danger{background:#fbe0e0;color:#b00020}
+.pd-module-output .section-header,.pd-module-output .section-title{display:none}
+.pd-module-output .panel,.pd-module-output .section{border:0;box-shadow:none;background:transparent;margin:0;padding:0}
+.pd-module-output .panel-body{padding:0}
+.pd-module-output .row{display:flex;flex-wrap:wrap;gap:16px;margin:0}
+.pd-module-output .row>[class*="col-"]{flex:1 1 240px;min-width:0;padding:0}
+.pd-module-output h6{font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--color-text-tertiary,#86868b);margin:16px 0 6px;font-weight:600}
+.pd-module-output h6:first-child{margin-top:0}
+.pd-module-output .form-control{width:100%;font-family:ui-monospace,Menlo,monospace;font-size:13px;line-height:1.5;padding:10px 12px;border:1px solid var(--color-border,#e3e8ee);border-radius:8px;background:var(--color-bg-subtle,#f7f8fa);color:var(--color-text,#1d1d1f);resize:vertical}
+.pd-module-output .label{display:inline-block;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:600}
+.pd-module-output .label-success{background:#d4f4dd;color:#1a7f37}
+.pd-module-output .label-info{background:#d6e9ff;color:#0b5cad}
+.pd-module-output .label-warning{background:#fdf0c9;color:#9a6700}
+.pd-module-output .label-danger{background:#fbe0e0;color:#b00020}
 {/literal}</style>
-<div class="card" id="pd-license">
+{/if}
+{if !empty($moduleclientarea) && !$pdIsCpanelSvc}
+<div class="card pd-module-output" id="pd-license">
     <div class="card-header"><h2 class="card-title">{if $module == 'licensing'}{$hadrianLang.services.licenseDetails}{else}{$hadrianLang.services.controlPanel}{/if}</h2></div>
     <div class="card-body">{$moduleclientarea}</div>
 </div>
@@ -332,7 +383,7 @@
     {/if}
 
     {if $pdHasUpgrades}
-    <a href="{$WEB_ROOT}/upgrade.php?type=package&id={$id|default:0|escape}" class="settings-item pd-manage-upgrade" style="text-decoration:none;color:inherit;">
+    <a href="{$pdUpgradeUrl}" class="settings-item pd-manage-upgrade" style="text-decoration:none;color:inherit;">
         <div class="settings-item-icon pd-manage-upgrade-ico">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="8 8 12 4 16 8"/><polyline points="8 16 12 20 16 16"/></svg>
         </div>
@@ -459,6 +510,69 @@
 </div>
 {/if}
 
+{* ── Module overview ($tplOverviewTabOutput) ──────────────────────────
+   A server module can replace the stock overview with its own template
+   (tabOverviewReplacementTemplate). cPanel, Plesk and WP Squared do, and
+   Hadrian overrides those three in templates/hadrian/modules/servers/<m>/
+   overview.tpl to render only what this page doesn't already show (Sitejet,
+   WordPress, email accounts, add-on upsells) as Hadrian cards, so it prints
+   bare. Any other module's overview is printed in a module-output card
+   rather than dropped. *}
+{if !empty($tplOverviewTabOutput)}
+    {* Globals the modules' js/client.js expects (stock themes define them on
+       every page). Set here, where $token is certainly in scope, before the
+       overview's own scripts run. *}
+    <script>
+        var csrfToken    = window.csrfToken || "{$token|escape:'javascript'}";
+        var whmcsBaseUrl = window.whmcsBaseUrl || "{$smarty.server.REQUEST_SCHEME|default:'https'|escape:'javascript'}://{$smarty.server.HTTP_HOST|escape:'javascript'}{$WEB_ROOT|escape:'javascript'}";
+    </script>
+    {if in_array($module, ['cpanel','plesk','wpsquared'])}
+        {$tplOverviewTabOutput}
+    {else}
+    <div class="card pd-module-output" id="pd-module-overview">
+        <div class="card-header"><h2 class="card-title">{$LANG.overview}</h2></div>
+        <div class="card-body">{$tplOverviewTabOutput}</div>
+    </div>
+    {/if}
+{/if}
+
+{* ── Hook output ─────────────────────────────────────────────────────
+   ClientAreaProductDetailsOutput returns: MarketConnect promotions and any
+   addon's panel for this service. Printed as WHMCS hands it, like stock. *}
+{if isset($hookOutput) && $hookOutput}
+    {foreach $hookOutput as $output}
+    <div class="pd-hook-output">{$output}</div>
+    {/foreach}
+{/if}
+
+{* ── Configurable options chosen for this service ── *}
+{if isset($configurableoptions) && $configurableoptions}
+<div class="settings-group" id="pd-configoptions">
+    <div class="settings-group-header"><div class="settings-group-title">{$LANG.orderconfigpackage}</div></div>
+    {foreach $configurableoptions as $configoption}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$configoption.optionname}</div></div><div class="settings-item-action"><span class="settings-item-value">{if $configoption.optiontype eq 3}{if $configoption.selectedqty}{$LANG.yes}{else}{$LANG.no}{/if}{elseif $configoption.optiontype eq 4}{$configoption.selectedqty} x {$configoption.selectedoption}{else}{$configoption.selectedoption}{/if}</span></div></div>
+    {/foreach}
+</div>
+{/if}
+
+{* ── Custom fields (the product's client-visible fields) ── *}
+{if isset($customfields) && $customfields}
+<div class="settings-group" id="pd-customfields">
+    <div class="settings-group-header"><div class="settings-group-title">{$LANG.additionalInfo}</div></div>
+    {foreach $customfields as $field}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$field.name}</div></div><div class="settings-item-action"><span class="settings-item-value">{$field.value}</span></div></div>
+    {/foreach}
+</div>
+{/if}
+
+{* ── Usage-based billing metrics ── *}
+{if isset($metricStats) && $metricStats}
+<div class="card" id="pd-metrics">
+    <div class="card-header"><h2 class="card-title">{$LANG.metrics.title}</h2></div>
+    <div class="card-body">{include file="`$template`/clientareaproductusagebilling.tpl"}</div>
+</div>
+{/if}
+
 {* Quick actions folded into the Manage card (Upgrade / Downgrade); the
    standalone Back-to-services + Renew rows were retired to match the mockup. *}
 
@@ -495,6 +609,9 @@
     {/if}
     {if !empty($recurringamount)}
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.recurringamount}</div></div><div class="settings-item-action"><span class="settings-item-value">{include file="`$template`/includes/common/price.tpl" hPrice=$recurringamount}{if !empty($billingcycle)} / {$billingcycle|escape}{/if}</span></div></div>
+    {/if}
+    {if isset($quantitySupported) && $quantitySupported && $quantity > 1}
+    <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.quantity}</div></div><div class="settings-item-action"><span class="settings-item-value">{$quantity|escape}</span></div></div>
     {/if}
     {if !empty($paymentmethodname)}
     <div class="settings-item"><div class="settings-item-content"><div class="settings-item-label">{$LANG.paymentmethod}</div></div><div class="settings-item-action"><span class="settings-item-value">{$paymentmethodname|escape}</span></div></div>

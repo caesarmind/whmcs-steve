@@ -62,7 +62,9 @@ foreach ($variants as $name => $v) {
 
     foreach ($styles as $style) {
         $smarty = new Smarty();
-        $smarty->setTemplateDir($theme);
+        // The theme folder for the variant paths, plus its parent (templates/)
+        // so "{$template}/includes/..." includes resolve the way WHMCS does.
+        $smarty->setTemplateDir([$theme, dirname($theme)]);
         $smarty->setCompileDir(sys_get_temp_dir() . '/hadrian-login-harness');
         $smarty->caching = false;
         $smarty->assign([
@@ -100,7 +102,7 @@ foreach ($variants as $name => $v) {
             ],
             'rememberMe' => false, 'logout' => false, 'incorrect' => false,
             'verifylinkexpired' => false, 'passwordResetSuccessful' => false,
-            'ssoProviders' => [], 'captcha' => null, 'captchaForm' => 'login',
+            'linkableProviders' => [], 'captcha' => null, 'captchaForm' => 'login',
         ]);
         $body = $smarty->fetch($v['file']);
         $panes[$name] = ($panes[$name] ?? '')

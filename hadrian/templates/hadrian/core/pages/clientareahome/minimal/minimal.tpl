@@ -284,3 +284,6 @@
 })();
 </script>
 {/literal}
+
+{* Panels and hook output from WHMCS / modules that this variant does not draw itself. *}
+{include file="`$template`/core/pages/clientareahome/extra-panels.tpl"}

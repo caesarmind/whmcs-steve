@@ -474,5 +474,9 @@
     <div class="content-area">
     {* Email-verification banner (renders only when WHMCS flags the email unverified). *}
     {include file="`$template`/includes/verifyemail.tpl"}
+    {* Network-issue and user-validation banners (stock Nexus shows both on every
+       client-area page; each renders only when WHMCS sets its flag). *}
+    {include file="`$template`/includes/network-issues-notifications.tpl"}
+    {include file="`$template`/includes/validateuser.tpl"}
     {/if}{* end portal chrome (skipped when fullPage) *}
 {/if}

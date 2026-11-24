@@ -1084,35 +1084,6 @@ body[data-subnav-order="off"] .sidebar-collapsed { display: none !important; }
     letter-spacing: -0.004em;
 }
 
-/* -- Guarantees strip (2 trust cards below the grid) ------ */
-.st-guarantees {
-    margin-top: 20px;
-    display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
-}
-@media (max-width: 720px) { .st-guarantees { grid-template-columns: 1fr; } }
-.st-guarantee {
-    padding: 14px 16px;
-    display: flex; align-items: flex-start; gap: 12px;
-}
-.st-guarantee-ico {
-    width: 32px; height: 32px; border-radius: 10px;
-    background: var(--color-accent-light);
-    color: var(--color-accent);
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-}
-.st-guarantee-ico svg { width: 15px; height: 15px; }
-.st-guarantee-title {
-    font-size: var(--text-base, 13px); font-weight: var(--fw-semibold, 600);
-    color: var(--color-text-primary);
-    letter-spacing: -0.008em;
-}
-.st-guarantee-sub {
-    font-size: 11.5px;
-    color: var(--color-text-tertiary);
-    margin-top: 2px;
-    line-height: 1.4;
-}
 
 /* -- Empty state -- used inside the main card when the
    selected category has no purchasable packages --------- */

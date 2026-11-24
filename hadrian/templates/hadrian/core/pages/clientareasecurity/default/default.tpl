@@ -102,7 +102,7 @@
                 <div class="sec-header-sub">{$hadrianLang.account.linkedAccountsSub}</div>
             </div>
             <div class="sec-providers">
-                {foreach $linkableProviders as $provider}{$provider.code}{/foreach}
+                {include file="`$template`/includes/linkedaccounts.tpl" linkContext="clientsecurity" customFeedback=true}
             </div>
             <div class="providerLinkingFeedback"></div>
         </div>

@@ -63,6 +63,10 @@
             {* CSRF token WHMCS expects on POST forms (guarded so it's harmless if unset). *}
             {if isset($token) && $token}<input type="hidden" name="token" value="{$token|escape}">{/if}
 
+            {* WHMCS Signin Integrations: sign up with a linked provider (renders
+               nothing when none is enabled), placed where stock Nexus puts it. *}
+            {include file="`$template`/includes/linkedaccounts.tpl" linkContext="registration"}
+
             <section class="cr-section">
                 <h2 class="cr-section-title">{$LANG.orderForm.personalInformation}</h2>
                 <div class="form-row">

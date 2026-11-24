@@ -365,35 +365,6 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
 }
 .co-forgot-link:hover { color: var(--color-accent-hover); text-decoration: underline; }
 
-/* "or sign up with" divider + social buttons (placeholders -- real
-   OAuth would need a WHMCS hook integration). */
-.co-divider {
-    display: flex; align-items: center; gap: 12px;
-    margin: 18px 0 14px;
-    font-size: 10.5px; color: var(--color-text-tertiary);
-    text-transform: uppercase; letter-spacing: 0.08em;
-}
-.co-divider::before, .co-divider::after {
-    content: ""; flex: 1; height: 0.5px; background: var(--color-border);
-}
-.co-social { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-@media (max-width: 520px) { .co-social { grid-template-columns: 1fr; } }
-.co-social-btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    height: 42px; padding: 0 16px;
-    border-radius: 999px;
-    background: var(--color-surface);
-    border: 0.5px solid var(--color-border);
-    font-size: 13px; font-weight: 500;
-    color: var(--color-text-primary);
-    cursor: pointer; font-family: inherit;
-    letter-spacing: -0.008em;
-    transition: background 0.15s;
-    text-decoration: none;
-}
-.co-social-btn:hover { background: var(--color-surface-secondary, #f5f5f7); }
-.co-social-btn svg { width: 16px; height: 16px; flex-shrink: 0; }
-
 /* When the account card hosts the signup container, strip
    #containerNewUserSignup's outer card chrome (the multi-card
    #order-standard_cart selector below otherwise paints it twice). */

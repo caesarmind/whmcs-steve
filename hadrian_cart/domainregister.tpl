@@ -14,19 +14,22 @@
  *      .dr-results-empty -- empty-state placeholder shown when the
  *                          state-chip flips body[data-data="empty"]
  *
- * Mode tabs: standard_cart only renders ONE search form per page based
- * on the WHMCS admin setting "Use the standard or smart domain search"
- * ($showAdvancedSearchOptions). We render BOTH forms so the user can
- * tab-switch between AI Generator and Classic Search:
- *   - The form matching the WHMCS-chosen mode keeps the canonical
- *     scripts.min.js hooks (#frmDomainChecker, #message OR #inputDomain,
- *     #btnCheckAvailability) so the live AJAX flow works exactly as
- *     standard_cart intends.
- *   - The other-mode form renders with `dr-alt-` prefixed IDs and
- *     submits a regular POST to cart.php?a=checkDomain. WHMCS's
- *     checkDomain handler accepts either `message` or `domain` field,
- *     so the page reloads with results rendered in the chosen mode.
- * Tab click swaps which form is visible via data-search-mode on the
+ * Search modes follow the WHMCS setting "Use the standard or smart domain
+ * search" ($showAdvancedSearchOptions):
+ *   - Smart (AI) search ON: AI Generator and Classic Search tabs. The AI
+ *     form is the live one (#frmDomainChecker, #message,
+ *     #btnCheckAvailability) and holds the captcha. Classic is a proxy
+ *     form with `dr-alt-` IDs placed before it: its submit copies the
+ *     query into #message and clicks #btnCheckAvailability (see the
+ *     submit bridge at the bottom). In Classic mode only the AI form's
+ *     search box is hidden, so the captcha stays visible AND inside the
+ *     live form - scripts.min.js mounts the reCAPTCHA widget in the form
+ *     that holds .btn-recaptcha and posts that form's serialize().
+ *   - Smart search OFF: no tabs and no AI form, exactly like stock: one
+ *     live Classic form (#inputDomain) with the captcha inside it.
+ *     data-search-mode is "standard" so the Classic-tab-only rule that
+ *     hides the suggestion list doesn't apply.
+ * Tab click swaps the visible search box via data-search-mode on the
  * .dr-search container.
  *
  * State toggle (full vs empty):
@@ -69,7 +72,7 @@
  * dropdown (.dr-filters / .dr-tld-option / .dr-length-pill / .dr-switch)
  * that mirrors the hidden native <select>s WHMCS serializes; the old
  * bootstrap-multiselect widgets were removed. The captcha is rendered
- * once as a shared block below both forms (see "Shared captcha" below).
+ * once, inside the live form (see "Captcha" below).
  *}
 
 {include file="orderforms/$carttpl/common.tpl"}
@@ -90,7 +93,7 @@
         {include file="orderforms/$carttpl/sidebar-categories.tpl"}
 
         {* RIGHT: search + results *}
-        <div class="dr-main" data-search-mode="{if $showAdvancedSearchOptions}ai{else}classic{/if}" style="min-width: 0;">
+        <div class="dr-main" data-search-mode="{if $showAdvancedSearchOptions}ai{else}standard{/if}" style="min-width: 0;">
 
             {* sidebar-categories-collapsed.tpl is deliberately NOT included
                here. Its <select>-based output relies on Bootstrap responsive
@@ -100,45 +103,112 @@
                .st-split grid handles mobile by wrapping the aside under
                the main column at 880px, so the picker is redundant. *}
 
-            {* ---- Search card with AI/Classic mode tabs ---- *}
+            {* ---- Search card (AI/Classic tabs only when smart search is on) ---- *}
             <div class="dr-search domain-checker-container{if $showAdvancedSearchOptions} domain-checker-advanced{/if}"
-                 data-search-mode="{if $showAdvancedSearchOptions}ai{else}classic{/if}">
+                 data-search-mode="{if $showAdvancedSearchOptions}ai{else}standard{/if}">
 
+                {if $showAdvancedSearchOptions}
                 <div class="dr-mode-tabs" role="tablist" aria-label="{$hadrianLang.cart.searchModeLabel}">
-                    <button type="button" class="dr-mode-tab{if $showAdvancedSearchOptions} active{/if}"
+                    <button type="button" class="dr-mode-tab active"
                             role="tab" data-mode="ai"
-                            aria-selected="{if $showAdvancedSearchOptions}true{else}false{/if}">
+                            aria-selected="true">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg>
                         {$hadrianLang.cart.aiGenerator}
                     </button>
-                    <button type="button" class="dr-mode-tab{if !$showAdvancedSearchOptions} active{/if}"
+                    <button type="button" class="dr-mode-tab"
                             role="tab" data-mode="classic"
-                            aria-selected="{if !$showAdvancedSearchOptions}true{else}false{/if}">
+                            aria-selected="false">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                         {$hadrianLang.cart.classicSearch}
                     </button>
                 </div>
+                {/if}
 
                 <div class="domain-checker-bg clearfix">
 
-                    {* ---- AI form (smart / AI Generator mode) ---- *}
+                    {* ---- Captcha ----
+                       Captured once and printed INSIDE the live form
+                       (#frmDomainChecker), like stock standard_cart. That is
+                       what makes reCAPTCHA work: scripts.min.js mounts the
+                       widget in the form holding .btn-recaptcha, and
+                       validate_captcha() posts that form's serialize(), so
+                       #g-recaptcha-response must sit inside it. *}
+                    {capture name=drCaptcha}
+                    {if $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm) && !$captcha->recaptcha->isInvisible()}
+                        <div class="captcha-container dr-captcha-shared" id="captchaContainer">
+                            {if $captcha->recaptcha->isEnabled()}
+                                <div class="text-center">
+                                    <div class="form-group recaptcha-container"></div>
+                                </div>
+                            {else}
+                                <div class="default-captcha default-captcha-register-margin">
+                                    <p>{lang key="cartSimpleCaptcha"}</p>
+                                    <div>
+                                        <img id="inputCaptchaImage" src="{$systemurl}includes/verifyimage.php" align="middle" alt="{$LANG.captchatitle|escape}" />
+                                        <input id="inputCaptcha" type="text" name="code" maxlength="6" class="form-control input-sm" data-toggle="tooltip" data-placement="right" data-trigger="manual" title="{lang key='orderForm.required'}" />
+                                    </div>
+                                </div>
+                            {/if}
+                        </div>
+                    {/if}
+                    {/capture}
+
+                    {* ---- Classic form ----
+                       Smart search off: the live form, captcha inside.
+                       Smart search on: the Classic-tab proxy (dr-alt- IDs),
+                       placed before the AI form so the AI form's captcha
+                       sits under whichever search box is showing. *}
                     <form method="post"
                           action="{$WEB_ROOT}/cart.php"
                           class="dr-search-form"
-                          data-mode-form="ai"
-                          {if $showAdvancedSearchOptions}id="frmDomainChecker"{/if}>
+                          data-mode-form="classic"
+                          {if !$showAdvancedSearchOptions}id="frmDomainChecker"{/if}>
                         <input type="hidden" name="a" value="checkDomain">
 
                         <div class="dr-search-box input-group input-group-lg input-group-box">
                             <svg class="dr-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input type="text"
+                                   name="domain"
+                                   class="dr-search-input form-control"
+                                   {if !$showAdvancedSearchOptions}id="inputDomain"{else}id="dr-alt-domain"{/if}
+                                   placeholder="{$LANG.findyourdomain}"
+                                   value="{if !$showAdvancedSearchOptions}{$lookupTerm}{/if}"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   data-trigger="manual"
+                                   title="{lang key='orderForm.domainOrKeyword'}" />
+                            <button type="submit"
+                                    class="dr-generate-btn{if !$showAdvancedSearchOptions} domain-check-availability{$captcha->getButtonClass($captchaForm)}{/if}"
+                                    {if !$showAdvancedSearchOptions}id="btnCheckAvailability"{else}id="dr-alt-btnClassic"{/if}>
+                                {$LANG.search}
+                            </button>
+                        </div>
+
+                        {if !$showAdvancedSearchOptions}{$smarty.capture.drCaptcha}{/if}
+                    </form>
+
+                    {if $showAdvancedSearchOptions}
+                    {* ---- AI form (smart search; the live form) ----
+                       data-mode-form sits on the inner wrapper, not the form,
+                       so the Classic tab hides only this search box and the
+                       captcha below it stays visible. *}
+                    <form method="post"
+                          action="{$WEB_ROOT}/cart.php"
+                          class="dr-ai-form"
+                          id="frmDomainChecker">
+                        <input type="hidden" name="a" value="checkDomain">
+
+                        <div class="dr-search-form" data-mode-form="ai">
+                        <div class="dr-search-box input-group input-group-lg input-group-box">
+                            <svg class="dr-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                             <textarea name="message"
                                       class="dr-search-input"
-                                      {if $showAdvancedSearchOptions}id="message"{else}id="dr-alt-message"{/if}
+                                      id="message"
                                       rows="1"
                                       title="{lang key='domainSearch.domainOrAiPrompt'}"
                                       data-placement="top"
                                       data-trigger="manual"
-                                      placeholder="{lang key='domainSearch.domainOrAiInstruction'}">{if $showAdvancedSearchOptions}{$message}{/if}</textarea>
+                                      placeholder="{lang key='domainSearch.domainOrAiInstruction'}">{$message}</textarea>
                             {* ---- Filters: theme-styled dropdown, INSIDE the
                                search bar -- between the input and the Search
                                button, divided by a hairline. Functional parity
@@ -206,67 +276,15 @@
                                 </div>
                             </div>
                             <button type="submit"
-                                    class="dr-generate-btn{if $showAdvancedSearchOptions} domain-check-availability{$captcha->getButtonClass($captchaForm)}{/if}"
-                                    {if $showAdvancedSearchOptions}id="btnCheckAvailability"{else}id="dr-alt-btnAi"{/if}>
+                                    class="dr-generate-btn domain-check-availability{$captcha->getButtonClass($captchaForm)}"
+                                    id="btnCheckAvailability">
                                 {lang key='search'}
                             </button>
                         </div>
+                        </div>{* /.dr-search-form[data-mode-form=ai] *}
+
+                        {$smarty.capture.drCaptcha}
                     </form>
-
-                    {* ---- Classic form (single-input / Classic Search mode) ---- *}
-                    <form method="post"
-                          action="{$WEB_ROOT}/cart.php"
-                          class="dr-search-form"
-                          data-mode-form="classic"
-                          {if !$showAdvancedSearchOptions}id="frmDomainChecker"{/if}>
-                        <input type="hidden" name="a" value="checkDomain">
-
-                        <div class="dr-search-box input-group input-group-lg input-group-box">
-                            <svg class="dr-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                            <input type="text"
-                                   name="domain"
-                                   class="dr-search-input form-control"
-                                   {if !$showAdvancedSearchOptions}id="inputDomain"{else}id="dr-alt-domain"{/if}
-                                   placeholder="{$LANG.findyourdomain}"
-                                   value="{if !$showAdvancedSearchOptions}{$lookupTerm}{/if}"
-                                   data-toggle="tooltip"
-                                   data-placement="top"
-                                   data-trigger="manual"
-                                   title="{lang key='orderForm.domainOrKeyword'}" />
-                            <button type="submit"
-                                    class="dr-generate-btn{if !$showAdvancedSearchOptions} domain-check-availability{$captcha->getButtonClass($captchaForm)}{/if}"
-                                    {if !$showAdvancedSearchOptions}id="btnCheckAvailability"{else}id="dr-alt-btnClassic"{/if}>
-                                {$LANG.search}
-                            </button>
-                        </div>
-
-                    </form>
-
-                    {* ---- Shared captcha (visible on BOTH tabs) ----
-                       Lives outside the two mode-forms so it doesn't vanish
-                       when you switch tabs. The image-captcha input carries
-                       form="frmDomainChecker" so it still serializes with
-                       whichever form WHMCS made active -- validate_captcha()
-                       posts that form's .serialize(). NOTE: a reCAPTCHA
-                       #g-recaptcha-response can't be relocated this way, so
-                       if you switch the domain-search captcha to reCAPTCHA
-                       this block must move back inside the active form. *}
-                    {if $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm) && !$captcha->recaptcha->isInvisible()}
-                        <div class="captcha-container dr-captcha-shared" id="captchaContainer">
-                            {if $captcha->recaptcha->isEnabled()}
-                                <div class="text-center">
-                                    <div class="form-group recaptcha-container"></div>
-                                </div>
-                            {else}
-                                <div class="default-captcha default-captcha-register-margin">
-                                    <p>{lang key="cartSimpleCaptcha"}</p>
-                                    <div>
-                                        <img id="inputCaptchaImage" src="{$systemurl}includes/verifyimage.php" align="middle" alt="{$LANG.captchatitle|escape}" />
-                                        <input id="inputCaptcha" type="text" name="code" maxlength="6" form="frmDomainChecker" class="form-control input-sm" data-toggle="tooltip" data-placement="right" data-trigger="manual" title="{lang key='orderForm.required'}" />
-                                    </div>
-                                </div>
-                            {/if}
-                        </div>
                     {/if}
 
                 </div>

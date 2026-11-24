@@ -5,7 +5,7 @@
      $maximumamount   — maximum top-up
      $maximumbalance  — credit balance cap
      $clientcurrency  — currency object: prefix, suffix, code, format
-     $paymentmethods  — array of gateway: name (module), displayname
+     $gateways        — array of gateway: sysname (module), name (display)
      $errormessage    — array/string of validation errors
      $clientsdetails  — client (use .credit for current balance)
      $token           — CSRF token, required on POST
@@ -80,12 +80,14 @@
             <form method="post" action="{$WEB_ROOT}/clientarea.php?action=addfunds" class="af-form">
                 <input type="hidden" name="token" value="{$token|default:''|escape}">
 
-                {if isset($paymentmethods) && $paymentmethods|@count > 0}
+                {* WHMCS passes the gateways as $gateways[] {sysname, name} (stock
+                   nexus); the form posts the chosen sysname as paymentmethod. *}
+                {if isset($gateways) && $gateways|@count > 0}
                 <div class="af-form-row">
                     <label class="af-form-label" for="af-method">{$LANG.orderpaymentmethod}</label>
                     <select id="af-method" name="paymentmethod" class="af-select">
-                        {foreach $paymentmethods as $pm}
-                        <option value="{$pm.module|default:$pm.name|escape}">{$pm.displayname|default:$pm.name|escape}</option>
+                        {foreach $gateways as $gateway}
+                        <option value="{$gateway.sysname}">{$gateway.name}</option>
                         {/foreach}
                     </select>
                 </div>

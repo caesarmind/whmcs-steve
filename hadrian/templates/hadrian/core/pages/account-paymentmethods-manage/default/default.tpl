@@ -231,10 +231,13 @@
 </div>
 
 {* Tokenised gateways only: their AJAX-delivered fields and WHMCS.payment events
-   need jQuery + WHMCS's shared script, which the client area does not load. *}
+   need jQuery + the WHMCS JS core + assets/js/whmcs/payment.js, which the
+   client area does not load. (standard_cart's scripts.min.js was used before:
+   it doesn't define WHMCS.payment, and it throws on this page because it
+   formats #inputCardNumber with the jquery.payment plugin.) *}
 {if !empty($pmTypes.tokenGateways)}
-<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-<script src="{$WEB_ROOT}/templates/orderforms/standard_cart/js/scripts.min.js"></script>
+{include file="`$template`/includes/partials/whmcs-core-js.tpl"}
+<script src="{$WEB_ROOT}/assets/js/whmcs/payment.js"></script>
 {/if}
 
 <script>

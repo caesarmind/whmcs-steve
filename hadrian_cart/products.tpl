@@ -25,7 +25,6 @@
  *                        │                          body[data-data="empty"]
  *                        │                          .when-full toggle)
  *                        └── .st-empty
- *                + .st-guarantees (3 trust cards)
  *
  * Variant switching is driven by hadrian's state-chip (`data-plan-set`).
  * The active variant is captured on <body data-plan="x"> and the
@@ -88,13 +87,18 @@
    verbose-but-portable {elseif} chain follows standard_cart's pattern
    and works across every Smarty 3.x we've encountered. *}
 
-{* Pre-compute featured index — middle item when count >= 3, else first.
-   Featured = "Most popular" CTA highlight; only applies when we have
-   enough plans for a meaningful highlight (a 2-plan grid with one
-   "featured" looks dishonest). *}
+{* Pre-compute featured index = the first product the admin marked Featured
+   (Products/Services > product > Details > Featured, $product.isFeatured,
+   the flag WHMCS's own premium_comparison form reads). It drives the
+   "Most popular" badge and the primary CTA. No product flagged, no badge:
+   the theme doesn't pick a winner on the host's behalf. *}
 {$productCount = ($products) ? count($products) : 0}
 {$featuredIndex = -1}
-{if $productCount >= 3}{$featuredIndex = floor($productCount / 2)}{/if}
+{if $productCount > 0}
+    {foreach $products as $fp}
+        {if $fp.isFeatured}{$featuredIndex = $fp@index}{break}{/if}
+    {/foreach}
+{/if}
 
 {* Resolve group: WHMCS uses $productGroup on /cart.php?gid=X (standard
    route) and may use $productgroup on /store/<slug> (friendly URL).
@@ -197,7 +201,7 @@
                              data-billed-biennially="{$hadrianLang.cart.planBilledBiennially|escape:'html':'UTF-8':false}"
                              data-billed-triennially="{$hadrianLang.cart.planBilledTriennially|escape:'html':'UTF-8':false}">
                             <button type="button" data-cycle="monthly">{$hadrianLang.cart.cycleMonthly}</button>
-                            <button type="button" data-cycle="annually" class="active">{$hadrianLang.cart.cycleAnnual} <span class="st-cycle-saving">{$hadrianLang.cart.cycleSaving}</span></button>
+                            <button type="button" data-cycle="annually" class="active">{$hadrianLang.cart.cycleAnnual} <span class="st-cycle-saving" data-save-tpl="{$hadrianLang.cart.savePercent|escape}" data-save-upto-tpl="{$hadrianLang.cart.saveUpToPercent|escape}" hidden></span></button>
                             <button type="button" data-cycle="biennially">{$hadrianLang.cart.cycleBiennial}</button>
                         </div>
                     </div>
@@ -311,7 +315,7 @@
 
                                     <a href="{$product.productUrl}"
                                        id="{$idPrefix}-order-button"
-                                       class="st-plan-cta{if !$isFeatured} secondary{/if} btn-order-now"
+                                       class="st-plan-cta{if !$isFeatured && $featuredIndex >= 0} secondary{/if} btn-order-now"
                                        {if $product.hasRecommendations} data-has-recommendations="1"{/if}>
                                         {$LANG.ordernowbutton}
                                     </a>
@@ -483,7 +487,7 @@
                                 {foreach $products as $product}
                                     {$isFeatured = ($product@index == $featuredIndex)}
                                     <div class="st-compare-footer-cta">
-                                        <a href="{$product.productUrl}" class="st-plan-cta{if !$isFeatured} secondary{/if}" style="width: auto; min-width: 140px;">{$LANG.ordernowbutton}</a>
+                                        <a href="{$product.productUrl}" class="st-plan-cta{if !$isFeatured && $featuredIndex >= 0} secondary{/if}" style="width: auto; min-width: 140px;">{$LANG.ordernowbutton}</a>
                                     </div>
                                 {/foreach}
                             </div>
@@ -768,30 +772,6 @@
 
             </div>{* /.card *}
 
-            {* ── Guarantees strip — 2 trust cards below the main card ── *}
-            {if $productCount > 0}
-                <div class="st-guarantees">
-                    <div class="card st-guarantee">
-                        <div class="st-guarantee-ico">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                        </div>
-                        <div>
-                            <div class="st-guarantee-title">{$hadrianLang.cart.support247}</div>
-                            <div class="st-guarantee-sub">{$hadrianLang.cart.support247Sub}</div>
-                        </div>
-                    </div>
-                    <div class="card st-guarantee">
-                        <div class="st-guarantee-ico">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                        </div>
-                        <div>
-                            <div class="st-guarantee-title">{$hadrianLang.cart.uptime}</div>
-                            <div class="st-guarantee-sub">{$hadrianLang.cart.uptimeSub}</div>
-                        </div>
-                    </div>
-                </div>
-            {/if}
-
             {else}
                 {* ── Landing state: no category selected ──────────────
                    User landed on /cart.php without ?gid. The error/info
@@ -972,5 +952,32 @@
         if (offered && (!start || p.classList.contains('active'))) start = c;
     });
     if (start) applyCycle(start); else switcher.style.display = 'none';
+
+    // The Annual pill's badge is the real saving: a year billed annually
+    // against twelve monthly payments, for each plan that offers both.
+    // Plans can differ, so it reads "Save up to N%" then. No saving, no badge.
+    // The Hide Billing Cycle Discounts setting removes it outright.
+    var saveEl = switcher.querySelector('.st-cycle-saving');
+    if (saveEl && document.body.getAttribute('data-hide-discounts') === '1') {
+        saveEl.parentNode.removeChild(saveEl);
+        saveEl = null;
+    }
+    if (saveEl) {
+        var savings = [];
+        document.querySelectorAll('[data-raw-monthly][data-raw-annually]').forEach(function (h) {
+            var m = parseFloat(h.getAttribute('data-raw-monthly'));
+            var a = parseFloat(h.getAttribute('data-raw-annually'));
+            if (m > 0 && a > 0) savings.push(Math.round((1 - a / (m * 12)) * 100));
+        });
+        var best = savings.length ? Math.max.apply(null, savings) : 0;
+        if (best >= 1) {
+            var same = savings.every(function (s) { return s === best; });
+            var tpl = saveEl.getAttribute(same ? 'data-save-tpl' : 'data-save-upto-tpl') || '';
+            saveEl.textContent = tpl.replace('%s', best).replace('%%', '%');
+            saveEl.hidden = false;
+        } else {
+            saveEl.parentNode.removeChild(saveEl);
+        }
+    }
 })();
 </script>

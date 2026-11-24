@@ -90,12 +90,81 @@
                         </select>
                     </div>
 
+                    {* Domain the service attaches to. cart-order-addtocart reads
+                       domain_type (existing-domain | sub-domain | custom-domain,
+                       the stock tab ids) plus that choice's field: existing_domain,
+                       sub_domain + existing_sld_for_subdomain, or custom_domain.
+                       Stock sets domain_type from its Bootstrap tabs; here a radio
+                       per choice does, through the small script below. *}
                     {if isset($requireDomain) && $requireDomain}
-                        <div class="form-group">
-                            <label class="form-label">{$hadrianLang.store.ordDomainLabel}</label>
-                            <input type="text" class="form-input domain-input" name="custom_domain" placeholder="{$hadrianLang.store.ordDomainPlaceholder}" value="{if isset($orderFormData.custom_domain)}{$orderFormData.custom_domain}{elseif isset($customDomain)}{$customDomain}{/if}">
-                            <div class="form-hint">{$hadrianLang.store.ordDomainHint}</div>
-                        </div>
+                        {assign var=hnOrdHasDomains value=(isset($domains) && $domains && count($domains) > 0 && $loggedin)}
+                        {assign var=hnOrdType value=''}
+                        {if isset($orderFormData.domain_type)}{assign var=hnOrdType value=$orderFormData.domain_type}{/if}
+                        {if !$hnOrdType}{if $hnOrdHasDomains}{assign var=hnOrdType value='existing-domain'}{else}{assign var=hnOrdType value='custom-domain'}{/if}{/if}
+                        <fieldset class="form-group hn-ord-domain" style="border:0;padding:0;margin:0 0 16px;">
+                            <legend class="form-label">{$LANG.store.chooseDomain}</legend>
+                            <div style="display:flex;flex-direction:column;gap:10px;">
+                                {if $hnOrdHasDomains}
+                                <label class="settings-item" style="cursor:pointer;gap:12px;">
+                                    <input type="radio" name="hn_domain_choice" value="existing-domain"{if $hnOrdType == 'existing-domain'} checked{/if}>
+                                    <span class="settings-item-content" style="flex:1;min-width:0;">
+                                        <span class="settings-item-label">{$LANG.store.chooseExistingDomain}</span>
+                                        <select class="form-select" name="existing_domain" data-hn-ord-panel="existing-domain" style="margin-top:8px;">
+                                            {foreach $domains as $domain}
+                                                <option value="{$domain}"{if (isset($orderFormData.existing_domain) && $orderFormData.existing_domain == $domain) || (!isset($orderFormData.existing_domain) && isset($selectedDomain) && $domain == $selectedDomain)} selected{/if}>{$domain}</option>
+                                            {/foreach}
+                                        </select>
+                                    </span>
+                                </label>
+                                {elseif isset($domains) && $domains && count($domains) > 0}
+                                <p class="form-hint" style="margin:0;"><a href="{routePath('cart-order-login')}">{$LANG.store.login}</a> {$LANG.store.addToExistingPackage}</p>
+                                {/if}
+                                {if isset($allowSubdomains) && $allowSubdomains && isset($domains) && $domains && count($domains) > 0}
+                                <label class="settings-item" style="cursor:pointer;gap:12px;">
+                                    <input type="radio" name="hn_domain_choice" value="sub-domain"{if $hnOrdType == 'sub-domain'} checked{/if}>
+                                    <span class="settings-item-content" style="flex:1;min-width:0;">
+                                        <span class="settings-item-label">{$LANG.store.subOfExisting}</span>
+                                        <span data-hn-ord-panel="sub-domain" style="display:flex;gap:8px;margin-top:8px;">
+                                            <input type="text" class="form-input subdomain-input" name="sub_domain" placeholder="{$hadrianLang.store.ordDomainPlaceholder}" value="{if isset($orderFormData.sub_domain)}{$orderFormData.sub_domain}{/if}">
+                                            <select class="form-select" name="existing_sld_for_subdomain" id="existing_sld_for_subdomain">
+                                                {foreach $domains as $domain}
+                                                    <option value="{$domain}"{if isset($orderFormData.existing_sld_for_subdomain) && $orderFormData.existing_sld_for_subdomain == $domain} selected{/if}>.{$domain}</option>
+                                                {/foreach}
+                                            </select>
+                                        </span>
+                                    </span>
+                                </label>
+                                {/if}
+                                <label class="settings-item" style="cursor:pointer;gap:12px;">
+                                    <input type="radio" name="hn_domain_choice" value="custom-domain"{if $hnOrdType == 'custom-domain'} checked{/if}>
+                                    <span class="settings-item-content" style="flex:1;min-width:0;">
+                                        <span class="settings-item-label">{$LANG.store.domainAlreadyOwned}</span>
+                                        <input type="text" class="form-input domain-input" name="custom_domain" data-hn-ord-panel="custom-domain" placeholder="example.com" value="{if isset($orderFormData.custom_domain)}{$orderFormData.custom_domain}{elseif isset($customDomain)}{$customDomain}{/if}" style="margin-top:8px;">
+                                    </span>
+                                </label>
+                            </div>
+                        </fieldset>
+                        <script>{literal}
+                        (function () {
+                            var form = document.getElementById('frmAddToCart');
+                            var type = document.getElementById('inputDomainType');
+                            if (!form || !type) return;
+                            function sync() {
+                                var on = form.querySelector('input[name="hn_domain_choice"]:checked');
+                                type.value = on ? on.value : '';
+                                form.querySelectorAll('[data-hn-ord-panel]').forEach(function (el) {
+                                    var active = on && el.getAttribute('data-hn-ord-panel') === on.value;
+                                    el.style.opacity = active ? '' : '0.5';
+                                    el.querySelectorAll('input, select').forEach(function (c) { c.disabled = !active; });
+                                    if (el.matches('input, select')) el.disabled = !active;
+                                });
+                            }
+                            form.addEventListener('change', function (e) {
+                                if (e.target && e.target.name === 'hn_domain_choice') sync();
+                            });
+                            sync();
+                        })();
+                        {/literal}</script>
                     {/if}
                 </div>
             </div>
@@ -139,6 +208,57 @@
                 <button type="submit" name="continue" value="1" class="btn-secondary" style="width:100%;text-align:center">{$hadrianLang.store.ordContinue}</button>
             </div>
         </form>
+
+        {* Upsell to the next MarketConnect tier, when WHMCS offers one
+           ($upsellProduct + $promotion + $upsellComparison, as stock). The
+           button names the price difference for the billing cycle picked
+           above; the script shows the matching line. *}
+        {if isset($upsellProduct) && $upsellProduct && isset($promotion) && $promotion}
+        <div class="card store-promoted-product upsell-{$upsellProduct->productKey}" style="margin-top:24px;">
+            <div class="card-body" style="display:flex;gap:20px;align-items:flex-start;">
+                <img src="{$promotion->getImagePath()}" alt="" style="width:64px;height:64px;object-fit:contain;flex-shrink:0;">
+                <div style="flex:1;min-width:0;">
+                    <h2 class="card-title" style="margin:0 0 2px;">{$promotion->getHeadline()}</h2>
+                    <p style="margin:0 0 10px;color:var(--color-text-secondary);">{$promotion->getTagline()}</p>
+                    {if $promotion->getDescription()}<p style="margin:0 0 10px;color:var(--color-text-secondary);line-height:1.5;">{$promotion->getDescription()}</p>{/if}
+                    {if $promotion->hasFeatures()}
+                        <ul style="margin:0 0 14px;padding-left:18px;color:var(--color-text-primary);line-height:1.7;">
+                            {foreach $promotion->getFeatures() as $highlight}<li>{$highlight}</li>{/foreach}
+                        </ul>
+                    {/if}
+                    <form method="post" action="{routePath('cart-order')}">
+                        <input type="hidden" name="pid" value="{$upsellProduct->id}">
+                        <input type="hidden" name="upsell" value="1">
+                        <button type="submit" class="btn-primary">
+                            {foreach $product->pricing()->allAvailableCycles() as $pricing}
+                                <span class="span-upsell" data-hn-upsell-cycle="{$pricing->cycle()}"{if !$pricing@first} hidden{/if}>
+                                    {if is_null($upsellComparison->diff($pricing->cycle()))}
+                                        {$promotion->getCta()} {$upsellProduct->name} {lang key='fromJust'} {$upsellProduct->pricing()->best()->breakdownPrice()}
+                                    {else}
+                                        {$promotion->getCta()} {$upsellProduct->name} {lang key='forJust'} {$upsellComparison->diff($pricing->cycle())->breakdownPrice()} {$LANG.more|lower}
+                                    {/if}
+                                </span>
+                            {/foreach}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <script>{literal}
+        (function () {
+            var cycle = document.querySelector('#frmAddToCart select[name="billingcycle"]');
+            if (!cycle) return;
+            function show() {
+                var spans = document.querySelectorAll('[data-hn-upsell-cycle]');
+                var hit = false;
+                spans.forEach(function (s) { var on = s.getAttribute('data-hn-upsell-cycle') === cycle.value; s.hidden = !on; hit = hit || on; });
+                if (!hit && spans.length) spans[0].hidden = false;
+            }
+            cycle.addEventListener('change', show);
+            show();
+        })();
+        {/literal}</script>
+        {/if}
     {else}
         {* ---- Static mockup demo (admin preview / no product assigned) ---- *}
         <div class="card">
