@@ -326,6 +326,23 @@
                     </select>
                 </div>
 
+                {* Which part of the site the page belongs to. It only decides
+                   anything when layouts are chosen by area, but it is always
+                   shown: an admin setting a site up picks areas first and
+                   flips that switch afterwards. *}
+                <div class="mt-row">
+                    <div>
+                        <div class="mt-row-label">Area</div>
+                        <div class="mt-row-help">The part of the site this page belongs to. It decides which layout the page gets when layouts are chosen by area (Layouts &rarr; Choose layouts by). <strong>Automatic</strong> goes by what the page is.</div>
+                    </div>
+                    <select class="mt-select" name="area">
+                        <option value="" {if $area|default:'' == ''}selected{/if}>Automatic ({$areaChoices[$areaAutomatic]|escape})</option>
+                        {foreach $areaChoices as $areaKey => $areaLabel}
+                            <option value="{$areaKey|escape}" {if $area|default:'' == $areaKey}selected{/if}>{$areaLabel|escape}</option>
+                        {/foreach}
+                    </select>
+                </div>
+
                 {if $svcLayoutApplicable}
                     <div class="mt-row">
                         <div>

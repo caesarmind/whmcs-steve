@@ -166,6 +166,12 @@ Show or hide this page's sidebar sub-navigation. **Inherit (global default)**
 follows the site-wide toggle in **Settings -> Order / Website Section Sidebar**;
 **On (always show)** and **Off (always hide)** override it for this page.
 
+### Area
+
+The part of the site this page belongs to: **Website**, **Client area** or **Order process**. It decides which layout the page gets when layouts are chosen by area (see [Layout Manager](/client-theme/layout-manager/#by-visitor-or-by-area)); with layouts chosen by visitor it has no effect.
+
+**Automatic** goes by what the page is, and shows the result in brackets. Pick an area to move the page.
+
 ### Controls placement
 
 Where a list page's search and pagination controls sit: **Inside the card** keeps

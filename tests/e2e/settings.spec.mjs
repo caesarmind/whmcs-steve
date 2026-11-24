@@ -381,10 +381,12 @@ test('layouts by area: each part of the site draws its own pick, whoever is look
   const store = `/index.php?rp=/store/${id.productGroupSlug}`;
 
   expect(await seen(page, '/'), 'guest, homepage').toEqual(['website', 'top']);
-  expect(await seen(page, '/knowledgebase'), 'guest, a support page').toEqual(['client', 'side']);
+  expect(await seen(page, '/knowledgebase'), 'guest, a page read before signing in').toEqual(['website', 'top']);
+  expect(await seen(page, '/login'), 'guest, sign-in').toEqual(['website', 'top']);
+  expect(await seen(page, '/submitticket.php'), 'guest, a portal page').toEqual(['client', 'side']);
   expect(await seen(page, store), 'guest, product listing on a store route').toEqual(['order', 'rail']);
   expect(await seen(page, '/cart.php?a=view'), 'guest, cart').toEqual(['order', 'rail']);
-  await clean(page, context, 'guest', ['/', '/knowledgebase', store]);
+  await clean(page, context, 'guest', ['/', '/knowledgebase', '/submitticket.php', store]);
 
   await loginClient(context.request, 'full');
   expect(await seen(page, '/clientarea.php'), 'client, dashboard').toEqual(['client', 'side']);
@@ -397,7 +399,8 @@ test('layouts by area: a page names its area and the mode is off by default', as
   // No mode stored: the area is still reported, and the visitor pick applies everywhere.
   set({ ...NEVER_BY_AREA, 'hadrian_active_layout_main-menu_guest': str('top'), 'hadrian_active_layout_main-menu_area_website': str('rail') });
   expect(await seen(page, '/'), 'homepage').toEqual(['website', 'top']);
-  expect(await seen(page, '/knowledgebase'), 'support page').toEqual(['client', 'top']);
+  expect(await seen(page, '/knowledgebase'), 'knowledgebase').toEqual(['website', 'top']);
+  expect(await seen(page, '/submitticket.php'), 'a portal page').toEqual(['client', 'top']);
   expect(await seen(page, '/cart.php?a=view'), 'cart').toEqual(['order', 'top']);
 });
 
@@ -432,7 +435,8 @@ test('Layouts admin: switching to "by area" starts each area from what its visit
     await expect(active('rail', 'client')).toBeVisible();
     expect(await seen(guest, '/'), 'the site did not change for a guest').toEqual(['website', 'top']);
     expect(await seen(guest, '/cart.php?a=view')).toEqual(['order', 'top']);
-    expect(await seen(guest, '/knowledgebase'), 'the client area now has one pick for everyone').toEqual(['client', 'rail']);
+    expect(await seen(guest, '/knowledgebase'), 'a guest reading the knowledgebase stays on the website pick').toEqual(['website', 'top']);
+    expect(await seen(guest, '/submitticket.php'), 'the client area now has one pick for everyone').toEqual(['client', 'rail']);
 
     // One click gives the order process a layout of its own.
     await card('sidebar').locator('button[data-lay-row="order"]').click();
@@ -449,11 +453,49 @@ test('Layouts admin: switching to "by area" starts each area from what its visit
     await expect(active('top', 'guest')).toBeVisible();
     await expect(active('rail', 'client')).toBeVisible();
     expect(await seen(guest, '/cart.php?a=view'), 'a guest in the cart is back on the guest pick').toEqual(['order', 'top']);
-    expect(await seen(guest, '/knowledgebase'), 'and on a support page too').toEqual(['client', 'top']);
+    expect(await seen(guest, '/submitticket.php'), 'and on a portal page too').toEqual(['client', 'top']);
 
     // Returning to "by area" finds the picks made there, not a fresh copy.
     await page.locator('.mt-lay-mode-seg button[value="area"]').click();
     await expect(active('sidebar', 'order'), 'the order pick from before survived').toBeVisible();
+  } finally {
+    await guestContext.close();
+  }
+});
+
+test('Pages admin: an admin can move a page to another area', async ({ page, context, browser }) => {
+  test.setTimeout(3 * 60_000);
+  set({
+    ...NEVER_BY_AREA,
+    hadrian_layout_mode: str('area'),
+    'hadrian_active_layout_main-menu_area_website': str('top'),
+    'hadrian_active_layout_main-menu_area_client': str('rail'),
+    'hadrian_active_layout_main-menu_area_order': str('sidebar'),
+  });
+  await loginAdmin(context.request);
+  const EDIT = '/admin/addonmodules.php?module=Hadrian&action=pages&sub=edit&page=knowledgebase';
+  const guestContext = await browser.newContext({ baseURL: BASE_URL });
+  const guest = await guestContext.newPage();
+  const area = page.locator('select[name="area"]');
+  const save = async value => {
+    await page.goto(EDIT);
+    await area.selectOption(value);
+    await Promise.all([page.waitForURL(/flash=saved/), area.evaluate(el => el.form.requestSubmit())]);
+  };
+  try {
+    await page.goto(EDIT);
+    await expect(area, 'nothing picked: the page follows its own rules').toHaveValue('');
+    await expect(area.locator('option').first(), 'and the editor says where that puts it').toHaveText('Automatic (Website)');
+    expect(await seen(guest, '/knowledgebase')).toEqual(['website', 'top']);
+
+    await save('client');
+    await page.goto(EDIT);
+    await expect(area, 'the pick is stored').toHaveValue('client');
+    expect(await seen(guest, '/knowledgebase'), 'the page moved to the client area and took its layout').toEqual(['client', 'rail']);
+    expect(await seen(guest, '/'), 'other pages are untouched').toEqual(['website', 'top']);
+
+    await save('');
+    expect(await seen(guest, '/knowledgebase'), 'Automatic puts it back').toEqual(['website', 'top']);
   } finally {
     await guestContext.close();
   }

@@ -8,7 +8,8 @@
  *   php tests/php/settings.php restore
  *
  * snapshot copies every hadrian_settings row and every hadrian_pages variant
- * of the hadrian template to tests/.local/settings-snapshot.json. restore puts
+ * and per-page settings blob of the hadrian template to
+ * tests/.local/settings-snapshot.json. restore puts
  * that state back EXACTLY (rows added since are deleted) and removes the file.
  * The preflight runs restore whenever the file exists, so a run that died
  * halfway through a settings test heals on the next run instead of leaving
@@ -53,7 +54,10 @@ switch ($cmd) {
             if (!$isCache($r->setting)) $settings[$r->setting] = [$r->value, $r->value_type];
         }
         $variants = DB::table('hadrian_pages')->where('template', TEMPLATE)->pluck('variant', 'page')->all();
-        file_put_contents($snapFile, json_encode(['takenAt' => $now, 'settings' => $settings, 'variants' => $variants], JSON_PRETTY_PRINT));
+        // The per-page settings blob (options, layout overrides, sub-nav, area),
+        // as stored: a test that saves through the page editor rewrites it.
+        $pageSettings = DB::table('hadrian_pages')->where('template', TEMPLATE)->pluck('settings', 'page')->all();
+        file_put_contents($snapFile, json_encode(['takenAt' => $now, 'settings' => $settings, 'variants' => $variants, 'pageSettings' => $pageSettings], JSON_PRETTY_PRINT));
         echo 'snapshot: ' . count($settings) . " settings\n";
         break;
 
@@ -88,6 +92,10 @@ switch ($cmd) {
         }
         foreach ($snap['variants'] as $page => $variant) {
             DB::table('hadrian_pages')->where('template', TEMPLATE)->where('page', $page)->update(['variant' => $variant]);
+        }
+        // Absent from a snapshot file written before this was added.
+        foreach (($snap['pageSettings'] ?? []) as $page => $blob) {
+            DB::table('hadrian_pages')->where('template', TEMPLATE)->where('page', $page)->update(['settings' => $blob]);
         }
         unlink($snapFile);
         echo "restored the settings snapshot from {$snap['takenAt']}\n";

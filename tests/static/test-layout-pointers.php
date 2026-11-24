@@ -70,8 +70,28 @@ namespace {
     same('the product listing served from a store route is an order step too', A::forPage('products', true, []), 'order');
     same('a page a module draws is the website', A::forPage('module-page', false, []), 'website');
     same('the dashboard is the client area', A::forPage('clientareahome', false, ['group' => 'Client Area']), 'client');
-    same('support pages are the client area', A::forPage('knowledgebase', false, ['group' => 'Support']), 'client');
-    same('a page nothing is known about is the client area', A::forPage('error/page-not-found', false, []), 'client');
+    same('support pages are the client area', A::forPage('supporttickets', false, ['group' => 'Support']), 'client');
+    same('a page nothing is known about is the client area', A::forPage('some-module-page', false, []), 'client');
+    // What a visitor meets before signing in belongs to the website.
+    same('sign-in and registration are the website', [A::forPage('login', false, ['group' => 'Authentication']), A::forPage('clientregister', false, ['group' => 'Authentication'])], ['website', 'website']);
+    same('a "no such address" page is the website', [A::forPage('error/page-not-found', false, []), A::forPage('error/unknown-routepath', false, [])], ['website', 'website']);
+    // The pick an admin makes in the page editor beats everything else.
+    same('an admin pick beats what the page declares', A::forPage('knowledgebase', false, ['group' => 'Support', 'area' => 'website'], 'client'), 'client');
+    same('and beats the cart flag', A::forPage('viewcart', true, [], 'website'), 'website');
+    same('an admin pick that is not an area is ignored', A::forPage('clientareahome', false, ['group' => 'Client Area'], 'moon'), 'client');
+    same('no admin pick leaves the page to its own rules', A::forPage('knowledgebase', false, ['group' => 'Support', 'area' => 'website'], ''), 'website');
+
+    // The shipped pages a guest reads say so themselves.
+    $pagesDir = dirname(__DIR__, 2) . '/hadrian/templates/hadrian/core/pages';
+    foreach (['knowledgebase', 'knowledgebasearticle', 'knowledgebasecat', 'announcements', 'viewannouncement', 'login', 'clientregister', 'homepage', 'contact'] as $guestPage) {
+        $meta = require $pagesDir . '/' . $guestPage . '/page.php';
+        same("{$guestPage} is filed under the website", A::forPage($guestPage, false, $meta), 'website');
+    }
+    foreach (['clientareahome', 'clientareainvoices', 'supporttickets', 'viewticket', 'clientareadetails'] as $portalPage) {
+        $meta = require $pagesDir . '/' . $portalPage . '/page.php';
+        same("{$portalPage} is filed under the client area", A::forPage($portalPage, false, $meta), 'client');
+    }
+    same('store-order is filed under the order process', A::forPage('store/order', true, require $pagesDir . '/store-order/page.php'), 'order');
     same('three areas, labelled and described', [array_keys(A::LABELS), array_keys(A::HELP)], [['website', 'client', 'order'], ['website', 'client', 'order']]);
 
     // --------------------------------------------------- by visitor (default)

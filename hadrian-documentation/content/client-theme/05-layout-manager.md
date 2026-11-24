@@ -79,8 +79,8 @@ Above the tabs, **Choose layouts by** sets what a pick applies to. There are two
 
 With **Area** selected, each layout card shows three rows instead of two:
 
-- **Website** - the homepage, the store landing pages, custom pages and pages made with the Page Builder.
-- **Client area** - the portal: dashboard, services, billing, support and account pages.
+- **Website** - what a visitor sees before signing in: the homepage, the store landing pages, custom pages and pages made with the Page Builder, plus sign-in, registration, password reset, the knowledgebase and announcements.
+- **Client area** - the portal: dashboard, services, billing, tickets and account pages.
 - **Order process** - product listings, product configuration, the cart and checkout.
 
 A top bar on the website, a sidebar in the client area and a plainer frame around checkout is three clicks.
@@ -88,12 +88,16 @@ A top bar on the website, a sidebar in the client area and a plainer frame aroun
 :::info What changes when you switch
 The first time you select **Area**, every area starts from what most of its visitors see now: the website and the order process take the guest pick, the client area takes the existing-client pick. A guest on the homepage or in the cart and a client in the portal see no difference.
 
-Two cases do change, because a pick no longer depends on who is looking. A guest on a client-area page, such as the knowledgebase or the login page, now gets the client-area pick. A signed-in client on the website or in the cart now gets those areas' picks. If your guest and existing-client picks were the same layout, nothing changes at all.
+Two cases do change, because a pick no longer depends on who is looking. A signed-in client on the website or in the cart now gets those areas' picks. A guest on one of the few portal pages they can reach, such as opening a ticket, now gets the client-area pick. If your guest and existing-client picks were the same layout, nothing changes at all.
 
 The two sets of picks are kept side by side, so switching back to **Visitor** restores the earlier ones.
 :::
 
-A page states which area it belongs to with an `area` key in its `page.php` (`website`, `client` or `order`). Pages without one are placed by what they are: order-form pages go to the order process, pages in the Public and Shop groups go to the website, and everything else goes to the client area.
+### Moving a page to another area
+
+Every page has an **Area** setting in **Pages**, under **Page settings**. **Automatic** goes by what the page is, and the setting shows where that puts it. Pick an area to override it, for example to give the knowledgebase the client-area layout.
+
+For your own pages, an `area` key in the page's `page.php` (`website`, `client` or `order`) sets the automatic answer. Pages without one are placed by what they are: pages in the Public, Shop and Authentication groups go to the website, order-form pages go to the order process, and everything else goes to the client area.
 
 ## Per-layout options
 

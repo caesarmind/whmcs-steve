@@ -7,6 +7,7 @@ use Hadrian\Controller\AbstractController;
 use Hadrian\Database\Migrator;
 use Hadrian\Helpers\AddonHelper;
 use Hadrian\Helpers\LocaleHelper;
+use Hadrian\Helpers\PageArea;
 use Hadrian\Helpers\PageUrlResolver;
 use Hadrian\Helpers\ThemeManifest;
 use Hadrian\Models\Settings;
@@ -338,6 +339,11 @@ final class PagesController extends AbstractController
             'visibility'       => $options['visibility'],
             'subnav'           => $options['subnav'],
             'svclayout'          => $options['svclayout'],
+            // Which part of the site the page belongs to: '' follows the
+            // page's own nature (areaAutomatic), or an admin pick.
+            'area'             => $options['area'],
+            'areaChoices'      => PageArea::LABELS,
+            'areaAutomatic'    => PageArea::forPage($page, false, is_array($meta) ? $meta : []),
             'svcLayoutApplicable' => in_array($page, Template::SVC_LAYOUT_PAGES, true),
             'seo'              => $options['seo'],
             'seoUrl'           => $options['url'],
@@ -386,6 +392,9 @@ final class PagesController extends AbstractController
         if (!in_array($visibility, self::VALID_VISIBILITY, true)) { $visibility = 'public'; }
         if (!in_array($subnav,     self::VALID_SUBNAV,     true)) { $subnav     = 'inherit'; }
         if (!in_array($svclayout,  self::VALID_SVCLAYOUT,  true)) { $svclayout  = 'inherit'; }
+        // '' = automatic. Anything that is not one of the three areas is automatic too.
+        $area = (string)($_POST['area'] ?? '');
+        if (!PageArea::valid($area)) { $area = ''; }
 
         // SEO title/description are per-language maps keyed by WHMCS language
         // name; the editor submits seo_title[<lang>] / seo_description[<lang>].
@@ -478,6 +487,7 @@ final class PagesController extends AbstractController
                 'layout_overrides' => $layoutOverrides,
                 'subnav'           => $subnav,
                 'svclayout'        => $svclayout,
+                'area'             => $area,
             ],
         ]);
 
@@ -806,6 +816,7 @@ final class PagesController extends AbstractController
             'visibility' => (string)($row['visibility'] ?? 'public'),
             'subnav'     => (string)($settings['subnav'] ?? 'inherit'),
             'svclayout'  => (string)($settings['svclayout'] ?? 'inherit'),
+            'area'       => PageArea::valid((string)($settings['area'] ?? '')) ? (string)$settings['area'] : '',
             'seo' => [
                 'title'        => $titleFields,
                 'description'  => $descFields,

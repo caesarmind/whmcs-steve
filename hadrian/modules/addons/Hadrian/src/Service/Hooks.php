@@ -102,7 +102,8 @@ final class Hooks
         $this->area  = PageArea::forPage(
             $currentPage,
             !empty($vars['inShoppingCart']) || (string)($vars['filename'] ?? '') === 'cart',
-            is_array($pages[$currentPage]['meta'] ?? null) ? $pages[$currentPage]['meta'] : []
+            is_array($pages[$currentPage]['meta'] ?? null) ? $pages[$currentPage]['meta'] : [],
+            (string)($pages[$currentPage]['area'] ?? '')
         );
 
         $layouts  = [
@@ -2900,6 +2901,7 @@ final class Hooks
                 'indexing'         => $row['indexing'] ?? null,
                 'visibility'       => $row['visibility'] ?? null,
                 'subnav'           => $rowSettings['subnav'] ?? null,
+                'area'             => $rowSettings['area'] ?? null,
                 'svclayout'        => $rowSettings['svclayout'] ?? null,
                 'options'          => is_array($rowSettings['options'] ?? null) ? $rowSettings['options'] : [],
                 'layout_overrides' => is_array($rowSettings['layout_overrides'] ?? null) ? $rowSettings['layout_overrides'] : [],
@@ -2944,6 +2946,9 @@ final class Hooks
                 'social_image' => (string)($stored['seo']['social_image'] ?? ''),
             ],
             'options' => is_array($stored['options'] ?? null) ? $stored['options'] : [],
+            // An admin's pick of which area this page belongs to; '' leaves
+            // it to PageArea.
+            'area'    => PageArea::valid((string)($stored['area'] ?? '')) ? (string)$stored['area'] : '',
             'subnav'  => in_array((string)($stored['subnav'] ?? 'inherit'), ['inherit', 'on', 'off'], true)
                 ? (string)($stored['subnav'] ?? 'inherit') : 'inherit',
             'svclayout' => in_array((string)($stored['svclayout'] ?? 'inherit'), ['inherit', 'inside', 'outside'], true)
