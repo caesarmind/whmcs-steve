@@ -335,4 +335,17 @@ final class Bridge
             ? \Hadrian\Helpers\Extensions::all()
             : [];
     }
+
+    /** Hadrian's version (core/hadrian.php), for the version pill in the shared admin header. */
+    public static function themeVersion(): string
+    {
+        if (!self::boot() || !class_exists('\Hadrian\Helpers\AddonHelper')) {
+            return '';
+        }
+        try {
+            return (string)(\Hadrian\Helpers\AddonHelper::getTemplate()?->getVersion() ?? '');
+        } catch (\Throwable $e) {
+            return '';
+        }
+    }
 }
