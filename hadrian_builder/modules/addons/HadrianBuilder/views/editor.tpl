@@ -9,7 +9,7 @@
 <div class="hbx" id="hbx">
 
     <div class="hbx-bar">
-        <a class="mt-back" href="{$base}">
+        <a class="mt-back" href="{$pagesUrl|escape}">
             <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
             Pages
         </a>

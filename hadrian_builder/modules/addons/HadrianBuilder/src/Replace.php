@@ -63,9 +63,11 @@ final class Replace
      * Anything else (a page number, a search, an action) means the visitor
      * wants something only the theme's page can give, so it is left alone.
      * "rp" is how WHMCS carries the path itself when URLs are not rewritten;
-     * the path is checked separately.
+     * the path is checked separately. "hadrian_customize" is the token of
+     * Hadrian's customizer, whose preview frame must show the same page a
+     * visitor gets.
      */
-    private const NEUTRAL_QUERY = ['language', 'currency', 'rp', 'systpl', 'carttpl'];
+    private const NEUTRAL_QUERY = ['language', 'currency', 'rp', 'systpl', 'carttpl', 'hadrian_customize'];
 
     public static function mode(): string
     {

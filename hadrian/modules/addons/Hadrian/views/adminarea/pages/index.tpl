@@ -45,6 +45,8 @@
 
 {* Between the tab strip and the group cards, so the confirmation sits with the
    content it describes rather than above the search box. *}
+{if $extOk|default:''}<div class="mt-alert mt-alert-success" data-ext-flash>{$extOk|escape}</div>{/if}
+{if $extErr|default:''}<div class="mt-alert mt-alert-danger" data-ext-flash>{$extErr|escape}</div>{/if}
 {if $flashMsg == 'saved'}
     <div class="mt-alert mt-alert-success mt-alert-lead">
         <span class="mt-alert-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span>
@@ -175,7 +177,24 @@
                 <h2 class="mt-section-title">{$g|escape} pages</h2>
                 <div class="mt-section-sub" data-group-count data-total="{$groupRows|count}">{$groupRows|count} pages</div>
             </div>
+            {* A group an extension module owns: a new page is made by that
+               module, from a name typed here. The form posts to the module,
+               which answers by opening its editor on the new page. *}
+            {if !empty($extensionGroups[$g]) && $extensionGroups[$g].createUrl}
+                <form method="post" action="{$extensionGroups[$g].createUrl|escape}" class="mt-section-tools" data-group-create style="gap:8px">
+                    <input type="text" class="mt-input" name="name" maxlength="120" required
+                           placeholder="{$extensionGroups[$g].createPlaceholder|escape}" aria-label="Name of the new page"
+                           style="width:260px;padding:8px 12px;font-size:13px">
+                    <button type="submit" class="mt-btn mt-btn-primary mt-btn-sm">{$extensionGroups[$g].createLabel|escape}</button>
+                </form>
+            {/if}
         </header>
+
+        {* The owning module's own controls for this tab, rendered by the
+           module (Helpers\ExtensionPages, "panel"). *}
+        {if !empty($extensionGroups[$g]) && $extensionGroups[$g].panelHtml}
+            <div data-group-extension>{$extensionGroups[$g].panelHtml nofilter}</div>
+        {/if}
 
         {if $groupRows|count}
             <div class="mt-pagerow-scroll">
@@ -204,12 +223,12 @@
                                  data-search="{$page.label|lower|escape} {$page.description|lower|escape} {$page.name|lower|escape} {$page.variantLabel|lower|escape}">
                                 <a class="mt-pagerow-main mt-pagerow-edit"
                                    href="?module=Hadrian&amp;action=pages&amp;sub=edit&amp;page={$page.name|escape:'url'}">
-                                    <span class="mt-pagerow-name">{$page.label|escape}</span>
+                                    <span class="mt-pagerow-name">{$page.label|escape}{if !empty($page.notes)}{foreach $page.notes as $mtNote} <span class="mt-badge mt-badge-primary" data-page-note>{$mtNote|escape}</span>{/foreach}{/if}</span>
                                     {if $page.description}
                                         <span class="mt-pagerow-desc">{$page.description|escape}</span>
                                     {/if}
                                 </a>
-                                <span class="mt-pagerow-variant">{$page.variantLabel|escape}</span>
+                                <span class="mt-pagerow-variant">{$page.variantLabel|escape}{if !empty($page.extension)} <span class="mt-badge {if $page.extension.live}mt-badge-success{else}mt-badge-warning{/if}" data-page-status>{$page.extension.status|escape}</span>{/if}</span>
                                 <span>
                                     {if $page.hasSeo}
                                         <span class="mt-badge mt-badge-primary">SEO</span>
@@ -241,6 +260,13 @@
                                    the editor. plain |escape, never |escape:'url'
                                    -- the value carries its own ?a=b query. *}
                                 <span class="mt-pagerow-open">
+                                    {* A page an extension module owns: its
+                                       content is edited there. The row itself
+                                       still opens these settings. *}
+                                    {if !empty($page.extension) && $page.extension.editUrl}
+                                        <a class="mt-pagerow-openlink" data-page-content href="{$page.extension.editUrl|escape}"
+                                           title="Opens this page in {$page.extension.label|escape}.">Edit content</a>
+                                    {/if}
                                     {if $page.publicUrl}
                                         <a class="mt-pagerow-openlink" href="{$page.publicUrl|escape}"
                                            target="_blank" rel="noopener"

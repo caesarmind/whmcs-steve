@@ -72,6 +72,28 @@ final class Page
     }
 
     /**
+     * Every page with what the rest of the site needs to know about it: its
+     * address, status, what it replaces and its meta. No documents.
+     *
+     * @return list<array<string,mixed>>
+     */
+    public static function forSite(): array
+    {
+        try {
+            $rows = \WHMCS\Database\Capsule::table(self::TABLE)
+                ->orderBy('id')
+                ->get(['id', 'slug', 'name', 'status', 'meta', 'replaces', 'replace_rule']);
+        } catch (\Throwable $e) {
+            return [];
+        }
+        $out = [];
+        foreach ($rows as $row) {
+            $out[] = self::hydrate($row);
+        }
+        return $out;
+    }
+
+    /**
      * The page that names this theme page as the one it replaces, or null.
      * The router calls this on client requests: a table that predates the
      * column means "nothing replaces it", not an error.

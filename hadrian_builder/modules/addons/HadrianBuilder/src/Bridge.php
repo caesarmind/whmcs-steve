@@ -228,6 +228,49 @@ final class Bridge
         }
     }
 
+    /** Hadrian is recent enough to list a module's pages in its Pages screen. */
+    public static function listsPages(): bool
+    {
+        return self::boot() && class_exists('\\Hadrian\\Helpers\\ExtensionPages');
+    }
+
+    /**
+     * Report this module's pages to Hadrian's Pages screen (see SitePages).
+     * An older Hadrian has no such list; built pages then work as before,
+     * with the settings this module has itself.
+     *
+     * @param array<string,mixed> $module
+     */
+    public static function registerPages(array $module): void
+    {
+        if (self::listsPages()) {
+            \Hadrian\Helpers\ExtensionPages::register($module);
+        }
+    }
+
+    /**
+     * A built page was created, changed, published or deleted. Bring
+     * Hadrian's page registry up to date now, so the sitemap and the Pages
+     * screen do not wait for someone to open Pages. Never throws: the change
+     * itself is already saved.
+     */
+    public static function pagesChanged(): void
+    {
+        if (!self::listsPages() || !class_exists('\\Hadrian\\Service\\PageRegistry')
+            || !method_exists('\\Hadrian\\Service\\PageRegistry', 'syncExtensionPages')) {
+            return;
+        }
+        try {
+            $template = \Hadrian\Helpers\AddonHelper::getTemplate();
+            if ($template !== null) {
+                \Hadrian\Helpers\ExtensionPages::refresh();
+                \Hadrian\Service\PageRegistry::syncExtensionPages($template);
+            }
+        } catch (\Throwable $e) {
+            error_log('Hadrian Page Builder: could not update Hadrian\'s page list: ' . $e->getMessage());
+        }
+    }
+
     /** @return list<array<string,string>> */
     public static function extensionNav(): array
     {

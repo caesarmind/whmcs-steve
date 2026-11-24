@@ -65,6 +65,10 @@ require is_file($admin . '/src/Helpers/IntegrityHashes.php')
     ? $admin . '/src/Helpers/IntegrityHashes.php'
     : $admin . '/src/Helpers/IntegrityHashes.fallback.php';
 require $admin . '/src/Helpers/ThemeManifest.php';
+// Template::getPages() also lists pages an extension module adds; none is
+// registered here, so the list is the theme's own.
+require $admin . '/src/Helpers/PageArea.php';
+require $admin . '/src/Helpers/ExtensionPages.php';
 require $admin . '/src/Template/PagesCache.php';
 require $admin . '/src/Template/Template.php';
 

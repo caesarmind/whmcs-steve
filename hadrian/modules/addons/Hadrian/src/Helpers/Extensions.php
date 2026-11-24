@@ -33,6 +33,9 @@ final class Extensions
      *        name        full name, for the Extensions page (defaults to label)
      *        description one line, for the Extensions page
      *        version     shown beside the name
+     *        tab         false for a module with no screen of its own to open
+     *                    (its pages live in Hadrian's Pages, say). It is still
+     *                    listed on the Extensions page. Default true.
      */
     public static function register(array $entry): void
     {
@@ -58,6 +61,7 @@ final class Extensions
             'description' => $cut(trim((string)($entry['description'] ?? '')), 200),
             'version'     => $cut(trim((string)($entry['version'] ?? '')), 20),
             'url'         => $url,
+            'tab'         => ($entry['tab'] ?? true) === false ? '0' : '1',
         ];
     }
 

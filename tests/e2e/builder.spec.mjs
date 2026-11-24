@@ -3,7 +3,9 @@
 // A SEPARATE addon module (hadrian_builder/, mounted at modules/addons/HadrianBuilder)
 // that requires Hadrian. What is checked here is what only a browser and a
 // real WHMCS can show:
-//   - it plugs into Hadrian's admin (a tab, a card) without living inside it
+//   - it plugs into Hadrian's admin without living inside it: a card on the
+//     Extensions page, and no screen of its own. Its pages are listed, made,
+//     replaced and deleted from Hadrian's Pages; only the editor is here
 //   - a page built in the editor is served at its address, inside the theme,
 //     with no rewrite rule added anywhere
 //   - a draft is never public: saving does not change the live page, the
@@ -13,6 +15,8 @@
 //   - a built page cannot take over an address WHMCS answers
 //   - unless the admin says so: a built page can stand in for a theme page,
 //     switched for the whole site or page by page, and switched back
+//   - a built page is a row in Hadrian's Pages screen, and what is set there
+//     (visibility, SEO) applies to it; the sitemap lists it only while live
 //   - nothing answers a visitor who is not signed in, and the writes are
 //     CSRF-protected for one who is
 //
@@ -28,6 +32,9 @@ import { loginAdmin } from './helpers.mjs';
 
 const MODULE = '/admin/addonmodules.php?module=HadrianBuilder';
 const HADRIAN = '/admin/addonmodules.php?module=Hadrian';
+// Where built pages are listed and made: the Built tab of Hadrian's Pages.
+const PAGES = `${HADRIAN}&action=pages#tab=Built`;
+const settingsOf = id => `${HADRIAN}&action=pages&sub=edit&page=built-${id}`;
 
 const builder = (...args) => JSON.parse(execFileSync(PHP, [path.join(TESTS_DIR, 'php', 'builder.php'), ...args], { encoding: 'utf8' }).trim());
 const pages = () => builder('state');
@@ -55,11 +62,12 @@ const addSection = async (page, label) => {
 };
 const sectionTypes = page => page.evaluate(() => window.hbBuilder.state.doc.sections.map(s => s.type));
 
-/** Make a page through the list screen and land in its editor. Returns its id. */
+/** Make a page from the Built tab of Pages and land in its editor. Returns its id. */
 async function createPage(page, name) {
-  await page.goto(MODULE);
-  await page.locator('#pb-name').fill(name);
-  await page.getByRole('button', { name: 'Create page' }).click();
+  await page.goto(PAGES);
+  const form = page.locator('[data-group-panel="Built"] [data-group-create]');
+  await form.locator('input[name="name"]').fill(name);
+  await form.getByRole('button', { name: 'Create page' }).click();
   await expect(page.locator('#hbx')).toBeVisible();
   await settled(page);
   return page.evaluate(() => JSON.parse(document.getElementById('hbx-boot').textContent).id);
@@ -72,6 +80,13 @@ async function saveDraft(page) {
   await page.locator('#hbx-save').click();
   await expect(page.locator('#hbx-notice .mt-alert-success')).toContainText('Draft saved');
 }
+/** Delete a built page from its settings in Pages, where the button lives. */
+async function deletePage(page, id) {
+  await page.goto(settingsOf(id));
+  page.once('dialog', dialog => dialog.accept());
+  await page.locator('[data-page-extension-panel] [data-pb-delete]').click();
+  await expect(page.locator('[data-ext-flash]')).toContainText('was deleted');
+}
 async function publish(page) {
   await page.locator('#hbx-publish').click();
   await expect(page.locator('#hbx-notice .mt-alert-success')).toContainText('Published');
@@ -82,18 +97,27 @@ async function visitor(playwright) {
 }
 
 test('it is its own module, and it plugs into the Hadrian admin', async ({ page }) => {
+  // No tab of its own: it has no list screen, its pages are in Hadrian's Pages.
   await page.goto(`${HADRIAN}&action=settings`);
-  const tab = page.locator('.mt-topnav-item', { hasText: /^Builder$/ });
-  await expect(tab, 'Hadrian navigation has a Builder tab').toHaveCount(1);
-  expect(await tab.getAttribute('href'), 'which leads to the other module, not to a Hadrian action').toBe('?module=HadrianBuilder');
+  await expect(page.locator('.mt-topnav-item', { hasText: /^Builder$/ }), 'Hadrian navigation has no Builder tab').toHaveCount(0);
 
+  // It is still a module of its own, listed as one.
   await page.goto(`${HADRIAN}&action=extensions`);
   await expect(page.locator('.mt-card-title', { hasText: 'Page Builder' })).toBeVisible();
 
+  // Its own address answers by opening the Built tab of Pages.
   await page.goto(MODULE);
+  await expect(page).toHaveURL(/module=Hadrian&action=pages#tab=Built$/);
+  const built = page.locator('[data-group-panel="Built"]');
+  await expect(built, 'the Built tab is open').toBeVisible();
+  await expect(built.locator('[data-group-create]'), 'with the form that makes a page').toBeVisible();
+  await expect(built.locator('#pb-site'), 'and the switch for who serves the website').toBeVisible();
+
+  // The editor is the one screen that is the module's own, drawn in Hadrian's shell.
+  await createPage(page, 'E2E Shell');
   await expect(page).toHaveTitle('WHMCS - Hadrian Page Builder');
-  await expect(page.locator('.mt-page-title')).toHaveText('Page builder');
-  await expect(page.locator('.mt-topnav-item.is-active')).toHaveText('Builder');
+  await expect(page.locator('.mt-topnav-item.is-active'), 'it sits under Pages').toHaveText('Pages');
+  await expect(page.locator('.hbx-bar .mt-back'), 'and leads back there').toHaveAttribute('href', '?module=Hadrian&action=pages#tab=Built');
   // The shared header shows the theme's real version here too, as on Hadrian's own pages.
   await expect(page.locator('.mt-brand-ver'), 'the header carries the theme version').toHaveText(/^v\d+\.\d+/);
 });
@@ -315,7 +339,7 @@ test('a built page cannot take over an address WHMCS answers', async ({ page, pl
 test('a built page replaces a theme page when the site, or the page, says so', async ({ page, playwright }) => {
   const MARK = 'E2E replaces announcements';
   const before = builder('mode').mode;
-  await createPage(page, 'E2E Replace');
+  const id = await createPage(page, 'E2E Replace');
   await addSection(page, 'Closing call to action');
   await field(page, 'Headline').locator('input').fill(MARK);
   await setAddress(page, 'e2e-replace');
@@ -323,21 +347,35 @@ test('a built page replaces a theme page when the site, or the page, says so', a
 
   const anon = await visitor(playwright);
   const themePage = async () => (await anon.get('/announcements')).text();
-  const row = () => page.locator('tr', { has: page.locator('.mt-pb-name', { hasText: 'E2E Replace' }) });
+  // What a page replaces is set on its settings in Pages; who serves the
+  // website is set at the top of the Built tab.
+  const panel = page.locator('[data-page-extension-panel]');
+  const state = panel.locator('[data-pb-state]');
+  const row = () => page.locator('[data-group-panel="Built"] [data-page-row]', { has: page.locator('.mt-pagerow-name', { hasText: 'E2E Replace' }) });
+  const siteServedBy = async mode => {
+    await page.goto(PAGES);
+    await page.locator(`#pb-site button[value="${mode}"]`).click();
+    await expect(page.locator('[data-ext-flash]')).toContainText(mode === 'builder' ? 'served by Page Builder' : 'served by the theme');
+  };
   try {
     builder('mode', 'theme');
-    await page.goto(MODULE);
-    await expect(row().locator('.mt-badge')).toHaveText('Published');
+    await page.goto(PAGES);
+    await expect(row().locator('[data-page-status]')).toHaveText('Published');
 
     // Point it at Announcements. The site is on Theme, so it only stands by.
-    await row().locator('select[name="replaces"]').selectOption('announcements');
-    await expect(page.locator('.mt-alert-success')).toContainText('now replaces Announcements');
-    await expect(row().locator('.mt-badge')).toHaveText('Standby');
+    await page.goto(settingsOf(id));
+    await expect(state, 'replaces nothing yet').toHaveCount(0);
+    await panel.locator('select[name="replaces"]').selectOption('announcements');
+    await expect(page.locator('[data-ext-flash]')).toContainText('now replaces Announcements');
+    await expect(page, 'and stays on the page it was set on').toHaveURL(new RegExp(`page=built-${id}`));
+    await expect(state).toHaveText('Standby');
     expect(await themePage(), 'site on Theme: the theme page shows').not.toContain(MARK);
 
     // Flip the site. Now the built page is what visitors get there.
-    await page.locator('#pb-site button[value="builder"]').click();
-    await expect(row().locator('.mt-badge')).toHaveText('Serving');
+    await siteServedBy('builder');
+    await expect(row().locator('[data-page-status]')).toHaveText('Serving');
+    await expect(page.locator('[data-group-panel="Support"] [data-page-row]', { has: page.locator('.mt-pagerow-name', { hasText: /^Announcements/ }) }).locator('[data-page-note]'),
+      'the theme page it replaces says so on its own row').toHaveText('Replaced by E2E Replace');
     const html = await themePage();
     expect(html, 'site on Page Builder: the built page shows').toContain(MARK);
     expect(html, 'drawn through the theme').toContain('data-tpl="module-page"');
@@ -351,23 +389,100 @@ test('a built page replaces a theme page when the site, or the page, says so', a
     expect(await (await anon.get('/e2e-replace')).text()).toContain(MARK);
 
     // The exception: "Never" keeps this one page on the theme.
-    await row().locator('select[name="replace_rule"]').selectOption('never');
-    await expect(row().locator('.mt-badge')).toHaveText('Standby');
+    await page.goto(settingsOf(id));
+    await expect(state).toHaveText('Serving');
+    await panel.locator('select[name="replace_rule"]').selectOption('never');
+    await expect(state).toHaveText('Standby');
     expect(await themePage(), 'rule Never: the theme page shows').not.toContain(MARK);
 
     // "Always" serves it even with the site back on Theme.
-    await row().locator('select[name="replace_rule"]').selectOption('always');
-    await page.locator('#pb-site button[value="theme"]').click();
-    await expect(row().locator('.mt-badge')).toHaveText('Serving');
+    await panel.locator('select[name="replace_rule"]').selectOption('always');
+    await expect(state).toHaveText('Serving');
+    await siteServedBy('theme');
+    await expect(row().locator('[data-page-status]')).toHaveText('Serving');
     expect(await themePage(), 'rule Always, site on Theme: the built page shows').toContain(MARK);
 
-    // Unpublished, it cannot serve; the theme page is back with nothing lost.
-    await row().locator('select[name="replaces"]').selectOption('');
-    await expect(page.locator('.mt-alert-success')).toContainText('no longer replaces');
+    // Let go of it: the theme page is back with nothing lost.
+    await page.goto(settingsOf(id));
+    await panel.locator('select[name="replaces"]').selectOption('');
+    await expect(page.locator('[data-ext-flash]')).toContainText('no longer replaces');
     expect(await themePage(), 'let go: the theme page shows').not.toContain(MARK);
   } finally {
     await anon.dispose();
     builder('mode', before);
+  }
+});
+
+test("a built page is a row in Hadrian's Pages, and what is set there applies to it", async ({ page, playwright }) => {
+  const MARK = 'E2E listed in Pages';
+  const id = await createPage(page, 'E2E Listed');
+  await addSection(page, 'Closing call to action');
+  await field(page, 'Headline').locator('input').fill(MARK);
+  await setAddress(page, 'e2e-listed');
+  await saveDraft(page);
+
+  const SETTINGS = settingsOf(id);
+  const row = () => page.locator('[data-group-panel="Built"] [data-page-row]', { has: page.locator('.mt-pagerow-name', { hasText: 'E2E Listed' }) });
+  const anon = await visitor(playwright);
+  const saveSettings = async fill => {
+    await page.goto(SETTINGS);
+    await fill();
+    await Promise.all([page.waitForURL(/flash=saved/), page.locator('select[name="visibility"]').evaluate(el => el.form.requestSubmit())]);
+  };
+
+  try {
+    // A draft: listed, but not live and not in the sitemap.
+    expect(builder('registry', String(id)), 'saving the draft gave it a row').toMatchObject({ url: 'e2e-listed', group: 'Built', published: false, inSitemap: false });
+    await page.goto(PAGES);
+    await expect(row().locator('[data-page-status]'), 'the list says it is a draft').toHaveText('Draft');
+    await expect(row().locator('[data-page-content]'), 'and links to where its content is edited').toHaveAttribute('href', `?module=HadrianBuilder&action=edit&id=${id}`);
+
+    // Published: live, and in the sitemap.
+    await page.goto(`${MODULE}&action=edit&id=${id}`);
+    await settled(page);
+    await publish(page);
+    expect(builder('registry', String(id)), 'publishing made it live').toMatchObject({ published: true, visibility: 'public', inSitemap: true });
+    await page.goto(PAGES);
+    await expect(row().locator('[data-page-status]')).toHaveText('Published');
+    expect((await anon.get('/e2e-listed')).status(), 'a visitor reaches it').toBe(200);
+
+    // Its settings screen is Hadrian's own page editor.
+    await page.goto(SETTINGS);
+    await expect(page.locator('[data-page-extension]'), 'which says where the content is made').toContainText('Page Builder');
+    await expect(page.locator('select[name="area"] option').first(), 'a built page is part of the website').toHaveText('Automatic (Website)');
+
+    // Visibility set in Pages is enforced on the built page.
+    await saveSettings(() => page.locator('select[name="visibility"]').selectOption('auth'));
+    const gated = await anon.get('/e2e-listed', { maxRedirects: 0 });
+    expect(gated.status(), 'signed-out visitors are sent to sign in').toBe(302);
+    expect(gated.headers().location, 'to the login page').toMatch(/login/);
+    expect(builder('registry', String(id)).inSitemap, 'and the page leaves the sitemap').toBe(false);
+
+    // Public again, with a description written in Pages.
+    await saveSettings(async () => {
+      await page.locator('select[name="visibility"]').selectOption('public');
+      await page.locator('textarea[name^="seo_description["]').first().evaluate((el, v) => { el.value = v; }, 'E2E described in Pages');
+    });
+    const html = await (await anon.get('/e2e-listed')).text();
+    expect(html, 'the page is back').toContain(MARK);
+    expect(html, 'with the description set in Pages').toMatch(/<meta name="description" content="E2E described in Pages"/);
+
+    // Unpublished: the row stays (so do its settings) but it is not live.
+    await page.goto(`${MODULE}&action=edit&id=${id}`);
+    await settled(page);
+    page.once('dialog', dialog => dialog.accept());
+    await page.locator('#hbx-pagebtn').click();
+    await page.getByRole('button', { name: 'Take this page offline' }).click();
+    await expect(page.locator('#hbx-status')).toHaveText('Draft');
+    expect(builder('registry', String(id)), 'unpublishing takes it out of the sitemap').toMatchObject({ published: false, inSitemap: false });
+
+    // Deleted from its settings: gone from the list, and its row with it.
+    await deletePage(page, id);
+    await expect(page, 'deleting lands back on the Built tab').toHaveURL(/action=pages&ext_ok=.*#tab=Built$/);
+    await expect(row()).toHaveCount(0);
+    expect(builder('registry', String(id)), 'its row went with it').toBeNull();
+  } finally {
+    await anon.dispose();
   }
 });
 
@@ -417,10 +532,7 @@ test('every write is refused without the admin CSRF token', async ({ page }) => 
   await page.request.post(`${MODULE}&action=delete`, { form: { token: 'not-the-token', id: String(id) } });
   expect(JSON.stringify(pages()), 'a forged write changed nothing').toBe(before);
 
-  // With the real token, delete works and the page is gone from the list.
-  page.once('dialog', d => d.accept());
-  await page.goto(MODULE);
-  await page.locator('tr', { hasText: 'E2E Token' }).getByRole('button', { name: 'Delete' }).click();
-  await expect(page.locator('.mt-alert-success')).toContainText('was deleted');
+  // With the real token, delete works and the page is gone.
+  await deletePage(page, id);
   expect(pages().some(p => p.id === id)).toBe(false);
 });

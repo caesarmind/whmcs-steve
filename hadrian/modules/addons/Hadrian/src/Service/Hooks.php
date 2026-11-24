@@ -92,7 +92,7 @@ final class Hooks
         if ($template === null || $page === '') {
             return null;
         }
-        $key      = self::pageKey($page);
+        $key      = self::pageKey($page, $vars);
         $row      = \Hadrian\Models\Page::get($template->getName(), $key);
         $settings = is_array($row['settings'] ?? null) ? $row['settings'] : [];
         $picked   = (string)($settings['area'] ?? '');
@@ -118,8 +118,13 @@ final class Hooks
      * 'store-<slug>' and 'store-<slug>-<sub>', beside every other page in
      * core/pages/.
      */
-    private static function pageKey(string $templatefile): string
+    private static function pageKey(string $templatefile, array $vars = []): string
     {
+        // A page an extension module draws through module-page.tpl has a
+        // registry row of its own (Helpers\ExtensionPages).
+        if ($templatefile === \Hadrian\Helpers\ExtensionPages::TEMPLATE) {
+            return \Hadrian\Helpers\ExtensionPages::keyFor($vars) ?? $templatefile;
+        }
         if (preg_match('#^store/([^/]+)(?:/(\w+))?$#', $templatefile, $m)) {
             $sub = $m[2] ?? '';
             return ($sub !== '' && $sub !== 'index')
@@ -280,6 +285,10 @@ final class Hooks
             $page = (string)($vars['templatefile'] ?? '');
             if ($page === '') {
                 return;
+            }
+            // An extension module's page is gated by its own row.
+            if ($page === \Hadrian\Helpers\ExtensionPages::TEMPLATE) {
+                $page = self::pageKey($page, $vars);
             }
             $row = Page::get($template->getName(), $page);
             if ($row === null) {
@@ -2933,8 +2942,9 @@ final class Hooks
         }
 
         // Nexus-style store paths ('store/<slug>/index') become the flat
-        // 'store-<slug>' name the rest of this method works with.
-        $page = self::pageKey($page);
+        // 'store-<slug>' name the rest of this method works with, and an
+        // extension module's page becomes its own key.
+        $page = self::pageKey($page, $vars);
 
         $pageMeta = $template->getPageMeta($page);
 

@@ -43,6 +43,8 @@
 
 {* Same icon-chip alert as the Pages list, so a save reads identically whether
    you land back on the list or stay on the editor. *}
+{if $extOk|default:''}<div class="mt-alert mt-alert-success" data-ext-flash>{$extOk|escape}</div>{/if}
+{if $extErr|default:''}<div class="mt-alert mt-alert-danger" data-ext-flash>{$extErr|escape}</div>{/if}
 {if $flashMsg == 'saved'}
     <div class="mt-alert mt-alert-success mt-alert-lead">
         <span class="mt-alert-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg></span>
@@ -188,6 +190,16 @@
                             {/if}
                         </label>
                     {/foreach}
+                </div>
+            {elseif !empty($extension)}
+                {* A page an extension module owns. What is ON the page is made
+                   in that module; everything else on this screen applies to it
+                   as to any page. *}
+                <div class="mt-pd-none" data-page-extension>
+                    This page is made in {$extension.label|escape}, which draws it inside the theme. Its address and content are set there.
+                    {if $extension.editUrl}
+                        <a class="mt-btn mt-btn-secondary mt-btn-sm" style="margin-left:8px" href="{$extension.editUrl|escape}">Edit content</a>
+                    {/if}
                 </div>
             {else}
                 <div class="mt-pd-none">No variants found under <code>core/pages/{$page|escape}/</code>.</div>
@@ -526,6 +538,16 @@
        SEO bulk modal existing (it renders only when there are 2+ languages). *}
     {include file="includes/savebar.tpl" label="Save changes"}
 </form>
+
+{* A page an extension module owns: the module's own controls for it, rendered
+   by the module. Outside the form above on purpose: these are the module's
+   own forms and post to the module, not to Save changes. *}
+{if !empty($extensionPanel)}
+    <div class="mt-panel pad" data-page-extension-panel style="margin-top:20px">
+        <div class="mt-subhead">{$extension.label|default:'Extension'|escape}</div>
+        {$extensionPanel nofilter}
+    </div>
+{/if}
 
 {literal}
 <script>

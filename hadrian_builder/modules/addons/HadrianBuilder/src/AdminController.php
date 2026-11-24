@@ -32,8 +32,12 @@ final class AdminController
     public const MODULE  = 'HadrianBuilder';
     public const BASE    = '?module=HadrianBuilder';
 
-    /** What Hadrian's navigation highlights for this module's pages. */
-    public const NAV_KEY = 'ext-builder';
+    /**
+     * What Hadrian's navigation highlights while this module's editor is
+     * open. The module has no tab of its own: its pages are listed in
+     * Hadrian's Pages (see SitePages), so the editor belongs under that tab.
+     */
+    public const NAV_KEY = 'pages';
 
     public function dispatch(): string
     {
@@ -57,45 +61,26 @@ final class AdminController
         if (!Bridge::available()) {
             return $this->unavailable();
         }
+        // The list of built pages, the site switch and the replace rules are
+        // drawn inside Hadrian's Pages screen. An older Hadrian has no such
+        // place for them.
+        if (!Bridge::listsPages()) {
+            return $this->unavailable('This version of Hadrian Page Builder lists its pages in Hadrian\'s Pages screen, which the installed Hadrian addon does not offer yet. Update Hadrian, then come back here.');
+        }
         return match ($action) {
             'edit'   => $this->edit(),
             'create' => $this->create(),
             'delete' => $this->delete(),
             'mode'    => $this->setMode(),
             'replace' => $this->setReplaces(),
-            default  => $this->index(),
+            // No screen of its own: the pages are in Hadrian's Pages.
+            default  => $this->redirect(SitePages::listUrl()),
         };
     }
 
-    // ----------------------------------------------------------------- list
-
-    private function index(): string
-    {
-        $mode    = Replace::mode();
-        $pages   = [];
-        $serving = 0;
-        foreach (Page::all() as $page) {
-            $page['url']     = $page['slug'] !== '' ? Router::urlFor((string)$page['slug']) : '';
-            $page['preview'] = Router::previewUrlFor((int)$page['id']);
-            $page['replaces']     = Replace::isTarget((string)($page['replaces'] ?? '')) ? (string)$page['replaces'] : '';
-            $page['replace_rule'] = Replace::rule((string)($page['replace_rule'] ?? ''));
-            // Is this page what visitors get at the theme page's address now?
-            $page['serving'] = $page['replaces'] !== ''
-                && Replace::serves($mode, $page['replace_rule'], (string)$page['status']);
-            $serving += $page['serving'] ? 1 : 0;
-            $pages[] = $page;
-        }
-        return $this->view('index', [
-            'pages'    => $pages,
-            'siteMode' => $mode,
-            'targets'  => Replace::TARGETS,
-            'serving'  => $serving,
-            'token'    => $this->token(),
-            'sections' => count(Sections::types()),
-            'flashMsg' => (string)($_GET['flash'] ?? ''),
-            'flashErr' => (string)($_GET['err'] ?? ''),
-        ]);
-    }
+    // ---------------------------------------------------------------- pages
+    // Made, replaced and deleted from Hadrian's Pages screen (SitePages draws
+    // the controls there); each of these answers by sending the admin back.
 
     private function create(): string
     {
@@ -114,6 +99,7 @@ final class AdminController
             'slug' => $slug,
             'meta' => Document::normalizeMeta(['title' => $name]),
         ]);
+        Bridge::pagesChanged();
         $this->redirect(self::BASE . '&action=edit&id=' . $id);
     }
 
@@ -126,6 +112,7 @@ final class AdminController
             $this->fail('That page no longer exists.');
         }
         Page::delete($id);
+        Bridge::pagesChanged();
         unset($_SESSION[Router::PREVIEW_SESSION][$id]);
         $this->done('"' . $page['name'] . '" was deleted.');
     }
@@ -140,6 +127,7 @@ final class AdminController
             $this->fail('Choose Theme or Page Builder.');
         }
         Replace::setMode($mode);
+        Bridge::pagesChanged();
         $this->done($mode === Replace::MODE_BUILDER
             ? 'Your website is now served by Page Builder wherever a built page replaces a theme page.'
             : 'Your website is now served by the theme. Built replacements are kept on standby.');
@@ -158,9 +146,10 @@ final class AdminController
             $this->fail('That page cannot be replaced.');
         }
         Page::setReplaces($id, $target, Replace::rule((string)($_POST['replace_rule'] ?? '')));
+        Bridge::pagesChanged();
         $this->done($target === ''
             ? '"' . $page['name'] . '" no longer replaces a theme page.'
-            : '"' . $page['name'] . '" now replaces ' . Replace::TARGETS[$target] . '.');
+            : '"' . $page['name'] . '" now replaces ' . Replace::TARGETS[$target] . '.', $id);
     }
 
     // --------------------------------------------------------------- editor
@@ -299,6 +288,7 @@ final class AdminController
         $doc  = Document::normalize(is_array($in['doc'] ?? null) ? $in['doc'] : [], $installed);
         $meta = Document::normalizeMeta(is_array($in['meta'] ?? null) ? $in['meta'] : [], $installed);
         Page::update($id, ['name' => $name, 'slug' => $slug, 'meta' => $meta, 'draft' => $doc]);
+        Bridge::pagesChanged();
         unset($_SESSION[Router::PREVIEW_SESSION][$id]);
 
         $fresh = Page::find($id) ?? $page;
@@ -321,6 +311,7 @@ final class AdminController
             $this->json(['ok' => false, 'field' => 'slug', 'error' => 'Give the page an address before publishing it.'], 422);
         }
         Page::publish((int)$page['id']);
+        Bridge::pagesChanged();
         $this->json(['ok' => true, 'status' => 'published', 'changed' => false, 'pageUrl' => Router::urlFor((string)$page['slug'])]);
     }
 
@@ -328,6 +319,7 @@ final class AdminController
     private function apiUnpublish(array $page): never
     {
         Page::unpublish((int)$page['id']);
+        Bridge::pagesChanged();
         $this->json(['ok' => true, 'status' => 'draft', 'changed' => false]);
     }
 
@@ -360,17 +352,19 @@ final class AdminController
             'mtExtensions'  => Bridge::extensionNav(),
             'mtThemeVersion' => Bridge::themeVersion(),
             'base'          => self::BASE,
+            // Where the list of built pages is: Hadrian's Pages, Built tab.
+            'pagesUrl'      => SitePages::listUrl(),
         ] + $vars);
         return (string)$smarty->fetch($template . '.tpl');
     }
 
-    /** Hadrian is missing, switched off, or its theme cannot draw a page. */
-    private function unavailable(): string
+    /** Hadrian is missing, switched off, too old, or its theme cannot draw a page. */
+    private function unavailable(string $reason = ''): string
     {
         $e = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES, 'UTF-8');
         return '<div style="max-width:720px;margin:32px auto;padding:24px 28px;border:1px solid #e8e8ed;border-radius:14px;background:#fff;font:15px/1.55 -apple-system,BlinkMacSystemFont,\'Segoe UI\',Roboto,Helvetica,Arial,sans-serif;color:#1d1d1f;">'
             . '<div style="font-size:20px;font-weight:600;margin:0 0 10px;">Hadrian Page Builder needs Hadrian</div>'
-            . '<p style="margin:0 0 12px;">' . $e(Bridge::reason()) . '</p>'
+            . '<p style="margin:0 0 12px;">' . $e($reason !== '' ? $reason : Bridge::reason()) . '</p>'
             . '<p style="margin:0;color:#6e6e73;">Built pages are not being served until this is fixed. Nothing has been deleted.</p>'
             . '</div>';
     }
@@ -378,6 +372,12 @@ final class AdminController
     // ----------------------------------------------------------- CSRF + I/O
 
     private function token(): string
+    {
+        return self::adminToken();
+    }
+
+    /** WHMCS's admin token for this session; '' outside WHMCS. Also for the forms SitePages renders. */
+    public static function adminToken(): string
     {
         try {
             return function_exists('generate_token') ? (string)generate_token('plain') : '';
@@ -397,7 +397,7 @@ final class AdminController
     private function requirePost(): void
     {
         if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
-            $this->fail('That action needs to be submitted from the Builder page.');
+            $this->fail('That action needs to be submitted from the Pages screen.');
         }
         if (!$this->tokenOk((string)($_POST['token'] ?? ''))) {
             $this->fail('Your session expired. Reload the page and try again.');
@@ -410,14 +410,19 @@ final class AdminController
         exit;
     }
 
-    private function done(string $message): never
+    /**
+     * Back to Hadrian's Pages with the outcome: the Built tab, or the
+     * settings of one page when the action was taken there.
+     */
+    private function done(string $message, int $pageId = 0): never
     {
-        $this->redirect(self::BASE . '&flash=' . rawurlencode($message));
+        $query = '&ext_ok=' . rawurlencode($message);
+        $this->redirect($pageId > 0 ? SitePages::settingsUrl($pageId, $query) : SitePages::listUrl($query));
     }
 
     private function fail(string $message): never
     {
-        $this->redirect(self::BASE . '&err=' . rawurlencode($message));
+        $this->redirect(SitePages::listUrl('&ext_err=' . rawurlencode($message)));
     }
 
     /** @return array<string,mixed> */

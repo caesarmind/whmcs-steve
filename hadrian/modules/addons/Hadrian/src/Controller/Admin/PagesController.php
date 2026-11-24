@@ -6,6 +6,7 @@ namespace Hadrian\Controller\Admin;
 use Hadrian\Controller\AbstractController;
 use Hadrian\Database\Migrator;
 use Hadrian\Helpers\AddonHelper;
+use Hadrian\Helpers\ExtensionPages;
 use Hadrian\Helpers\LocaleHelper;
 use Hadrian\Helpers\PageArea;
 use Hadrian\Helpers\PageUrlResolver;
@@ -101,7 +102,11 @@ final class PagesController extends AbstractController
                 'group'        => $group,
                 'description'  => (string)($meta['description'] ?? ''),
                 'variant'      => $variant,
-                'variantLabel' => ucfirst(str_replace(['-', '_'], ' ', $variant)),
+                // An extension page has no theme template: the column names
+                // the module that draws it instead.
+                'variantLabel' => is_array($meta['extension'] ?? null)
+                    ? (string)$meta['extension']['label']
+                    : ucfirst(str_replace(['-', '_'], ' ', $variant)),
                 'hasSeo'       => $options['hasSeo'],
                 'indexing'     => $options['indexing'],
                 'visibility'   => $options['visibility'],
@@ -109,7 +114,18 @@ final class PagesController extends AbstractController
                 'publicReason' => $public['reason'],
                 // Filtered behind a toggle in the list, never dropped.
                 'isSystem'     => in_array($page, self::SYSTEM_PAGES, true),
+                // A page an extension module owns: where its content is
+                // edited and whether it is live. Null for a theme page.
+                'extension'    => is_array($meta['extension'] ?? null) ? $meta['extension'] : null,
+                // What extensions say about this theme page ("Replaced by ...").
+                'notes'        => ExtensionPages::notesFor($page),
             ];
+        }
+
+        // An extension module's tab is listed even with no pages in it:
+        // that is where its first page is made.
+        foreach (array_keys(ExtensionPages::groups()) as $extensionGroup) {
+            $allGroups[$extensionGroup] = true;
         }
 
         $groups = array_keys($allGroups);
@@ -136,10 +152,27 @@ final class PagesController extends AbstractController
         return $this->view('pages/index', [
             'groups'       => $groups,
             'pagesByGroup' => $pagesByGroup,
+            // Groups that belong to an extension module, with the link to
+            // where its pages are made (see Helpers\ExtensionPages).
+            'extensionGroups' => ExtensionPages::groups(),
             'totalCount'   => count($rows),
             'systemCount'  => count(array_filter($rows, static fn (array $r): bool => !empty($r['isSystem']))),
             'flashMsg'     => (string)($_GET['flash'] ?? ''),
+            ...self::extensionFlash(),
         ]);
+    }
+
+    /**
+     * What an extension module reports back after one of its own forms on
+     * this screen was submitted (it redirects here with the outcome in the
+     * URL). Plain text, escaped by the view.
+     *
+     * @return array{extOk:string, extErr:string}
+     */
+    private static function extensionFlash(): array
+    {
+        $text = static fn (string $key): string => mb_substr(trim(html_entity_decode((string)($_GET[$key] ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8')), 0, 300);
+        return ['extOk' => $text('ext_ok'), 'extErr' => $text('ext_err')];
     }
 
     public function editAction(): string
@@ -331,6 +364,13 @@ final class PagesController extends AbstractController
             'pageLabel'        => (string)($meta['display_name'] ?? ucwords(str_replace(['-', '_'], ' ', $page))),
             'pageGroup'        => (string)($meta['group'] ?? 'Other'),
             'pageDescription'  => (string)($meta['description'] ?? ''),
+            // Set for a page an extension module owns (Helpers\ExtensionPages):
+            // its content is edited in that module, not here.
+            'extension'        => is_array($meta['extension'] ?? null) ? $meta['extension'] : null,
+            // The owning module's own controls for this page, as HTML it
+            // renders itself (see Helpers\ExtensionPages).
+            'extensionPanel'   => ExtensionPages::pagePanel($page),
+            ...self::extensionFlash(),
             'variants'         => $variants,
             'activeVariant'    => $activeVariant,
             'optionRows'       => $optionRows,
@@ -879,6 +919,7 @@ final class PagesController extends AbstractController
             'Support'        => 6,
             'Shop'           => 7,
             'Order Process'  => 8,
+            // Groups of extension pages come last, in name order.
             default          => 99,
         };
     }

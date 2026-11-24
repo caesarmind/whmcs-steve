@@ -18,6 +18,7 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . 'autoload.php';
 use HadrianBuilder\AdminController;
 use HadrianBuilder\Bridge;
 use HadrianBuilder\Router;
+use HadrianBuilder\SitePages;
 
 // ============================================================================
 // NO ADMIN REQUEST IS ANSWERED FROM THIS FILE.
@@ -46,6 +47,27 @@ add_hook('ClientAreaPage', -5000, function ($vars) {
 });
 
 // ============================================================================
+// Built pages in Hadrian's Pages screen.
+//
+// Registered on every request, not only in the admin: when the theme draws a
+// built page it looks the page up here to apply what Pages has set for it
+// (SEO, visibility, area, layout). Registering costs nothing; the list is
+// only read when Hadrian asks for it.
+// ============================================================================
+Bridge::registerPages([
+    'id'       => 'builder',
+    'prefix'   => SitePages::PREFIX,
+    'label'    => 'Page Builder',
+    'group'    => SitePages::GROUP,
+    'createUrl'   => AdminController::BASE . '&action=create',
+    'createLabel' => 'Create page',
+    'createPlaceholder' => 'New page, for example: WordPress hosting',
+    'panel'     => [SitePages::class, 'groupPanel'],
+    'pagePanel' => [SitePages::class, 'pagePanel'],
+    'provider' => [SitePages::class, 'rows'],
+]);
+
+// ============================================================================
 // Admin page chrome: Hadrian's stylesheet in the <head> of this module's page,
 // so it is in place before first paint. Hadrian's own hook only emits it on
 // Hadrian's page.
@@ -59,7 +81,9 @@ add_hook('AdminAreaHeadOutput', 1, function ($vars) {
 });
 
 // ============================================================================
-// A tab in Hadrian's admin navigation and a card on its Extensions page.
+// A card on Hadrian's Extensions page. No tab in its navigation: this module
+// has no list screen of its own, its pages are on the Built tab of Hadrian's
+// Pages (above). Its address still answers, by sending the admin there.
 // Admin requests only: nothing in the client area reads the registry.
 // ============================================================================
 if (defined('ADMINAREA')) {
@@ -70,5 +94,6 @@ if (defined('ADMINAREA')) {
         'description' => 'Build marketing pages from sections and publish them at their own addresses.',
         'url'         => AdminController::BASE,
         'version'     => AdminController::VERSION,
+        'tab'         => false,
     ]);
 }

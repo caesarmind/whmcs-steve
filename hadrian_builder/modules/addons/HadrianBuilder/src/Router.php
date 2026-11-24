@@ -190,6 +190,9 @@ final class Router
         $ca->assign('modulePage', [
             'module'      => AdminController::MODULE,
             'id'          => (int)$page['id'],
+            // The page's row in Hadrian's Pages screen; the theme applies
+            // that row's settings to this request.
+            'pageKey'     => SitePages::key((int)$page['id']),
             'slug'        => (string)$page['slug'],
             'title'       => $title,
             'description' => Text::pick($meta['description'], $lang),

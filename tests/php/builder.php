@@ -8,6 +8,9 @@
  *   php tests/php/builder.php clean
  *       Delete the pages the tests made: any whose name starts with "E2E ".
  *       JSON: how many were removed.
+ *   php tests/php/builder.php registry <id>
+ *       JSON: the built page's row in Hadrian's page registry (the Pages
+ *       screen), and whether the sitemap would list it. null when it has none.
  *   php tests/php/builder.php mode [theme|builder]
  *       JSON: the "Website served by" setting. With a value, set it first.
  *   php tests/php/builder.php products
@@ -51,8 +54,36 @@ switch ($command) {
         break;
 
     case 'clean':
-        $n = DB::schema()->hasTable(TABLE) ? DB::table(TABLE)->where('name', 'like', 'E2E %')->delete() : 0;
+        $ids = DB::schema()->hasTable(TABLE) ? DB::table(TABLE)->where('name', 'like', 'E2E %')->pluck('id')->all() : [];
+        $n   = $ids === [] ? 0 : DB::table(TABLE)->whereIn('id', $ids)->delete();
+        // Their rows in Hadrian's page registry go with them. Deleting a page
+        // in the admin does this itself; this helper goes round the admin.
+        if ($ids !== [] && DB::schema()->hasTable('hadrian_pages')) {
+            DB::table('hadrian_pages')->whereIn('page', array_map(static fn($id) => 'built-' . (int) $id, $ids))->delete();
+        }
         echo json_encode(['removed' => $n]);
+        break;
+
+    case 'registry':
+        $key = 'built-' . (int) ($argv[2] ?? 0);
+        $row = DB::schema()->hasTable('hadrian_pages')
+            ? DB::table('hadrian_pages')->where('page', $key)->first(['template', 'page', 'url', 'page_group', 'published', 'visibility', 'indexing'])
+            : null;
+        if ($row === null) {
+            echo json_encode(null);
+            break;
+        }
+        // The sitemap's own row source. Its rows carry the address, not the
+        // page key, and a built page's address is its own.
+        $listed = array_column(Hadrian\Models\Page::forSitemap((string) $row->template), 'url');
+        echo json_encode([
+            'page'       => $row->page,
+            'url'        => $row->url,
+            'group'      => $row->page_group,
+            'published'  => (bool) $row->published,
+            'visibility' => $row->visibility,
+            'inSitemap'  => $row->url !== null && in_array((string) $row->url, $listed, true),
+        ]);
         break;
 
     case 'mode':

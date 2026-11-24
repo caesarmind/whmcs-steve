@@ -243,10 +243,13 @@ final class Template
         $declared   = $this->manifest['provides']['pages'] ?? [];
         $discovered = PagesCache::ensure($this);
         $order      = array_keys(self::ORDER_PAGES);
+        // Pages an extension module adds (a built page, say). Like the order
+        // pages they have no folder under core/pages; see Helpers\ExtensionPages.
+        $extension  = array_keys(\Hadrian\Helpers\ExtensionPages::all());
 
         $seen = [];
         $out  = [];
-        foreach ([...$declared, ...$discovered, ...$order] as $name) {
+        foreach ([...$declared, ...$discovered, ...$order, ...$extension] as $name) {
             if (!is_string($name) || $name === '' || isset($seen[$name])) continue;
             $seen[$name] = true;
             $out[] = $name;
@@ -288,6 +291,10 @@ final class Template
                 'listDisplay'      => true,
                 'supportedOptions' => [],
             ];
+        }
+        // An extension module's page: the module describes it.
+        if ($meta === [] && \Hadrian\Helpers\ExtensionPages::owns($page)) {
+            return \Hadrian\Helpers\ExtensionPages::meta($page);
         }
         return $meta;
     }

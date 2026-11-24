@@ -72,6 +72,17 @@ final class Page
         }
     }
 
+    /** Remove a page's row. For a page that no longer exists. */
+    public static function delete(string $template, string $page): void
+    {
+        try {
+            \WHMCS\Database\Capsule::table(self::TABLE)
+                ->where('template', $template)->where('page', $page)->delete();
+        } catch (\Throwable $e) {
+            // Nothing to remove.
+        }
+    }
+
     /** @return list<array<string,mixed>> */
     public static function all(string $template): array
     {
@@ -135,6 +146,9 @@ final class Page
     {
         $settings = self::decode($r->settings ?? null);
         return [
+            // Which page the row is for. PageRegistry needs it to find rows
+            // whose page has gone.
+            'page'            => (string)($r->page ?? ''),
             'url'             => $r->url !== null ? (string)$r->url : null,
             'page_group'      => (string)($r->page_group ?? ''),
             'seo_enabled'     => (bool)$r->seo_enabled,

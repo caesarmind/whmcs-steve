@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Hadrian\Service;
 
+use Hadrian\Helpers\ExtensionPages;
 use Hadrian\Models\Page;
 use Hadrian\Models\Settings;
 use Hadrian\Template\Template;
@@ -33,6 +34,48 @@ final class PageRegistry
                 continue;
             }
             Page::upsert($tpl, $page, self::seedRow($template, $page, $sort));
+        }
+        self::syncExtensionPages($template);
+    }
+
+    /**
+     * Keep the rows of extension pages (Helpers\ExtensionPages) in step with
+     * the modules that own them.
+     *
+     * A new page gets a row, seeded like any other. On a row that exists,
+     * only what the module owns is written: the address and whether the page
+     * is live, which together decide whether it is in the sitemap. What an
+     * admin set in Pages (SEO, visibility, area, layout) is never touched.
+     * A row whose page the module no longer reports is removed.
+     *
+     * Cheap enough to call whenever a module changes one of its pages, which
+     * is what keeps the sitemap right without a visit to the Pages screen.
+     */
+    public static function syncExtensionPages(Template $template): void
+    {
+        $tpl   = $template->getName();
+        $pages = ExtensionPages::all();
+        $sort  = 100000;
+        foreach ($pages as $page => $meta) {
+            $sort += 10;
+            if (!Page::exists($tpl, $page)) {
+                Page::upsert($tpl, $page, self::seedRow($template, $page, $sort));
+            }
+            Page::upsert($tpl, $page, [
+                'url'        => isset($meta['url']) ? (string)$meta['url'] : null,
+                'published'  => !empty($meta['extension']['live']),
+                'page_group' => (string)($meta['group'] ?? 'Other'),
+            ]);
+        }
+        // Rows left behind by pages that are gone. Only keys of modules that
+        // registered on this request are considered, so a module that is
+        // switched off keeps its rows (and the settings in them) until it is
+        // back, or its pages are really deleted.
+        foreach (Page::all($tpl) as $row) {
+            $page = (string)($row['page'] ?? '');
+            if (ExtensionPages::owns($page) && !isset($pages[$page])) {
+                Page::delete($tpl, $page);
+            }
         }
     }
 

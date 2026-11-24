@@ -74,7 +74,11 @@
                    addon that registered itself; see Helpers\Extensions). On an
                    extension's own page $currentAction is its nav key. *}
                 {foreach $mtExtensions|default:[] as $mtExt}
-                    <a class="mt-topnav-item {if $mt_nav == $mtExt.nav}is-active{/if}" href="{$mtExt.url|escape}">{$mtExt.label|escape}</a>
+                    {* A module that works inside one of Hadrian's own screens
+                       asks for no tab (Helpers\Extensions, "tab"). *}
+                    {if $mtExt.tab|default:'1' != '0'}
+                        <a class="mt-topnav-item {if $mt_nav == $mtExt.nav}is-active{/if}" href="{$mtExt.url|escape}">{$mtExt.label|escape}</a>
+                    {/if}
                 {/foreach}
                 <a class="mt-topnav-item {if $mt_nav == 'extensions'}is-active{/if}" href="{$viewHelper->url('extensions')}">Extensions</a>
                 <a class="mt-topnav-item {if $mt_nav == 'tools'}is-active{/if}" href="{$viewHelper->url('tools')}">Tools</a>
