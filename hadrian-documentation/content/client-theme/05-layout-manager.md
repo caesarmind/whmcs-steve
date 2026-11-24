@@ -70,6 +70,31 @@ Activating for one audience leaves the other untouched, so a marketing-style top
 Everything else on this page - the per-layout options, Header flags, Containers sizes and Footer options - is a single global value shared by both audiences. Setting the sidebar to the right for clients also sets it for guests.
 :::
 
+## By visitor or by area
+
+Above the tabs, **Choose layouts by** sets what a pick applies to. There are two ways, and a site uses one of them.
+
+- **Visitor** - one pick for guests and one for signed-in clients, on every page. This is the default and is what the section above describes.
+- **Area** - one pick for each part of the site, whoever is looking.
+
+With **Area** selected, each layout card shows three rows instead of two:
+
+- **Website** - the homepage, the store landing pages, custom pages and pages made with the Page Builder.
+- **Client area** - the portal: dashboard, services, billing, support and account pages.
+- **Order process** - product listings, product configuration, the cart and checkout.
+
+A top bar on the website, a sidebar in the client area and a plainer frame around checkout is three clicks.
+
+:::info What changes when you switch
+The first time you select **Area**, every area starts from what most of its visitors see now: the website and the order process take the guest pick, the client area takes the existing-client pick. A guest on the homepage or in the cart and a client in the portal see no difference.
+
+Two cases do change, because a pick no longer depends on who is looking. A guest on a client-area page, such as the knowledgebase or the login page, now gets the client-area pick. A signed-in client on the website or in the cart now gets those areas' picks. If your guest and existing-client picks were the same layout, nothing changes at all.
+
+The two sets of picks are kept side by side, so switching back to **Visitor** restores the earlier ones.
+:::
+
+A page states which area it belongs to with an `area` key in its `page.php` (`website`, `client` or `order`). Pages without one are placed by what they are: order-form pages go to the order process, pages in the Public and Shop groups go to the website, and everything else goes to the client area.
+
 ## Per-layout options
 
 :::shot img/lay-card-sidebar.png The Sidebar card while active. Sidebar position has been set to Right here, so the segmented control shows a non-default pick.
@@ -194,4 +219,4 @@ Layouts are site-wide, but a single page can opt out. In **Pages**, open a page 
 3. Leave either on **- Inherit -** to keep following the global setting.
 :::
 
-A per-page override beats the global choice for that page, including the per-audience one. Useful for a checkout that should lose the sidebar, or a landing page that wants the extended footer when nothing else does.
+A per-page override beats the global choice for that page, including the per-audience or per-area one. Useful for a checkout that should lose the sidebar, or a landing page that wants the extended footer when nothing else does.

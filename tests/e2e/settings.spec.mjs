@@ -20,7 +20,7 @@ import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { PHP, TESTS_DIR, BASE_URL } from '../lib/env.mjs';
-import { fx, loginClient } from './helpers.mjs';
+import { fx, loginClient, loginAdmin } from './helpers.mjs';
 import { watch, judge } from './page-checks.mjs';
 
 const id = fx.ids;
@@ -354,6 +354,110 @@ for (const [layout, token] of MENU_LAYOUTS) {
     await clean(page, context, 'full', ['/clientarea.php']);
   });
 }
+
+// ------------------------------------------------------- layouts by area
+// A site picks its layouts by visitor (guest / client, the default, which the
+// tests above cover) or by area: website, client area, order process.
+const seen = async (page, url) => { await page.goto(url); return [await bodyAttr(page, 'data-area'), await bodyAttr(page, 'data-layout')]; };
+// An install that has never been in "by area" mode: no mode row, no area picks.
+// These tests start from it explicitly so they do not depend on whether someone
+// tried the switch on this install before.
+const NEVER_BY_AREA = Object.fromEntries([
+  'hadrian_layout_mode',
+  ...['main-menu', 'footer'].flatMap(kind => ['website', 'client', 'order'].map(area => `hadrian_active_layout_${kind}_area_${area}`)),
+].map(key => [key, null]));
+
+test('layouts by area: each part of the site draws its own pick, whoever is looking', async ({ page, context }) => {
+  test.setTimeout(3 * 60_000);
+  set({
+    hadrian_layout_mode: str('area'),
+    'hadrian_active_layout_main-menu_area_website': str('top'),
+    'hadrian_active_layout_main-menu_area_client': str('sidebar'),
+    'hadrian_active_layout_main-menu_area_order': str('rail'),
+    // The visitor picks stay stored and must not apply in this mode.
+    'hadrian_active_layout_main-menu_guest': str('topbar-minimal'),
+    'hadrian_active_layout_main-menu_client': str('topbar-minimal'),
+  });
+  const store = `/index.php?rp=/store/${id.productGroupSlug}`;
+
+  expect(await seen(page, '/'), 'guest, homepage').toEqual(['website', 'top']);
+  expect(await seen(page, '/knowledgebase'), 'guest, a support page').toEqual(['client', 'side']);
+  expect(await seen(page, store), 'guest, product listing on a store route').toEqual(['order', 'rail']);
+  expect(await seen(page, '/cart.php?a=view'), 'guest, cart').toEqual(['order', 'rail']);
+  await clean(page, context, 'guest', ['/', '/knowledgebase', store]);
+
+  await loginClient(context.request, 'full');
+  expect(await seen(page, '/clientarea.php'), 'client, dashboard').toEqual(['client', 'side']);
+  expect(await seen(page, '/cart.php?a=view'), 'client, cart').toEqual(['order', 'rail']);
+  expect(await seen(page, store), 'client, product listing').toEqual(['order', 'rail']);
+  await clean(page, context, 'full', ['/clientarea.php', '/cart.php?a=view']);
+});
+
+test('layouts by area: a page names its area and the mode is off by default', async ({ page }) => {
+  // No mode stored: the area is still reported, and the visitor pick applies everywhere.
+  set({ ...NEVER_BY_AREA, 'hadrian_active_layout_main-menu_guest': str('top'), 'hadrian_active_layout_main-menu_area_website': str('rail') });
+  expect(await seen(page, '/'), 'homepage').toEqual(['website', 'top']);
+  expect(await seen(page, '/knowledgebase'), 'support page').toEqual(['client', 'top']);
+  expect(await seen(page, '/cart.php?a=view'), 'cart').toEqual(['order', 'top']);
+});
+
+test('Layouts admin: switching to "by area" starts each area from what its visitors saw', async ({ page, context, browser }) => {
+  test.setTimeout(3 * 60_000);
+  set({ ...NEVER_BY_AREA, 'hadrian_active_layout_main-menu_guest': str('top'), 'hadrian_active_layout_main-menu_client': str('rail') });
+  await loginAdmin(context.request);
+  const LAYOUTS = '/admin/addonmodules.php?module=Hadrian&action=layouts';
+  const card = name => page.locator(`[data-kind-panel="main-menu"] [data-lay-card="${name}"]`);
+  const active = (name, row) => card(name).locator(`.mt-lay-aud.is-on[data-lay-row="${row}"]`);
+
+  // The site is checked from a second, signed-out browser: a signed-in admin
+  // counts as an existing client, so the admin's own tab cannot show what a
+  // guest gets.
+  const guestContext = await browser.newContext({ baseURL: BASE_URL });
+  const guest = await guestContext.newPage();
+  try {
+    await page.goto(LAYOUTS);
+    await expect(card('top').locator('[data-lay-row]'), 'by visitor: two rows a card').toHaveCount(2);
+    await expect(active('top', 'guest')).toBeVisible();
+    await expect(active('rail', 'client')).toBeVisible();
+    expect(await seen(guest, '/'), 'guest, before').toEqual(['website', 'top']);
+    expect(await seen(page, '/cart.php?a=view'), 'the admin is served as an existing client').toEqual(['order', 'rail']);
+
+    await page.goto(LAYOUTS);
+    await page.locator('.mt-lay-mode-seg button[value="area"]').click();
+    await expect(card('top').locator('[data-lay-row]'), 'by area: three rows a card').toHaveCount(3);
+    // Each area starts from what its visitors saw: guest pick for the website
+    // and the order process, client pick for the client area.
+    await expect(active('top', 'website')).toBeVisible();
+    await expect(active('top', 'order')).toBeVisible();
+    await expect(active('rail', 'client')).toBeVisible();
+    expect(await seen(guest, '/'), 'the site did not change for a guest').toEqual(['website', 'top']);
+    expect(await seen(guest, '/cart.php?a=view')).toEqual(['order', 'top']);
+    expect(await seen(guest, '/knowledgebase'), 'the client area now has one pick for everyone').toEqual(['client', 'rail']);
+
+    // One click gives the order process a layout of its own.
+    await card('sidebar').locator('button[data-lay-row="order"]').click();
+    await expect(active('sidebar', 'order')).toBeVisible();
+    await expect(active('top', 'order'), 'a pick is exclusive within its area').toHaveCount(0);
+    expect(await seen(guest, '/cart.php?a=view'), 'checkout follows the new pick').toEqual(['order', 'side']);
+    expect(await seen(guest, '/'), 'the website keeps its own').toEqual(['website', 'top']);
+    expect(await seen(page, '/cart.php?a=view'), 'and it no longer depends on who is looking').toEqual(['order', 'side']);
+
+    // Back to "by visitor": the earlier picks are still there.
+    await page.goto(LAYOUTS);
+    await page.locator('.mt-lay-mode-seg button[value="audience"]').click();
+    await expect(card('top').locator('[data-lay-row]')).toHaveCount(2);
+    await expect(active('top', 'guest')).toBeVisible();
+    await expect(active('rail', 'client')).toBeVisible();
+    expect(await seen(guest, '/cart.php?a=view'), 'a guest in the cart is back on the guest pick').toEqual(['order', 'top']);
+    expect(await seen(guest, '/knowledgebase'), 'and on a support page too').toEqual(['client', 'top']);
+
+    // Returning to "by area" finds the picks made there, not a fresh copy.
+    await page.locator('.mt-lay-mode-seg button[value="area"]').click();
+    await expect(active('sidebar', 'order'), 'the order pick from before survived').toBeVisible();
+  } finally {
+    await guestContext.close();
+  }
+});
 
 const FOOTERS = [['default', 'hp-footer-slim'], ['extended', 'hp-footer-extended'], ['extended-info', 'hp-footer-extended-info']];
 for (const [footer, cls] of FOOTERS) {

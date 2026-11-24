@@ -120,8 +120,12 @@ $check(str_contains($js, 'serverLayout'), 'core-layout.js honours the server tok
 $hooks = file_get_contents($admin . '/src/Service/Hooks.php');
 $check(str_contains($hooks, 'buildLayoutGatesHead'), 'Hooks emits generated gates');
 $check(str_contains($hooks, 'resolvePreviewLayoutTokens'), 'Hooks builds the preview token map');
-$check(str_contains($hooks, 'in_array($active, $template->getLayouts($kind), true)'),
-    'stale pointers are validated in resolveActiveLayout');
+// The guard moved with the pointer logic into LayoutPointers, which the client
+// render and the admin page both resolve through. Its behaviour is tested in
+// test-layout-pointers.php; here it is enough that Hooks goes through it.
+$check(str_contains($hooks, 'LayoutPointers::resolve(')
+    && str_contains((string)file_get_contents($admin . '/src/Helpers/LayoutPointers.php'), 'in_array($value, $valid, true)'),
+    'stale pointers are validated where the active layout is resolved');
 
 $adminTpl = file_get_contents($admin . '/views/adminarea/layouts/index.tpl');
 $check(str_contains($adminTpl, 'Custom layout wireframe'), 'admin has a main-menu custom wireframe');

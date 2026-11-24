@@ -4,7 +4,9 @@ declare(strict_types=1);
 namespace Hadrian\Service;
 
 use Hadrian\Helpers\AddonHelper;
+use Hadrian\Helpers\LayoutPointers;
 use Hadrian\Helpers\LocaleHelper;
+use Hadrian\Helpers\PageArea;
 use Hadrian\Helpers\ThemeManifest;
 use Hadrian\Helpers\Uploader;
 use Hadrian\Helpers\VisibilityGate;
@@ -42,6 +44,13 @@ final class Hooks
     private const DASHBOARD_ROWS = 8;
 
     private static ?self $instance = null;
+
+    /**
+     * The area of the page being rendered (PageArea), set by clientAreaPage().
+     * Kept on the instance because the head-output hook resolves the active
+     * layout too and is not handed the page.
+     */
+    private ?string $area = null;
 
     public static function instance(): self
     {
@@ -86,6 +95,16 @@ final class Hooks
         $this->enforceVisibility($vars, $template);
 
         $pages    = $this->resolveCurrentPage($vars, $template);
+
+        // Website, client area or order process. Decides which layout pick
+        // applies when the site chooses its layouts per area.
+        $currentPage = (string)($vars['templatefile'] ?? '');
+        $this->area  = PageArea::forPage(
+            $currentPage,
+            !empty($vars['inShoppingCart']) || (string)($vars['filename'] ?? '') === 'cart',
+            is_array($pages[$currentPage]['meta'] ?? null) ? $pages[$currentPage]['meta'] : []
+        );
+
         $layouts  = [
             'main-menu' => $this->resolveActiveLayout($template, 'main-menu'),
             'footer'    => $this->resolveActiveLayout($template, 'footer'),
@@ -95,7 +114,6 @@ final class Hooks
         // pins a specific main-menu or footer layout, swap the global pick
         // before exposing $hadrian.layouts to Smarty — templates don't have
         // to know about overrides; they just see the effective layout.
-        $currentPage = (string)($vars['templatefile'] ?? '');
         if ($currentPage !== '' && isset($pages[$currentPage]['layout_overrides'])) {
             foreach (['main-menu', 'footer'] as $kind) {
                 $override = $pages[$currentPage]['layout_overrides'][$kind] ?? null;
@@ -115,6 +133,9 @@ final class Hooks
                 'manifest'      => $template->getManifest(),
                 'styles'        => $this->resolveActiveStyle($template),
                 'layouts'       => $layouts,
+                // website | client | order (PageArea). header.tpl prints it as
+                // body[data-area].
+                'area'          => $this->area,
                 'pages'         => $pages,
                 // Computed SEO context (canonical, og:url/type, hreflang) for the
                 // document <head> in header.tpl. Built in PHP so the query-param
@@ -2738,45 +2759,26 @@ final class Hooks
 
     private function resolveActiveLayout(Template $template, string $kind): array
     {
-        // Lagom-style per-audience pointers. The admin Layouts manager
-        // writes one row per (kind, audience): guest-audience visitors
-        // get one layout, logged-in clients get another. Fallback chain:
-        //   1. per-audience key  hadrian_active_layout_<kind>_<aud>
-        //   2. legacy single key hadrian_active_layout_<kind>
-        //      (backwards-compat for installs migrated from the
-        //      pre-dual-pointer Settings shape)
-        //   3. default-by-kind (`main-menu`→`sidebar`, `footer`→`extended`)
+        // Two ways a site picks its layouts (LayoutPointers): per audience,
+        // one pick for guests and one for signed-in clients, or per area, one
+        // each for the website, the client area and the order process. The
+        // admin Layouts page resolves through the same class, so the card
+        // wearing "Active" is always the layout drawn here.
         //
-        // Keep this default-by-kind table in sync with
-        // LayoutsController::DEFAULT_BY_KIND — otherwise the admin's
-        // "Active" badge will disagree with the live render.
-        $defaultByKind = ['main-menu' => 'sidebar', 'footer' => 'extended'];
-        $default       = $defaultByKind[$kind] ?? 'default';
+        // A pick naming a layout that no longer exists (a deleted custom
+        // folder, a renamed one) resolves to the default for the kind rather
+        // than being drawn from a missing manifest; the stored value is left
+        // alone, so putting the folder back restores it. getLayouts() reads
+        // the cached union: no filesystem work on this client path.
+        $audience = \Hadrian\Menu\Audience::current() === \Hadrian\Menu\Audience::CLIENT ? 'client' : 'guest';
 
-        $audience    = \Hadrian\Menu\Audience::current();
-        $audienceKey = $audience === \Hadrian\Menu\Audience::CLIENT ? 'client' : 'guest';
-
-        $newKey = $template->getName() . '_active_layout_' . $kind . '_' . $audienceKey;
-        $active = (string)Settings::getValue($newKey, '');
-
-        if ($active === '') {
-            $legacyKey = $template->getName() . '_active_layout_' . $kind;
-            $active    = (string)Settings::getValue($legacyKey, $default);
-        }
-
-        /* A pointer at a layout that no longer exists (a deleted custom folder,
-           a renamed dir) must resolve to the default, NOT be rendered from a
-           missing manifest. Without this, buildLayoutMeta loads [] and the page
-           silently falls back to the sidebar via header.tpl's |default:'side'
-           while the admin still shows the stale name as Active — the render and
-           the badge disagreeing is exactly Lagom's stale-pointer defect.
-           Resolving to default is the honest answer (the resolveStyleName
-           philosophy); the Settings row is left in place, so re-dropping the
-           folder restores the pick. getLayouts() reads the cached union — no
-           filesystem work on this client path. */
-        if (!in_array($active, $template->getLayouts($kind), true)) {
-            $active = $default;
-        }
+        $active = LayoutPointers::resolve(
+            $template->getName(),
+            $kind,
+            $audience,
+            $this->area ?? PageArea::CLIENT,
+            $template->getLayouts($kind)
+        );
 
         return $this->buildLayoutMeta($template, $kind, $active);
     }

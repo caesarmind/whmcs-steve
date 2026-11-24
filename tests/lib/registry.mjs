@@ -80,6 +80,8 @@ export const CHECKS = [
   ].map(([id, title]) => ({ id, title, cmd: [PHP, STATIC(`check-${id}.php`)], cwd: REPO_ROOT, blocking: true })),
   { id: 'creating-pages', title: 'Custom page creation', cmd: [PHP, STATIC('test-creating-pages.php')], cwd: REPO_ROOT, blocking: true },
   { id: 'visibility-gate', title: 'Page visibility gate', cmd: [PHP, STATIC('test-visibility-gate.php')], cwd: REPO_ROOT, blocking: true },
+  { id: 'layout-pointers', title: 'Layout picks: by visitor, by area', cmd: [PHP, STATIC('test-layout-pointers.php')], cwd: REPO_ROOT, blocking: true,
+    why: 'Which layout is drawn for whom, which area a page is in, and that switching to "by area" starts from what visitors already see.' },
 
   // Hadrian Email Templates: a separate addon module (hadrian_email/) that
   // requires Hadrian. Its live checks (takeover, publish, real mail) are in

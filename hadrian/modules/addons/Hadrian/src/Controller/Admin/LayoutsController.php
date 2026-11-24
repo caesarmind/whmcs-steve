@@ -5,15 +5,22 @@ namespace Hadrian\Controller\Admin;
 
 use Hadrian\Controller\AbstractController;
 use Hadrian\Helpers\AddonHelper;
+use Hadrian\Helpers\LayoutPointers;
+use Hadrian\Helpers\PageArea;
 use Hadrian\Helpers\ThemeManifest;
 use Hadrian\Models\Settings;
 use Hadrian\Template\LayoutsCache;
 
 /**
- * Admin: pick a layout per kind (main-menu, footer), per audience
- * (guest_client, existing_client). Mirrors Lagom's Layout Manager:
- * each layout has TWO independent pointers, one for each audience,
- * with per-row "Activate" buttons (no global Save).
+ * Admin: pick a layout per kind (main-menu, footer). Each layout card has
+ * one "Activate" row per pick (no global Save).
+ *
+ * The site chooses its layouts one of two ways (LayoutPointers::mode):
+ *   audience  one pick for guests and one for signed-in clients (the default)
+ *   area      one pick each for the website, the client area and the order
+ *             process (PageArea)
+ * The page shows the rows of the mode in use. Both sets of picks are stored
+ * side by side, so switching mode and back loses nothing.
  *
  * Settings keys:
  *   hadrian_active_layout_<kind>_guest    — guest-audience pointer
@@ -33,10 +40,20 @@ use Hadrian\Template\LayoutsCache;
 final class LayoutsController extends AbstractController
 {
     /** Audience values valid in POST payloads + Settings key suffixes. */
-    private const AUDIENCES = ['guest', 'client'];
+    private const AUDIENCES = LayoutPointers::AUDIENCES;
 
-    /** Per-kind default layout — kept in sync with Hooks::resolveActiveLayout. */
-    private const DEFAULT_BY_KIND = ['main-menu' => 'sidebar', 'footer' => 'extended'];
+    /** Audience => [row label, what the Activate button's tooltip says]. */
+    private const AUDIENCE_ROWS = [
+        'guest'  => ['Guest client', 'guests'],
+        'client' => ['Existing client', 'logged-in clients'],
+    ];
+
+    /** Area => what the Activate button's tooltip says. Labels come from PageArea. */
+    private const AREA_HINTS = [
+        PageArea::WEBSITE => 'the website',
+        PageArea::CLIENT  => 'the client area',
+        PageArea::ORDER   => 'the order process',
+    ];
 
     /**
      * Content width. Not a FLAGS entry because those are booleans — this is an
@@ -120,6 +137,19 @@ final class LayoutsController extends AbstractController
         // one appears in the rejected-folders notice — never silently.
         $discovery = LayoutsCache::ensure($template);
 
+        // Switching between "by visitor" and "by area". The first switch to
+        // area starts every area from what most of its visitors see today
+        // (LayoutPointers::setMode says exactly what does and does not change).
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['layout_mode'])) {
+            $validByKind = [];
+            foreach (['main-menu', 'footer'] as $kind) {
+                $validByKind[$kind] = $template->getLayouts($kind);
+            }
+            LayoutPointers::setMode($template->getName(), (string)$_POST['layout_mode'], $validByKind);
+            $backTo = (string)($_POST['kind'] ?? 'main-menu');
+            $this->redirect('?module=Hadrian&action=layouts&kind=' . urlencode(in_array($backTo, ['main-menu', 'footer'], true) ? $backTo : 'main-menu'));
+        }
+
         // POST = activation OR an option change. The form carries its own `kind`
         // because the Main-menu/Footer tabs are client-side (no page reload), so
         // `kind` can't be read from the URL.
@@ -176,13 +206,19 @@ final class LayoutsController extends AbstractController
             $activeKind = 'main-menu';
         }
 
+        $layoutMode = LayoutPointers::mode($template->getName());
+
         // Build BOTH kinds so the tabs are pure client-side toggles.
         $groups = [];
         $sizeAppliesTo = [];
         foreach (['main-menu', 'footer'] as $kind) {
-            $default       = self::DEFAULT_BY_KIND[$kind] ?? 'default';
-            $currentGuest  = $this->resolvePointer($template, $kind, 'guest',  $default);
-            $currentClient = $this->resolvePointer($template, $kind, 'client', $default);
+            $valid         = $template->getLayouts($kind);
+            $currentGuest  = LayoutPointers::forAudience($template->getName(), $kind, 'guest', $valid);
+            $currentClient = LayoutPointers::forAudience($template->getName(), $kind, 'client', $valid);
+            $currentByArea = [];
+            foreach (array_keys(PageArea::LABELS) as $area) {
+                $currentByArea[$area] = LayoutPointers::forArea($template->getName(), $kind, $area, $valid);
+            }
 
             $list = [];
             foreach ($template->getLayouts($kind) as $name) {
@@ -216,12 +252,31 @@ final class LayoutsController extends AbstractController
                     }
                 }
 
+                /* One activation row per pick of the mode in use. The view
+                   loops these, so it carries no knowledge of which mode the
+                   site is in or how many picks that mode has. */
+                $rows = [];
+                if ($layoutMode === LayoutPointers::MODE_AREA) {
+                    foreach (PageArea::LABELS as $area => $label) {
+                        $rows[] = ['param' => 'area', 'value' => $area, 'label' => $label,
+                            'hint' => self::AREA_HINTS[$area], 'active' => $name === $currentByArea[$area]];
+                    }
+                } else {
+                    foreach (self::AUDIENCE_ROWS as $aud => [$label, $hint]) {
+                        $rows[] = ['param' => 'audience', 'value' => $aud, 'label' => $label,
+                            'hint' => $hint, 'active' => $name === ($aud === 'guest' ? $currentGuest : $currentClient)];
+                    }
+                }
+
                 $list[] = [
                     'name'           => $name,
                     'displayName'    => $meta['displayName'] ?? ucfirst($name),
                     'description'    => $meta['description'] ?? '',
                     'isActiveGuest'  => $name === $currentGuest,
                     'isActiveClient' => $name === $currentClient,
+                    'rows'           => $rows,
+                    // Live for at least one pick of the mode in use.
+                    'isOn'           => in_array(true, array_column($rows, 'active'), true),
                     'options'        => $options,
                     // Feeds the "Live preview" link. header.tpl honours
                     // ?preview=1&layout=<side|top|rail> and that value is this
@@ -270,6 +325,10 @@ final class LayoutsController extends AbstractController
         return $this->view('layouts/index', [
             'groups'      => $groups,
             'activeKind'  => $activeKind,
+            // audience | area: which set of activation rows the cards show.
+            'layoutMode'  => $layoutMode,
+            'layoutAreas' => PageArea::HELP,
+            'layoutAreaLabels' => PageArea::LABELS,
             'template'    => $template->getName(),
             'layoutFlags' => $layoutFlags,
             'footerFlags' => $footerFlags,
@@ -497,36 +556,16 @@ final class LayoutsController extends AbstractController
         $this->redirect('?module=Hadrian&action=layouts&kind=' . urlencode($kind) . '&flag=1');
     }
 
-    /**
-     * Resolve the active layout for one (kind, audience) pointer.
-     * Falls back: per-audience key → legacy single key → default.
-     * Kept identical to the read path in Hooks::resolveActiveLayout so
-     * the "Active" badge always tracks what the front-end renders.
-     */
-    private function resolvePointer($template, string $kind, string $audience, string $default): string
-    {
-        $newKey = $template->getName() . '_active_layout_' . $kind . '_' . $audience;
-        $value  = (string)Settings::getValue($newKey, '');
-        if ($value === '') {
-            $legacyKey = $template->getName() . '_active_layout_' . $kind;
-            $value     = (string)Settings::getValue($legacyKey, $default);
-        }
-
-        /* Mirror of Hooks::resolveActiveLayout's stale-pointer guard, and it
-           MUST stay in sync with it: this method decides which card wears the
-           Active badge, that one decides what actually renders. If only one
-           validated, a deleted custom layout would show Active here while the
-           client area serves the default. */
-        return in_array($value, $template->getLayouts($kind), true) ? $value : $default;
-    }
-
     private function saveAction($template, string $kind): string
     {
         $layout      = (string)$_POST['layout'];
         $validLayout = in_array($layout, $template->getLayouts($kind), true);
 
         if ($validLayout) {
-            if (isset($_POST['audience'])) {
+            if (isset($_POST['area'])) {
+                // -- Activation (per-area pick) --
+                LayoutPointers::setForArea($template->getName(), $kind, (string)$_POST['area'], $layout);
+            } elseif (isset($_POST['audience'])) {
                 // ── Activation (per-audience pointer) ──
                 $audience = (string)$_POST['audience'];
                 if (in_array($audience, self::AUDIENCES, true)) {

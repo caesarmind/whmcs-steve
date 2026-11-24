@@ -5,7 +5,11 @@
     <h1 class="mt-page-title">Layouts {include file="includes/doclink.tpl" article="layout-manager"}</h1>
     <p class="mt-page-subtitle">
         Pick the navigation and footer arrangement for <strong>{$template|escape}</strong>.
-        Each layout has two independent activations &mdash; one for guests (unauthenticated visitors) and one for existing clients (logged in).
+        {if $layoutMode|default:'audience' == 'area'}
+            Each layout is activated separately for the website, the client area and the order process.
+        {else}
+            Each layout has two independent activations &mdash; one for guests (unauthenticated visitors) and one for existing clients (logged in).
+        {/if}
     </p>
 </header>
 
@@ -98,6 +102,12 @@
     .mt-seg button{flex:1;border:0;background:transparent;font:inherit;font-size:12px;font-weight:500;color:var(--mt-text-2);padding:6px 0;border-radius:7px;cursor:pointer}
     .mt-seg button:hover{color:var(--mt-text)}
     .mt-seg button.on{background:var(--mt-surface);color:var(--mt-text);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+    /* The "choose layouts by" switch. The segment keeps its own width here: on
+       a card .mt-seg fills the card, in this row it sits at the end. */
+    .mt-lay-mode{display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-bottom:16px}
+    .mt-lay-mode-text{flex:1;min-width:260px}
+    .mt-lay-mode-seg{width:auto;flex-shrink:0}
+    .mt-lay-mode-seg button{padding:7px 22px;font-size:13px}
     .mt-lay-optnone{border-top:1px dashed var(--mt-border);padding-top:11px;font-size:11.5px;color:var(--mt-text-3);font-style:italic}
     .mt-flag-form{display:flex;align-items:center;gap:8px;margin:0;flex-shrink:0}
 
@@ -109,6 +119,29 @@
     .mt-planned-select{max-width:280px}
 {/literal}
 </style>
+
+{* How the site picks its layouts. A form of its own, above the tabs, because
+   the choice covers both kinds. Switching to "area" for the first time starts
+   each area from what most of its visitors see now (the guest pick for the
+   website and the order process, the client pick for the client area). *}
+<div class="mt-panel pad mt-lay-mode">
+    <div class="mt-lay-mode-text">
+        <div class="mt-row-label mt-tip-line">Choose layouts by {include file="includes/doclink.tpl" article="layout-manager" anchor="by-visitor-or-by-area"}</div>
+        <div class="mt-row-help">
+            {if $layoutMode|default:'audience' == 'area'}
+                One pick for each part of the site, whoever is looking:
+                {foreach $layoutAreaLabels|default:[] as $areaKey => $areaLabel}<strong>{$areaLabel|escape}</strong> ({$layoutAreas[$areaKey]|escape|lower}){if !$areaLabel@last}; {/if}{/foreach}.
+            {else}
+                One pick for guests and one for signed-in clients, on every page.
+            {/if}
+        </div>
+    </div>
+    <form method="post" action="" class="mt-seg mt-lay-mode-seg">
+        <input type="hidden" name="kind" value="{$activeKind|escape}" data-lay-mode-kind>
+        <button type="submit" name="layout_mode" value="audience"{if $layoutMode|default:'audience' != 'area'} class="on" aria-pressed="true"{else} aria-pressed="false"{/if}>Visitor</button>
+        <button type="submit" name="layout_mode" value="area"{if $layoutMode|default:'audience' == 'area'} class="on" aria-pressed="true"{else} aria-pressed="false"{/if}>Area</button>
+    </form>
+</div>
 
 <div class="mt-tabs" role="tablist">
     <a href="{$viewHelper->url('layouts', ['kind' => 'main-menu'])}"
@@ -140,7 +173,22 @@
 
         <div class="mt-lay-cards">
             {foreach $list as $layout}
-                <div class="mt-lay-card{if $layout.isActiveGuest || $layout.isActiveClient} is-on{/if}">
+                {* Rows and the "live" flag come from the controller. A caller
+                   that passes only the two audience flags still gets the two
+                   audience rows. *}
+                {if isset($layout.rows)}
+                    {assign var=mtRows value=$layout.rows}
+                    {assign var=mtOn value=$layout.isOn}
+                {else}
+                    {assign var=mtGuestOn value=$layout.isActiveGuest|default:false}
+                    {assign var=mtClientOn value=$layout.isActiveClient|default:false}
+                    {assign var=mtRows value=[
+                        ['param' => 'audience', 'value' => 'guest', 'label' => 'Guest client', 'hint' => 'guests', 'active' => $mtGuestOn],
+                        ['param' => 'audience', 'value' => 'client', 'label' => 'Existing client', 'hint' => 'logged-in clients', 'active' => $mtClientOn]
+                    ]}
+                    {assign var=mtOn value=($mtGuestOn || $mtClientOn)}
+                {/if}
+                <div class="mt-lay-card{if $mtOn} is-on{/if}" data-lay-card="{$layout.name|escape}">
                     <div class="mt-lay-thumb">
                         {if $layout.name == 'top'}
                             <svg viewBox="0 0 150 86" role="img" aria-label="Top navigation wireframe">
@@ -235,40 +283,30 @@
                         {* title carries the untruncated text, since the box clamps to two lines. *}
                         {if $layout.description}<div class="mt-lay-desc" title="{$layout.description|escape}">{$layout.description|escape}</div>{/if}
 
+                        {* One row per pick of the mode in use: two (guest, existing
+                           client) when layouts are chosen by visitor, three (website,
+                           client area, order process) when they are chosen by area.
+                           The controller builds the rows, so nothing here knows which
+                           mode the site is in. *}
                         <div class="mt-lay-auds">
-                            {if $layout.isActiveGuest}
-                                <span class="mt-lay-aud is-on">
-                                    <span class="mt-lay-aud-label">Guest client</span>
-                                    <span class="mt-badge mt-badge-success">Active</span>
-                                </span>
-                            {else}
-                                <form method="post" action="">
-                                    <input type="hidden" name="kind"     value="{$k|escape}">
-                                    <input type="hidden" name="layout"   value="{$layout.name|escape}">
-                                    <input type="hidden" name="audience" value="guest">
-                                    <button type="submit" class="mt-lay-aud" title="Activate {$layout.displayName|escape} for guests">
-                                        <span class="mt-lay-aud-label">Guest client</span>
-                                        <span class="mt-lay-aud-cta">Activate</span>
-                                    </button>
-                                </form>
-                            {/if}
-
-                            {if $layout.isActiveClient}
-                                <span class="mt-lay-aud is-on">
-                                    <span class="mt-lay-aud-label">Existing client</span>
-                                    <span class="mt-badge mt-badge-success">Active</span>
-                                </span>
-                            {else}
-                                <form method="post" action="">
-                                    <input type="hidden" name="kind"     value="{$k|escape}">
-                                    <input type="hidden" name="layout"   value="{$layout.name|escape}">
-                                    <input type="hidden" name="audience" value="client">
-                                    <button type="submit" class="mt-lay-aud" title="Activate {$layout.displayName|escape} for logged-in clients">
-                                        <span class="mt-lay-aud-label">Existing client</span>
-                                        <span class="mt-lay-aud-cta">Activate</span>
-                                    </button>
-                                </form>
-                            {/if}
+                            {foreach $mtRows as $row}
+                                {if $row.active}
+                                    <span class="mt-lay-aud is-on" data-lay-row="{$row.value|escape}">
+                                        <span class="mt-lay-aud-label">{$row.label|escape}</span>
+                                        <span class="mt-badge mt-badge-success">Active</span>
+                                    </span>
+                                {else}
+                                    <form method="post" action="">
+                                        <input type="hidden" name="kind"   value="{$k|escape}">
+                                        <input type="hidden" name="layout" value="{$layout.name|escape}">
+                                        <input type="hidden" name="{$row.param|escape}" value="{$row.value|escape}">
+                                        <button type="submit" class="mt-lay-aud" data-lay-row="{$row.value|escape}" title="Activate {$layout.displayName|escape} for {$row.hint|escape}">
+                                            <span class="mt-lay-aud-label">{$row.label|escape}</span>
+                                            <span class="mt-lay-aud-cta">Activate</span>
+                                        </button>
+                                    </form>
+                                {/if}
+                            {/foreach}
                         </div>
 
                         {* Loop every declared option, don't hardcode 'align'.
@@ -282,7 +320,7 @@
                            someone — configuring alignment on a layout nobody is
                            served is noise. Matches the design file, where the
                            alignment segment appears only on an activated card. *}
-                        {if $layout.isActiveGuest || $layout.isActiveClient}
+                        {if $mtOn}
                             {if $layout.options}
                                 {foreach $layout.options as $optKey => $opt}
                                 <div class="mt-lay-opt">
@@ -568,6 +606,10 @@
     function show(kind){
         panels.forEach(function (p) { p.hidden = p.getAttribute('data-kind-panel') !== kind; });
         tabs.forEach(function (t) { t.classList.toggle('is-active', t.getAttribute('data-kind-tab') === kind); });
+        // The "choose layouts by" form sits above the tabs and posts which tab
+        // to come back to.
+        var back = document.querySelector('[data-lay-mode-kind]');
+        if (back) { back.value = kind; }
     }
     tabs.forEach(function (t) {
         t.addEventListener('click', function (e) { e.preventDefault(); show(t.getAttribute('data-kind-tab')); });
