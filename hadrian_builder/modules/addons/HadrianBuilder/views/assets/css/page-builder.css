@@ -25,11 +25,11 @@
 .hbx-notice:empty { margin: 0; }
 .hbx-notice .mt-alert { margin: 0 0 8px; }
 
-/* -- three columns ------------------------------------------------------- */
-.hbx-main { display: grid; grid-template-columns: var(--hbx-left) minmax(0, 1fr) var(--hbx-right); align-items: start; }
+/* -- three columns: outline, inspector, then the preview on the right ---- */
+.hbx-main { display: grid; grid-template-columns: var(--hbx-left) var(--hbx-right) minmax(0, 1fr); align-items: start; }
 .hbx-side { position: sticky; top: 58px; max-height: calc(100vh - 58px); overflow-y: auto; padding: 18px 16px 28px; }
 .hbx-left { border-right: 1px solid var(--mt-border); }
-.hbx-right { border-left: 1px solid var(--mt-border); background: var(--mt-surface); min-height: calc(100vh - 58px); }
+.hbx-right { border-right: 1px solid var(--mt-border); background: var(--mt-surface); min-height: calc(100vh - 58px); }
 @media (max-width: 1180px) {
     .hbx { --hbx-left: 220px; --hbx-right: 304px; }
 }

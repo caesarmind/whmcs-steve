@@ -53,6 +53,8 @@
             <p class="hbx-hint">A new section goes after the selected one, or at the end.</p>
         </aside>
 
+        <aside class="hbx-side hbx-right" id="hbx-inspector"></aside>
+
         <div class="hbx-stage">
             <div class="hbx-device" id="hbx-canvas">
                 <iframe class="hbx-frame" id="hbx-frame" title="Page preview"></iframe>
@@ -63,8 +65,6 @@
                 <span id="hbx-scale"></span>
             </div>
         </div>
-
-        <aside class="hbx-side hbx-right" id="hbx-inspector"></aside>
 
     </div>
 </div>
