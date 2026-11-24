@@ -11,6 +11,8 @@
 //   - a price card shows the price WHMCS itself gives for the product
 //   - a translation shows to a visitor browsing in that language
 //   - a built page cannot take over an address WHMCS answers
+//   - unless the admin says so: a built page can stand in for a theme page,
+//     switched for the whole site or page by page, and switched back
 //   - nothing answers a visitor who is not signed in, and the writes are
 //     CSRF-protected for one who is
 //
@@ -307,6 +309,65 @@ test('a built page cannot take over an address WHMCS answers', async ({ page, pl
     expect(html).not.toContain('data-tpl="module-page"');
   } finally {
     await anon.dispose();
+  }
+});
+
+test('a built page replaces a theme page when the site, or the page, says so', async ({ page, playwright }) => {
+  const MARK = 'E2E replaces announcements';
+  const before = builder('mode').mode;
+  await createPage(page, 'E2E Replace');
+  await addSection(page, 'Closing call to action');
+  await field(page, 'Headline').locator('input').fill(MARK);
+  await setAddress(page, 'e2e-replace');
+  await publish(page);
+
+  const anon = await visitor(playwright);
+  const themePage = async () => (await anon.get('/announcements')).text();
+  const row = () => page.locator('tr', { has: page.locator('.mt-pb-name', { hasText: 'E2E Replace' }) });
+  try {
+    builder('mode', 'theme');
+    await page.goto(MODULE);
+    await expect(row().locator('.mt-badge')).toHaveText('Published');
+
+    // Point it at Announcements. The site is on Theme, so it only stands by.
+    await row().locator('select[name="replaces"]').selectOption('announcements');
+    await expect(page.locator('.mt-alert-success')).toContainText('now replaces Announcements');
+    await expect(row().locator('.mt-badge')).toHaveText('Standby');
+    expect(await themePage(), 'site on Theme: the theme page shows').not.toContain(MARK);
+
+    // Flip the site. Now the built page is what visitors get there.
+    await page.locator('#pb-site button[value="builder"]').click();
+    await expect(row().locator('.mt-badge')).toHaveText('Serving');
+    const html = await themePage();
+    expect(html, 'site on Page Builder: the built page shows').toContain(MARK);
+    expect(html, 'drawn through the theme').toContain('data-tpl="module-page"');
+    expect((await anon.get('/announcements')).status(), 'as a normal page').toBe(200);
+
+    // Only the front door: a view inside the page, and a page with no
+    // replacement, are still the theme's.
+    expect(await (await anon.get('/announcements?page=2')).text(), 'page 2 is the theme').not.toContain(MARK);
+    expect(await (await anon.get('/knowledgebase')).text(), 'an unreplaced page is the theme').not.toContain(MARK);
+    // And it keeps its own address throughout.
+    expect(await (await anon.get('/e2e-replace')).text()).toContain(MARK);
+
+    // The exception: "Never" keeps this one page on the theme.
+    await row().locator('select[name="replace_rule"]').selectOption('never');
+    await expect(row().locator('.mt-badge')).toHaveText('Standby');
+    expect(await themePage(), 'rule Never: the theme page shows').not.toContain(MARK);
+
+    // "Always" serves it even with the site back on Theme.
+    await row().locator('select[name="replace_rule"]').selectOption('always');
+    await page.locator('#pb-site button[value="theme"]').click();
+    await expect(row().locator('.mt-badge')).toHaveText('Serving');
+    expect(await themePage(), 'rule Always, site on Theme: the built page shows').toContain(MARK);
+
+    // Unpublished, it cannot serve; the theme page is back with nothing lost.
+    await row().locator('select[name="replaces"]').selectOption('');
+    await expect(page.locator('.mt-alert-success')).toContainText('no longer replaces');
+    expect(await themePage(), 'let go: the theme page shows').not.toContain(MARK);
+  } finally {
+    await anon.dispose();
+    builder('mode', before);
   }
 });
 

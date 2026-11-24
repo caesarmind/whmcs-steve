@@ -291,6 +291,23 @@ same('an intro line and a list', Catalog::splitDescription("Everything you need.
 same('plain lines', Catalog::splitDescription("For one site\n10 GB storage<br>Free SSL"), ['For one site', ['10 GB storage', 'Free SSL']]);
 same('nothing at all', Catalog::splitDescription(''), ['', []]);
 
+// ------------------------------------------------- replacing a theme page
+$section = 'replacing a theme page';
+$R = \HadrianBuilder\Replace::class;
+check('site on Theme: a following page stands by', !$R::serves('theme', 'follow', 'published'));
+check('site on Page Builder: a following page serves', $R::serves('builder', 'follow', 'published'));
+check('"always" serves with the site on Theme', $R::serves('theme', 'always', 'published'));
+check('"never" stands by with the site on Page Builder', !$R::serves('builder', 'never', 'published'));
+check('a draft never serves, whatever the rule', !$R::serves('builder', 'always', 'draft') && !$R::serves('builder', 'follow', 'draft'));
+check('an unknown rule is read as "follow"', $R::rule('sometimes') === 'follow' && !$R::serves('theme', 'sometimes', 'published'));
+check('only listed theme pages can be replaced', $R::isTarget('homepage') && !$R::isTarget('clientareahome') && !$R::isTarget('viewcart') && !$R::isTarget(''));
+check('no client-area, cart or sign-in page is offered', array_intersect(array_keys($R::TARGETS), ['login', 'clientregister', 'clientareahome', 'viewinvoice', 'viewcart', 'checkout', 'supportticketsubmit-stepone']) === []);
+check('a bare request is the page itself', $R::plainRequest([]) && $R::plainRequest(['language' => 'french']) && $R::plainRequest(['rp' => '/announcements']));
+check('a page number, search or action is left to the theme', !$R::plainRequest(['page' => '2']) && !$R::plainRequest(['search' => 'dns']) && !$R::plainRequest(['a' => 'add']));
+check('only the front door is replaced, not a view inside the page', $R::frontDoor('homepage', '') && $R::frontDoor('announcements', 'announcements') && $R::frontDoor('contact', 'contact.php')
+    && !$R::frontDoor('announcements', 'announcements/view/2026-05') && !$R::frontDoor('knowledgebase', 'knowledgebase/3/billing') && !$R::frontDoor('homepage', 'store/ssl'));
+check('every replaceable page has a front door', array_filter(array_keys($R::TARGETS), static fn($t) => !$R::frontDoor($t, $t === 'homepage' ? '' : $t)) === []);
+
 // Clean up the compiled templates and the stand-in theme folder.
 foreach ([$compileDir, $compileDir . '-cache', $themeDir] as $dir) {
     if (is_dir($dir)) {

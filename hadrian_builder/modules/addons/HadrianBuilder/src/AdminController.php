@@ -11,6 +11,8 @@ namespace HadrianBuilder;
  *   edit      the editor for one page (&id=)
  *   create    POST make a page and open it in the editor
  *   delete    POST remove a page
+ *   mode      POST set "Website served by" (Theme or Page Builder)
+ *   replace   POST choose the theme page a built page stands in for, and when
  *
  * The editor talks JSON to four endpoints (api-preview, api-save, api-publish,
  * api-unpublish). They come through dispatch() like every other action, so
@@ -59,6 +61,8 @@ final class AdminController
             'edit'   => $this->edit(),
             'create' => $this->create(),
             'delete' => $this->delete(),
+            'mode'    => $this->setMode(),
+            'replace' => $this->setReplaces(),
             default  => $this->index(),
         };
     }
@@ -67,14 +71,25 @@ final class AdminController
 
     private function index(): string
     {
-        $pages = [];
+        $mode    = Replace::mode();
+        $pages   = [];
+        $serving = 0;
         foreach (Page::all() as $page) {
             $page['url']     = $page['slug'] !== '' ? Router::urlFor((string)$page['slug']) : '';
             $page['preview'] = Router::previewUrlFor((int)$page['id']);
+            $page['replaces']     = Replace::isTarget((string)($page['replaces'] ?? '')) ? (string)$page['replaces'] : '';
+            $page['replace_rule'] = Replace::rule((string)($page['replace_rule'] ?? ''));
+            // Is this page what visitors get at the theme page's address now?
+            $page['serving'] = $page['replaces'] !== ''
+                && Replace::serves($mode, $page['replace_rule'], (string)$page['status']);
+            $serving += $page['serving'] ? 1 : 0;
             $pages[] = $page;
         }
         return $this->view('index', [
             'pages'    => $pages,
+            'siteMode' => $mode,
+            'targets'  => Replace::TARGETS,
+            'serving'  => $serving,
             'token'    => $this->token(),
             'sections' => count(Sections::types()),
             'flashMsg' => (string)($_GET['flash'] ?? ''),
@@ -113,6 +128,39 @@ final class AdminController
         Page::delete($id);
         unset($_SESSION[Router::PREVIEW_SESSION][$id]);
         $this->done('"' . $page['name'] . '" was deleted.');
+    }
+
+    // ------------------------------------------------- replacing theme pages
+
+    private function setMode(): string
+    {
+        $this->requirePost();
+        $mode = (string)($_POST['mode'] ?? '');
+        if (!in_array($mode, [Replace::MODE_THEME, Replace::MODE_BUILDER], true)) {
+            $this->fail('Choose Theme or Page Builder.');
+        }
+        Replace::setMode($mode);
+        $this->done($mode === Replace::MODE_BUILDER
+            ? 'Your website is now served by Page Builder wherever a built page replaces a theme page.'
+            : 'Your website is now served by the theme. Built replacements are kept on standby.');
+    }
+
+    private function setReplaces(): string
+    {
+        $this->requirePost();
+        $id   = (int)($_POST['id'] ?? 0);
+        $page = Page::find($id);
+        if ($page === null) {
+            $this->fail('That page no longer exists.');
+        }
+        $target = (string)($_POST['replaces'] ?? '');
+        if ($target !== '' && !Replace::isTarget($target)) {
+            $this->fail('That page cannot be replaced.');
+        }
+        Page::setReplaces($id, $target, Replace::rule((string)($_POST['replace_rule'] ?? '')));
+        $this->done($target === ''
+            ? '"' . $page['name'] . '" no longer replaces a theme page.'
+            : '"' . $page['name'] . '" now replaces ' . Replace::TARGETS[$target] . '.');
     }
 
     // --------------------------------------------------------------- editor

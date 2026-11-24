@@ -13,10 +13,13 @@ namespace HadrianBuilder;
  * of a published page, it draws that page through the theme and ends the
  * request with a 200.
  *
- * Two things follow from hooking the not-found page and nothing earlier:
- *   - a built page can never take over an address WHMCS itself answers
- *   - no rewrite rule or file in the WHMCS root is needed; the server
- *     configuration WHMCS already requires is enough
+ * Hooking the not-found page means no rewrite rule or file in the WHMCS root
+ * is needed (the server configuration WHMCS already requires is enough), and
+ * a built page's own address can never shadow one WHMCS answers.
+ *
+ * The one exception is deliberate and opt-in: a built page may stand in for
+ * one of a short list of the theme's website pages (see Replace). That goes
+ * through the same hook, when WHMCS is about to draw that theme page.
  *
  * The editor's preview comes through here too, at preview/<id> under
  * PREVIEW_PREFIX, for a signed-in admin only.
@@ -44,11 +47,15 @@ final class Router
      */
     public static function intercept(array $vars): array
     {
-        if (self::$serving || ($vars['templatefile'] ?? '') !== self::NOT_FOUND) {
+        if (self::$serving) {
             return [];
         }
         if (!in_array($_SERVER['REQUEST_METHOD'] ?? 'GET', ['GET', 'HEAD'], true)) {
             return [];
+        }
+        $template = (string)($vars['templatefile'] ?? '');
+        if ($template !== self::NOT_FOUND) {
+            return self::interceptReplaced($template, $vars);
         }
         try {
             $path = self::requestedPath();
@@ -64,6 +71,45 @@ final class Router
             // Whatever went wrong, the visitor still gets WHMCS's own
             // not-found page rather than an error.
             error_log('Hadrian Page Builder: could not serve "' . ($_SERVER['REQUEST_URI'] ?? '') . '": ' . $e->getMessage()
+                . ' at ' . $e->getFile() . ':' . $e->getLine());
+            self::$serving = false;
+        }
+        return [];
+    }
+
+    /**
+     * WHMCS is about to draw one of the theme's own website pages. If a built
+     * page stands in for it right now (see Replace), draw that instead.
+     *
+     * A signed-in admin can add ?hb_original=1 to see the theme's page while
+     * the built one is live.
+     *
+     * @param array<string,mixed> $vars
+     * @return array<string,mixed>
+     */
+    private static function interceptReplaced(string $template, array $vars): array
+    {
+        if (!Replace::isTarget($template)) {
+            return [];
+        }
+        try {
+            $query = $_GET;
+            if (isset($query['hb_original'])) {
+                if (self::isAdmin()) {
+                    return [];
+                }
+                unset($query['hb_original']);
+            }
+            if (!Bridge::available()) {
+                return [];
+            }
+            $page = Replace::pageFor($template, self::requestedPath(), $query);
+            if ($page !== null) {
+                self::serve($page, (array)$page['published'], false, $vars);
+            }
+        } catch (\Throwable $e) {
+            // The theme's own page is still there to draw.
+            error_log('Hadrian Page Builder: could not replace "' . $template . '": ' . $e->getMessage()
                 . ' at ' . $e->getFile() . ':' . $e->getLine());
             self::$serving = false;
         }

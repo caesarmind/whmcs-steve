@@ -60,7 +60,7 @@ final class Page
         try {
             $rows = \WHMCS\Database\Capsule::table(self::TABLE)
                 ->orderBy('name')
-                ->get(['id', 'slug', 'name', 'status', 'published_at', 'updated_at']);
+                ->get(['id', 'slug', 'name', 'status', 'published_at', 'updated_at', 'replaces', 'replace_rule']);
         } catch (\Throwable $e) {
             return [];
         }
@@ -69,6 +69,40 @@ final class Page
             $out[] = self::hydrate($row);
         }
         return $out;
+    }
+
+    /**
+     * The page that names this theme page as the one it replaces, or null.
+     * The router calls this on client requests: a table that predates the
+     * column means "nothing replaces it", not an error.
+     *
+     * @return array<string,mixed>|null
+     */
+    public static function replacing(string $target): ?array
+    {
+        if ($target === '') {
+            return null;
+        }
+        try {
+            $row = \WHMCS\Database\Capsule::table(self::TABLE)->where('replaces', $target)->orderBy('id')->first();
+            return $row ? self::hydrate($row) : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Point a page at the theme page it replaces ('' for none). A theme page
+     * has one replacement, so any other page naming it lets go.
+     */
+    public static function setReplaces(int $id, string $target, string $rule): void
+    {
+        if ($target !== '') {
+            \WHMCS\Database\Capsule::table(self::TABLE)->where('replaces', $target)->where('id', '!=', $id)
+                ->update(['replaces' => '', 'replace_rule' => 'follow']);
+        }
+        \WHMCS\Database\Capsule::table(self::TABLE)->where('id', $id)
+            ->update(['replaces' => $target, 'replace_rule' => $target === '' ? 'follow' : $rule, 'updated_at' => date('Y-m-d H:i:s')]);
     }
 
     /** Is another page already using this address? */

@@ -8,6 +8,8 @@
  *   php tests/php/builder.php clean
  *       Delete the pages the tests made: any whose name starts with "E2E ".
  *       JSON: how many were removed.
+ *   php tests/php/builder.php mode [theme|builder]
+ *       JSON: the "Website served by" setting. With a value, set it first.
  *   php tests/php/builder.php products
  *       JSON: the first three products an admin can pick, with the price a
  *       price card should show for each.
@@ -51,6 +53,13 @@ switch ($command) {
     case 'clean':
         $n = DB::schema()->hasTable(TABLE) ? DB::table(TABLE)->where('name', 'like', 'E2E %')->delete() : 0;
         echo json_encode(['removed' => $n]);
+        break;
+
+    case 'mode':
+        if (isset($argv[2])) {
+            HadrianBuilder\Replace::setMode((string) $argv[2]);
+        }
+        echo json_encode(['mode' => HadrianBuilder\Replace::mode()]);
         break;
 
     case 'products':

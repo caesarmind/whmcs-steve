@@ -22,6 +22,9 @@ namespace HadrianBuilder;
  *   status     draft | published. A published page with a newer draft stays
  *              "published"; the editor compares the two documents to say
  *              whether there are unpublished changes.
+ *   replaces   the theme page this one stands in for: a key of
+ *              Replace::TARGETS, or '' for none. At most one page per target.
+ *   replace_rule  follow | always | never (see Replace)
  */
 final class Schema
 {
@@ -52,6 +55,16 @@ final class Schema
                 $t->timestamps();
                 $t->index('slug');
                 $t->index('status');
+            });
+        }
+
+        // Added after 0.1.0. ensure() runs on every visit to the admin page,
+        // so an older table picks the columns up without a reactivation.
+        if (!$schema->hasColumn(self::PAGES, 'replaces')) {
+            $schema->table(self::PAGES, function ($t) {
+                $t->string('replaces', 64)->default('');
+                $t->string('replace_rule', 16)->default('follow');
+                $t->index('replaces');
             });
         }
     }
