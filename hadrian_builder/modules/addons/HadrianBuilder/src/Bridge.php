@@ -188,6 +188,22 @@ final class Bridge
         return self::boot() && class_exists('\\Hadrian\\View\\ViewHelper') ? new \Hadrian\View\ViewHelper() : null;
     }
 
+    /**
+     * The active Hadrian theme's version, for the pill in the shared admin
+     * header. '' when it cannot be read; the header then hides the pill.
+     */
+    public static function themeVersion(): string
+    {
+        if (!self::boot() || !class_exists('\\Hadrian\\Helpers\\AddonHelper')) {
+            return '';
+        }
+        try {
+            return (string)(\Hadrian\Helpers\AddonHelper::getTemplate()?->getVersion() ?? '');
+        } catch (\Throwable $e) {
+            return '';
+        }
+    }
+
     /** Smarty 4 and earlier use \Smarty; Smarty 5 moved it. */
     public static function smartyClass(): string
     {

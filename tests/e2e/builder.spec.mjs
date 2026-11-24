@@ -86,6 +86,8 @@ test('it is its own module, and it plugs into the Hadrian admin', async ({ page 
   await expect(page).toHaveTitle('WHMCS - Hadrian Page Builder');
   await expect(page.locator('.mt-page-title')).toHaveText('Page builder');
   await expect(page.locator('.mt-topnav-item.is-active')).toHaveText('Builder');
+  // The shared header shows the theme's real version here too, as on Hadrian's own pages.
+  await expect(page.locator('.mt-brand-ver'), 'the header carries the theme version').toHaveText(/^v\d+\.\d+/);
 });
 
 test('build a page in the editor, publish it, and visit it', async ({ page, playwright }) => {
