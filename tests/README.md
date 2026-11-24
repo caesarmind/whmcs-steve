@@ -33,11 +33,29 @@ Playwright report (screenshots, traces, the HTML of every failing page).
 | Tier | What it checks | Needs the site | Time |
 |---|---|---|---|
 | **preflight** | the stack is up, serves *this* checkout, the template is `hadrian`, the addon's hooks load, data is seeded, a gateway is active | yes | ~5 s |
-| **static** | 26 checkers: every page is tested or has a stated reason why not, CSS is ASCII-only, PHP parses, Smarty balance, every `$hadrianLang` key resolves, colour defaults match the CSS, the three "Free" implementations agree, admin JS parses, docs anchors, ... | no | ~30 s |
+| **static** | 32 checkers: every page is tested or has a stated reason why not, CSS is ASCII-only, PHP parses, Smarty balance, every `$hadrianLang` key resolves, colour defaults match the CSS, the three "Free" implementations agree, admin JS parses, docs anchors, ... | no | ~30 s |
 | **compile** | every one of the 314 templates compiled by **WHMCS's own Smarty** (its modifiers + security policy) | WHMCS files | ~12 s |
 | **smoke** | every page x persona over HTTP, every Hadrian admin screen, and a crawl that follows every link the theme renders | yes | ~3 min |
 | **browser** | real Chromium: every key page in 3 layouts x light/dark + phone width; JS errors, failed assets, layout geometry, unreadable text; six user flows | yes | ~3 min |
 | **visual** | screenshots compared against approved baselines - **advisory**, never fails the run | yes | ~2 min |
+
+### Hadrian Email Templates
+
+A separate addon module (`hadrian_email/`, mounted at `modules/addons/HadrianEmail`)
+that requires Hadrian. It is tested in two places:
+
+- **static**: three checks. `test-email-engine.php` drives the engine with no WHMCS
+  (merge-field handling, the sanitiser, document validation, colour resolution, the
+  renderer); the other two lint its templates and its builder script.
+- **settings** (`e2e/email.spec.mjs`, beside `settings.spec.mjs`, one worker): the
+  module driven through its admin UI in Chromium, with the emails WHMCS then sends read
+  back from Mailpit. It also runs `tests/php/email-live.php`, the checks that need WHMCS
+  itself: the takeover and its fallback, publishing, translations, edits made outside,
+  and that turning it off restores WHMCS byte for byte.
+
+The spec switches the header of every email the install sends, which is why it never
+runs beside the smoke or browser tiers. It removes the mail-log rows it creates: an
+email left in a persona's history is opened by the smoke crawl, links and all.
 
 ```bash
 node tests/run.mjs --tier static,compile   # no site needed

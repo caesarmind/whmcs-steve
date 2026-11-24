@@ -1,0 +1,158 @@
+/* Email builder. Inlined into views/builder.tpl by AdminController, the same
+   way Hadrian inlines its own admin stylesheet. ASCII only.
+
+   Every class is prefixed hxb- and lives inside .hxb, which sits inside
+   .mt-wrap, so it inherits the --mt-* tokens and both admin themes. */
+
+/* The builder wants the whole width; every other admin page is a 1180px column. */
+.mt-body:has(.hxb) { max-width: none; padding: 0 0 40px; }
+
+.hxb { --hxb-left: 264px; --hxb-right: 348px; color: var(--mt-text); }
+.hxb button { font-family: inherit; }
+
+/* -- top bar ------------------------------------------------------------- */
+.hxb-bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 16px; padding: 12px 24px; background: var(--mt-surface); border-bottom: 1px solid var(--mt-border); flex-wrap: wrap; }
+.hxb-title { display: flex; align-items: center; gap: 10px; min-width: 0; margin-right: auto; }
+.hxb-name { font-size: 17px; font-weight: 600; letter-spacing: -0.015em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hxb-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.hxb-tools .mt-select { width: auto; min-width: 170px; padding: 7px 34px 7px 12px; font-size: 13px; border-radius: 10px; }
+.hxb-seg { display: inline-flex; padding: 3px; background: var(--mt-surface-2); border-radius: 10px; }
+.hxb-seg button { border: 0; background: none; padding: 5px 12px; font-size: 13px; font-weight: 500; color: var(--mt-text-2); border-radius: 8px; cursor: pointer; }
+.hxb-seg button.is-active { background: var(--mt-surface); color: var(--mt-text); box-shadow: var(--mt-shadow-seg); }
+.hxb-sep { width: 1px; height: 22px; background: var(--mt-border); }
+
+.hxb-notice { margin: 14px 24px 0; }
+.hxb-notice .mt-alert { margin: 0 0 8px; }
+.hxb-notice ul { margin: 6px 0 0 18px; padding: 0; }
+
+/* -- three columns ------------------------------------------------------- */
+.hxb-main { display: grid; grid-template-columns: var(--hxb-left) minmax(0, 1fr) var(--hxb-right); align-items: start; }
+.hxb-side { position: sticky; top: 58px; max-height: calc(100vh - 58px); overflow-y: auto; padding: 18px 16px 28px; }
+.hxb-left { border-right: 1px solid var(--mt-border); }
+.hxb-right { border-left: 1px solid var(--mt-border); background: var(--mt-surface); min-height: calc(100vh - 58px); }
+@media (max-width: 1180px) {
+    .hxb { --hxb-left: 216px; --hxb-right: 300px; }
+}
+@media (max-width: 900px) {
+    .hxb-main { grid-template-columns: 1fr; }
+    .hxb-side { position: static; max-height: none; border: 0; border-top: 1px solid var(--mt-border); min-height: 0; }
+}
+
+.hxb-h { margin: 0 0 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--mt-text-3); }
+.hxb-h:not(:first-child) { margin-top: 24px; }
+
+/* -- palette ------------------------------------------------------------- */
+.hxb-palette { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.hxb-pal { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px; border: 1px solid var(--mt-border); border-radius: 12px; background: var(--mt-surface); color: var(--mt-text); cursor: grab; text-align: left; touch-action: none; user-select: none; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.hxb-pal:hover { border-color: var(--mt-primary); box-shadow: 0 0 0 3px var(--mt-primary-ring); }
+.hxb-pal:active { cursor: grabbing; }
+.hxb-pal svg { width: 18px; height: 18px; color: var(--mt-primary); }
+.hxb-pal span { font-size: 12.5px; font-weight: 600; line-height: 1.2; }
+.hxb-pal[disabled] { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
+.hxb-hint { margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: var(--mt-text-3); }
+
+/* -- outline ------------------------------------------------------------- */
+.hxb-outline { position: relative; list-style: none; margin: 0; padding: 0; }
+.hxb-out { display: flex; align-items: center; gap: 6px; padding: 7px 6px 7px 4px; border-radius: 10px; cursor: pointer; user-select: none; }
+.hxb-out:hover { background: var(--mt-surface-2); }
+.hxb-out.is-sel { background: var(--mt-primary-tint); }
+.hxb-out-grip { display: inline-flex; padding: 2px; color: var(--mt-text-4); cursor: grab; touch-action: none; }
+.hxb-out-grip svg { width: 12px; height: 12px; }
+.hxb-out-text { flex: 1; min-width: 0; }
+.hxb-out-type { font-size: 12.5px; font-weight: 600; line-height: 1.2; }
+.hxb-out-sum { font-size: 11.5px; color: var(--mt-text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hxb-out-empty { padding: 10px 6px; font-size: 12.5px; color: var(--mt-text-3); }
+.hxb-out-line { position: absolute; left: 4px; right: 4px; height: 2px; margin-top: -1px; background: var(--mt-primary); border-radius: 2px; pointer-events: none; }
+
+.hxb-ico { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--mt-text-3); cursor: pointer; }
+.hxb-ico:hover { background: var(--mt-surface-2); color: var(--mt-text); }
+.hxb-ico.is-danger:hover { background: rgba(255,59,48,0.10); color: var(--mt-danger); }
+.hxb-ico svg { width: 14px; height: 14px; }
+.hxb-ico[disabled] { opacity: 0.3; pointer-events: none; }
+.hxb-out .hxb-ico { visibility: hidden; }
+.hxb-out:hover .hxb-ico, .hxb-out.is-sel .hxb-ico { visibility: visible; }
+
+/* -- stage --------------------------------------------------------------- */
+.hxb-stage { min-height: calc(100vh - 58px); padding: 24px 24px 60px; background: var(--mt-surface-2); }
+.hxb-device { position: relative; margin: 0 auto; max-width: 760px; background: #fff; border: 1px solid var(--mt-border); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.04); transition: max-width 0.2s ease; }
+.hxb-device.is-mobile { max-width: 390px; border-radius: 28px; }
+.hxb-frame { display: block; width: 100%; height: 520px; border: 0; background: #fff; }
+.hxb-overlay { position: absolute; inset: 0; outline: none; cursor: default; touch-action: none; }
+.hxb-box { position: absolute; pointer-events: none; border-radius: 6px; }
+.hxb-box.is-hover { box-shadow: 0 0 0 1px var(--mt-primary); opacity: 0.55; }
+.hxb-box.is-sel { box-shadow: 0 0 0 2px var(--mt-primary); }
+.hxb-tag { position: absolute; left: -2px; top: -22px; height: 20px; padding: 0 8px; display: inline-flex; align-items: center; background: var(--mt-primary); color: #fff; font-size: 11px; font-weight: 600; border-radius: 6px 6px 0 0; white-space: nowrap; }
+.hxb-acts { position: absolute; right: -2px; top: -30px; display: inline-flex; gap: 2px; padding: 2px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: 9px; box-shadow: var(--mt-shadow-dropdown); pointer-events: auto; }
+.hxb-box.is-low .hxb-tag { top: 2px; left: 2px; border-radius: 6px; }
+.hxb-box.is-low .hxb-acts { top: 2px; right: 2px; }
+.hxb-line { position: absolute; height: 3px; margin-top: -2px; background: var(--mt-primary); border-radius: 3px; pointer-events: none; box-shadow: 0 0 0 3px var(--mt-primary-ring); }
+.hxb-empty { position: absolute; display: flex; align-items: center; justify-content: center; padding: 12px; border: 1.5px dashed var(--mt-primary); border-radius: 12px; background: rgba(255,255,255,0.86); color: #1d1d1f; font-size: 13px; font-weight: 500; text-align: center; pointer-events: none; }
+.hxb-busy { position: absolute; right: 10px; top: 10px; padding: 3px 9px; border-radius: 980px; background: rgba(0,0,0,0.62); color: #fff; font-size: 11px; font-weight: 600; pointer-events: none; }
+/* The drag ghost and the merge-field popover are appended to document.body, so
+   they carry .mt-wrap to inherit the admin tokens. .mt-wrap is also a page
+   wrapper (min-height 70vh, bottom padding, page background), which a floating
+   chip must not inherit: hence the doubled class and the resets. */
+.mt-wrap.hxb-ghost { position: fixed; z-index: 10001; min-height: 0; padding: 7px 12px; border-radius: 10px; background: var(--mt-primary); color: #fff; font-size: 12.5px; font-weight: 600; line-height: 1.3; pointer-events: none; box-shadow: var(--mt-shadow-dropdown); transform: translate(12px, 12px); }
+.hxb-meta { margin: 12px auto 0; max-width: 760px; display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--mt-text-3); }
+.hxb.is-dragging, .hxb.is-dragging * { cursor: grabbing !important; user-select: none; }
+
+/* -- inspector ----------------------------------------------------------- */
+.hxb-insp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.hxb-insp-title { font-size: 17px; font-weight: 600; letter-spacing: -0.015em; }
+.hxb-insp-sub { margin: 0 0 18px; font-size: 12.5px; line-height: 1.5; color: var(--mt-text-3); }
+.hxb-field { margin-bottom: 16px; }
+.hxb-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; font-size: 13px; font-weight: 500; }
+.hxb-label small { font-size: 11px; font-weight: 500; color: var(--mt-primary); }
+.hxb-help { margin: 6px 0 0; font-size: 12px; line-height: 1.5; color: var(--mt-text-3); }
+.hxb-field .mt-input, .hxb-field .mt-select, .hxb-field .mt-textarea { padding: 9px 12px; font-size: 14px; border-radius: 10px; }
+.hxb-inline { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.hxb-inline .hxb-label { margin: 0; }
+.hxb-unit { display: flex; align-items: center; gap: 8px; }
+.hxb-unit .mt-input { width: 96px; }
+.hxb-unit span { font-size: 13px; color: var(--mt-text-3); }
+.hxb-with-btn { display: flex; gap: 6px; }
+.hxb-with-btn .mt-input { flex: 1; min-width: 0; }
+.hxb-mf { flex-shrink: 0; width: 38px; height: auto; border: 1px solid var(--mt-input-border); border-radius: 10px; background: var(--mt-surface); color: var(--mt-text-2); font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; font-weight: 600; cursor: pointer; }
+.hxb-mf:hover { border-color: var(--mt-primary); color: var(--mt-primary); }
+.hxb-code { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12.5px !important; line-height: 1.5; min-height: 180px; white-space: pre; overflow-wrap: normal; overflow-x: auto; }
+
+.hxb-rich-wrap { border: 1px solid var(--mt-input-border); border-radius: 10px; background: var(--mt-surface); overflow: hidden; }
+.hxb-rich-wrap:focus-within { border-color: var(--mt-primary); box-shadow: 0 0 0 3px var(--mt-primary-ring); }
+.hxb-rich-bar { display: flex; gap: 2px; padding: 4px; border-bottom: 1px solid var(--mt-border); background: var(--mt-surface-3); }
+.hxb-rich-bar .hxb-ico { width: 28px; height: 26px; font-size: 13px; font-weight: 700; color: var(--mt-text-2); }
+.hxb-rich-bar .hxb-ico.is-text { width: auto; padding: 0 8px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; margin-left: auto; }
+.hxb-rich { min-height: 96px; max-height: 320px; overflow-y: auto; padding: 10px 12px; font-size: 14px; line-height: 1.55; outline: none; }
+.hxb-rich p { margin: 0 0 10px; }
+.hxb-rich p:last-child { margin-bottom: 0; }
+.hxb-rich ul, .hxb-rich ol { margin: 0 0 10px; padding-left: 20px; }
+.hxb-rich a { color: var(--mt-link); text-decoration: underline; }
+.hxb-rich:empty::before { content: attr(data-placeholder); color: var(--mt-text-4); }
+
+.hxb-rep { display: flex; flex-direction: column; gap: 8px; }
+.hxb-rep-item { display: grid; grid-template-columns: 1fr 26px; gap: 6px; padding: 8px; border: 1px solid var(--mt-border); border-radius: 10px; background: var(--mt-surface-3); }
+.hxb-rep-fields { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.hxb-rep-item .mt-input { padding: 7px 10px; font-size: 13px; }
+.hxb-add { align-self: flex-start; border: 0; background: none; padding: 4px 0; color: var(--mt-primary); font-size: 13px; font-weight: 500; cursor: pointer; }
+.hxb-add[disabled] { opacity: 0.4; pointer-events: none; }
+
+.hxb-divider { height: 1px; margin: 20px 0; background: var(--mt-border); }
+
+/* -- layout design picker ------------------------------------------------ */
+.hxb-designs { display: flex; flex-direction: column; gap: 8px; }
+.hxb-design { display: flex; flex-direction: column; gap: 3px; width: 100%; padding: 10px 12px; border: 1px solid var(--mt-border); border-radius: 12px; background: var(--mt-surface); color: var(--mt-text); text-align: left; cursor: pointer; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.hxb-design:hover { border-color: var(--mt-primary); }
+.hxb-design.is-active { border-color: var(--mt-primary); box-shadow: 0 0 0 3px var(--mt-primary-ring); }
+.hxb-design strong { font-size: 13px; font-weight: 600; }
+.hxb-design span { font-size: 12px; line-height: 1.45; color: var(--mt-text-3); }
+.hxb-fields-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.hxb-chip { border: 1px solid var(--mt-border); border-radius: 8px; background: var(--mt-surface-3); padding: 3px 7px; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 11.5px; color: var(--mt-text-2); cursor: pointer; }
+.hxb-chip:hover { border-color: var(--mt-primary); color: var(--mt-primary); }
+.hxb-group-label { margin: 12px 0 6px; font-size: 12px; font-weight: 600; color: var(--mt-text-2); }
+.hxb-linkbtn { border: 0; background: none; padding: 0; font: inherit; font-size: 13px; color: var(--mt-text-3); cursor: pointer; text-decoration: underline; }
+.hxb-linkbtn:hover { color: var(--mt-danger); }
+
+/* -- merge-field popover (moved to document.body) ------------------------ */
+.mt-wrap.hxb-pop { position: fixed; z-index: 10000; width: 250px; min-height: 0; max-height: 320px; overflow-y: auto; padding: 8px; background: var(--mt-surface); border: 1px solid var(--mt-border); border-radius: 12px; box-shadow: var(--mt-shadow-dropdown); color: var(--mt-text); }
+.hxb-pop-group { padding: 6px 6px 2px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--mt-text-3); }
+.hxb-pop button { display: block; width: 100%; border: 0; background: none; padding: 6px; border-radius: 7px; text-align: left; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 12px; color: var(--mt-text); cursor: pointer; }
+.hxb-pop button:hover { background: var(--mt-primary-tint); color: var(--mt-link); }

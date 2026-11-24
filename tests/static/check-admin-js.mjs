@@ -16,13 +16,15 @@
 // "did MY file start failing", not as a clean bill for the whole tree.
 //
 //   node tests/static/check-admin-js.mjs
-import { readFileSync, readdirSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 
 // Node 18 has no fs.globSync, so walk it.
 const walk = d => readdirSync(d, { withFileTypes: true }).flatMap(e =>
   e.isDirectory() ? walk(join(d, e.name)) : (e.name.endsWith('.tpl') ? [join(d, e.name)] : []));
-const files = walk('hadrian/modules/addons/Hadrian/views/adminarea');
+// Hadrian Email Templates is a separate addon with admin views of its own.
+const files = ['hadrian/modules/addons/Hadrian/views/adminarea', 'hadrian_email/modules/addons/HadrianEmail/views']
+  .filter(d => existsSync(d)).flatMap(walk);
 let bad = 0, checked = 0;
 
 for (const f of files) {

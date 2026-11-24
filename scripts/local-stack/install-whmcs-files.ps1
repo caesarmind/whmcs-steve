@@ -33,7 +33,9 @@ $repo = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $junctions = @(
     @{ link = "$web\templates\hadrian";                 target = "$repo\hadrian\templates\hadrian" },
     @{ link = "$web\modules\addons\Hadrian";            target = "$repo\hadrian\modules\addons\Hadrian" },
-    @{ link = "$web\templates\orderforms\hadrian_cart"; target = "$repo\hadrian_cart" }
+    @{ link = "$web\templates\orderforms\hadrian_cart"; target = "$repo\hadrian_cart" },
+    # Hadrian Email Templates: a separate addon module that requires Hadrian.
+    @{ link = "$web\modules\addons\HadrianEmail";       target = "$repo\hadrian_email\modules\addons\HadrianEmail" }
 )
 
 # --- resolve the source to a folder ---------------------------------------

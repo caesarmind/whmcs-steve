@@ -15,17 +15,21 @@ machine, with the theme folders of this repo mounted straight into it. Edit a
 
 ## The repo is mounted, not copied
 
-Three directory junctions inside the install point back into this checkout:
+Four directory junctions inside the install point back into this checkout:
 
 ```
 C:\laragon\www\whmcs\templates\hadrian                 -> hadrian\templates\hadrian
 C:\laragon\www\whmcs\modules\addons\Hadrian            -> hadrian\modules\addons\Hadrian
 C:\laragon\www\whmcs\templates\orderforms\hadrian_cart -> hadrian_cart
+C:\laragon\www\whmcs\modules\addons\HadrianEmail       -> hadrian_email\modules\addons\HadrianEmail
 ```
 
-That is exactly the set the deploy Action ships (`.github/workflows/main.yml`),
-so what you see locally is what a push would put on the live box. Anything
-else in the repo (mockups, docs, scripts) is invisible to WHMCS, same as prod.
+The first three are exactly the set the deploy Action ships
+(`.github/workflows/main.yml`), so what you see locally is what a push would
+put on the live box. The fourth is Hadrian Email Templates, a separate addon
+module that requires Hadrian: it is mounted here so it can be developed and
+tested, and the deploy Action does not ship it. Anything else in the repo
+(mockups, docs, scripts) is invisible to WHMCS, same as prod.
 
 `git checkout` of another branch flips the local site with it - there is no
 separate copy to keep in sync.

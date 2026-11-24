@@ -20,13 +20,15 @@ export const MYSQL_BIN = process.env.HADRIAN_MYSQL_BIN || 'C:/laragon/bin/mysql/
 export const MAILPIT_BIN = process.env.HADRIAN_MAILPIT_BIN || 'C:/laragon/bin/mailpit/1.22.3/mailpit.exe';
 export const MAILPIT_URL = (process.env.HADRIAN_MAILPIT_URL || 'http://localhost:8025').replace(/\/$/, '');
 
-// The three directories the local install serves from this checkout. If a
+// The directories the local install serves from this checkout. If a
 // junction points anywhere else (another worktree, a stale copy), every test
 // would be exercising code you are not looking at.
 export const JUNCTIONS = [
   { link: path.join(WHMCS_ROOT, 'templates', 'hadrian'),                  target: path.join(REPO_ROOT, 'hadrian', 'templates', 'hadrian') },
   { link: path.join(WHMCS_ROOT, 'modules', 'addons', 'Hadrian'),          target: path.join(REPO_ROOT, 'hadrian', 'modules', 'addons', 'Hadrian') },
   { link: path.join(WHMCS_ROOT, 'templates', 'orderforms', 'hadrian_cart'), target: path.join(REPO_ROOT, 'hadrian_cart') },
+  // Hadrian Email Templates: its own addon module, in its own top-level folder.
+  { link: path.join(WHMCS_ROOT, 'modules', 'addons', 'HadrianEmail'),     target: path.join(REPO_ROOT, 'hadrian_email', 'modules', 'addons', 'HadrianEmail') },
 ];
 
 // A fixed desktop UA. WHMCS binds admin sessions to the user agent, so the

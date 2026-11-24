@@ -80,6 +80,15 @@ export const CHECKS = [
   ].map(([id, title]) => ({ id, title, cmd: [PHP, STATIC(`check-${id}.php`)], cwd: REPO_ROOT, blocking: true })),
   { id: 'creating-pages', title: 'Custom page creation', cmd: [PHP, STATIC('test-creating-pages.php')], cwd: REPO_ROOT, blocking: true },
   { id: 'visibility-gate', title: 'Page visibility gate', cmd: [PHP, STATIC('test-visibility-gate.php')], cwd: REPO_ROOT, blocking: true },
+
+  // Hadrian Email Templates: a separate addon module (hadrian_email/) that
+  // requires Hadrian. Its live checks (takeover, publish, real mail) are in
+  // the settings tier: e2e/email.spec.mjs.
+  { id: 'email-engine', title: 'Email module: engine', cmd: [PHP, STATIC('test-email-engine.php')], cwd: REPO_ROOT, blocking: true,
+    why: 'Merge-field handling, the sanitiser, document validation, colours and the renderer, with no WHMCS.' },
+  { id: 'email-smarty-lint', title: 'Email module: Smarty safety lint', cmd: [node, STATIC('smarty-lint.mjs'), 'hadrian_email/modules/addons/HadrianEmail/views'], cwd: REPO_ROOT, blocking: true },
+  { id: 'email-builder-js', title: 'Email module: builder script parses', cmd: [node, '--check', 'hadrian_email/modules/addons/HadrianEmail/views/assets/js/email-builder.js'], cwd: REPO_ROOT, blocking: true,
+    why: 'The script is inlined into the page by PHP, so check-admin-js never sees its source.' },
 ];
 
 // Tier 2 lives here too so run.mjs treats it like any other check.

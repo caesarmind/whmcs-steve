@@ -8,6 +8,11 @@
 export const SKIP = [
   /logout|dologout/i,            // ends the session by design
   /[?&]token=/i,                  // carries a CSRF token => mutates something
+  // WHMCS's marketing opt-out is a plain GET with no token: following it from
+  // an email in the client's history opts the persona out and sends them a
+  // confirmation. Seen for real when a test email with an unsubscribe link
+  // was left in that history.
+  /unsubscribe\.php|email_marketing_opt(in|out)/i,
   /closeticket|markasread|dismiss|regenerate/i,
   /[?&]a=(add|remove|empty|update|checkout)/i, /sub=(delete|remove|save)/i,
   /[?&](language|currency)=/i,   // flips session settings for later pages
