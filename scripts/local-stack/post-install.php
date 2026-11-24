@@ -11,6 +11,7 @@
  *      which runs the migrator, the menu seeder and the pages cache)
  *   3. Activate Hadrian Email Templates the same way, when its folder is
  *      mounted (it is a separate module that requires Hadrian)
+ *   4. Activate Hadrian Page Builder the same way, when its folder is mounted
  */
 
 define('CLIENTAREA', false);
@@ -111,6 +112,7 @@ function activateAddon(string $module, string $whmcsRoot, bool $required = true)
 activateAddon('Hadrian', $whmcsRoot);
 // A separate product that requires Hadrian, so it goes second.
 activateAddon('HadrianEmail', $whmcsRoot, false);
+activateAddon('HadrianBuilder', $whmcsRoot, false);
 
 echo "== verify ==\n";
 foreach (['Template', 'OrderFormTemplate', 'SystemURL'] as $s) {

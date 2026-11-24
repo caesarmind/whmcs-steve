@@ -29,6 +29,8 @@ export const JUNCTIONS = [
   { link: path.join(WHMCS_ROOT, 'templates', 'orderforms', 'hadrian_cart'), target: path.join(REPO_ROOT, 'hadrian_cart') },
   // Hadrian Email Templates: its own addon module, in its own top-level folder.
   { link: path.join(WHMCS_ROOT, 'modules', 'addons', 'HadrianEmail'),     target: path.join(REPO_ROOT, 'hadrian_email', 'modules', 'addons', 'HadrianEmail') },
+  // Hadrian Page Builder: the same shape, a third folder.
+  { link: path.join(WHMCS_ROOT, 'modules', 'addons', 'HadrianBuilder'),   target: path.join(REPO_ROOT, 'hadrian_builder', 'modules', 'addons', 'HadrianBuilder') },
 ];
 
 // A fixed desktop UA. WHMCS binds admin sessions to the user agent, so the

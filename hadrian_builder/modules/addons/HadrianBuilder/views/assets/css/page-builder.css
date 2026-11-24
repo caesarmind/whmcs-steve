@@ -1,0 +1,143 @@
+/* Page builder editor. Inlined into views/editor.tpl by AdminController, the
+   same way Hadrian inlines its own admin stylesheet. ASCII only.
+
+   Every class is prefixed hbx- and lives inside .hbx, which sits inside
+   .mt-wrap, so it inherits the --mt-* tokens and both admin themes. */
+
+/* The editor wants the whole width; every other admin page is a 1180px column. */
+.mt-body:has(.hbx) { max-width: none; padding: 0 0 40px; }
+
+.hbx { --hbx-left: 272px; --hbx-right: 356px; color: var(--mt-text); }
+.hbx button { font-family: inherit; }
+
+/* -- top bar ------------------------------------------------------------- */
+.hbx-bar { position: sticky; top: 0; z-index: 30; display: flex; align-items: center; gap: 16px; padding: 12px 24px; background: var(--mt-surface); border-bottom: 1px solid var(--mt-border); flex-wrap: wrap; }
+.hbx-title { display: flex; align-items: center; gap: 10px; min-width: 0; margin-right: auto; }
+.hbx-name { font-size: 17px; font-weight: 600; letter-spacing: -0.015em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hbx-tools { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.hbx-tools .mt-select { width: auto; min-width: 170px; padding: 7px 34px 7px 12px; font-size: 13px; border-radius: 10px; }
+.hbx-seg { display: inline-flex; padding: 3px; background: var(--mt-surface-2); border-radius: 10px; }
+.hbx-seg button { border: 0; background: none; padding: 5px 12px; font-size: 13px; font-weight: 500; color: var(--mt-text-2); border-radius: 8px; cursor: pointer; }
+.hbx-seg button.is-active { background: var(--mt-surface); color: var(--mt-text); box-shadow: var(--mt-shadow-seg); }
+.hbx-sep { width: 1px; height: 22px; background: var(--mt-border); }
+
+.hbx-notice { margin: 14px 24px 0; }
+.hbx-notice:empty { margin: 0; }
+.hbx-notice .mt-alert { margin: 0 0 8px; }
+
+/* -- three columns ------------------------------------------------------- */
+.hbx-main { display: grid; grid-template-columns: var(--hbx-left) minmax(0, 1fr) var(--hbx-right); align-items: start; }
+.hbx-side { position: sticky; top: 58px; max-height: calc(100vh - 58px); overflow-y: auto; padding: 18px 16px 28px; }
+.hbx-left { border-right: 1px solid var(--mt-border); }
+.hbx-right { border-left: 1px solid var(--mt-border); background: var(--mt-surface); min-height: calc(100vh - 58px); }
+@media (max-width: 1180px) {
+    .hbx { --hbx-left: 220px; --hbx-right: 304px; }
+}
+@media (max-width: 900px) {
+    .hbx-main { grid-template-columns: 1fr; }
+    .hbx-side { position: static; max-height: none; border: 0; border-top: 1px solid var(--mt-border); min-height: 0; }
+}
+
+.hbx-h { margin: 0 0 10px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--mt-text-3); }
+.hbx-h:not(:first-child) { margin-top: 24px; }
+.hbx-hint { margin: 10px 0 0; font-size: 12px; line-height: 1.5; color: var(--mt-text-3); }
+
+/* -- outline ------------------------------------------------------------- */
+.hbx-outline { list-style: none; margin: 0; padding: 0; }
+.hbx-out { display: flex; align-items: center; gap: 6px; padding: 7px 6px 7px 4px; border-radius: 10px; cursor: pointer; user-select: none; border-top: 2px solid transparent; border-bottom: 2px solid transparent; }
+.hbx-out:hover { background: var(--mt-surface-2); }
+.hbx-out.is-sel { background: var(--mt-primary-tint); }
+.hbx-out.is-hidden .hbx-out-text { opacity: 0.45; }
+.hbx-out.is-over-before { border-top-color: var(--mt-primary); }
+.hbx-out.is-over-after { border-bottom-color: var(--mt-primary); }
+.hbx-out.is-dragged { opacity: 0.4; }
+.hbx-out-grip { display: inline-flex; padding: 2px; color: var(--mt-text-4); cursor: grab; }
+.hbx-out-grip svg { width: 12px; height: 12px; }
+.hbx-out-text { flex: 1; min-width: 0; }
+.hbx-out-type { font-size: 12.5px; font-weight: 600; line-height: 1.2; }
+.hbx-out-sum { font-size: 11.5px; color: var(--mt-text-3); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hbx-out-empty { padding: 10px 6px; font-size: 12.5px; color: var(--mt-text-3); }
+
+.hbx-ico { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; border: 0; border-radius: 8px; background: none; color: var(--mt-text-3); cursor: pointer; }
+.hbx-ico:hover { background: var(--mt-surface-2); color: var(--mt-text); }
+.hbx-ico.is-danger:hover { background: rgba(255,59,48,0.10); color: var(--mt-danger); }
+.hbx-ico svg { width: 14px; height: 14px; }
+.hbx-ico[disabled] { opacity: 0.3; pointer-events: none; }
+.hbx-out .hbx-ico { visibility: hidden; }
+.hbx-out:hover .hbx-ico, .hbx-out.is-sel .hbx-ico { visibility: visible; }
+
+.hbx-pagebtn { display: block; width: 100%; margin-top: 10px; padding: 8px 10px; border: 1px solid var(--mt-border); border-radius: 10px; background: var(--mt-surface); color: var(--mt-text); font-size: 12.5px; font-weight: 600; text-align: left; cursor: pointer; }
+.hbx-pagebtn:hover, .hbx-pagebtn.is-sel { border-color: var(--mt-primary); box-shadow: 0 0 0 3px var(--mt-primary-ring); }
+
+/* -- palette ------------------------------------------------------------- */
+.hbx-pal-group { margin: 12px 0 6px; font-size: 12px; font-weight: 600; color: var(--mt-text-2); }
+.hbx-pal-group:first-child { margin-top: 0; }
+.hbx-pal { display: block; width: 100%; margin-bottom: 6px; padding: 9px 10px; border: 1px solid var(--mt-border); border-radius: 12px; background: var(--mt-surface); color: var(--mt-text); text-align: left; cursor: pointer; }
+.hbx-pal:hover { border-color: var(--mt-primary); box-shadow: 0 0 0 3px var(--mt-primary-ring); }
+.hbx-pal strong { display: block; font-size: 12.5px; font-weight: 600; line-height: 1.3; }
+.hbx-pal span { display: block; font-size: 11.5px; line-height: 1.4; color: var(--mt-text-3); }
+
+/* -- stage --------------------------------------------------------------- */
+.hbx-stage { min-height: calc(100vh - 58px); padding: 24px 24px 60px; background: var(--mt-surface-2); }
+/* The frame is always as wide as the device it stands for, so the theme lays
+   the page out for that device, and is scaled down to fit the stage. The
+   script sets the sizes (fitFrame). */
+.hbx-device { position: relative; margin: 0 auto; background: #fff; border: 1px solid var(--mt-border); border-radius: 14px; overflow: hidden; box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+.hbx-device.is-mobile { border-radius: 28px; }
+.hbx-frame { display: block; width: 100%; height: 480px; border: 0; background: #fff; transform-origin: 0 0; }
+.hbx-busy { position: absolute; right: 10px; top: 10px; padding: 3px 9px; border-radius: 980px; background: rgba(0,0,0,0.62); color: #fff; font-size: 11px; font-weight: 600; pointer-events: none; }
+.hbx-meta { margin: 12px auto 0; display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--mt-text-3); }
+
+/* -- inspector ----------------------------------------------------------- */
+.hbx-insp-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.hbx-insp-title { font-size: 17px; font-weight: 600; letter-spacing: -0.015em; }
+.hbx-insp-sub { margin: 0 0 18px; font-size: 12.5px; line-height: 1.5; color: var(--mt-text-3); }
+.hbx-field { margin-bottom: 16px; }
+.hbx-label { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px; font-size: 13px; font-weight: 500; }
+.hbx-label small { font-size: 11px; font-weight: 500; color: var(--mt-primary); }
+.hbx-help { margin: 6px 0 0; font-size: 12px; line-height: 1.5; color: var(--mt-text-3); }
+.hbx-error { margin: 6px 0 0; font-size: 12px; line-height: 1.5; color: var(--mt-danger); }
+.hbx-field .mt-input, .hbx-field .mt-select, .hbx-field .mt-textarea { padding: 9px 12px; font-size: 14px; border-radius: 10px; }
+.hbx-field textarea.mt-input { min-height: 84px; resize: vertical; line-height: 1.5; }
+.hbx-inline { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.hbx-inline .hbx-label { margin: 0; }
+.hbx-unit { display: flex; align-items: center; gap: 8px; }
+.hbx-unit .mt-input { width: 96px; }
+.hbx-unit span { font-size: 13px; color: var(--mt-text-3); }
+.hbx-addr { display: flex; align-items: center; border: 1px solid var(--mt-input-border); border-radius: 10px; background: var(--mt-surface); overflow: hidden; }
+.hbx-addr:focus-within { border-color: var(--mt-primary); box-shadow: 0 0 0 3px var(--mt-primary-ring); }
+.hbx-addr span { padding: 9px 0 9px 12px; font-size: 13px; color: var(--mt-text-3); white-space: nowrap; max-width: 55%; overflow: hidden; text-overflow: ellipsis; direction: rtl; }
+.hbx-addr input { flex: 1; min-width: 0; border: 0; outline: none; background: none; padding: 9px 12px 9px 2px; font-size: 14px; color: var(--mt-text); font-family: inherit; }
+
+.hbx-rich-wrap { border: 1px solid var(--mt-input-border); border-radius: 10px; background: var(--mt-surface); overflow: hidden; }
+.hbx-rich-wrap:focus-within { border-color: var(--mt-primary); box-shadow: 0 0 0 3px var(--mt-primary-ring); }
+.hbx-rich-bar { display: flex; gap: 2px; padding: 4px; border-bottom: 1px solid var(--mt-border); background: var(--mt-surface-3); }
+.hbx-rich-bar .hbx-ico { width: 28px; height: 26px; font-size: 13px; font-weight: 700; color: var(--mt-text-2); }
+.hbx-rich { min-height: 84px; max-height: 320px; overflow-y: auto; padding: 10px 12px; font-size: 14px; line-height: 1.55; outline: none; }
+.hbx-rich p { margin: 0 0 10px; }
+.hbx-rich p:last-child { margin-bottom: 0; }
+.hbx-rich ul, .hbx-rich ol { margin: 0 0 10px; padding-left: 20px; }
+.hbx-rich a { color: var(--mt-link); text-decoration: underline; }
+.hbx-rich:empty::before { content: attr(data-placeholder); color: var(--mt-text-4); }
+
+.hbx-icons { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+.hbx-icon { display: inline-flex; align-items: center; justify-content: center; aspect-ratio: 1; padding: 0; border: 1px solid var(--mt-border); border-radius: 9px; background: var(--mt-surface); color: var(--mt-text-2); cursor: pointer; }
+.hbx-icon:hover { border-color: var(--mt-primary); color: var(--mt-primary); }
+.hbx-icon.is-active { border-color: var(--mt-primary); background: var(--mt-primary-tint); color: var(--mt-primary); }
+.hbx-icon svg { width: 18px; height: 18px; }
+.hbx-icon.is-none { font-size: 11px; font-weight: 600; }
+
+.hbx-rep { display: flex; flex-direction: column; gap: 8px; }
+.hbx-rep-item { border: 1px solid var(--mt-border); border-radius: 12px; background: var(--mt-surface-3); }
+.hbx-rep-head { display: flex; align-items: center; gap: 4px; padding: 6px 6px 6px 12px; cursor: pointer; }
+.hbx-rep-name { flex: 1; min-width: 0; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hbx-rep-body { padding: 4px 12px 2px; border-top: 1px solid var(--mt-border); }
+.hbx-rep-body .hbx-field:first-child { margin-top: 10px; }
+.hbx-add { align-self: flex-start; border: 0; background: none; padding: 4px 0; color: var(--mt-primary); font-size: 13px; font-weight: 500; cursor: pointer; }
+.hbx-add[disabled] { opacity: 0.4; pointer-events: none; }
+
+.hbx-divider { height: 1px; margin: 20px 0; background: var(--mt-border); }
+.hbx-group-label { margin: 0 0 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--mt-text-3); }
+.hbx-row-btns { display: flex; gap: 8px; flex-wrap: wrap; }
+.hbx-linkbtn { border: 0; background: none; padding: 0; font: inherit; font-size: 13px; color: var(--mt-text-3); cursor: pointer; text-decoration: underline; }
+.hbx-linkbtn:hover { color: var(--mt-danger); }

@@ -1,0 +1,169 @@
+<?php
+declare(strict_types=1);
+
+namespace HadrianBuilder;
+
+/**
+ * `hadrian_builder_pages`: thin Capsule wrapper. The table is described in
+ * Schema. JSON columns are decoded on read and encoded on write.
+ *
+ * Reads are wrapped: the router calls bySlug() on a client request, and a
+ * missing table (files uploaded, module never activated) must mean "no such
+ * page", not an error on someone's 404.
+ */
+final class Page
+{
+    private const TABLE = Schema::PAGES;
+
+    private const JSON = ['draft', 'published', 'meta'];
+
+    /** @return array<string,mixed>|null */
+    public static function find(int $id): ?array
+    {
+        if ($id < 1) {
+            return null;
+        }
+        try {
+            $row = \WHMCS\Database\Capsule::table(self::TABLE)->where('id', $id)->first();
+            return $row ? self::hydrate($row) : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * The published page at this address, or null.
+     *
+     * @return array<string,mixed>|null
+     */
+    public static function bySlug(string $slug): ?array
+    {
+        if ($slug === '') {
+            return null;
+        }
+        try {
+            $row = \WHMCS\Database\Capsule::table(self::TABLE)
+                ->where('slug', $slug)->where('status', 'published')->orderBy('id')->first();
+            return $row ? self::hydrate($row) : null;
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /**
+     * Every page for the list screen, without the documents.
+     *
+     * @return list<array<string,mixed>>
+     */
+    public static function all(): array
+    {
+        try {
+            $rows = \WHMCS\Database\Capsule::table(self::TABLE)
+                ->orderBy('name')
+                ->get(['id', 'slug', 'name', 'status', 'published_at', 'updated_at']);
+        } catch (\Throwable $e) {
+            return [];
+        }
+        $out = [];
+        foreach ($rows as $row) {
+            $out[] = self::hydrate($row);
+        }
+        return $out;
+    }
+
+    /** Is another page already using this address? */
+    public static function slugTaken(string $slug, int $exceptId = 0): bool
+    {
+        if ($slug === '') {
+            return false;
+        }
+        try {
+            return \WHMCS\Database\Capsule::table(self::TABLE)
+                ->where('slug', $slug)->where('id', '!=', $exceptId)->exists();
+        } catch (\Throwable $e) {
+            return false;
+        }
+    }
+
+    /** @param array<string,mixed> $data */
+    public static function create(array $data): int
+    {
+        $now = date('Y-m-d H:i:s');
+        $row = self::columns($data) + [
+            'slug' => '', 'draft' => Document::encode(Document::blank()), 'status' => 'draft',
+            'created_at' => $now, 'updated_at' => $now,
+        ];
+        return (int)\WHMCS\Database\Capsule::table(self::TABLE)->insertGetId($row);
+    }
+
+    /** @param array<string,mixed> $data */
+    public static function update(int $id, array $data): void
+    {
+        $row = self::columns($data) + ['updated_at' => date('Y-m-d H:i:s')];
+        \WHMCS\Database\Capsule::table(self::TABLE)->where('id', $id)->update($row);
+    }
+
+    public static function delete(int $id): void
+    {
+        \WHMCS\Database\Capsule::table(self::TABLE)->where('id', $id)->delete();
+    }
+
+    /** Make the current draft the page visitors get. */
+    public static function publish(int $id): void
+    {
+        $page = self::find($id);
+        if ($page === null) {
+            return;
+        }
+        self::update($id, ['published' => $page['draft'], 'status' => 'published', 'published_at' => date('Y-m-d H:i:s')]);
+    }
+
+    /** Take the page offline. The draft and the last published copy are kept. */
+    public static function unpublish(int $id): void
+    {
+        self::update($id, ['status' => 'draft']);
+    }
+
+    /** Does the draft differ from what visitors see? */
+    public static function hasUnpublishedChanges(array $page): bool
+    {
+        return $page['status'] === 'published'
+            && Document::encode((array)$page['draft']) !== Document::encode((array)$page['published']);
+    }
+
+    /**
+     * @param array<string,mixed> $data
+     * @return array<string,mixed>
+     */
+    private static function columns(array $data): array
+    {
+        $out = [];
+        foreach (['slug', 'name', 'status', 'published_at'] as $k) {
+            if (array_key_exists($k, $data)) {
+                $out[$k] = $data[$k];
+            }
+        }
+        foreach (self::JSON as $k) {
+            if (array_key_exists($k, $data)) {
+                $out[$k] = $data[$k] === null ? null : Document::encode((array)$data[$k]);
+            }
+        }
+        return $out;
+    }
+
+    /** @return array<string,mixed> */
+    private static function hydrate(object $row): array
+    {
+        $a = (array)$row;
+        foreach (self::JSON as $k) {
+            if (array_key_exists($k, $a)) {
+                $decoded = is_string($a[$k]) && $a[$k] !== '' ? json_decode($a[$k], true) : null;
+                $a[$k]   = is_array($decoded) ? $decoded : [];
+            }
+        }
+        if (isset($a['id'])) {
+            $a['id'] = (int)$a['id'];
+        }
+        return $a;
+    }
+}

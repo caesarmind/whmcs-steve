@@ -35,7 +35,9 @@ $junctions = @(
     @{ link = "$web\modules\addons\Hadrian";            target = "$repo\hadrian\modules\addons\Hadrian" },
     @{ link = "$web\templates\orderforms\hadrian_cart"; target = "$repo\hadrian_cart" },
     # Hadrian Email Templates: a separate addon module that requires Hadrian.
-    @{ link = "$web\modules\addons\HadrianEmail";       target = "$repo\hadrian_email\modules\addons\HadrianEmail" }
+    @{ link = "$web\modules\addons\HadrianEmail";       target = "$repo\hadrian_email\modules\addons\HadrianEmail" },
+    # Hadrian Page Builder: the same shape, a third folder.
+    @{ link = "$web\modules\addons\HadrianBuilder";     target = "$repo\hadrian_builder\modules\addons\HadrianBuilder" }
 )
 
 # --- resolve the source to a folder ---------------------------------------

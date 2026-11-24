@@ -90,6 +90,15 @@ export const CHECKS = [
   { id: 'email-builder-js', title: 'Email module: builder script parses', cmd: [node, '--check', 'hadrian_email/modules/addons/HadrianEmail/views/assets/js/email-builder.js'], cwd: REPO_ROOT, blocking: true,
     why: 'The script is inlined into the page by PHP, so check-admin-js never sees its source.' },
 
+  // Hadrian Page Builder: a separate addon module (hadrian_builder/) that
+  // requires Hadrian. Its live checks (routing, the editor, publishing, real
+  // prices) are in the settings tier: e2e/builder.spec.mjs.
+  { id: 'builder-engine', title: 'Builder module: engine', cmd: [PHP, STATIC('test-builder-engine.php')], cwd: REPO_ROOT, blocking: true,
+    why: 'Link and text cleaning, the sanitiser, the section catalogue, document validation and every section rendered, with no WHMCS.' },
+  { id: 'builder-smarty-lint', title: 'Builder module: Smarty safety lint', cmd: [node, STATIC('smarty-lint.mjs'), 'hadrian_builder/modules/addons/HadrianBuilder/views'], cwd: REPO_ROOT, blocking: true },
+  { id: 'builder-editor-js', title: 'Builder module: editor script parses', cmd: [node, '--check', 'hadrian_builder/modules/addons/HadrianBuilder/views/assets/js/page-builder.js'], cwd: REPO_ROOT, blocking: true,
+    why: 'The script is inlined into the page by PHP, so check-admin-js never sees its source.' },
+
   // Add-on products are written from scratch. Lagom is a behaviour reference
   // that stays outside the repo; this catches a paste from it.
   { id: 'no-lagom', title: 'Product modules carry no Lagom code', cmd: [node, STATIC('check-no-lagom.mjs')], cwd: REPO_ROOT, blocking: true,

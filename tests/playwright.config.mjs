@@ -55,7 +55,8 @@ export default defineConfig({
       // of every email the install sends, and the flows tier reads that inbox.
       // admin-uploads.spec.mjs too: a logo upload changes every client page.
       // admin-csrf.spec.mjs saves real settings through the admin screens.
-      name: 'settings', testMatch: /(settings|email|admin-uploads|admin-csrf)\.spec\.mjs/, dependencies: ['setup'],
+      // builder.spec.mjs creates and publishes pages on the install the other tiers crawl.
+      name: 'settings', testMatch: /(settings|email|builder|admin-uploads|admin-csrf)\.spec\.mjs/, dependencies: ['setup'],
       use: { ...devices['Desktop Chrome'], userAgent: USER_AGENT, viewport: { width: 1280, height: 860 } },
     },
     {

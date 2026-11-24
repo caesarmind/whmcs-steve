@@ -8,7 +8,7 @@ import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { PHP } from '../lib/env.mjs';
 
-const roots = ['hadrian/modules/addons/Hadrian', 'hadrian/templates/hadrian', 'hadrian_email/modules/addons/HadrianEmail'];
+const roots = ['hadrian/modules/addons/Hadrian', 'hadrian/templates/hadrian', 'hadrian_email/modules/addons/HadrianEmail', 'hadrian_builder/modules/addons/HadrianBuilder'];
 const files = [];
 const walk = d => {
   for (const e of fs.readdirSync(d, { withFileTypes: true })) {

@@ -22,8 +22,9 @@ import { join } from 'node:path';
 // Node 18 has no fs.globSync, so walk it.
 const walk = d => readdirSync(d, { withFileTypes: true }).flatMap(e =>
   e.isDirectory() ? walk(join(d, e.name)) : (e.name.endsWith('.tpl') ? [join(d, e.name)] : []));
-// Hadrian Email Templates is a separate addon with admin views of its own.
-const files = ['hadrian/modules/addons/Hadrian/views/adminarea', 'hadrian_email/modules/addons/HadrianEmail/views']
+// Hadrian Email Templates and Hadrian Page Builder are separate addons with
+// admin views of their own.
+const files = ['hadrian/modules/addons/Hadrian/views/adminarea', 'hadrian_email/modules/addons/HadrianEmail/views', 'hadrian_builder/modules/addons/HadrianBuilder/views']
   .filter(d => existsSync(d)).flatMap(walk);
 let bad = 0, checked = 0;
 
