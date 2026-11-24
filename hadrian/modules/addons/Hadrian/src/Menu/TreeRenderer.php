@@ -52,10 +52,15 @@ final class TreeRenderer
      */
     private static array $orderedTopLevel = [];
 
-    public static function populate(Item $parent, Menu $menu): void
+    /**
+     * @param string|null $as filter items for this audience instead of the
+     *                        menu's own. Passed for a menu an area was given
+     *                        (MenuPointers), which guests and clients share.
+     */
+    public static function populate(Item $parent, Menu $menu, ?string $as = null): void
     {
         self::$locale = LocaleHelper::current();
-        $audience = $menu->audience === Audience::ALL ? Audience::current() : $menu->audience;
+        $audience = $as ?? ($menu->audience === Audience::ALL ? Audience::current() : $menu->audience);
         $layout   = self::currentLayout();
 
         // Reset per-render so two menus on the same page (primary + secondary)
@@ -126,10 +131,11 @@ final class TreeRenderer
      * Called from the ClientAreaPage hook (not the navbar hook) so the data
      * is ready BEFORE template render, regardless of hook order.
      */
-    public static function buildFlatList(Menu $menu): array
+    public static function buildFlatList(Menu $menu, ?string $as = null): array
     {
         self::$locale = LocaleHelper::current();
-        $audience = $menu->audience === Audience::ALL ? Audience::current() : $menu->audience;
+        // $as: see populate().
+        $audience = $as ?? ($menu->audience === Audience::ALL ? Audience::current() : $menu->audience);
         $layout   = self::currentLayout();
         $out = [];
         foreach ($menu->topLevelItems() as $node) {

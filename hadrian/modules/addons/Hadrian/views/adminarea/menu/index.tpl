@@ -3,7 +3,7 @@
 <header class="mt-page-header">
     <div class="mt-page-eyebrow">Theme</div>
     <h1 class="mt-page-title">Menu {include file="includes/doclink.tpl" article="menu-manager"}</h1>
-    <p class="mt-page-subtitle">Build navigation menus and assign them to client / guest audiences.</p>
+    <p class="mt-page-subtitle">Build navigation menus and choose who sees them: guests, clients, or everyone in one area of the site.</p>
 </header>
 
 <div class="mt-tabs">
@@ -17,6 +17,8 @@
     <div class="mt-alert mt-alert-info">Re-seed finished — every preset was already complete, nothing to add.</div>
 {elseif $flashMsg|substr:0:7 == 'seeded-'}
     <div class="mt-alert mt-alert-info">Re-seeded {$flashMsg|replace:'seeded-':''|escape} preset(s).</div>
+{elseif $flashMsg == 'areas-saved'}
+    <div class="mt-alert mt-alert-info">Menus by area saved.</div>
 {elseif $flashMsg|substr:0:16 == 'reset-defaults-'}
     <div class="mt-alert mt-alert-info">Reset {$flashMsg|replace:'reset-defaults-':''|escape} WHMCS Defaults preset(s) to factory items.</div>
 {/if}
@@ -66,7 +68,12 @@
                         <td>{$menu.item_count} <span class="mt-table-muted">items</span></td>
                         <td>
                             {if $menu.active}<span class="mt-badge mt-badge-success">Active</span>
-                            {else}<span class="mt-badge mt-badge-neutral">Disabled</span>{/if}
+                            {elseif empty($menu.areas)}<span class="mt-badge mt-badge-neutral">Disabled</span>{/if}
+                            {if !empty($menu.areas)}
+                                {foreach $menu.areas as $areaLabel}
+                                    <span class="mt-badge mt-badge-primary" data-menu-area-badge title="Shown to everyone in this area">{$areaLabel|escape}</span>
+                                {/foreach}
+                            {/if}
                         </td>
                         <td class="mt-table-actions">
                             <a href="?module=Hadrian&action=menu&sub=edit&id={$menu.id}" class="mt-btn mt-btn-ghost mt-btn-sm">Edit</a>
@@ -79,5 +86,43 @@
     {/if}
 </section>
 </div>
+
+{* One menu per area, as an alternative to one per visitor. Every area starts
+   on "By visitor", which is the rule the table above describes, so this panel
+   changes nothing until an area is given a menu. *}
+{if $menus && !empty($areaLabels)}
+<div class="mt-panel pad">
+<section class="mt-section" data-menu-areas>
+    <header class="mt-section-header">
+        <h2 class="mt-section-title">Menus by area</h2>
+        {include file="includes/doclink.tpl" article="menu-manager" anchor="menus-by-area"}
+    </header>
+    <p class="mt-section-note">
+        Give a part of the site its own menu. Everyone there sees it, guest or client, whatever the menu's audience and status above. Its items still follow their own audience, so a <em>Sign in</em> item for guests stays hidden from clients.
+    </p>
+    <form method="post" action="?module=Hadrian&action=menu&sub=areas">
+        <input type="hidden" name="location" value="{$tab|escape}">
+        {foreach $areaLabels as $areaKey => $areaLabel}
+            <div class="mt-row">
+                <div>
+                    <div class="mt-row-label">{$areaLabel|escape}</div>
+                    <div class="mt-row-help">{$areaHelp[$areaKey]|default:''|escape}</div>
+                </div>
+                {assign var=areaPick value=$areaPicks[$areaKey]|default:0}
+                <select class="mt-select" name="area_menu[{$areaKey|escape}]" data-menu-area="{$areaKey|escape}" style="max-width:320px">
+                    <option value="0" {if $areaPick == 0}selected{/if}>By visitor (guest / client)</option>
+                    {foreach $menus as $menu}
+                        <option value="{$menu.id}" {if $areaPick == $menu.id}selected{/if}>{$menu.name|escape}</option>
+                    {/foreach}
+                </select>
+            </div>
+        {/foreach}
+        <div style="display:flex;justify-content:flex-end;padding-top:16px">
+            <button type="submit" class="mt-btn mt-btn-primary mt-btn-sm">Save menus by area</button>
+        </div>
+    </form>
+</section>
+</div>
+{/if}
 
 {include file="includes/footer.tpl"}

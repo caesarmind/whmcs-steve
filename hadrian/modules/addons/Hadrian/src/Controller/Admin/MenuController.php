@@ -7,8 +7,10 @@ use Hadrian\Controller\AbstractController;
 use Hadrian\Database\Migrator;
 use Hadrian\Helpers\AddonHelper;
 use Hadrian\Helpers\LocaleHelper;
+use Hadrian\Helpers\PageArea;
 use Hadrian\Menu\ItemTypes;
 use Hadrian\Menu\MenuPages;
+use Hadrian\Menu\MenuPointers;
 use Hadrian\Menu\Seeder;
 use Hadrian\Menu\WhmcsDefaults;
 use Hadrian\Models\Menu;
@@ -27,6 +29,7 @@ use WHMCS\Database\Capsule;
  *   index   → list of menus (filtered by ?tab=main|secondary|footer|footer-secondary)
  *   edit    → editor for one menu (?id=N)
  *   save    → POST handler that rewrites the menu and its items
+ *   areas   → POST handler for the "Menus by area" panel (one location)
  *   delete  → DELETE menu (?id=N&confirm=1)
  *   seed    → re-run preset seeder (admin override)
  */
@@ -98,6 +101,10 @@ final class MenuController extends AbstractController
             $tab = 'main';
         }
 
+        // Area => menu id for this location. A pick whose menu has gone is
+        // shown as "By visitor", which is what the site draws for it.
+        $picks = MenuPointers::all()[$tab] ?? [];
+
         $menus = Menu::where('location', $tab)
             ->orderBy('audience')
             ->orderBy('id')
@@ -110,14 +117,56 @@ final class MenuController extends AbstractController
                 'version'  => $m->version,
                 'changed'  => (bool)$m->changed_by_user,
                 'item_count' => $m->items()->count(),
+                // Areas that show this menu to everyone, as labels.
+                'areas'    => array_map(
+                    static fn (string $area): string => PageArea::LABELS[$area],
+                    array_keys($picks, $m->id, true)
+                ),
             ])
             ->all();
 
+        $known     = array_column($menus, 'id');
+        $areaPicks = [];
+        foreach (array_keys(PageArea::LABELS) as $area) {
+            $id = $picks[$area] ?? 0;
+            $areaPicks[$area] = in_array($id, $known, true) ? $id : 0;
+        }
+
         return $this->view('menu/index', [
-            'menus'    => $menus,
-            'tab'      => $tab,
-            'flashMsg' => $_GET['flash'] ?? '',
+            'menus'      => $menus,
+            'tab'        => $tab,
+            'flashMsg'   => $_GET['flash'] ?? '',
+            'areaLabels' => PageArea::LABELS,
+            'areaHelp'   => PageArea::HELP,
+            'areaPicks'  => $areaPicks,
         ]);
+    }
+
+    /**
+     * Save the "Menus by area" panel of one location: for each area, a menu
+     * of this location, or 0 to leave the area on the by-visitor rule.
+     */
+    public function areasAction(): string
+    {
+        $location = (string)($_POST['location'] ?? '');
+        if (!in_array($location, MenuPointers::LOCATIONS, true)) {
+            $location = 'main';
+        }
+        if (strtoupper((string)($_SERVER['REQUEST_METHOD'] ?? 'GET')) !== 'POST') {
+            $this->redirect('?module=Hadrian&action=menu&tab=' . urlencode($location));
+        }
+
+        $posted = is_array($_POST['area_menu'] ?? null) ? $_POST['area_menu'] : [];
+        foreach (array_keys(PageArea::LABELS) as $area) {
+            $id = (int)($posted[$area] ?? 0);
+            // Only a menu that exists in this location can be picked.
+            if ($id > 0 && !Menu::where('id', $id)->where('location', $location)->exists()) {
+                $id = 0;
+            }
+            MenuPointers::setForArea($location, $area, $id);
+        }
+
+        $this->redirect('?module=Hadrian&action=menu&tab=' . urlencode($location) . '&flash=areas-saved');
     }
 
     public function editAction(): string
@@ -378,6 +427,8 @@ final class MenuController extends AbstractController
         }
         $location = $menu->location;
         $menu->delete(); // cascades items via FK
+        // An area that showed this menu goes back to the by-visitor rule.
+        MenuPointers::forget($id);
         $this->redirect('?module=Hadrian&action=menu&tab=' . urlencode($location));
     }
 

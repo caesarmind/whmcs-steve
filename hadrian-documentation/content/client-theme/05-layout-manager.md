@@ -97,6 +97,8 @@ The two sets of picks are kept side by side, so switching back to **Visitor** re
 
 Every page has an **Area** setting in **Pages**, under **Page settings**. **Automatic** goes by what the page is, and the setting shows where that puts it. Pick an area to override it, for example to give the knowledgebase the client-area layout.
 
+Menus can follow the same three areas: see [Menus by area](/client-theme/menu-manager/#menus-by-area) in Menu Manager. That is a separate choice and works whichever way layouts are picked.
+
 For your own pages, an `area` key in the page's `page.php` (`website`, `client` or `order`) sets the automatic answer. Pages without one are placed by what they are: pages in the Public, Shop and Authentication groups go to the website, order-form pages go to the order process, and everything else goes to the client area.
 
 ## Per-layout options

@@ -265,8 +265,13 @@ if (AddonHelper::isActive()) {
                 (new Hadrian\Menu\Seeder())->run();
             }
 
-            $audience = Hadrian\Menu\Audience::current();
-            $menu     = Hadrian\Models\Menu::pick('main', $audience);
+            // The area was worked out by the ClientAreaPage hooks, which
+            // run before WHMCS builds the navbar.
+            [$menu, $as] = Hadrian\Menu\MenuPointers::pick(
+                'main',
+                HookService::instance()->area(),
+                Hadrian\Menu\Audience::current()
+            );
             if ($menu === null) {
                 return; // no custom menu — leave WHMCS's default alone
             }
@@ -280,7 +285,7 @@ if (AddonHelper::isActive()) {
             foreach (array_keys($native) as $name) {
                 $primaryNavbar->removeChild($name);
             }
-            Hadrian\Menu\TreeRenderer::populate($primaryNavbar, $menu);
+            Hadrian\Menu\TreeRenderer::populate($primaryNavbar, $menu, $as);
         } catch (\Throwable $e) {
             // Don't blow up the page if the menu system fails. Log and let the
             // default WHMCS navbar render.
@@ -301,10 +306,13 @@ if (AddonHelper::isActive()) {
             if (!\WHMCS\Database\Capsule::schema()->hasTable('hadrian_menus')) {
                 return null;
             }
-            $audience = Hadrian\Menu\Audience::current();
-            $menu     = Hadrian\Models\Menu::pick('main', $audience);
+            [$menu, $as] = Hadrian\Menu\MenuPointers::pick(
+                'main',
+                HookService::instance()->areaFor($vars),
+                Hadrian\Menu\Audience::current()
+            );
             if ($menu === null) return null;
-            $items = Hadrian\Menu\TreeRenderer::buildFlatList($menu);
+            $items = Hadrian\Menu\TreeRenderer::buildFlatList($menu, $as);
             return ['mtSidebarItems' => $items];
         } catch (\Throwable $e) {
             error_log('Hadrian buildFlatList failed: ' . $e->getMessage());
@@ -331,10 +339,13 @@ if (AddonHelper::isActive()) {
             if (Hadrian\Models\Menu::where('location', 'footer')->count() === 0) {
                 (new Hadrian\Menu\Seeder())->run();
             }
-            $audience = Hadrian\Menu\Audience::current();
-            $menu     = Hadrian\Models\Menu::pick('footer', $audience);
+            [$menu, $as] = Hadrian\Menu\MenuPointers::pick(
+                'footer',
+                HookService::instance()->areaFor($vars),
+                Hadrian\Menu\Audience::current()
+            );
             if ($menu === null) return null;
-            $items = Hadrian\Menu\TreeRenderer::buildFlatList($menu);
+            $items = Hadrian\Menu\TreeRenderer::buildFlatList($menu, $as);
             return ['mtFooterItems' => $items];
         } catch (\Throwable $e) {
             error_log('Hadrian footer buildFlatList failed: ' . $e->getMessage());
@@ -358,10 +369,13 @@ if (AddonHelper::isActive()) {
             if (Hadrian\Models\Menu::where('location', 'footer-secondary')->count() === 0) {
                 (new Hadrian\Menu\Seeder())->run();
             }
-            $audience = Hadrian\Menu\Audience::current();
-            $menu     = Hadrian\Models\Menu::pick('footer-secondary', $audience);
+            [$menu, $as] = Hadrian\Menu\MenuPointers::pick(
+                'footer-secondary',
+                HookService::instance()->areaFor($vars),
+                Hadrian\Menu\Audience::current()
+            );
             if ($menu === null) return null;
-            $items = Hadrian\Menu\TreeRenderer::buildFlatList($menu);
+            $items = Hadrian\Menu\TreeRenderer::buildFlatList($menu, $as);
             return ['mtFooterSecondaryItems' => $items];
         } catch (\Throwable $e) {
             error_log('Hadrian footer-secondary buildFlatList failed: ' . $e->getMessage());
@@ -409,8 +423,11 @@ if (AddonHelper::isActive()) {
     // Secondary navbar — same pattern (location = secondary). If no menu, leave alone.
     add_hook('ClientAreaSecondaryNavbar', 100, function (WHMCS\View\Menu\Item $secondaryNavbar) {
         try {
-            $audience = Hadrian\Menu\Audience::current();
-            $menu     = Hadrian\Models\Menu::pick('secondary', $audience);
+            [$menu, $as] = Hadrian\Menu\MenuPointers::pick(
+                'secondary',
+                HookService::instance()->area(),
+                Hadrian\Menu\Audience::current()
+            );
             if ($menu === null) return;
             $native = [];
             foreach ($secondaryNavbar->getChildren() as $name => $child) {
@@ -420,7 +437,7 @@ if (AddonHelper::isActive()) {
             foreach (array_keys($native) as $name) {
                 $secondaryNavbar->removeChild($name);
             }
-            Hadrian\Menu\TreeRenderer::populate($secondaryNavbar, $menu);
+            Hadrian\Menu\TreeRenderer::populate($secondaryNavbar, $menu, $as);
         } catch (\Throwable $e) {
             if (function_exists('logActivity')) {
                 logActivity('Hadrian secondary menu render failed: ' . $e->getMessage());

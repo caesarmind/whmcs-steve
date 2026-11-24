@@ -110,6 +110,34 @@ A layout audience picks the *shell*; a menu audience picks the *contents*. They 
 
 Individual items can narrow this further - see [Display settings](#display-settings) below.
 
+## Menus by area
+
+A menu can also belong to a part of the site instead of a kind of visitor. Hadrian sorts every page into one of three areas:
+
+- **Website** - what a visitor sees before signing in: the homepage, store landing pages, custom and built pages, sign-in, the knowledgebase and announcements.
+- **Client area** - the portal: dashboard, services, billing, tickets and account pages.
+- **Order process** - product listings, configuration, the cart and checkout.
+
+Under the menu list on each tab sits a **Menus by area** panel with one dropdown per area. Each starts on **By visitor (guest / client)**, which is the rule described above, so the panel changes nothing until you pick a menu in it.
+
+:::steps
+1. Open **Hadrian -> Menu** and choose the tab for the location: Main, Secondary, Footer or Footer secondary.
+2. In **Menus by area**, pick a menu for the area.
+3. Click **Save menus by area**.
+:::
+
+The area then shows that menu to everyone in it. In the list above, the menu gains a badge naming the area.
+
+The usual reasons to reach for it: a short marketing menu on the website while the portal keeps its full navigation, or a checkout with most of the links taken out.
+
+:::info What a menu picked for an area ignores
+Its **Display Rule** and its **Status**. Those two decide which menu the *by visitor* rule picks, and nothing else, so a menu can be switched off there and still serve an area. Each item's own audience is still respected: a *Sign in* item set to guests stays hidden from a signed-in client.
+:::
+
+Areas are the same ones [Layout Manager](/client-theme/layout-manager/#by-visitor-or-by-area) uses, and a page can be moved to another area in [Page Manager](/client-theme/page-manager/#area). Menus and layouts are picked separately: giving the website its own menu does not require layouts to be chosen by area, and the other way round.
+
+Deleting a menu that an area uses puts that area back on **By visitor**.
+
 ## Item types
 
 **Add As** offers ten kinds of item. Only **Dropdown** can hold sub-items.

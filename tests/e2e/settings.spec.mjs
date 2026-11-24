@@ -501,6 +501,89 @@ test('Pages admin: an admin can move a page to another area', async ({ page, con
   }
 });
 
+// ---------------------------------------------------------- menus by area
+// A location shows the active menu for the visitor (guest / client) unless an
+// area was given a menu of its own on the Menu page. Menu items are named
+// mt-<item id>, so two different menus never share a name.
+const menuItems = async (page, url) => {
+  await page.goto(url);
+  return page.locator('aside.sidebar [data-nav], aside.sidebar [data-group]')
+    .evaluateAll(els => els.map(el => el.getAttribute('data-nav') ?? el.getAttribute('data-group')));
+};
+
+test('Menu admin: an area can be given a menu of its own', async ({ page, context, browser }) => {
+  test.setTimeout(4 * 60_000);
+  set({
+    ...NEVER_BY_AREA,
+    menus_by_area: null,
+    'hadrian_active_layout_main-menu_guest': str('sidebar'),
+    'hadrian_active_layout_main-menu_client': str('sidebar'),
+  });
+  await loginAdmin(context.request);
+  const MENUS = '/admin/addonmodules.php?module=Hadrian&action=menu&tab=main';
+  const CART = '/cart.php?a=view';
+  const guestContext = await browser.newContext({ baseURL: BASE_URL });
+  const guest = await guestContext.newPage();
+  const clientContext = await browser.newContext({ baseURL: BASE_URL });
+  await loginClient(clientContext.request, 'full');
+  const client = await clientContext.newPage();
+  const pick = area => page.locator(`select[data-menu-area="${area}"]`);
+  const save = async (area, choice) => {
+    await page.goto(MENUS);
+    await pick(area).selectOption(choice);
+    await Promise.all([page.waitForURL(/flash=areas-saved/), pick(area).evaluate(el => el.form.requestSubmit())]);
+  };
+  const rows = page.locator('.mt-table tbody tr');
+  try {
+    await page.goto(MENUS);
+    for (const area of ['website', 'client', 'order']) {
+      await expect(pick(area), `${area} starts on the visitor rule`).toHaveValue('0');
+    }
+    // A menu that is switched off, preferably a guest one: an area's menu
+    // needs neither the Active switch nor a matching audience.
+    const listed = await rows.evaluateAll(trs => trs.map((tr, index) => ({
+      index,
+      name: tr.querySelector('.mt-table-name a').textContent.trim(),
+      audience: tr.children[1].textContent.trim(),
+      active: tr.classList.contains('is-active'),
+    })));
+    const spare = listed.find(r => !r.active && r.audience === 'Guest') ?? listed.find(r => !r.active);
+    expect(spare, 'the install has a menu that is switched off').toBeTruthy();
+
+    const before = {
+      home: await menuItems(guest, '/'),
+      portal: await menuItems(guest, '/submitticket.php'),
+      cart: await menuItems(guest, CART),
+      clientCart: await menuItems(client, CART),
+    };
+    expect(before.home.length, 'the guest menu has items').toBeGreaterThan(0);
+    expect(before.cart, 'by visitor, a guest sees one menu everywhere').toEqual(before.home);
+
+    await save('order', { label: spare.name });
+    await expect(pick('order'), 'the pick is stored').not.toHaveValue('0');
+    await expect(rows.nth(spare.index).locator('[data-menu-area-badge]'), 'the list says where the menu is used').toHaveText('Order process');
+    await expect(rows.nth(spare.index).getByText('Disabled'), 'and stops calling it disabled').toHaveCount(0);
+
+    const guestCart = await menuItems(guest, CART);
+    expect(guestCart.length, 'the order process draws its own menu').toBeGreaterThan(0);
+    expect(guestCart.filter(name => before.cart.includes(name)), 'a different menu: none of the earlier items').toEqual([]);
+    const clientCart = await menuItems(client, CART);
+    expect(clientCart.length, 'a client in the cart gets it too').toBeGreaterThan(0);
+    expect(clientCart.filter(name => before.clientCart.includes(name)), 'not the client menu any more').toEqual([]);
+    expect(await menuItems(guest, '/'), 'the website still follows the visitor').toEqual(before.home);
+    expect(await menuItems(guest, '/submitticket.php'), 'and so does the client area').toEqual(before.portal);
+    await clean(guest, guestContext, 'guest', [CART, '/']);
+
+    await save('order', '0');
+    expect(await menuItems(guest, CART), '"By visitor" puts the area back').toEqual(before.cart);
+    await page.goto(MENUS);
+    await expect(rows.nth(spare.index).locator('[data-menu-area-badge]')).toHaveCount(0);
+  } finally {
+    await guestContext.close();
+    await clientContext.close();
+  }
+});
+
 const FOOTERS = [['default', 'hp-footer-slim'], ['extended', 'hp-footer-extended'], ['extended-info', 'hp-footer-extended-info']];
 for (const [footer, cls] of FOOTERS) {
   test(`footer layout "${footer}"`, async ({ page, context }) => {

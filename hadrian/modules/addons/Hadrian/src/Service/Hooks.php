@@ -52,9 +52,80 @@ final class Hooks
      */
     private ?string $area = null;
 
+    /** @var array<string, string> templatefile => area, for areaFor() */
+    private array $areaOf = [];
+
     public static function instance(): self
     {
         return self::$instance ??= new self();
+    }
+
+    /**
+     * The area of the page being rendered, or null before any page has been
+     * resolved. For hooks that are not handed the page, such as the navbar
+     * hooks, which WHMCS fires while it renders.
+     */
+    public function area(): ?string
+    {
+        return $this->area;
+    }
+
+    /**
+     * The area of the page a ClientAreaPage hook was handed.
+     *
+     * The menu hooks need it and are registered separately from the main
+     * dispatch, so this does not lean on which of them WHMCS runs first: it
+     * answers from what clientAreaPage() already worked out when it has, and
+     * otherwise from the same three inputs (page.php, the admin's pick, the
+     * cart flag).
+     *
+     * @param array<string,mixed> $vars
+     */
+    public function areaFor(array $vars): ?string
+    {
+        $page = (string)($vars['templatefile'] ?? '');
+        if (isset($this->areaOf[$page])) {
+            return $this->areaOf[$page];
+        }
+        $template = AddonHelper::getTemplate();
+        if ($template === null || $page === '') {
+            return null;
+        }
+        $key      = self::pageKey($page);
+        $row      = \Hadrian\Models\Page::get($template->getName(), $key);
+        $settings = is_array($row['settings'] ?? null) ? $row['settings'] : [];
+        $picked   = (string)($settings['area'] ?? '');
+
+        return $this->areaOf[$page] = PageArea::forPage(
+            $page,
+            self::inCart($vars),
+            $template->getPageMeta($key),
+            PageArea::valid($picked) ? $picked : ''
+        );
+    }
+
+    /** WHMCS says this request is part of an order. */
+    private static function inCart(array $vars): bool
+    {
+        return !empty($vars['inShoppingCart']) || (string)($vars['filename'] ?? '') === 'cart';
+    }
+
+    /**
+     * The flat page name for a templatefile. WHMCS routes /store/<slug>
+     * through 'store/<slug>/index' (or 'store/<slug>/<sub>' for sub-products
+     * such as ssl/dv); discovery and the admin Pages tab keep those as
+     * 'store-<slug>' and 'store-<slug>-<sub>', beside every other page in
+     * core/pages/.
+     */
+    private static function pageKey(string $templatefile): string
+    {
+        if (preg_match('#^store/([^/]+)(?:/(\w+))?$#', $templatefile, $m)) {
+            $sub = $m[2] ?? '';
+            return ($sub !== '' && $sub !== 'index')
+                ? 'store-' . $m[1] . '-' . $sub
+                : 'store-' . $m[1];
+        }
+        return $templatefile;
     }
 
     public function dispatch(string $hookName, mixed $hookArg): mixed
@@ -101,10 +172,11 @@ final class Hooks
         $currentPage = (string)($vars['templatefile'] ?? '');
         $this->area  = PageArea::forPage(
             $currentPage,
-            !empty($vars['inShoppingCart']) || (string)($vars['filename'] ?? '') === 'cart',
+            self::inCart($vars),
             is_array($pages[$currentPage]['meta'] ?? null) ? $pages[$currentPage]['meta'] : [],
             (string)($pages[$currentPage]['area'] ?? '')
         );
+        $this->areaOf[$currentPage] = $this->area;
 
         $layouts  = [
             'main-menu' => $this->resolveActiveLayout($template, 'main-menu'),
@@ -2836,19 +2908,9 @@ final class Hooks
             return [];
         }
 
-        // Normalize Nexus-style store templatefile paths to our flat naming
-        // convention. WHMCS routes /store/<slug> through a templatefile like
-        // 'store/<slug>/index' (or 'store/<slug>/<sub>' for sub-products such
-        // as ssl/dv, ssl/ev). Our discovery + admin Pages tab keep them as
-        // 'store-<slug>' or 'store-<slug>-<sub>' so they slot into the flat
-        // core/pages/ scheme alongside every other page.
-        if (preg_match('#^store/([^/]+)(?:/(\w+))?$#', $page, $m)) {
-            $slug = $m[1];
-            $sub  = $m[2] ?? '';
-            $page = ($sub !== '' && $sub !== 'index')
-                ? 'store-' . $slug . '-' . $sub
-                : 'store-' . $slug;
-        }
+        // Nexus-style store paths ('store/<slug>/index') become the flat
+        // 'store-<slug>' name the rest of this method works with.
+        $page = self::pageKey($page);
 
         $pageMeta = $template->getPageMeta($page);
 
