@@ -7,7 +7,7 @@ return [
     'label'  => 'Feature cards',
     'hint'   => 'A grid of icon cards',
     'group'  => 'Features',
-    'order'  => 20,
+    'order'  => 300,
     'fields' => [
         ['key' => 'title', 'type' => 'text', 'label' => 'Heading', 'translatable' => true, 'default' => ['_' => 'Everything included']],
         ['key' => 'subtitle', 'type' => 'text', 'label' => 'Subheading', 'translatable' => true, 'default' => ['_' => 'No add-ons to buy before your site works.']],
@@ -19,6 +19,9 @@ return [
                     'options' => ['blue' => 'Blue', 'green' => 'Green', 'purple' => 'Purple', 'orange' => 'Orange', 'teal' => 'Teal', 'red' => 'Red']],
                 ['key' => 'title', 'type' => 'text', 'label' => 'Title', 'translatable' => true, 'default' => ['_' => 'Card title']],
                 ['key' => 'text', 'type' => 'textarea', 'label' => 'Text', 'translatable' => true, 'default' => ['_' => '']],
+                ['key' => 'linkLabel', 'type' => 'text', 'label' => 'Link text', 'translatable' => true, 'default' => ['_' => ''],
+                    'help' => 'Optional. Shown under the text when it has an address too.'],
+                ['key' => 'link', 'type' => 'link', 'label' => 'Link', 'default' => ''],
             ],
             'default' => [
                 ['icon' => 'bolt', 'colour' => 'blue', 'title' => ['_' => 'Fast by default'], 'text' => ['_' => 'NVMe storage and caching on every plan.']],

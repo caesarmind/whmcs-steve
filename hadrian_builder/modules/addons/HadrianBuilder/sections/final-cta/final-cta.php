@@ -7,7 +7,7 @@ return [
     'label'  => 'Closing call to action',
     'hint'   => 'A dark band with a headline and a button',
     'group'  => 'Call to action',
-    'order'  => 60,
+    'order'  => 800,
     'fields' => [
         ['key' => 'title', 'type' => 'text', 'label' => 'Headline', 'translatable' => true, 'default' => ['_' => 'Ready when you are']],
         ['key' => 'text', 'type' => 'textarea', 'label' => 'Text', 'translatable' => true, 'default' => ['_' => 'Order in a few minutes. Move in whenever it suits you.']],

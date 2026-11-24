@@ -1,0 +1,21 @@
+{assign var=hbCount value=0}
+{foreach $s.items as $item}{if $item.value !== '' || $item.title !== '' || $item.text !== ''}{assign var=hbCount value=$hbCount+1}{/if}{/foreach}
+{if $hbCount > 0 || $s.title !== ''}
+<section class="hp-upgrade-section">
+    {if $s.title !== ''}<h2>{$s.title|escape}</h2>{/if}
+    {if $s.subtitle !== ''}<p class="upgrade-sub">{$s.subtitle|escape}</p>{/if}
+    {if $hbCount > 0}
+        <div class="hp-upgrade-grid">
+            {foreach $s.items as $item}
+                {if $item.value !== '' || $item.title !== '' || $item.text !== ''}
+                    <div class="hp-upgrade-item">
+                        {if $item.value !== ''}<div class="upgrade-metric">{$item.value|escape}</div>{/if}
+                        {if $item.title !== ''}<h4>{$item.title|escape}</h4>{/if}
+                        {if $item.text !== ''}<p>{$item.text|escape|nl2br}</p>{/if}
+                    </div>
+                {/if}
+            {/foreach}
+        </div>
+    {/if}
+</section>
+{/if}

@@ -9,6 +9,7 @@
                     {if $item.iconSvg !== ''}<div class="feat-icon {$item.colour|escape}">{$item.iconSvg nofilter}</div>{/if}
                     {if $item.title !== ''}<h4>{$item.title|escape}</h4>{/if}
                     {if $item.text !== ''}<p>{$item.text|escape|nl2br}</p>{/if}
+                    {if $item.linkLabel !== '' && $item.link !== ''}<a href="{$item.link|escape}" style="display: inline-block; margin-top: 8px; color: var(--color-accent); font-size: var(--text-md); font-weight: var(--fw-medium);">{$item.linkLabel|escape} &rsaquo;</a>{/if}
                 </div>
             {/foreach}
         </div>

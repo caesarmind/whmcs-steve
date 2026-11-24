@@ -7,7 +7,7 @@ return [
     'label'  => 'Alternating rows',
     'hint'   => 'Text beside an image, sides switching each row',
     'group'  => 'Features',
-    'order'  => 30,
+    'order'  => 305,
     'fields' => [
         ['key' => 'rows', 'type' => 'list', 'label' => 'Rows', 'max' => 8, 'itemLabel' => 'title', 'addLabel' => 'Add row',
             'fields' => [

@@ -7,7 +7,7 @@ return [
     'label'  => 'Hero, split',
     'hint'   => 'Headline and buttons beside an image',
     'group'  => 'Hero',
-    'order'  => 10,
+    'order'  => 105,
     'fields' => [
         ['key' => 'eyebrow', 'type' => 'text', 'label' => 'Eyebrow', 'translatable' => true, 'default' => ['_' => 'Web hosting'],
             'help' => 'The short line above the headline. Leave empty to hide it.'],

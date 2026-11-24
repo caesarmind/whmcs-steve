@@ -6,8 +6,8 @@
 return [
     'label'  => 'Questions and answers',
     'hint'   => 'A list of questions that open on click',
-    'group'  => 'Content',
-    'order'  => 50,
+    'group'  => 'Questions',
+    'order'  => 600,
     'fields' => [
         ['key' => 'title', 'type' => 'text', 'label' => 'Heading', 'translatable' => true, 'default' => ['_' => 'Questions, answered']],
         ['key' => 'subtitle', 'type' => 'text', 'label' => 'Subheading', 'translatable' => true, 'default' => ['_' => '']],

@@ -8,7 +8,7 @@ return [
     'label'  => 'Pricing cards',
     'hint'   => 'WHMCS products with live prices',
     'group'  => 'Pricing',
-    'order'  => 40,
+    'order'  => 200,
     'fields' => [
         ['key' => 'title', 'type' => 'text', 'label' => 'Heading', 'translatable' => true, 'default' => ['_' => 'Pick a plan']],
         ['key' => 'subtitle', 'type' => 'text', 'label' => 'Subheading', 'translatable' => true, 'default' => ['_' => 'Change or cancel whenever you like.']],
