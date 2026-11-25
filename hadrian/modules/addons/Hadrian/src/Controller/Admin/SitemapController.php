@@ -15,7 +15,7 @@ use Hadrian\Service\SitemapGenerator;
  *   index    → settings form + generate/preview controls
  *   save     → persist settings, then regenerate (Lagom parity)
  *   generate → write sitemap.xml (+ robots.txt) to the web root
- *   preview  → render the sitemap XML inline (no file write)
+ *   preview  → the sitemap XML itself, for a new tab (no file write)
  */
 final class SitemapController extends AbstractController
 {
@@ -29,7 +29,19 @@ final class SitemapController extends AbstractController
 
     public function saveAction(): string
     {
-        SitemapGenerator::saveConfig([
+        SitemapGenerator::saveConfig($this->postedConfig());
+        // Saving also regenerates the files (mirrors Lagom's save behaviour).
+        return $this->generateAction();
+    }
+
+    /**
+     * The settings as the form posts them: a toggle that is off is absent.
+     *
+     * @return array<string,mixed>
+     */
+    private function postedConfig(): array
+    {
+        return [
             'enabled'       => isset($_POST['enabled']),
             'robots'        => isset($_POST['robots']),
             'productGroups' => isset($_POST['productGroups']),
@@ -38,9 +50,7 @@ final class SitemapController extends AbstractController
             'downloads'     => isset($_POST['downloads']),
             'frequency'     => in_array((string)($_POST['frequency'] ?? 'weekly'), self::FREQUENCIES, true)
                 ? (string)$_POST['frequency'] : 'weekly',
-        ]);
-        // Saving also regenerates the files (mirrors Lagom's save behaviour).
-        return $this->generateAction();
+        ];
     }
 
     public function generateAction(): string
@@ -58,18 +68,46 @@ final class SitemapController extends AbstractController
         $this->redirect('?module=Hadrian&action=sitemap&' . $key . '=' . rawurlencode($res['message']));
     }
 
-    public function previewAction(): string
+    /**
+     * The sitemap as it would be written, as the XML document itself, for a
+     * browser tab of its own. Nothing is written or saved.
+     *
+     * The Preview button posts the settings form here, so the preview shows
+     * the toggles as they are on screen, saved or not. A plain GET (a
+     * bookmarked or typed address) previews the saved settings.
+     */
+    public function previewAction(): never
     {
         $template = AddonHelper::getTemplate();
         if ($template === null) {
-            return $this->renderForm();
+            $this->raw('No active template.', 'text/plain', 409);
         }
+        $cfg = ($_SERVER['REQUEST_METHOD'] ?? '') === 'POST'
+            ? array_merge(SitemapGenerator::defaults(), $this->postedConfig())
+            : null;
         try {
-            $xml = (new SitemapGenerator())->buildSitemap($template->getName());
+            $xml = (new SitemapGenerator())->buildSitemap($template->getName(), $cfg);
         } catch (\Throwable $e) {
-            return $this->renderForm(['flashErr' => 'Preview failed: ' . $e->getMessage()]);
+            $this->raw('The preview could not be built: ' . $e->getMessage(), 'text/plain', 500);
         }
-        return $this->renderForm(['previewXml' => $xml]);
+        $this->raw($xml, 'application/xml', 200);
+    }
+
+    /** Answer with a document of our own instead of an admin page. */
+    private function raw(string $body, string $type, int $code): never
+    {
+        while (ob_get_level() > 0) {
+            @ob_end_clean();
+        }
+        if (!headers_sent()) {
+            http_response_code($code);
+            header('Content-Type: ' . $type . '; charset=utf-8');
+            header('X-Content-Type-Options: nosniff');
+            header('Cache-Control: no-store');
+            header('X-Robots-Tag: noindex');
+        }
+        echo $body;
+        exit;
     }
 
     /** @param array<string,mixed> $extra */
@@ -102,7 +140,6 @@ final class SitemapController extends AbstractController
             'pageCount'     => $pageCount,
             'rootWritable'  => $rootWritable,
             'lastGenerated' => $lastGenerated,
-            'previewXml'    => '',
             'flashMsg'      => (string)($_GET['flash'] ?? ''),
             'flashErr'      => (string)($_GET['err'] ?? ''),
         ], $extra));

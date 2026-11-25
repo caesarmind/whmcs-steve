@@ -1,7 +1,7 @@
 // Tier 3c (sitemap) - sitemap.xml and robots.txt, the files Hadrian keeps in
 // the WHMCS root.
 //
-// Three things are checked:
+// Four things are checked:
 //   - what the files list, and when they are rewritten, against rows made for
 //     the purpose (tests/php/sitemap.php check): a hidden product group, a
 //     translated and a private knowledgebase article, hidden categories, a
@@ -12,6 +12,8 @@
 //     switched off takes it out of sitemap.xml and into robots.txt.
 //   - a built page standing in for a theme page answers at two addresses; both
 //     name one canonical address, the one WHMCS sends visitors to.
+//   - Preview XML opens the sitemap itself in a new tab, for the settings as
+//     they are on screen, and writes and saves nothing.
 //
 // Runs in the `settings` project (one worker): it rewrites two files in the
 // web root of the install the other tiers crawl, and puts them back.
@@ -87,6 +89,50 @@ test('saving a page in Pages rewrites sitemap.xml and robots.txt', async ({ page
     files = sitemap('files');
     expect(files.urls, 'set back, it is listed again').toContain(address);
     expect(files.disallow, 'and no longer disallowed').not.toContain('/' + target.url.replace(/^\//, ''));
+  } finally {
+    sitemap('restore');
+  }
+});
+
+test('Preview XML opens the sitemap in a new tab, for the settings on screen', async ({ page }) => {
+  const single = /announcements\/\d+\//;      // the address of one announcement
+  sitemap('backup');
+  try {
+    sitemap('begin');
+    const before = sitemap('files');
+    expect(before.urls.some(u => single.test(u)), 'the saved sitemap lists announcements').toBe(true);
+
+    await page.goto(`${HADRIAN}&action=sitemap`);
+    // Switch Announcements off on screen, and do not save.
+    const toggle = page.locator('input[name="announcements"]');
+    await expect(toggle).toBeChecked();
+    await toggle.evaluate(el => { el.checked = false; });
+
+    const [tab, res] = await Promise.all([
+      page.waitForEvent('popup'),
+      page.context().waitForEvent('response', r => /sub=preview/.test(r.url())),
+      page.locator('[data-sitemap-preview]').click(),
+    ]);
+    expect(res.status()).toBe(200);
+    expect(res.headers()['content-type'], 'it is the XML document itself, not an admin page').toContain('application/xml');
+    const xml = await res.text();
+    expect(xml.trimStart().startsWith('<?xml')).toBe(true);
+    expect(xml).toContain('<urlset');
+    expect(xml).not.toContain('mt-wrap');
+    expect(single.test(xml), 'with Announcements off on screen, the preview lists none').toBe(false);
+    await tab.close();
+
+    await expect(page, 'the Sitemap tab stays where it was').toHaveURL(/action=sitemap$/);
+    const after = sitemap('files');
+    expect(after.urls, 'a preview writes nothing').toEqual(before.urls);
+    expect(after.mtime).toBe(before.mtime);
+    await page.reload();
+    await expect(toggle, 'and saves nothing').toBeChecked();
+
+    // A plain address still works, and previews the saved settings.
+    const saved = await page.request.get(`${HADRIAN}&action=sitemap&sub=preview`);
+    expect(saved.headers()['content-type']).toContain('application/xml');
+    expect(single.test(await saved.text()), 'saved settings: announcements are listed').toBe(true);
   } finally {
     sitemap('restore');
   }

@@ -125,16 +125,14 @@
     </p>
     <div style="display:flex; gap:8px; flex-wrap:wrap;">
         <a class="mt-btn mt-btn-primary mt-btn-sm" href="?module=Hadrian&action=sitemap&sub=generate&amp;token={$csrfToken|escape:'url'}">Generate now</a>
-        <a class="mt-btn mt-btn-secondary mt-btn-sm" href="?module=Hadrian&action=sitemap&sub=preview">Preview XML</a>
+        {* Posts the settings form above to the preview, in a new tab: the XML
+           shown is for the toggles as they are on screen, saved or not. The
+           form carries the admin token WHMCS adds to every POST form. *}
+        <button type="submit" class="mt-btn mt-btn-secondary mt-btn-sm" form="sitemap-form"
+                formaction="?module=Hadrian&action=sitemap&sub=preview" formtarget="_blank" data-sitemap-preview>Preview XML</button>
     </div>
+    <p class="mt-row-help" style="margin-top:10px;">Preview XML opens the sitemap in a new tab, for the settings as they are on screen, and writes nothing. Generate now uses the saved settings.</p>
 </section>
-
-{if $previewXml}
-<section class="mt-section">
-    <header class="mt-section-header"><h2 class="mt-section-title">Preview</h2>{include file="includes/doclink.tpl" article="seo" anchor="generating"}</header>
-    <pre style="margin:0; padding:14px; background:var(--mt-surface-2); border:1px solid var(--mt-border); border-radius:var(--mt-radius); font-size:12px; line-height:1.5; overflow:auto; max-height:460px; white-space:pre;">{$previewXml|escape}</pre>
-</section>
-{/if}
 
 </div>
 

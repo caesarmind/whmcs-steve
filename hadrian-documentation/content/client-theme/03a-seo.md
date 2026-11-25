@@ -273,12 +273,12 @@ maintaining.
 
 ### Generating
 
-:::shot img/seo-sitemap-preview.png The Generate panel, with a preview open.
+:::shot img/seo-sitemap-preview.png The Generate panel.
 
 :::steps
 1. Set the toggles above and press **Save & generate**. Saving writes the files as well, so most of the time this is the only button you need.
-2. **Generate now** rewrites both files without changing any settings.
-3. **Preview XML** shows exactly what would be written, and writes nothing.
+2. **Generate now** rewrites both files without changing any settings. It uses the settings as they were last saved.
+3. **Preview XML** opens the sitemap in a new browser tab, as the XML document itself. It shows what would be written for the toggles as they are on screen, so you can try a setting before saving it. It writes nothing and saves nothing.
 :::
 
 **Last written** carries the timestamp of the current `sitemap.xml`, or says
