@@ -87,6 +87,24 @@ final class PageRegistry
                 $changed = true;
             }
         }
+        // Which module pages stand in for which theme pages also decides what
+        // the sitemap lists (SitemapGenerator), and no row records it: it
+        // moves when the site is switched between Theme and Page Builder. A
+        // remembered signature tells a switch from an ordinary visit.
+        $standIns = [];
+        foreach ($pages as $page => $meta) {
+            $replaced = (string)($meta['extension']['replaces'] ?? '');
+            if ($replaced !== '') {
+                $standIns[$page] = $replaced;
+            }
+        }
+        ksort($standIns);
+        $signature = $standIns === [] ? '' : (string)json_encode($standIns);
+        if ((string)Settings::getValue($tpl . '_extension_standins', '') !== $signature) {
+            Settings::setValue($tpl . '_extension_standins', $signature);
+            $changed = true;
+        }
+
         // Only on a real change, so opening the Pages screen writes nothing.
         if ($changed) {
             SitemapGenerator::refresh($tpl);

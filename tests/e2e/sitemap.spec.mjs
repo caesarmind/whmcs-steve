@@ -1,7 +1,7 @@
 // Tier 3c (sitemap) - sitemap.xml and robots.txt, the files Hadrian keeps in
 // the WHMCS root.
 //
-// Two things are checked:
+// Three things are checked:
 //   - what the files list, and when they are rewritten, against rows made for
 //     the purpose (tests/php/sitemap.php check): a hidden product group, a
 //     translated and a private knowledgebase article, hidden categories, a
@@ -10,6 +10,8 @@
 //     nothing they list has changed, or before the site has set them up.
 //   - the same through the admin: saving a page in Pages with indexing
 //     switched off takes it out of sitemap.xml and into robots.txt.
+//   - a built page standing in for a theme page answers at two addresses; both
+//     name one canonical address, the one WHMCS sends visitors to.
 //
 // Runs in the `settings` project (one worker): it rewrites two files in the
 // web root of the install the other tiers crawl, and puts them back.
@@ -32,6 +34,26 @@ test('the sitemap lists what visitors can reach, and follows changes', async () 
   for (const r of results) {
     expect.soft(r.ok, r.name + (r.detail ? ` (${r.detail})` : '')).toBe(true);
   }
+});
+
+test('a built page standing in for a theme page has one canonical address', async () => {
+  const r = sitemap('standin');
+  test.skip(!!r.skipped, r.skipped || '');
+
+  // On its own, a built page is its own canonical address.
+  expect(r.alone.status).toBe(200);
+  expect(r.alone.canonical, 'not standing in: it names itself').toMatch(/\/e2e-stand-in$/);
+
+  // Standing in for Announcements, the same content answers at two addresses.
+  expect(r.own.built && r.served.built, 'both addresses show the built page').toBe(true);
+  expect(r.served.canonical, 'the theme page\'s address names an address').not.toBe('');
+  expect(r.own.canonical, 'and its own address names the same one, not itself').toBe(r.served.canonical);
+  expect(r.own.canonical).not.toMatch(/e2e-stand-in/);
+  expect(r.own.ogUrl, 'og:url agrees').toBe(r.own.canonical);
+
+  // That address is where WHMCS itself sends a visitor, not one that redirects.
+  expect(r.redirect.status, 'announcements.php only redirects').toBe(301);
+  expect(r.own.canonical.endsWith(r.redirect.location), `the canonical is where it redirects to (${r.redirect.location})`).toBe(true);
 });
 
 test('saving a page in Pages rewrites sitemap.xml and robots.txt', async ({ page }) => {

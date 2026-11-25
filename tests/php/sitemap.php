@@ -18,6 +18,10 @@
  *       the Sitemap tab does. JSON: the pages the sitemap lists.
  *   php tests/php/sitemap.php files
  *       JSON: {urls: [...], disallow: [...], mtime: n} read from the files.
+ *   php tests/php/sitemap.php standin
+ *       Makes a built page serve as Announcements and asks for it at both of
+ *       its addresses. JSON: the canonical address each one names. Needs
+ *       Hadrian Page Builder; {skipped: why} without it.
  *
  * Every row and file it touches is put back. Refuses unless SystemURL is
  * localhost.
@@ -129,6 +133,7 @@ switch ($command) {
         $made  = ['groups' => [], 'kb' => []];
         $page  = null;
         $pageBefore = null;
+        $themeBefore = null;
         try {
             // ---- what is listed ------------------------------------------
             $now = date('Y-m-d H:i:s');
@@ -215,10 +220,11 @@ switch ($command) {
             }
 
             // A module's page, as Hadrian Page Builder reports its pages.
-            $live = true;
+            $live     = true;
+            $replaces = '';
             $rows = [['id' => 987001, 'name' => 'E2E Sitemap Module Page', 'url' => 'e2e-sitemap-module-page', 'live' => true]];
-            ExtensionPages::register(['id' => 'sitemaptest', 'prefix' => 'smtest', 'label' => 'Sitemap test', 'provider' => static function () use (&$rows, &$live): array {
-                return array_map(static fn(array $r): array => ['live' => $live] + $r, $rows);
+            ExtensionPages::register(['id' => 'sitemaptest', 'prefix' => 'smtest', 'label' => 'Sitemap test', 'provider' => static function () use (&$rows, &$live, &$replaces): array {
+                return array_map(static fn(array $r): array => ['live' => $live, 'replaces' => $replaces] + $r, $rows);
             }]);
             $sync = static function () use ($template): void {
                 ExtensionPages::refresh();
@@ -235,6 +241,43 @@ switch ($command) {
             $check('unpublished, it leaves the sitemap', !$has($urls($read($sitemap)), 'e2e-sitemap-module-page'));
             $live = true;
             $sync();
+
+            // Standing in for a theme page (a built page serving as
+            // Announcements): the same content answers at two addresses, and
+            // the page names the theme page's address as canonical. The
+            // sitemap lists that address once, and the module page's settings
+            // decide whether it is listed, because they are in force there.
+            $theme = Page::get($tpl, 'announcements');
+            if ($theme === null || (string) ($theme['url'] ?? '') === '') {
+                $check('the Announcements page has an address to stand in at', false);
+            } else {
+                $themeUrl    = rtrim($systemUrl, '/') . '/' . ltrim((string) $theme['url'], '/');
+                $themeIndex  = (string) $theme['indexing'];
+                $themeBefore = $themeIndex;         // for the finally block, should a check throw
+                $moduleIndex = (string) (Page::get($tpl, 'smtest-987001')['indexing'] ?? 'inherit');
+                $count       = static fn(): int => count(array_keys($urls($read($sitemap)), $themeUrl, true));
+
+                $replaces = 'announcements';
+                $sync();
+                $check('a module page standing in for a theme page is not listed at its own address', !$has($urls($read($sitemap)), 'e2e-sitemap-module-page'));
+                $check('the address it serves at is listed once', $count() === 1, $themeUrl);
+
+                Page::upsert($tpl, 'smtest-987001', ['indexing' => 'disallow']);
+                SitemapGenerator::refresh($tpl);
+                $check('set to "do not index", the address it serves at leaves the sitemap', $count() === 0);
+                Page::upsert($tpl, 'smtest-987001', ['indexing' => $moduleIndex]);
+
+                Page::upsert($tpl, 'announcements', ['indexing' => 'disallow']);
+                SitemapGenerator::refresh($tpl);
+                $check('the theme page\'s own "do not index" does not hide an indexable stand-in', $count() === 1);
+                Page::upsert($tpl, 'announcements', ['indexing' => $themeIndex]);
+
+                // Standing down changes no row; the files must follow all the same.
+                $replaces = '';
+                $sync();
+                $check('standing down, its own address is listed again', $has($urls($read($sitemap)), 'e2e-sitemap-module-page') && $count() === 1);
+            }
+
             $rows = [];
             $sync();
             $check('deleted, it leaves the sitemap and the registry', !$has($urls($read($sitemap)), 'e2e-sitemap-module-page') && Page::get($tpl, 'smtest-987001') === null);
@@ -269,6 +312,20 @@ switch ($command) {
             if ($page !== null && $pageBefore !== null) {
                 Page::upsert($tpl, (string) $page['page'], ['indexing' => $pageBefore]);
             }
+            if ($themeBefore !== null) {
+                Page::upsert($tpl, 'announcements', ['indexing' => $themeBefore]);
+            }
+            // The test module goes, and with it its row and its part in the
+            // remembered stand-in signature. Before the files are put back:
+            // this sync may rewrite them.
+            $rows     = [];
+            $replaces = '';
+            try {
+                ExtensionPages::refresh();
+                PageRegistry::syncExtensionPages($template);
+            } catch (\Throwable $e) {
+                // The restore below still runs.
+            }
             Page::delete($tpl, 'smtest-987001');
             if ($made['groups'] !== []) {
                 DB::table('tblproductgroups')->whereIn('id', $made['groups'])->delete();
@@ -288,6 +345,56 @@ switch ($command) {
             $restore($state);
         }
         echo json_encode($out);
+        break;
+
+    case 'standin':
+        // A built page serving as Announcements, asked for at both of its
+        // addresses. JSON: what each says its canonical address is, and where
+        // WHMCS itself sends a visitor who asks for announcements.php.
+        $builder = $whmcsRoot . '/modules/addons/HadrianBuilder/autoload.php';
+        if (!is_file($builder)) {
+            echo json_encode(['skipped' => 'Hadrian Page Builder is not mounted.']);
+            break;
+        }
+        require_once $builder;
+        $fetch = static function (string $path) use ($systemUrl): array {
+            $ctx  = stream_context_create(['http' => ['ignore_errors' => true, 'follow_location' => 0,
+                'header' => "User-Agent: Mozilla/5.0 (HadrianTests)\r\n"]]);
+            $html = (string) @file_get_contents(rtrim($systemUrl, '/') . $path, false, $ctx);
+            $location = '';
+            foreach ($http_response_header ?? [] as $h) {
+                if (stripos($h, 'Location:') === 0) {
+                    $location = trim(substr($h, 9));
+                }
+            }
+            preg_match('#<link rel="canonical" href="([^"]*)"#', $html, $c);
+            preg_match('#<meta property="og:url" content="([^"]*)"#', $html, $o);
+            return [
+                'status'    => (int) (explode(' ', (string) ($http_response_header[0] ?? ''))[1] ?? 0),
+                'built'     => str_contains($html, 'E2E STAND-IN MARK'),
+                'canonical' => html_entity_decode($c[1] ?? '', ENT_QUOTES),
+                'ogUrl'     => html_entity_decode($o[1] ?? '', ENT_QUOTES),
+                'location'  => $location,
+            ];
+        };
+        $langs = \HadrianBuilder\Bridge::languages();
+        $doc   = \HadrianBuilder\Document::normalize(['sections' => [['type' => 'final-cta', 'props' => ['title' => ['_' => 'E2E STAND-IN MARK']]]]], $langs);
+        $id    = \HadrianBuilder\Page::create(['name' => 'E2E Stand-in', 'slug' => 'e2e-stand-in', 'draft' => $doc,
+            'meta' => \HadrianBuilder\Document::normalizeMeta(['title' => 'E2E Stand-in'], $langs)]);
+        $result = [];
+        try {
+            \HadrianBuilder\Page::publish($id);
+            $result['alone'] = $fetch('/e2e-stand-in');
+            \HadrianBuilder\Page::setReplaces($id, 'announcements', 'always');
+            \HadrianBuilder\Bridge::pagesChanged();
+            $result['own']      = $fetch('/e2e-stand-in');
+            $result['served']   = $fetch('/announcements');
+            $result['redirect'] = $fetch('/announcements.php');
+        } finally {
+            \HadrianBuilder\Page::delete($id);
+            \HadrianBuilder\Bridge::pagesChanged();
+        }
+        echo json_encode($result);
         break;
 
     default:

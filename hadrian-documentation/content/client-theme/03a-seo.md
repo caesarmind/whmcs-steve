@@ -87,6 +87,17 @@ redirect at the web-server level - that is the only place it can be done
 without a round trip.
 :::
 
+There is one case where the canonical is not the address the visitor used. A
+page made by an add-on can stand in for a theme page - with Page Builder, a
+built page can serve as your homepage, Announcements, Knowledgebase or Contact
+page. While it does, the same content answers at two addresses: the built
+page's own, and the theme page's. Both name the theme page's address as
+canonical, because that is the one your menus link to. The sitemap follows
+suit: it lists that address once and leaves the built page's own address out,
+and whether it is listed at all follows the built page's indexing and
+visibility, since those are the settings in force there. When the built page
+stops standing in, it goes back to being its own canonical address.
+
 ### Open Graph and Twitter cards
 
 Both card sets are emitted on every page, whether or not you have filled
