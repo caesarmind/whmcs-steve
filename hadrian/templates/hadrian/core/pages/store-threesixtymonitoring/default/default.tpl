@@ -54,7 +54,7 @@
 .mon-check-form .mon-location { display: flex; align-items: center; gap: 8px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 0 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.06); }
 .mon-check-form .mon-location svg { width: 16px; height: 16px; color: var(--color-accent); flex-shrink: 0; }
 .mon-check-form .mon-location select { flex: 1; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; color: var(--color-text-primary); padding: 14px 0; appearance: none; cursor: pointer; -webkit-appearance: none; }
-.mon-check-form .mon-check-btn { background: var(--color-accent); color: #fff; border: 0; border-radius: 16px; padding: 0 22px; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.15s; }
+.mon-check-form .mon-check-btn { background: var(--color-accent); color: var(--color-on-accent); border: 0; border-radius: 16px; padding: 0 22px; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.15s; }
 .mon-check-form .mon-check-btn:hover { background: #0077ed; }
 [data-theme="dark"] .mon-check-form .mon-location { background: #1c1c1e; border-color: #3a3a3c; }
 [data-theme="dark"] .mon-check-form .mon-location select { color: #f5f5f7; }
@@ -62,7 +62,7 @@
 @media (max-width: 720px) { .mon-check-form { grid-template-columns: 1fr; } }
 .mon-subtabs { display: flex; justify-content: center; gap: 6px; margin: 8px 0 40px; }
 .mon-subtabs button { border: none; background: transparent; padding: 10px 22px; font-size: 14px; font-weight: 500; border-radius: 980px; cursor: pointer; color: var(--color-text-secondary); transition: all 0.2s ease; font-family: inherit; }
-.mon-subtabs button.active { background: var(--color-accent); color: #fff; }
+.mon-subtabs button.active { background: var(--color-accent); color: var(--color-on-accent); }
 [data-theme="dark"] .mon-subtabs button { color: #a1a1a6; }
 [data-theme="dark"] .mon-subtabs button.active { background: #2997ff; color: #fff; }
 .mon-pane { display: none; }

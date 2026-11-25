@@ -45,19 +45,19 @@
             <div class="plan-cards">
                 {if $ucDemo}
                     <label class="plan-card current" data-selectable>
-                        <input type="radio" name="uc_plan" value="pro" hidden>
+                        <input type="radio" name="uc_plan" value="pro" class="sr-only">
                         <span class="plan-radio"></span>
                         <span class="plan-info"><span class="plan-name">Pro <span class="plan-badge">{$LANG.upgradecurrentconfig}</span></span><span class="plan-features">100 GB SSD, 2 TB bandwidth</span></span>
                         <span class="plan-price">$20.33<span class="plan-price-period">/mo</span></span>
                     </label>
                     <label class="plan-card selected" data-selectable>
-                        <input type="radio" name="uc_plan" value="business" checked hidden>
+                        <input type="radio" name="uc_plan" value="business" checked class="sr-only">
                         <span class="plan-radio"></span>
                         <span class="plan-info"><span class="plan-name">Business</span><span class="plan-features">500 GB SSD, unmetered bandwidth</span></span>
                         <span class="plan-price">$41.58<span class="plan-price-period">/mo</span></span>
                     </label>
                     <label class="plan-card" data-selectable>
-                        <input type="radio" name="uc_plan" value="enterprise" hidden>
+                        <input type="radio" name="uc_plan" value="enterprise" class="sr-only">
                         <span class="plan-radio"></span>
                         <span class="plan-info"><span class="plan-name">Enterprise</span><span class="plan-features">1 TB SSD, unmetered, dedicated IP</span></span>
                         <span class="plan-price">$79.99<span class="plan-price-period">/mo</span></span>
@@ -65,7 +65,7 @@
                 {else}
                     {foreach $upgradepackages as $pkg}
                     <label class="plan-card{if $pkg@first} selected{/if}" data-selectable>
-                        <input type="radio" name="uc_plan" value="{$pkg.pid|escape}"{if $pkg@first} checked{/if} hidden>
+                        <input type="radio" name="uc_plan" value="{$pkg.pid|escape}"{if $pkg@first} checked{/if} class="sr-only">
                         <span class="plan-radio"></span>
                         <span class="plan-info"><span class="plan-name">{$pkg.name|escape}</span></span>
                         <span class="plan-price">{if isset($pkg.pricing.monthly)}{$pkg.pricing.monthly}{/if}</span>
@@ -122,6 +122,11 @@
             c.classList.add('selected');
             var r = c.querySelector('input[type=radio]');
             if (r) { r.checked = true; }
+        });
+        // Arrow keys move the radio without a click: follow the input too.
+        var r = c.querySelector('input[type=radio]');
+        if (r) r.addEventListener('change', function () {
+            cards.forEach(function (x) { x.classList.toggle('selected', x === c); });
         });
     });
 })();

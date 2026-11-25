@@ -276,9 +276,9 @@ return [
             ['var' => '--color-accent',       'label' => 'Accent',       'light' => '#0071e3',              'dark' => '#2997ff',              'hint' => 'Primary buttons, active states, focus rings.'],
             ['var' => '--color-accent-hover', 'label' => 'Accent hover', 'light' => '#0077ed',              'dark' => '#40a3ff',              'hint' => 'Follows the Accent. Set a value only to break that link; the swatch shows stock, not the derived colour.'],
             ['var' => '--color-accent-light', 'label' => 'Accent tint',  'light' => 'rgba(0,113,227,0.08)', 'dark' => 'rgba(41,151,255,0.12)', 'hint' => 'The translucent wash behind selected rows and info badges.'],
-            ['var' => '--color-on-accent',    'label' => 'On accent',    'light' => '#ffffff',              'dark' => '#ffffff',              'hint' => 'Text and icons sitting ON a filled accent surface. Stays light in both modes.'],
-            ['var' => '--color-link',         'label' => 'Link',         'light' => '#0066cc',              'dark' => '#2997ff',              'hint' => 'Follows the Accent: darker than it in light mode, equal in dark.'],
-            ['var' => '--color-link-hover',   'label' => 'Link hover',   'light' => '#0071e3',              'dark' => '#40a3ff',              'hint' => 'Follows the Accent automatically.'],
+            ['var' => '--color-on-accent',    'label' => 'On accent',    'light' => '#ffffff',              'dark' => '#ffffff',              'hint' => 'Text and icons sitting ON a filled accent surface. Left at its default it is worked out from the Accent (black or white, whichever reads); set it only to force one.'],
+            ['var' => '--color-link',         'label' => 'Link',         'light' => '#0066cc',              'dark' => '#52abff',              'hint' => 'Follows the Accent: darker than it in light mode, lighter in dark so links stay readable on raised surfaces.'],
+            ['var' => '--color-link-hover',   'label' => 'Link hover',   'light' => '#0071e3',              'dark' => '#7cc0ff',              'hint' => 'Follows the Accent automatically.'],
         ],
 
         // Renamed from "Backgrounds" to match the word every other panel's
@@ -293,9 +293,9 @@ return [
 
         'Text' => [
             ['var' => '--color-text-primary',    'label' => 'Primary',    'light' => '#1d1d1f', 'dark' => '#f5f5f7', 'hint' => 'Headings and body copy.'],
-            ['var' => '--color-text-secondary',  'label' => 'Secondary',  'light' => '#6e6e73', 'dark' => '#a1a1a6'],
-            ['var' => '--color-text-tertiary',   'label' => 'Tertiary',   'light' => '#86868b', 'dark' => '#8e8e93', 'hint' => 'Captions and meta. Only ~3.4:1 on a light card -- never for text that matters.'],
-            ['var' => '--color-text-quaternary', 'label' => 'Quaternary', 'light' => '#aeaeb2', 'dark' => '#636366', 'hint' => 'Placeholders only.'],
+            ['var' => '--color-text-secondary',  'label' => 'Secondary',  'light' => '#636368', 'dark' => '#b8b8bd'],
+            ['var' => '--color-text-tertiary',   'label' => 'Tertiary',   'light' => '#6e6e73', 'dark' => '#a6a6ab', 'hint' => 'Captions and meta. Keep it at 4.5:1 or better on every surface (WCAG AA); the default just clears that on the grey surface.'],
+            ['var' => '--color-text-quaternary', 'label' => 'Quaternary', 'light' => '#737378', 'dark' => '#9a9a9f', 'hint' => 'Placeholders and small meta. Placeholder text must still reach 4.5:1 on the field background.'],
         ],
 
         'Borders' => [
@@ -311,10 +311,10 @@ return [
         // Neutral is how a buyer thinks about it.
         'Status & badges' => [
             ['var' => '--color-green',       'label' => 'Success',      'light' => '#30d158',               'dark' => '#30d158', 'hint' => 'The dot or fill. Pair with Success text for the label.'],
-            ['var' => '--color-green-text',  'label' => 'Success text', 'light' => '#248a3d',               'dark' => '#30d158'],
+            ['var' => '--color-green-text',  'label' => 'Success text', 'light' => '#207b37',               'dark' => '#45d669'],
             ['var' => '--color-green-bg',    'label' => 'Success fill', 'light' => 'rgba(48,209,88,0.10)',  'dark' => 'rgba(48,209,88,0.16)'],
             ['var' => '--color-orange',      'label' => 'Warning',      'light' => '#ff9f0a',               'dark' => '#ff9f0a'],
-            ['var' => '--color-orange-text', 'label' => 'Warning text', 'light' => '#c27400',               'dark' => '#ff9f0a'],
+            ['var' => '--color-orange-text', 'label' => 'Warning text', 'light' => '#9c5d00',               'dark' => '#ffab28'],
             ['var' => '--color-orange-bg',   'label' => 'Warning fill', 'light' => 'rgba(255,159,10,0.10)', 'dark' => 'rgba(255,159,10,0.16)'],
             // dark is #ff3b30, NOT #ff453a. core-theme.css does not redeclare
             // --color-red in the dark block, so dark mode renders the light
@@ -329,11 +329,11 @@ return [
             // --color-red-text already uses, and the dark-mode danger red), but
             // it is a design call, not a silent cleanup.
             ['var' => '--color-red',         'label' => 'Danger',       'light' => '#ff3b30',               'dark' => '#ff3b30'],
-            ['var' => '--color-red-text',    'label' => 'Danger text',  'light' => '#d70015',               'dark' => '#ff453a'],
+            ['var' => '--color-red-text',    'label' => 'Danger text',  'light' => '#d20015',               'dark' => '#ff7a72'],
             ['var' => '--color-red-bg',      'label' => 'Danger fill',  'light' => 'rgba(255,59,48,0.10)',  'dark' => 'rgba(255,59,48,0.16)'],
-            ['var' => '--color-blue-text',   'label' => 'Info',         'light' => '#0071e3',               'dark' => '#2997ff', 'hint' => 'Separate from the Accent on purpose, so info need not follow a rebrand.'],
+            ['var' => '--color-blue-text',   'label' => 'Info',         'light' => '#0067d0',               'dark' => '#64b4ff', 'hint' => 'Separate from the Accent on purpose, so info need not follow a rebrand.'],
             ['var' => '--color-blue-bg',     'label' => 'Info fill',    'light' => 'rgba(0,113,227,0.08)',  'dark' => 'rgba(41,151,255,0.14)'],
-            ['var' => '--color-gray-text',   'label' => 'Neutral',      'light' => '#6e6e73',               'dark' => '#a1a1a6'],
+            ['var' => '--color-gray-text',   'label' => 'Neutral',      'light' => '#636368',               'dark' => '#b2b2b7'],
             ['var' => '--color-gray-bg',     'label' => 'Neutral fill', 'light' => 'rgba(142,142,147,0.12)','dark' => 'rgba(142,142,147,0.18)'],
         ],
 
@@ -363,9 +363,9 @@ return [
             ['var' => '--sidebar-bg',             'label' => 'Sidebar background', 'light' => 'rgba(246,246,248,0.80)', 'dark' => 'rgba(28,28,30,0.80)', 'hint' => 'Translucent: it frosts whatever scrolls under it.'],
             ['var' => '--sidebar-panel-bg',       'label' => 'Flyout panel',       'light' => '#ffffff',                'dark' => '#2c2c2e', 'follows' => '--color-surface',            'hint' => 'The rail layout only. Not the sidebar itself.'],
             ['var' => '--sidebar-text',           'label' => 'Text',               'light' => '#1d1d1f',                'dark' => '#f5f5f7', 'follows' => '--color-text-primary',       'hint' => 'Set this whenever you darken the background, or the menu goes dark-on-dark.'],
-            ['var' => '--sidebar-text-secondary', 'label' => 'Text soft',          'light' => '#6e6e73',                'dark' => '#a1a1a6', 'follows' => '--color-text-secondary'],
-            ['var' => '--sidebar-text-muted',     'label' => 'Text muted',         'light' => '#86868b',                'dark' => '#8e8e93', 'follows' => '--color-text-tertiary',      'hint' => 'Section labels and the user email.'],
-            ['var' => '--sidebar-text-faint',     'label' => 'Placeholder',        'light' => '#aeaeb2',                'dark' => '#636366', 'follows' => '--color-text-quaternary'],
+            ['var' => '--sidebar-text-secondary', 'label' => 'Text soft',          'light' => '#636368',                'dark' => '#b8b8bd', 'follows' => '--color-text-secondary'],
+            ['var' => '--sidebar-text-muted',     'label' => 'Text muted',         'light' => '#6e6e73',                'dark' => '#a6a6ab', 'follows' => '--color-text-tertiary',      'hint' => 'Section labels and the user email.'],
+            ['var' => '--sidebar-text-faint',     'label' => 'Placeholder',        'light' => '#737378',                'dark' => '#9a9a9f', 'follows' => '--color-text-quaternary'],
             ['var' => '--sidebar-border',         'label' => 'Border',             'light' => '#e8e8ed',                'dark' => '#3a3a3c', 'follows' => '--color-border'],
             ['var' => '--sidebar-field-bg',       'label' => 'Search field',       'light' => '#f5f5f7',                'dark' => '#3a3a3c', 'follows' => '--color-surface-secondary'],
             ['var' => '--sidebar-item-hover-bg',  'label' => 'Item hover',         'light' => 'rgba(0,0,0,0.04)',       'dark' => 'rgba(255,255,255,0.05)', 'hint' => 'Sidebar only -- the similarly named shared token is not editable here.'],

@@ -178,7 +178,7 @@
     <div class="sidebar-footer">
         {if $loggedin}
             <div class="profile-dropdown-wrapper only-in">
-                <div class="sidebar-user" role="button" tabindex="0" onclick="togglePortalProfile && togglePortalProfile(event, 'sidebar')">
+                <div class="sidebar-user" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" onclick="togglePortalProfile && togglePortalProfile(event, 'sidebar')">
                     <div class="sidebar-avatar">{$user_initials|default:'U'}</div>
                     <div class="sidebar-user-info">
                         <div class="sidebar-user-name">{$user_fullname|escape}</div>

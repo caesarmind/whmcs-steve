@@ -129,7 +129,7 @@ html[data-palette="slate"]   .um-row-avatar { background: linear-gradient(135deg
 .um-invite-btn {
     display: inline-flex; align-items: center; gap: 6px;
     height: 38px; padding: 0 16px;
-    background: var(--color-accent); color: #fff;
+    background: var(--color-accent); color: var(--color-on-accent);
     border: 0; border-radius: var(--radius-pill);
     font-size: var(--text-md); font-weight: var(--fw-medium); font-family: inherit;
     cursor: pointer; white-space: nowrap;

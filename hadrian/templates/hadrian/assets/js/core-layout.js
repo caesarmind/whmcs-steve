@@ -1043,3 +1043,271 @@
         boot();
     }
 })();
+
+/* ===== Accessibility helpers ==============================================
+   docs/accessibility-hadrian-plan.md, phase 3. Generic behaviour for the
+   widget patterns the theme uses, so each page does not need its own:
+
+     dialogs     any open [role=dialog][aria-modal=true] (and Bootstrap
+                 .modal): focus moves in, Tab stays inside, focus goes back to
+                 the opener when it closes (WCAG 2.4.3, 2.1.2)
+     menus       Escape returns focus to the button that opened the account
+                 or notification menu
+     sidebar     group toggles report aria-expanded (WCAG 4.1.2)
+     top nav     dropdown buttons toggle on click, report aria-expanded, and
+                 Escape dismisses a menu opened by hover or focus (1.4.13)
+     rail        flyout state on the rail items, Escape closes it
+     tabs        children of [role=tablist] become role=tab with
+                 aria-selected from their .active class; arrows, Home, End
+     radios      buttons in [role=radiogroup] become role=radio with
+                 aria-checked from .active; arrows move the choice
+     FAQ         checkbox-driven answers report aria-expanded and open with
+                 Enter or Space
+     tooltips    Escape hides a .cmp-tip shown by hover or focus
+     dark mode   every switch reports aria-checked
+
+   Each part watches the classes the existing scripts already toggle, so no
+   page script had to change. */
+(function () {
+    'use strict';
+    var FOCUSABLE = 'a[href], area[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), summary, [tabindex]:not([tabindex="-1"]), [contenteditable="true"]';
+    var ACTIVE = function (el) {
+        return el.classList.contains('active') || el.classList.contains('is-active') || el.getAttribute('aria-pressed') === 'true';
+    };
+    function shown(el) {
+        if (!el || !el.isConnected || el.hidden || el.closest('[hidden]')) return false;
+        var cs = getComputedStyle(el);
+        if (cs.display === 'none' || cs.visibility === 'hidden') return false;
+        var r = el.getBoundingClientRect();
+        return r.width > 0 && r.height > 0;
+    }
+    function focusables(root) {
+        return Array.prototype.filter.call(root.querySelectorAll(FOCUSABLE), function (e) {
+            return !e.closest('[inert]') && shown(e);
+        });
+    }
+    var uid = 0;
+    function idFor(el, prefix) { if (!el.id) el.id = prefix + '-' + (++uid); return el.id; }
+    function later(fn) { setTimeout(fn, 0); }
+
+    // ---- dialogs ----------------------------------------------------------
+    var DIALOGS = '[role="dialog"][aria-modal="true"], [role="alertdialog"], .modal[role="dialog"]';
+    var openDialogs = [];           // [{ el, opener }] in opening order
+    function checkDialogs() {
+        var now = Array.prototype.filter.call(document.querySelectorAll(DIALOGS), shown);
+        // Closed since last time: give focus back.
+        openDialogs = openDialogs.filter(function (d) {
+            if (now.indexOf(d.el) !== -1) return true;
+            var a = document.activeElement;
+            if ((!a || a === document.body || d.el.contains(a)) && d.opener && d.opener.isConnected && shown(d.opener)) {
+                try { d.opener.focus(); } catch (e) {}
+            }
+            return false;
+        });
+        // Newly open: remember the opener, move focus in.
+        now.forEach(function (el) {
+            if (openDialogs.some(function (d) { return d.el === el; })) return;
+            var opener = document.activeElement && document.activeElement !== document.body ? document.activeElement : null;
+            openDialogs.push({ el: el, opener: opener });
+            setTimeout(function () {
+                if (el.contains(document.activeElement)) return;   // the page focused a field itself
+                var target = el.querySelector('[autofocus]') || el.querySelector('[role="radio"][aria-checked="true"]') || focusables(el)[0];
+                if (target) target.focus();
+                else { el.setAttribute('tabindex', '-1'); el.focus(); }
+            }, 40);
+        });
+    }
+    var pending = false;
+    function schedule() { if (pending) return; pending = true; setTimeout(function () { pending = false; checkDialogs(); syncAll(); }, 30); }
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Tab' || !openDialogs.length) return;
+        var top = openDialogs[openDialogs.length - 1].el;
+        var items = focusables(top);
+        if (!items.length) { e.preventDefault(); return; }
+        var first = items[0], last = items[items.length - 1];
+        if (!top.contains(document.activeElement)) { e.preventDefault(); first.focus(); return; }
+        if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); }
+        else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); }
+    });
+
+    // ---- menus: Escape returns focus to their button ------------------------
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        var a = document.activeElement;
+        var wrap = a && a.closest && a.closest('.notification-wrapper, .profile-dropdown-wrapper');
+        if (!wrap) return;
+        var trigger = wrap.querySelector('[aria-haspopup]');
+        if (trigger && trigger !== a) later(function () { trigger.focus(); });
+    }, true);
+
+    // ---- sidebar groups ------------------------------------------------------
+    function syncSidebarGroups() {
+        document.querySelectorAll('.sidebar-group').forEach(function (g) {
+            var t = g.querySelector('.sidebar-group-toggle'), items = g.querySelector('.sidebar-group-items');
+            if (!t) return;
+            if (items) t.setAttribute('aria-controls', idFor(items, 'sbgroup'));
+            t.setAttribute('aria-expanded', g.classList.contains('open') ? 'true' : 'false');
+        });
+    }
+
+    // ---- top-nav dropdowns ---------------------------------------------------
+    function initTopnav() {
+        document.querySelectorAll('.nav-dropdown-wrap').forEach(function (wrap) {
+            var t = wrap.querySelector('.nav-dropdown-toggle'), menu = wrap.querySelector('.nav-dropdown-menu');
+            if (!t || !menu || t.dataset.a11y) return;
+            t.dataset.a11y = '1';
+            t.setAttribute('aria-controls', idFor(menu, 'navmenu'));
+            function sync() {
+                var open = !wrap.classList.contains('is-dismissed') &&
+                    (wrap.classList.contains('is-open') || wrap.matches(':hover') || wrap.matches(':focus-within'));
+                t.setAttribute('aria-expanded', open ? 'true' : 'false');
+            }
+            t.addEventListener('click', function (e) {
+                e.preventDefault();
+                var open = t.getAttribute('aria-expanded') === 'true' && !wrap.classList.contains('is-dismissed');
+                wrap.classList.toggle('is-open', !open);
+                wrap.classList.toggle('is-dismissed', open);
+                sync();
+            });
+            wrap.addEventListener('mouseenter', function () { wrap.classList.remove('is-dismissed'); sync(); });
+            wrap.addEventListener('mouseleave', function () { wrap.classList.remove('is-open'); later(sync); });
+            wrap.addEventListener('focusin', sync);
+            wrap.addEventListener('focusout', function () {
+                later(function () {
+                    if (!wrap.contains(document.activeElement)) wrap.classList.remove('is-open', 'is-dismissed');
+                    sync();
+                });
+            });
+            wrap.addEventListener('keydown', function (e) {
+                if (e.key !== 'Escape' || t.getAttribute('aria-expanded') !== 'true') return;
+                wrap.classList.add('is-dismissed');
+                wrap.classList.remove('is-open');
+                t.focus();
+                sync();
+            });
+            sync();
+        });
+    }
+
+    // ---- rail flyouts --------------------------------------------------------
+    function syncRail() {
+        var panel = document.querySelector('.ph-rail-panel');
+        if (!panel) return;
+        var open = document.body.classList.contains('rail-panel-open');
+        document.querySelectorAll('.ph-rail-item[data-rail]').forEach(function (b) {
+            b.setAttribute('aria-controls', idFor(panel, 'railpanel'));
+            b.setAttribute('aria-expanded', open && b.classList.contains('active') ? 'true' : 'false');
+        });
+    }
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape' || !document.body.classList.contains('rail-panel-open')) return;
+        var a = document.activeElement;
+        if (!a || !a.closest || !a.closest('.ph-rail, .ph-rail-panel')) return;
+        document.body.classList.remove('rail-panel-open');
+        var item = document.querySelector('.ph-rail-item.active');
+        if (item && a.closest('.ph-rail-panel')) item.focus();
+        syncRail();
+    });
+
+    // ---- tabs and radio groups -----------------------------------------------
+    function members(group, selector) {
+        return Array.prototype.filter.call(group.querySelectorAll(selector), function (b) {
+            return b.closest('[role="tablist"], [role="radiogroup"]') === group;
+        });
+    }
+    function syncGroups() {
+        document.querySelectorAll('[role="tablist"]').forEach(function (list) {
+            var tabs = members(list, 'button, a, [role="tab"]');
+            var any = tabs.some(ACTIVE);
+            tabs.forEach(function (t, i) {
+                if (!t.getAttribute('role')) t.setAttribute('role', 'tab');
+                var on = any ? ACTIVE(t) : (t.getAttribute('aria-selected') === 'true' || (i === 0 && !tabs.some(function (x) { return x.getAttribute('aria-selected') === 'true'; })));
+                t.setAttribute('aria-selected', on ? 'true' : 'false');
+                t.setAttribute('tabindex', on ? '0' : '-1');
+            });
+        });
+        document.querySelectorAll('[role="radiogroup"]').forEach(function (g) {
+            var opts = members(g, 'button, [role="radio"]');
+            if (!opts.length) return;
+            var any = opts.some(ACTIVE);
+            opts.forEach(function (o, i) {
+                o.setAttribute('role', 'radio');
+                var on = ACTIVE(o);
+                o.setAttribute('aria-checked', on ? 'true' : 'false');
+                o.setAttribute('tabindex', on || (!any && i === 0) ? '0' : '-1');
+            });
+        });
+    }
+    document.addEventListener('keydown', function (e) {
+        var k = e.key;
+        if (['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home', 'End'].indexOf(k) === -1) return;
+        var me = e.target;
+        if (!me || !me.getAttribute || me.tagName === 'INPUT') return;
+        var role = me.getAttribute('role');
+        if (role !== 'tab' && role !== 'radio') return;
+        var group = me.closest(role === 'tab' ? '[role="tablist"]' : '[role="radiogroup"]');
+        if (!group) return;
+        var list = members(group, '[role="' + role + '"]').filter(shown);
+        var i = list.indexOf(me);
+        if (i === -1) return;
+        var next = k === 'Home' ? 0 : k === 'End' ? list.length - 1
+            : (k === 'ArrowLeft' || k === 'ArrowUp') ? (i - 1 + list.length) % list.length : (i + 1) % list.length;
+        e.preventDefault();
+        list[next].focus();
+        list[next].click();          // the page's own handler moves .active
+        later(syncGroups);
+    });
+
+    // ---- FAQ answers driven by a checkbox -------------------------------------
+    function syncFaq() {
+        document.querySelectorAll('.faq-item').forEach(function (item) {
+            var box = item.querySelector('.faq-toggle'), q = item.querySelector('.faq-question');
+            if (box && q) q.setAttribute('aria-expanded', box.checked ? 'true' : 'false');
+        });
+    }
+    document.addEventListener('change', function (e) { if (e.target.classList && e.target.classList.contains('faq-toggle')) syncFaq(); });
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        var q = e.target.closest && e.target.closest('label.faq-question[role="button"]');
+        if (!q) return;
+        e.preventDefault();
+        q.click();
+    });
+
+    // ---- tooltips: Escape hides one shown by hover or focus -------------------
+    document.addEventListener('keydown', function (e) {
+        if (e.key !== 'Escape') return;
+        document.querySelectorAll('.cmp-tip:hover, .cmp-tip:focus').forEach(function (t) { t.classList.add('is-dismissed'); });
+    });
+    ['mouseleave', 'blur'].forEach(function (ev) {
+        document.addEventListener(ev, function (e) {
+            if (e.target.classList && e.target.classList.contains('cmp-tip')) e.target.classList.remove('is-dismissed');
+        }, true);
+    });
+
+    // ---- dark mode switches ----------------------------------------------------
+    function syncDarkSwitches() {
+        var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        document.querySelectorAll('[data-dark-toggle], #darkModeToggle').forEach(function (s) {
+            s.classList.toggle('active', dark);
+            if (s.getAttribute('role') === 'switch') s.setAttribute('aria-checked', dark ? 'true' : 'false');
+        });
+    }
+
+    function syncAll() { syncSidebarGroups(); syncRail(); syncGroups(); syncFaq(); syncDarkSwitches(); }
+    function boot() {
+        initTopnav();
+        syncAll();
+        checkDialogs();
+        new MutationObserver(function (list) {
+            for (var i = 0; i < list.length; i++) {
+                var m = list[i];
+                // Our own writes (aria-*, tabindex, role, id) are not in the filter,
+                // so they never trigger another round.
+                if (m.type === 'attributes' || m.addedNodes.length || m.removedNodes.length) { schedule(); return; }
+            }
+        }).observe(document.documentElement, { subtree: true, childList: true, attributes: true, attributeFilter: ['class', 'hidden', 'style', 'data-theme', 'aria-pressed'] });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
+})();

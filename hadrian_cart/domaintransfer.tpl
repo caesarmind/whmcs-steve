@@ -92,7 +92,7 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
 .dt-transfer-btn {
     height: 44px; padding: 0 22px;
     border-radius: var(--radius-pill);
-    background: var(--color-accent); color: #fff; border: 0;
+    background: var(--color-accent); color: var(--color-on-accent); border: 0;
     font-size: 13.5px; font-weight: 500;
     font-family: inherit; cursor: pointer;
     letter-spacing: -0.008em; flex-shrink: 0;

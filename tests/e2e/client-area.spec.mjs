@@ -731,7 +731,7 @@ test.describe('TH-G Dark mode (this install: switcher, default light)', () => {
     const errors = watchErrors(page);
     await context.addCookies([{ name: 'mt_theme', value: 'light', url: BASE_URL }]);
     await page.goto('/contact.php');
-    const moon = page.locator('.ph-side-topbar a[aria-label="Toggle theme"]');
+    const moon = page.locator('.ph-side-topbar button[aria-label="Toggle theme"]');
     await expect(moon, 'inner topbar (side layout)').toBeVisible();
     await moon.click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
@@ -759,7 +759,7 @@ test.describe('TH-G Dark mode (this install: switcher, default light)', () => {
       expect(await page.getAttribute('html', 'data-theme'), url).toBe('dark');
       const m = await page.evaluate(measure);
       expect(m.contrast.length, `${url}: something was measured`).toBeGreaterThan(0);
-      for (const c of m.contrast) if (c.ratio < 3) problems.push(`${url}: ${c.ratio}:1 in ${c.sel} "${c.text}"`);
+      for (const c of m.contrast) if (c.ratio < c.min) problems.push(`${url}: ${c.ratio}:1 in ${c.sel} "${c.text}"`);
     }
     expect(problems).toEqual([]);
   });

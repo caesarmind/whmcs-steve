@@ -90,7 +90,7 @@
         font-size: 11px; font-weight: 600; flex-shrink: 0;
     }
     .ct-step.done .ct-step-num { background: var(--color-green-bg); color: var(--color-green-text); }
-    .ct-step.active .ct-step-num { background: var(--color-accent); color: #fff; }
+    .ct-step.active .ct-step-num { background: var(--color-accent); color: var(--color-on-accent); }
     .ct-step.active { color: var(--color-text-primary); font-weight: 500; }
     .ct-step-sep { color: var(--color-text-quaternary); }
 
@@ -308,7 +308,7 @@
     .ct-promo-apply {
         height: 40px; padding: 0 20px;
         border-radius: var(--radius-pill);
-        background: var(--color-accent); color: #fff;
+        background: var(--color-accent); color: var(--color-on-accent);
         border: 0;
         font-size: 13px; font-weight: 500;
         cursor: pointer; font-family: inherit;
@@ -465,14 +465,14 @@
     .ct-checkout-btn {
         height: 46px; padding: 0 20px;
         border-radius: var(--radius-pill);
-        background: var(--color-accent); color: #fff; border: 0;
+        background: var(--color-accent); color: var(--color-on-accent); border: 0;
         font-size: 14px; font-weight: 500; letter-spacing: -0.008em;
         cursor: pointer; font-family: inherit;
         display: inline-flex; align-items: center; justify-content: center; gap: 8px;
         text-decoration: none;
         transition: background var(--transition-fast);
     }
-    .ct-checkout-btn:hover { background: var(--color-accent-hover); color: #fff; }
+    .ct-checkout-btn:hover { background: var(--color-accent-hover); color: var(--color-on-accent); }
     .ct-checkout-btn svg { width: 14px; height: 14px; }
     .ct-checkout-btn.disabled { opacity: 0.5; pointer-events: none; }
     .ct-continue-shop {
@@ -610,7 +610,7 @@
     .ct-recommend-body .mc-promo a.btn-add {
         height: 26px; padding: 0 12px;
         border-radius: var(--radius-pill, 999px);
-        background: var(--color-accent); color: #fff; border: 0;
+        background: var(--color-accent); color: var(--color-on-accent); border: 0;
         font-size: 11.5px; font-weight: 500; letter-spacing: -0.008em;
         cursor: pointer; font-family: inherit; text-decoration: none;
         display: inline-flex; align-items: center; gap: 4px;
@@ -708,8 +708,8 @@
         text-decoration: none;
         border-radius: var(--radius-pill);
     }
-    .ct-empty-actions .btn-primary { background: var(--color-accent); color: #fff; border: 0; }
-    .ct-empty-actions .btn-primary:hover { background: var(--color-accent-hover); color: #fff; }
+    .ct-empty-actions .btn-primary { background: var(--color-accent); color: var(--color-on-accent); border: 0; }
+    .ct-empty-actions .btn-primary:hover { background: var(--color-accent-hover); color: var(--color-on-accent); }
     .ct-empty-actions .btn-secondary { background: transparent; color: var(--color-text-primary); border: 0.5px solid var(--color-border); }
     .ct-empty-actions .btn-secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }
     .ct-empty-actions svg { width: 13px; height: 13px; }

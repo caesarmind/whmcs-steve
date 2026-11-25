@@ -215,7 +215,7 @@
 .co-step { display: inline-flex; align-items: center; gap: 8px; }
 .co-step-num { width: 22px; height: 22px; border-radius: 50%; background: var(--color-surface-secondary); color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; }
 .co-step.done .co-step-num { background: var(--color-green-bg, #e8f5e8); color: var(--color-green-text, #34c759); }
-.co-step.active .co-step-num { background: var(--color-accent); color: #fff; }
+.co-step.active .co-step-num { background: var(--color-accent); color: var(--color-on-accent); }
 .co-step.active { color: var(--color-text-primary); font-weight: 500; }
 .co-step-sep { color: var(--color-text-quaternary, #c7c7cc); }
 
@@ -273,7 +273,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
     height: 44px;
     padding: 0 18px;
     background: var(--color-accent);
-    color: #fff;
+    color: var(--color-on-accent);
     border: 0;
     border-radius: 999px;
     font-size: 14px;
@@ -650,7 +650,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
 #btnExistingLogin.co-signin-btn {
     height: 44px; width: 100%;
     padding: 0 20px;
-    background: var(--color-accent); color: #fff;
+    background: var(--color-accent); color: var(--color-on-accent);
     border: 0; border-radius: var(--radius-pill, 999px);
     font-size: 13.5px; font-weight: var(--fw-medium, 500);
     letter-spacing: -0.008em;
@@ -1183,7 +1183,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
     height: 48px;
     padding: 0 22px;
     background: var(--color-accent);
-    color: #fff;
+    color: var(--color-on-accent);
     border: 0;
     border-radius: 999px;
     font-size: 15px;
@@ -1508,7 +1508,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
 }
 .modal-generate-password .gp-btn-primary {
     background: var(--color-accent);
-    color: #fff;
+    color: var(--color-on-accent);
 }
 .modal-generate-password .gp-btn-primary:hover { filter: brightness(0.95); }
 
@@ -1662,7 +1662,7 @@ button.generate-password:hover {
 .co-lastchance-body .mc-promo a.btn-add {
     height: 26px; padding: 0 12px;
     border-radius: 999px;
-    background: var(--color-accent); color: #fff; border: 0;
+    background: var(--color-accent); color: var(--color-on-accent); border: 0;
     font-size: 11.5px; font-weight: 500; letter-spacing: -0.008em;
     cursor: pointer; font-family: inherit; text-decoration: none;
     display: inline-flex; align-items: center; gap: 4px;

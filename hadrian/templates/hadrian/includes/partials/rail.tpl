@@ -69,7 +69,7 @@
            role=button + tabindex keeps it keyboard reachable now that it no
            longer has an href. *}
         <div class="profile-dropdown-wrapper only-in">
-            <div class="ph-rail-user" role="button" tabindex="0"
+            <div class="ph-rail-user" role="button" tabindex="0" aria-haspopup="true" aria-expanded="false" aria-label="{$LANG.accounttab|default:'Account'}"
                  title="{$LANG.accounttab|default:'Account'}"
                  onclick="togglePortalProfile && togglePortalProfile(event, 'rail')">{($clientsdetails.firstname|default:'')|truncate:1:''|upper}</div>
             {include file="`$template`/includes/partials/profile-dropdown.tpl" ddId="profileDropdownRail" ddUp=true}

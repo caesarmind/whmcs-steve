@@ -85,7 +85,7 @@ for (const [persona, pages] of Object.entries(PAGES)) {
             if (m.content && nav && m.content.left < nav.right - 1) problems.push(`${where} navigation overlaps content (nav ends at ${nav.right}px, content starts at ${m.content.left}px)`);
             if (m.content && m.content.right > vw + 1) problems.push(`${where} content runs off the right edge (${m.content.right}px > ${vw}px)`);
             if (m.overflowX > 1) problems.push(`${where} horizontal overflow of ${m.overflowX}px`);
-            for (const c of m.contrast) if (c.ratio < 3) problems.push(`${where} unreadable text (${c.ratio}:1) in ${c.sel}: "${c.text}"`);
+            for (const c of m.contrast) if (c.ratio < c.min) problems.push(`${where} unreadable text (${c.ratio}:1) in ${c.sel}: "${c.text}"`);
           }
         }
 

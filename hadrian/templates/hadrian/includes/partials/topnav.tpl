@@ -43,11 +43,11 @@
     {elseif $mtType == 'dropdown_parent' || ($mtType == 'account_dropdown' && $item.children)}
         {assign var=mtDropdownStyle value=$item.dropdown_style|default:'default'}
         <div class="nav-dropdown-wrap{$sideRight}{if $mtDropdownStyle == 'mega'} nav-dropdown-wrap--mega{/if}">
-            <a href="#" class="nav-dropdown-toggle">
+            <button type="button" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
                 {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
                 {$item.label|escape}
                 <svg class="nav-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
-            </a>
+            </button>
             {if $item.children}
                 {if $mtDropdownStyle == 'mega'}
                     {* MEGA: full-width panel split into columns by `header` items.
@@ -162,7 +162,7 @@
 
         {if $loggedin}
             <div class="notification-wrapper only-in" id="navNotifyWrap">
-                <button type="button" class="topbar-btn" title="{$LANG.notifications}" onclick="togglePortalNotifications && togglePortalNotifications(event, 'nav')">
+                <button type="button" class="topbar-btn" aria-haspopup="true" aria-expanded="false" aria-label="{$LANG.notifications}{if (isset($clientAlerts) && $clientAlerts|count > 0) || (isset($publishedAnnouncements) && $publishedAnnouncements|count > 0)}, {$hadrianLang.nav.newNotifications}{/if}" title="{$LANG.notifications}" onclick="togglePortalNotifications && togglePortalNotifications(event, 'nav')">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
                     {if (isset($clientAlerts) && $clientAlerts|count > 0) || (isset($publishedAnnouncements) && $publishedAnnouncements|count > 0)}<div class="topbar-notification-dot"></div>{/if}
                 </button>
@@ -241,15 +241,15 @@
 
         {if $loggedin}
             <div class="profile-dropdown-wrapper only-in" id="navUserWrap">
-                <div class="topbar-avatar" onclick="togglePortalProfile && togglePortalProfile(event)" title="{$LANG.accounttab|default:'Account'}">{$user_initials|default:'U'}</div>
+                <button type="button" class="topbar-avatar" aria-haspopup="true" aria-expanded="false" aria-label="{$LANG.accounttab|default:'Account'}" onclick="togglePortalProfile && togglePortalProfile(event)">{$user_initials|default:'U'}</button>
                 {include file="`$template`/includes/partials/profile-dropdown.tpl" ddId="profileDropdown" ddToggleId="darkModeToggle"}
             </div>
         {else}
             <a href="{$WEB_ROOT}/login.php" class="nav-signin only-out">{$LANG.login}</a>
             {if $mtShowDarkToggle}
-            <a href="#" onclick="toggleDarkMode && toggleDarkMode(); return false;" class="topbar-btn only-out" aria-label="{$hadrianLang.common.toggleTheme}">
+            <button type="button" onclick="toggleDarkMode && toggleDarkMode();" class="topbar-btn only-out" aria-label="{$hadrianLang.common.toggleTheme}">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-            </a>
+            </button>
             {/if}
         {/if}
     </div>

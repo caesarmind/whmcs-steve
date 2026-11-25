@@ -33,6 +33,7 @@ return [
         ['key' => 'surface',      'group' => 'Neutral', 'label' => 'Surface',        'css' => 'var(--color-surface)',         'swatch' => '#ffffff'],
         ['key' => 'surface-2',    'group' => 'Neutral', 'label' => 'Surface 2',      'css' => 'var(--color-surface-secondary)','swatch' => '#f5f5f7'],
         ['key' => 'border',       'group' => 'Neutral', 'label' => 'Border',         'css' => 'var(--color-border)',          'swatch' => '#e8e8ed'],
+        ['key' => 'input-border', 'group' => 'Neutral', 'label' => 'Input border',   'css' => 'var(--color-input-border)',    'swatch' => '#8a8a8f'],
         ['key' => 'border-light', 'group' => 'Neutral', 'label' => 'Border light',   'css' => 'var(--color-border-light)',    'swatch' => '#f0f0f5'],
         ['key' => 'white',        'group' => 'Basic',   'label' => 'White',          'css' => '#ffffff',                      'swatch' => '#ffffff'],
         ['key' => 'transparent',  'group' => 'Basic',   'label' => 'Transparent',    'css' => 'transparent',                  'swatch' => 'transparent'],
@@ -75,7 +76,7 @@ return [
         'Field' => [
             ['var' => '--input-font-size',    'label' => 'Font size',    'type' => 'scale', 'scale' => 'font',        'default' => 'lg'],
             ['var' => '--input-radius',       'label' => 'Radius',       'type' => 'scale', 'scale' => 'radius',      'default' => 'sm'],
-            ['var' => '--input-border-width', 'label' => 'Border width', 'type' => 'scale', 'scale' => 'borderWidth', 'default' => 'hairline'],
+            ['var' => '--input-border-width', 'label' => 'Border width', 'type' => 'scale', 'scale' => 'borderWidth', 'default' => 'thin'],
         ],
         'Label' => [
             ['var' => '--input-label-font-size',   'label' => 'Font size',   'type' => 'scale', 'scale' => 'font',   'default' => 'base'],
@@ -91,7 +92,7 @@ return [
     'colorGroups' => [
         'Field' => [
             ['var' => '--input-bg',                  'label' => 'Background',    'default' => 'surface'],
-            ['var' => '--input-border-color',        'label' => 'Border',        'default' => 'border'],
+            ['var' => '--input-border-color',        'label' => 'Border',        'default' => 'input-border'],
             ['var' => '--input-color',               'label' => 'Text',          'default' => 'text'],
             ['var' => '--input-placeholder-color',   'label' => 'Placeholder',   'default' => 'text-4'],
             ['var' => '--input-focus-border-color',  'label' => 'Focus border',  'default' => 'primary'],

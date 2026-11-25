@@ -155,9 +155,24 @@ Covers 1.4.1, 1.4.3, 1.4.11.
 - Tighten the contrast check that already exists in `tests/e2e/page-checks.mjs`. Today it samples the first heading and first paragraph and fails below 3:1. Raise it to 4.5:1 for body-size text and add a fixed selector list for muted text, placeholders, status pills, buttons and links, composited arithmetically.
 - The admin colour panel already shows a contrast readout. Make it warn when a chosen colour drops a text pair below 4.5:1.
 
+### Phase 2 notes (done 2026-11-26)
+
+- Text greys: light secondary #636368, tertiary #6e6e73, quaternary #737378; dark #b8b8bd, #a6a6ab, #9a9a9f. Each passes 4.5:1 on bg, surface, surface-secondary and the accent tint. Light secondary was already at the limit on surface-secondary, so tertiary could not stay lighter; secondary went darker to keep three steps.
+- Status text: light green #207b37, orange #9c5d00, red #d20015, info #0067d0, neutral #636368; dark #45d669, #ffab28, #ff7a72, #64b4ff, #b2b2b7. Each passes on its own tinted fill over surface and bg.
+- Dark links derive from the accent at lightness +8 (was the accent itself, 3.76:1 on surface-secondary).
+- Ink on the accent is derived, black or white (decided 2026-11-26). Default dark mode and the amber, emerald, rose and violet presets get dark labels on their buttons. 84 rules that painted white text on an accent fill now use `--color-on-accent`.
+- Inputs: 1px border in a new `--color-input-border` (#8a8a8f light, #87878b dark), mirrored in the admin forms schema. Page-local and cart inputs that draw their own `var(--color-border)` hairline are not changed yet.
+- Style presets: amber, emerald, rose, slate and violet link and info colours darkened (light) or lightened (dark) to 4.5:1.
+- Links in running text are underlined. Two `opacity`-dimmed texts use a real colour. The notification bell's name says when there are new notifications.
+- The cart's `style.min.css` keeps its own copy of the text tokens and loads after the theme: it is updated to match. The email module's fallback palette too.
+- The browser tier's contrast sample now fails body text under 4.5:1 (was 3:1). It found the cart copy above.
+- Not done: the admin colour panel does not warn about contrast yet (its files carry other uncommitted work).
+
 ### Phase 3: Keyboard and widget behaviour (L)
 
 Covers 2.1.1, 2.1.2, 2.4.3, 1.4.13, 4.1.2.
+
+Done 2026-11-26. One block of helpers at the end of `core-layout.js` follows the classes the existing scripts toggle, so no page script changed: modal dialogs move focus in, trap Tab and restore focus on close; Escape returns focus to the account and notification menu buttons; sidebar groups and rail items report `aria-expanded`; the six tab lists get `role="tab"`, `aria-selected` and arrow keys; the locale radiogroup gets real radios; the FAQ answers report their state and open with Enter or Space; Escape hides compare-table tooltips. Template changes: the avatars, both dark-mode moon links and the top-nav dropdown triggers are `<button>`s; the dark-mode switch is a `role="switch"` button; menu triggers declare `aria-haspopup`; top-nav menus open on click and Escape dismisses them; the upgrade plan radios are focusable and the card shows the ring. Checked with a scripted probe (19 checks, all pass) and the browser tier.
 
 Build four small helpers in `core-layout.js` and use them everywhere, instead of fixing each widget by hand:
 

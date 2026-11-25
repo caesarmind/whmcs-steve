@@ -1758,7 +1758,7 @@ test.describe('OF-K Cross-cutting', () => {
         const m = await page.evaluate(measure);
         if (m.theme !== theme) problems.push(`${theme} ${url}: html[data-theme]="${m.theme}"`);
         if (m.overflowX > 1) problems.push(`${theme} ${url}: horizontal overflow ${m.overflowX}px`);
-        for (const c of m.contrast) if (c.ratio < 3) problems.push(`${theme} ${url}: unreadable ${c.sel} (${c.ratio}:1)`);
+        for (const c of m.contrast) if (c.ratio < c.min) problems.push(`${theme} ${url}: unreadable ${c.sel} (${c.ratio}:1)`);
         for (const c of await page.evaluate(contrastIn, sels)) {
           if (c.missing) problems.push(`${theme} ${url}: ${c.sel} not found`);
           else if (c.ratio < 4.5) problems.push(`${theme} ${url}: ${c.sel} contrast ${c.ratio}:1`);

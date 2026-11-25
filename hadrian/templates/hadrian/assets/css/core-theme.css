@@ -26,10 +26,18 @@
     --color-surface-tertiary: #fafafa;
     --color-border: #e8e8ed;
     --color-border-light: #f0f0f5;
+    /* Form-control outline: 3:1 against the surfaces an input sits on
+       (WCAG 1.4.11). Cards and dividers keep the hairline --color-border. */
+    --color-input-border: #8a8a8f;
     --color-text-primary: #1d1d1f;
-    --color-text-secondary: #6e6e73;
-    --color-text-tertiary: #86868b;
-    --color-text-quaternary: #aeaeb2;
+    /* Text greys: each passes 4.5:1 (WCAG 1.4.3) on bg, surface, surface-
+       secondary and the accent-tint selected state. Secondary is already at
+       the limit on surface-secondary, so tertiary cannot be lighter than it
+       was; secondary went one step darker to keep three visible steps.
+       Measured: docs/accessibility-hadrian-plan.md, phase 2. */
+    --color-text-secondary: #636368;
+    --color-text-tertiary: #6e6e73;
+    --color-text-quaternary: #737378;
     --color-accent: #0071e3;
     --color-accent-hover: #0077ED;
     --color-accent-light: rgba(0, 113, 227, 0.08);
@@ -38,17 +46,17 @@
     --color-border-card: rgba(0, 0, 0, 0.04);
     --color-green: #30d158;
     --color-green-bg: rgba(48, 209, 88, 0.10);
-    --color-green-text: #248a3d;
+    --color-green-text: #207b37;
     --color-orange: #ff9f0a;
     --color-orange-bg: rgba(255, 159, 10, 0.10);
-    --color-orange-text: #c27400;
+    --color-orange-text: #9c5d00;
     --color-red: #ff3b30;
     --color-red-bg: rgba(255, 59, 48, 0.10);
-    --color-red-text: #d70015;
+    --color-red-text: #d20015;
     --color-blue-bg: rgba(0, 113, 227, 0.08);
-    --color-blue-text: #0071e3;
+    --color-blue-text: #0067d0;
     --color-gray-bg: rgba(142, 142, 147, 0.12);
-    --color-gray-text: #6e6e73;
+    --color-gray-text: #636368;
     /* Sidebar icon tiles (bright saturated system palette) */
     --color-icon-blue: #007aff;
     --color-icon-purple: #af52de;
@@ -82,7 +90,12 @@
        the avatar monogram. Its own token rather than --color-surface: they
        share #ffffff in light mode but are different ideas, and surface goes
        #2c2c2e in dark.
-       MEASURED, AND CURRENTLY WRONG IN DARK MODE. The light accent #0071e3 has
+       The literal below is the floor for browsers without relative colour.
+       Everywhere else it is DERIVED from the accent at the end of this file
+       (black or white, whichever is readable), decided in the accessibility
+       work: white on the dark accent was 3.02:1, and four style presets failed
+       even in light mode. The history of that decision follows.
+       The light accent #0071e3 has
        luminance 0.1736, just below the 0.179129 ink crossover, so white is
        correct there (4.70:1). The dark accent #2997ff is 0.2982, well above it,
        where white collapses to 3.02:1 and black would give 6.96.
@@ -323,8 +336,8 @@
     --btn-default-hover-bg: var(--color-surface-secondary); --btn-default-hover-border: var(--color-border);  --btn-default-hover-color: var(--color-text-primary);
     --btn-default-active-bg: var(--color-surface-secondary); --btn-default-active-border: transparent;
 
-    --btn-primary-bg: var(--brand-primary);              --btn-primary-border: var(--brand-primary);          --btn-primary-color: #ffffff;
-    --btn-primary-hover-bg: var(--color-accent-hover);   --btn-primary-hover-border: var(--color-accent-hover); --btn-primary-hover-color: #ffffff;
+    --btn-primary-bg: var(--brand-primary);              --btn-primary-border: var(--brand-primary);          --btn-primary-color: var(--color-on-accent);
+    --btn-primary-hover-bg: var(--color-accent-hover);   --btn-primary-hover-border: var(--color-accent-hover); --btn-primary-hover-color: var(--color-on-accent);
     --btn-primary-active-bg: var(--color-accent-hover);  --btn-primary-active-border: var(--color-accent-hover);
 
     --btn-primary-faded-bg: var(--brand-primary-lighter-3);   --btn-primary-faded-border: var(--brand-primary-lighter-3);   --btn-primary-faded-color: var(--brand-primary);
@@ -359,8 +372,8 @@
        overrides via select-colors + scale dropdowns). Defaults MUST mirror
        core/config/forms.php. ============================================ */
     --input-height: 40px;  --input-pad-x: 14px;
-    --input-font-size: var(--text-lg);  --input-radius: var(--radius-sm);  --input-border-width: 0.5px;
-    --input-bg: var(--color-surface);  --input-border-color: var(--color-border);  --input-color: var(--color-text-primary);
+    --input-font-size: var(--text-lg);  --input-radius: var(--radius-sm);  --input-border-width: 1px;
+    --input-bg: var(--color-surface);  --input-border-color: var(--color-input-border);  --input-color: var(--color-text-primary);
     --input-placeholder-color: var(--color-text-quaternary);
     --input-focus-border-color: var(--color-accent);  --input-focus-ring: var(--color-accent-light);
     --input-disabled-bg: var(--color-surface-secondary);
@@ -501,26 +514,27 @@ html[data-theme="dark"] {
     --color-surface-tertiary: #252527;
     --color-border: #3a3a3c;
     --color-border-light: #2c2c2e;
+    --color-input-border: #87878b;
     --color-text-primary: #f5f5f7;
-    --color-text-secondary: #a1a1a6;
-    --color-text-tertiary: #8e8e93;
-    --color-text-quaternary: #636366;
+    --color-text-secondary: #b8b8bd;
+    --color-text-tertiary: #a6a6ab;
+    --color-text-quaternary: #9a9a9f;
     --color-accent: #2997ff;
     --color-accent-hover: #40a3ff;
     --color-accent-light: rgba(41, 151, 255, 0.12);
-    --color-link: #2997ff;
-    --color-link-hover: #40a3ff;
+    --color-link: #52abff;
+    --color-link-hover: #7cc0ff;
     --color-border-card: rgba(255, 255, 255, 0.06);
     --color-green-bg: rgba(48, 209, 88, 0.16);
-    --color-green-text: #30d158;
+    --color-green-text: #45d669;
     --color-orange-bg: rgba(255, 159, 10, 0.16);
-    --color-orange-text: #ff9f0a;
+    --color-orange-text: #ffab28;
     --color-red-bg: rgba(255, 59, 48, 0.16);
-    --color-red-text: #ff453a;
+    --color-red-text: #ff7a72;
     --color-blue-bg: rgba(41, 151, 255, 0.14);
-    --color-blue-text: #2997ff;
+    --color-blue-text: #64b4ff;
     --color-gray-bg: rgba(142, 142, 147, 0.18);
-    --color-gray-text: #a1a1a6;
+    --color-gray-text: #b2b2b7;
     --sidebar-bg: var(--_sb-bg, rgba(28, 28, 30, 0.80));
     --sidebar-item-hover: rgba(255, 255, 255, 0.05);
     --sidebar-item-active: rgba(255, 255, 255, 0.08);
@@ -602,8 +616,8 @@ html[data-theme="dark"] {
     }
     html[data-theme="dark"] {
         --color-accent-hover: hsl(from var(--color-accent) h s calc(l + 4.51));
-        --color-link:         var(--color-accent);
-        --color-link-hover:   hsl(from var(--color-accent) h s calc(l + 4.51));
+        --color-link:         hsl(from var(--color-accent) h s calc(l + 8));
+        --color-link-hover:   hsl(from var(--color-accent) h s calc(l + 14));
     }
 }
 
@@ -1349,7 +1363,7 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .thread-message.client { align-self: flex-end; }
 .thread-bubble { padding: 14px 18px; border-radius: 18px; font-size: var(--text-md); line-height: 1.55; }
 .thread-message.staff .thread-bubble { background: var(--color-surface-secondary); color: var(--color-text-primary); border-bottom-left-radius: 6px; }
-.thread-message.client .thread-bubble { background: var(--color-accent); color: white; border-bottom-right-radius: 6px; }
+.thread-message.client .thread-bubble { background: var(--color-accent); color: var(--color-on-accent); border-bottom-right-radius: 6px; }
 .thread-sender { font-size: var(--text-sm); font-weight: var(--fw-medium); color: var(--color-text-tertiary); margin-bottom: 4px; padding: 0 4px; }
 .thread-message.client .thread-sender { text-align: right; }
 .thread-time { font-size: var(--text-xs); color: var(--color-text-quaternary); margin-top: 4px; padding: 0 4px; }
@@ -1417,7 +1431,7 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .pagination { display: flex; align-items: center; justify-content: center; gap: 4px; margin-top: 24px; }
 .pagination-btn { width: 32px; height: 32px; border-radius: var(--pagination-radius); border: none; background: none; color: var(--color-text-secondary); font-size: var(--text-base); font-weight: var(--fw-medium); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all var(--transition-fast); font-family: var(--font-family); }
 .pagination-btn:hover { background: var(--color-surface-secondary); color: var(--color-text-primary); }
-.pagination-btn.active { background: var(--color-accent); color: white; }
+.pagination-btn.active { background: var(--color-accent); color: var(--color-on-accent); }
 .pagination-btn:disabled { opacity: 0.3; cursor: default; }
 
 /* ============================================
@@ -1444,7 +1458,7 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .auth-subtitle { font-size: var(--text-lg); color: var(--color-text-secondary); text-align: center; margin-bottom: 32px; }
 .auth-form { display: flex; flex-direction: column; gap: 20px; }
 .auth-link-row { text-align: center; margin-top: -4px; }
-.auth-link-row .auth-link { font-size: var(--text-md); color: var(--color-link); text-decoration: none; }
+.auth-link-row .auth-link { font-size: var(--text-md); color: var(--color-link); text-decoration: underline; text-underline-offset: 2px; }
 .auth-link-row .auth-link:hover { text-decoration: underline; }
 .form-row-inline { display: flex; align-items: center; justify-content: space-between; margin-top: -4px; }
 .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: var(--text-md); color: var(--color-text-secondary); cursor: pointer; }
@@ -1575,7 +1589,7 @@ a.ticket-item:hover .ticket-subject { color: var(--color-accent); }
 .store-nav { display: flex; gap: 6px; margin-bottom: 32px; overflow-x: auto; padding-bottom: 4px; }
 .store-nav a { padding: 6px 16px; border-radius: var(--radius-pill); font-size: var(--text-base); font-weight: var(--fw-medium); color: var(--color-text-secondary); background: var(--color-surface-secondary); border: 1px solid var(--color-border-card); transition: all var(--transition-fast); white-space: nowrap; text-decoration: none; }
 .store-nav a:hover { color: var(--color-text-primary); background: var(--color-surface); text-decoration: none; }
-.store-nav a.active { background: var(--color-accent); color: white; border-color: var(--color-accent); }
+.store-nav a.active { background: var(--color-accent); color: var(--color-on-accent); border-color: var(--color-accent); }
 
 .store-plans { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
 .store-plan-card { background: var(--color-surface); border-radius: var(--radius-lg); padding: 28px 24px; display: flex; flex-direction: column; }
@@ -1979,7 +1993,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .hp-hero-gradient.rose { background: linear-gradient(160deg, #fbecf1 0%, #f5d4df 40%, #ebadc3 100%); }
 .hp-hero-gradient.graphite { background: linear-gradient(160deg, var(--color-surface-secondary) 0%, var(--color-border) 40%, #d2d2d7 100%); }
 .hp-hero-gradient h1 { font-size: var(--text-display); font-weight: var(--fw-semibold); letter-spacing: -0.03em; line-height: 1.07; margin: 0 0 12px; color: var(--color-text-primary); }
-.hp-hero-gradient .hp-hero-sub { font-size: var(--text-2xl); color: var(--color-text-primary); opacity: 0.7; max-width: 540px; margin: 0 auto 40px; }
+.hp-hero-gradient .hp-hero-sub { font-size: var(--text-2xl); color: var(--color-text-secondary); max-width: 540px; margin: 0 auto 40px; }
 .hp-hero-gradient .hp-floating-cards { display: flex; justify-content: center; gap: 16px; margin-top: 40px; flex-wrap: wrap; }
 .hp-floating-card { background: rgba(255,255,255,0.85); backdrop-filter: blur(12px); border-radius: 16px; padding: 24px; min-width: 180px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.08); }
 .hp-floating-card .card-icon { font-size: var(--text-h3); margin-bottom: 8px; }
@@ -4336,3 +4350,59 @@ body .iti__divider { border-bottom: 0.5px solid var(--color-border); margin: 4px
 /* Jumping to an anchor, or tabbing down the page, must not leave the target
    under the sticky top bar (WCAG 2.4.11). */
 html { scroll-padding-top: 80px; }
+
+/* Ink on the accent (WCAG 1.4.3). Black or white, whichever is readable on
+   the accent the site actually has: the same crossover primitive the sidebar
+   and the avatars use. White on the default dark-mode accent was 3.02:1, and
+   white on four style presets failed even in light mode (amber 2.52, emerald
+   2.76, rose 3.60, violet 4.13). Both scopes are listed because the dark
+   block redeclares the literal floor at (0,1,1). A buyer who sets the row on
+   Styles > Colors still wins: the panel's emitted blocks come after this
+   file at equal or higher specificity. */
+@supports (color: color(from red srgb-linear r g b)) {
+    :root,
+    html[data-theme="dark"] {
+        --_acc-ink: clamp(0, (var(--ink-crossover, 0.179129) - (0.2126*r + 0.7152*g + 0.0722*b)) * 100000, 1);
+        --color-on-accent: color(from var(--color-accent) srgb-linear var(--_acc-ink) var(--_acc-ink) var(--_acc-ink) / 1);
+    }
+}
+
+/* Links inside running text are underlined (WCAG 1.4.1): colour alone did
+   not set them apart from the words around them (2.77:1 in dark mode, where
+   3:1 is the floor). Menus, buttons and cards are not running text; links
+   with a class are left to their component. */
+:is(p, td, dd, .notice-text, .auth-foot) a:not([class]),
+a.auth-link {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 2px;
+}
+
+/* Controls that used to be a <div> or <a href="#"> are real <button>s now
+   (WCAG 2.1.1, 4.1.2). Strip the browser's button chrome so they look as
+   they did. */
+/* :where() keeps this at zero specificity: it beats the browser default
+   button styles but loses to each component rule (the avatar gradient and
+   its derived ink, the switch track, the nav colours). */
+:where(button.topbar-avatar, button.toggle-switch, .homepage-nav button.nav-dropdown-toggle) {
+    appearance: none; -webkit-appearance: none;
+    padding: 0; margin: 0; border: 0;
+    font: inherit; color: inherit; background: none;
+}
+
+/* Top-nav menus: a click opens one (is-open), Escape dismisses one opened by
+   hover or focus (is-dismissed) until the pointer or focus leaves (1.4.13). */
+.homepage-nav .nav-dropdown-wrap.is-open .nav-dropdown-menu { opacity: 1; pointer-events: auto; transform: translateY(0); }
+.homepage-nav .nav-dropdown-wrap.is-dismissed .nav-dropdown-menu { opacity: 0; pointer-events: none; transform: translateY(-6px); }
+.homepage-nav .nav-dropdown-wrap.is-dismissed .nav-dropdown-menu * { visibility: hidden; }
+
+/* A tooltip hidden with Escape stays hidden until hover or focus leaves. */
+.cmp-tip.is-dismissed::before,
+.cmp-tip.is-dismissed::after { opacity: 0 !important; }
+
+/* Choice cards whose radio or checkbox is visually hidden: the ring goes on
+   the card, since the input itself is 1px (2.4.7). */
+label:has(> input.sr-only:focus-visible) {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+}

@@ -94,7 +94,7 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
     font-size: 11px; font-weight: 600;
 }
 .cd-step.done .cd-step-num { background: var(--color-green-bg); color: var(--color-green-text); }
-.cd-step.active .cd-step-num { background: var(--color-accent); color: #fff; }
+.cd-step.active .cd-step-num { background: var(--color-accent); color: var(--color-on-accent); }
 .cd-step.active { color: var(--color-text-primary); font-weight: 500; }
 .cd-step-sep { color: var(--color-text-quaternary, #c7c7cc); margin: 0 2px; }
 

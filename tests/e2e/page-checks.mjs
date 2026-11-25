@@ -23,11 +23,12 @@ export const measure = () => {
     }
     return document.documentElement.dataset.theme === 'dark' ? [0, 0, 0] : [255, 255, 255];
   };
-  const contrastOf = sel => {
+  // min: the WCAG 1.4.3 floor for the sample - 3:1 for the (large) h1, 4.5:1 for body text.
+  const contrastOf = (sel, min) => {
     const el = [...document.querySelectorAll(sel)].find(e => e.textContent.trim().length > 2 && e.getBoundingClientRect().width > 0);
     if (!el) return null;
     const a = lum(rgb(getComputedStyle(el).color)), b = lum(bgOf(el));
-    return { sel, text: el.textContent.trim().slice(0, 40), ratio: Math.round(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)) * 100) / 100 };
+    return { sel, min, text: el.textContent.trim().slice(0, 40), ratio: Math.round(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)) * 100) / 100 };
   };
   // Accessibility basics, no library: controls a screen reader cannot name.
   const visible = e => { const r = e.getBoundingClientRect(), cs = getComputedStyle(e); return r.width > 0 && r.height > 0 && cs.visibility !== 'hidden' && cs.display !== 'none'; };
@@ -48,7 +49,7 @@ export const measure = () => {
     sidebar: box('.sidebar'), rail: box('.ph-rail'), content: box('.content-area'),
     topVisible: [...document.querySelectorAll('.only-top')].some(e => e.getBoundingClientRect().width > 0),
     overflowX: document.documentElement.scrollWidth - innerWidth,
-    contrast: [contrastOf('.content-area h1, .page-header h1, h1'), contrastOf('.content-area p, .content-area td, .content-area label')].filter(Boolean),
+    contrast: [contrastOf('.content-area h1, .page-header h1, h1', 3), contrastOf('.content-area p, .content-area td, .content-area label', 4.5)].filter(Boolean),
   };
 };
 
@@ -79,7 +80,7 @@ export async function judge(page, url, { where = url, expectAuth, a11y = false }
   const vw = page.viewportSize().width;
   if (m.overflowX > 1) problems.push(`${where}: horizontal overflow of ${m.overflowX}px`);
   if (m.content && m.content.right > vw + 1) problems.push(`${where}: content runs off the right edge (${m.content.right}px > ${vw}px)`);
-  for (const c of m.contrast) if (c.ratio < 3) problems.push(`${where}: unreadable text (${c.ratio}:1) in ${c.sel}: "${c.text}"`);
+  for (const c of m.contrast) if (c.ratio < c.min) problems.push(`${where}: unreadable text (${c.ratio}:1) in ${c.sel}: "${c.text}"`);
   if (a11y) for (const a of m.a11y) problems.push(`${where}: ${a}`);
   return { problems, html, m };
 }

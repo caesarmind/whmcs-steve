@@ -136,6 +136,7 @@ return [
         'mainMenu'       => 'Main menu',
         'sidebar'        => 'Sidebar',
         'breadcrumb'     => 'Breadcrumb',
+        'newNotifications' => 'new notifications',
         'openNavigation' => 'Open navigation',
         'itemsInCart'    => '%s items in cart',
         'configureMenu'  => 'Configure menu...',
