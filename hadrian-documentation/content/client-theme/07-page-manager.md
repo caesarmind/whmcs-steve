@@ -80,7 +80,8 @@ At the top of a built page's settings is a **Content** list: the page's sections
 | --- | --- |
 | A row | Opens that section to edit its text, buttons, images and lists. One section is open at a time. |
 | The arrows, or dragging a row | Moves the section up or down the page. |
-| The eye, copy and bin buttons | Hide the section from visitors, duplicate it, or remove it. |
+| The switch | Shows or hides the section from visitors. A hidden section stays in the list, greyed out. |
+| The copy and bin buttons | Duplicate the section, or remove it. |
 | **Add section** | Picks a new section by category, the same ones the visual editor offers. It goes at the end. |
 | **Save draft** | Saves the list. Visitors still see the published page. |
 | **Publish** | Saves and puts the draft live. |

@@ -370,6 +370,17 @@ test("a page's sections can be edited as a list on its settings in Pages", async
   // Reorder, then save the draft and publish.
   await rows.nth(1).getByRole('button', { name: 'Move section up' }).click();
   expect(await page.evaluate(() => window.hbContent.state.doc.sections.map(s => s.type))).toEqual(['final-cta', 'hero-split']);
+
+  // The row's switch hides a section and shows it again, without opening it.
+  const shown = rows.nth(0).getByRole('checkbox', { name: /^Show .+ on the page$/ });
+  await expect(shown).toBeChecked();
+  await rows.nth(0).locator('.hbc-shown').click();
+  await expect(rows.nth(0)).toHaveClass(/is-hidden/);
+  await expect(rows.nth(0), 'the switch does not open the row').not.toHaveClass(/is-open/);
+  expect(await page.evaluate(() => window.hbContent.state.doc.sections[0].hidden)).toBe(true);
+  await rows.nth(0).locator('.hbc-shown').click();
+  await expect(rows.nth(0).getByRole('checkbox', { name: /^Show .+ on the page$/ })).toBeChecked();
+
   await card.locator('#hbc-save').click();
   await expect(card.locator('#hbc-notice .mt-alert-success')).toContainText('Draft saved');
   await expect(card.locator('#hbc-status')).toHaveText('Draft');

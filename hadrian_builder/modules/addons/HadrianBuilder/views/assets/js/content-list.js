@@ -147,24 +147,30 @@
         // not a button: it holds buttons of its own.
         head = el('div', {
             'class': 'hbc-head-row', draggable: 'true',
-            onclick: function (e) { if (!e.target.closest('button')) { toggle(); } },
+            onclick: function (e) { if (!e.target.closest('button, label, input')) { toggle(); } },
             ondragstart: function (e) { dragId = section.id; item.classList.add('is-dragged'); e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', section.id); },
             ondragend: function () { dragId = null; render(); }
         }, [
+            // The same row as an item in Hadrian's Menu editor: grip, open
+            // arrow, tag, name; copy, delete, the shown switch and moves at
+            // the end.
             el('span', { 'class': 'hbx-grip', html: svg('grip'), title: 'Drag to reorder' }),
-            el('span', { 'class': 'hbc-num', text: String(i + 1) }),
+            el('button', { type: 'button', 'class': 'hbc-open', title: isOpen ? 'Close' : 'Edit', 'aria-label': (isOpen ? 'Close ' : 'Edit ') + def.label,
+                'aria-expanded': String(isOpen), html: svg('right'), onclick: toggle }),
             el('span', { html: catTile(def.group) }),
             el('span', { 'class': 'hbc-txt' }, [el('b', { 'class': 'hbc-sum', text: kit.summary(section) }), el('small', { text: def.label + ' - ' + def.group })]),
             section.hidden ? el('span', { 'class': 'hbx-pill', text: 'Hidden' }) : null,
             el('span', { 'class': 'hbc-act' }, [
-                iconBtn('chevUp', 'Move section up', function () { move(section.id, -1); }, i === 0 ? 'is-off' : ''),
-                iconBtn('chevDown', 'Move section down', function () { move(section.id, 1); }, i === n - 1 ? 'is-off' : ''),
-                iconBtn(section.hidden ? 'eyeOff' : 'eye', section.hidden ? 'Show on the page' : 'Hide from the page', function () { section.hidden = !section.hidden; markDirty(); render(); }),
                 iconBtn('copy', 'Duplicate section', function () { duplicate(section.id); }),
-                iconBtn('trash', 'Remove section', function () { remove(section.id); })
-            ]),
-            el('button', { type: 'button', 'class': 'hbc-open', title: isOpen ? 'Close' : 'Edit', 'aria-label': (isOpen ? 'Close ' : 'Edit ') + def.label,
-                'aria-expanded': String(isOpen), html: svg('chevDown'), onclick: toggle })
+                iconBtn('trash', 'Remove section', function () { remove(section.id); }),
+                el('label', { 'class': 'mt-toggle mt-toggle-sm hbc-shown', title: section.hidden ? 'Hidden from visitors' : 'Shown on the page' }, [
+                    el('input', { type: 'checkbox', checked: !section.hidden, 'aria-label': 'Show ' + def.label + ' on the page',
+                        onchange: function () { section.hidden = !this.checked; markDirty(); render(); } }),
+                    el('span', { 'class': 'mt-toggle-track', html: '<span class="mt-toggle-thumb"></span>' })
+                ]),
+                iconBtn('chevUp', 'Move section up', function () { move(section.id, -1); }, i === 0 ? 'is-off' : ''),
+                iconBtn('chevDown', 'Move section down', function () { move(section.id, 1); }, i === n - 1 ? 'is-off' : '')
+            ])
         ]);
         item = el('li', {
             'class': 'hbc-row' + (isOpen ? ' is-open' : '') + (section.hidden ? ' is-hidden' : ''), 'data-id': section.id,
@@ -191,7 +197,7 @@
         if (isOpen) {
             body = el('div', { 'class': 'hbc-body' });
             kit.contentEls(section).forEach(function (node) { body.appendChild(node); });
-            body.appendChild(el('details', { 'class': 'hbx-group' }, [
+            body.appendChild(el('details', { 'class': 'hbx-group hbc-more' }, [
                 el('summary', { html: 'Section settings <small>space, anchor, hidden</small><span class="hbx-chev">' + svg('chevDown') + '</span>' }),
                 el('div', { 'class': 'hbx-group-body' }, kit.sectionEls(section))
             ]));
