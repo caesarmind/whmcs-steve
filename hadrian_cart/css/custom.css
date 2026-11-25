@@ -211,3 +211,13 @@ button:focus-visible {
 .hn-free-label { display: none; }
 body[data-free-label="1"] .hn-free-label { display: inline; }
 body[data-free-label="1"] .hn-free-label + .hn-free-amt { display: none; }
+
+/* Choice cards with an invisible input (billing cycle, option radios, apply
+   credit): the input is opacity 0, so its focus ring would be too. Ring the
+   card instead (WCAG 2.4.7). */
+.cp-cycle-opt:has(input:focus-visible),
+.cp-opt-radio:has(input:focus-visible),
+#applyCreditContainer .radio:has(input:focus-visible) {
+    outline: var(--focus-ring-width, 2px) solid var(--focus-ring-color, #0071e3);
+    outline-offset: var(--focus-ring-offset, 2px);
+}

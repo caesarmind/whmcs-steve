@@ -1294,11 +1294,94 @@
         });
     }
 
-    function syncAll() { syncSidebarGroups(); syncRail(); syncGroups(); syncFaq(); syncDarkSwitches(); }
+    // ---- labels whose field was swapped by script ------------------------------
+    // WHMCS StatesDropdown.js renames the state input to #stateinput, hides it
+    // and appends a #stateselect beside it, which leaves the field's label
+    // pointing at nothing or at a hidden input (WCAG 1.3.1, 4.1.2). A label in
+    // a form group whose target is gone or hidden follows the one visible
+    // field in that group.
+    function syncOrphanLabels() {
+        document.querySelectorAll('.form-group label[for], .co-field-label[for]').forEach(function (l) {
+            var target = document.getElementById(l.htmlFor);
+            if (target && shown(target)) return;
+            var group = l.closest('.form-group, .prepend-icon');
+            if (!group) return;
+            var fields = Array.prototype.filter.call(group.querySelectorAll('input:not([type="hidden"]), select, textarea'), shown);
+            if (fields.length !== 1) return;
+            l.htmlFor = idFor(fields[0], 'field');
+        });
+    }
+
+    // ---- error summaries take focus (WCAG 3.3.1, 4.1.3) ------------------------
+    // A form that failed comes back with its errors at the top. Focus moves
+    // there once, so a screen reader announces them and a keyboard user
+    // starts from them. Only blocks marked data-error-summary, so a standing
+    // banner never steals focus.
+    function focusErrorSummary() {
+        var box = Array.prototype.find.call(document.querySelectorAll('[data-error-summary]'), shown);
+        if (!box) return;
+        if (!box.hasAttribute('tabindex')) box.setAttribute('tabindex', '-1');
+        setTimeout(function () { box.focus(); }, 60);
+    }
+
+    // ---- announcements (WCAG 4.1.3) ---------------------------------------------
+    // One polite live region for the whole page. window.hadrianAnnounce(text)
+    // is for any script; the checks below cover the order form's own updates.
+    var STR = window.hadrianA11y || {};
+    var live = null;
+    function announce(text) {
+        text = String(text || '').replace(/\s+/g, ' ').trim();
+        if (!text) return;
+        if (!live) {
+            live = document.createElement('div');
+            live.id = 'mt-live';
+            live.className = 'sr-only';
+            live.setAttribute('aria-live', 'polite');
+            live.setAttribute('aria-atomic', 'true');
+            document.body.appendChild(live);
+        }
+        live.textContent = '';
+        setTimeout(function () { live.textContent = text.slice(0, 240); }, 60);
+    }
+    window.hadrianAnnounce = announce;
+    var said = {};
+    function announceChanges() {
+        // The order summary total, rebuilt by WHMCS after every option change.
+        var total = document.querySelector('#producttotal .total-due-today');
+        var t = total && shown(total) ? total.textContent.replace(/\s+/g, ' ').trim() : '';
+        if (t && said.total !== undefined && t !== said.total) announce(t);
+        if (t) said.total = t;
+        // The domain lookup result on the register and transfer pages.
+        var look = document.getElementById('primaryLookupResult');
+        var l = look && shown(look) ? look.textContent.replace(/\s+/g, ' ').trim() : '';
+        if (l && l !== said.lookup) announce(l);
+        said.lookup = l;
+    }
+
+    // ---- moving content can be paused (WCAG 2.2.2) --------------------------------
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    function initMotionToggles() {
+        if (reduceMotion) return;
+        document.querySelectorAll('.hp-hero-ticker, .hp-feature-marquee, .hp-testimonials-grid').forEach(function (sec) {
+            if (sec.querySelector(':scope > .mt-motion-toggle')) return;
+            if (sec.classList.contains('hp-testimonials-grid') && !sec.querySelector('.hp-testimonial-card + .hp-testimonial-card')) return;
+            var btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'mt-motion-toggle';
+            function label() { btn.textContent = sec.classList.contains('is-motion-paused') ? (STR.play || 'Play') : (STR.pause || 'Pause'); }
+            btn.addEventListener('click', function () { sec.classList.toggle('is-motion-paused'); label(); });
+            label();
+            sec.insertBefore(btn, sec.firstChild);
+        });
+    }
+
+    function syncAll() { syncSidebarGroups(); syncRail(); syncGroups(); syncFaq(); syncDarkSwitches(); syncOrphanLabels(); announceChanges(); initMotionToggles(); }
     function boot() {
         initTopnav();
         syncAll();
         checkDialogs();
+        focusErrorSummary();
+        initMotionToggles();
         new MutationObserver(function (list) {
             for (var i = 0; i < list.length; i++) {
                 var m = list[i];

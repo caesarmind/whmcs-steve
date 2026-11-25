@@ -31,12 +31,12 @@
 
             {if count($addons) == 0}
                 <div id="noAddons" class="alert alert-warning text-center" role="alert">
-                    <i class="fas fa-exclamation-circle"></i>
+                    <i aria-hidden="true" class="fas fa-exclamation-circle"></i>
                     {$LANG.cartproductaddonsnone}
                 </div>
                 <p class="text-center">
                     <a href="{$WEB_ROOT}/clientarea.php" class="btn btn-default">
-                        <i class="fas fa-arrow-circle-left"></i>
+                        <i aria-hidden="true" class="fas fa-arrow-circle-left"></i>
                         {$LANG.orderForm.returnToClientArea}
                     </a>
                 </p>
@@ -69,7 +69,7 @@
 
                                     <div class="clearfix"></div>
 
-                                    <footer class="col-12 text-right">
+                                    <div class="col-12 text-right">
                                         <div class="product-pricing">
                                             {if $addon.free}
                                                 <span class="addon-free-label">{$LANG.orderfree}</span>
@@ -81,10 +81,10 @@
                                             {/if}
                                         </div>
                                         <button type="submit" class="btn btn-primary btn-sm">
-                                            <i class="fas fa-shopping-cart"></i>
+                                            <i aria-hidden="true" class="fas fa-shopping-cart"></i>
                                             {$LANG.ordernowbutton}
                                         </button>
-                                    </footer>
+                                    </div>{* was a <footer>: a second contentinfo landmark inside main *}
                                 </form>
                             </div>
                         </div>

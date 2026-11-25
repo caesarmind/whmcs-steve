@@ -70,17 +70,17 @@ var _localLang = {
         <p class="page-subtitle">{$hadrianLang.cart.configSubtitle}</p>
     </header>
 
-        <div class="cp-steps" aria-label="Order progress">
+        <div class="cp-steps" aria-label="{$hadrianLang.a11y.orderProgress}">
             <span class="cp-step done">
                 <span class="cp-step-num">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg aria-hidden="true" focusable="false" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 </span>
                 {$hadrianLang.cart.stepChoosePlan}
             </span>
             <span class="cp-step-sep">›</span>
             <span class="cp-step done">
                 <span class="cp-step-num">
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <svg aria-hidden="true" focusable="false" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 </span>
                 {$LANG.domaincheckerchoosedomain}
             </span>
@@ -119,7 +119,7 @@ var _localLang = {
                     <div class="card cp-plan-hero-card">
                         <div class="cp-plan-hero">
                             <div class="cp-plan-hero-ico" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
                             </div>
                             <div class="cp-plan-hero-meta">
                                 <div class="cp-plan-hero-eyebrow">{$hadrianLang.cart.selectedPlan}</div>
@@ -556,7 +556,7 @@ var _localLang = {
                         <div class="cp-summary-head">
                             <h2>{$LANG.ordersummary}</h2>
                             <div class="loader w-hidden" id="orderSummaryLoader" aria-hidden="true">
-                                <i class="fas fa-fw fa-sync fa-spin"></i>
+                                <i aria-hidden="true" class="fas fa-fw fa-sync fa-spin"></i>
                             </div>
                         </div>
 
@@ -569,21 +569,21 @@ var _localLang = {
                         {* Promo code row sits between the Due Today strip
                            and the action footer. *}
                         <div class="cp-promo-row">
-                            <input type="text" class="cp-promo-input" id="promocode" name="promocode" placeholder="{lang key="orderPromoCodePlaceholder"}" value="{if $promocode}{$promocode|escape}{/if}">
+                            <input type="text" aria-label="{lang key='orderPromoCodePlaceholder'}" class="cp-promo-input" id="promocode" name="promocode" placeholder="{lang key="orderPromoCodePlaceholder"}" value="{if $promocode}{$promocode|escape}{/if}">
                             <button type="button" class="cp-promo-apply" onclick="applyPromoCode();">{$LANG.applyPromoCode}</button>
                         </div>
 
                         <div class="cp-summary-footer">
                             <button type="submit" id="btnCompleteProductConfig" class="cp-checkout-btn">
                                 {$hadrianLang.cart.reviewCart}
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                             </button>
                             {* Same URL strategy as .cp-plan-hero-change above:
                                cart.php?a=add&pid={$productinfo.pid} rewrites to the
                                plan's friendly URL (/store/<group>/<product>) which lands
                                on the configureproductdomain step for THIS specific plan. *}
                             <a href="{$WEB_ROOT}/cart.php?a=add&pid={$productinfo.pid}" class="cp-back-link">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                                 {$hadrianLang.cart.backToDomain}
                             </a>
                         </div>

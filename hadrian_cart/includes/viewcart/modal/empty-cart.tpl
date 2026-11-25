@@ -14,7 +14,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="{$LANG.orderForm.close}"><span aria-hidden="true">&times;</span></button>
                     </div>
                     <h4 class="modal-title margin-bottom mb-3">
-                        <i class="fas fa-trash-alt fa-3x"></i>
+                        <i aria-hidden="true" class="fas fa-trash-alt fa-3x"></i>
                         <span>{$LANG.emptycart}</span>
                     </h4>
                     {$LANG.cartemptyconfirm}

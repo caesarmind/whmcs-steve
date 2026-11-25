@@ -68,7 +68,7 @@
 
     {if isset($groupname) || isset($productname)}
     <div class="up-callout">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
         <div>{$LANG.upgradecurrentconfig}: <strong>{$groupname|default:''|escape}{if isset($productname)} - {$productname|escape}{/if}</strong>{if isset($domain) && $domain} ({$domain|escape}){/if}</div>
     </div>
     {/if}
@@ -86,7 +86,7 @@
             <input type="hidden" name="type" value="configoptions">
             <input type="hidden" name="id" value="{$id|default:''|escape}">
             {if isset($errormessage) && $errormessage}
-            <div class="up-callout warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div>{$errormessage|strip_tags}</div></div>
+            <div class="up-callout warn"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div>{$errormessage|strip_tags}</div></div>
             {/if}
             <div class="up-cfg">
             {foreach $configoptions as $cfg}
@@ -185,7 +185,7 @@
            services list. (The configoptions branch above has its own Cancel.) *}
         <div class="up-back">
             <a href="{if isset($id) && $id}{$WEB_ROOT}/clientarea.php?action=productdetails&id={$id|escape}{else}{$WEB_ROOT}/clientarea.php?action=services{/if}" class="up-back-link">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 {if isset($id) && $id}{$hadrianLang.services.backToMyService}{else}{$hadrianLang.services.backToServices}{/if}
             </a>
         </div>
@@ -200,19 +200,19 @@
         <div class="card subnav-card">
             <div class="subnav-heading">{$LANG.services|default:'Services'}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=services" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
                 {$LANG.myservices|default:'My Services'}
             </a>
             <a href="{$WEB_ROOT}/cart.php" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
                 {$LANG.ordernewservices|default:'Order New Services'}
             </a>
             <a href="{$WEB_ROOT}/cart.php?gid=addons" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 {$LANG.viewavailableaddons|default:'View Available Addons'}
             </a>
             <a href="{$WEB_ROOT}/upgrade.php{if isset($id) && $id}?type=package&id={$id|escape}{/if}" class="subnav-item active">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
                 {$LANG.upgrade}
             </a>
         </div>
@@ -227,7 +227,7 @@
     <div class="card">
         <div class="up-empty">
             <div class="up-empty-ico">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>
             </div>
             {if isset($overdueinvoice) && $overdueinvoice}
                 <p class="up-empty-title">{$hadrianLang.services.upgradeNotAvailTitle}</p>

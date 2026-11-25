@@ -97,8 +97,8 @@
                         <div>{$serviceRenewal.billingCycle}</div>
                         <div>
                             {include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$serviceRenewal.recurringBeforeTax}
-                            <a onclick="removeItem('r','{$serviceId}','service'); return false;" href="#" id="linkCartRemoveServiceRenewal{$serviceId}">
-                                <i class="fas fa-fw fa-trash-alt"></i>
+                            <a onclick="removeItem('r','{$serviceId}','service'); return false;" href="#" role="button" aria-label="{$LANG.orderForm.remove}" id="linkCartRemoveServiceRenewal{$serviceId}">
+                                <i aria-hidden="true" class="fas fa-fw fa-trash-alt"></i>
                             </a>
                         </div>
                     </div>
@@ -117,8 +117,8 @@
                         <div>{$serviceAddonRenewal.billingCycle}</div>
                         <div>
                             {include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$serviceAddonRenewal.recurringBeforeTax}
-                            <a onclick="removeItem('r','{$serviceAddonId}','addon'); return false;" href="#" id="linkCartRemoveServiceAddonRenewal{$serviceAddonId}">
-                                <i class="fas fa-fw fa-trash-alt"></i>
+                            <a onclick="removeItem('r','{$serviceAddonId}','addon'); return false;" href="#" role="button" aria-label="{$LANG.orderForm.remove}" id="linkCartRemoveServiceAddonRenewal{$serviceAddonId}">
+                                <i aria-hidden="true" class="fas fa-fw fa-trash-alt"></i>
                             </a>
                         </div>
                     </div>
@@ -134,8 +134,8 @@
                 </span>
                 <span class="pull-right float-right">
                     {include file="orderforms/{$carttpl|default:'hadrian_cart'}/includes/free-price.tpl" hnPrice=$renewal.priceBeforeTax}
-                    <a onclick="removeItem('r','{$domainId}','domain'); return false;" href="#" id="linkCartRemoveDomainRenewal{$domainId}">
-                        <i class="fas fa-fw fa-trash-alt"></i>
+                    <a onclick="removeItem('r','{$domainId}','domain'); return false;" href="#" role="button" aria-label="{$LANG.orderForm.remove}" id="linkCartRemoveDomainRenewal{$domainId}">
+                        <i aria-hidden="true" class="fas fa-fw fa-trash-alt"></i>
                     </a>
                 </span>
             </div>

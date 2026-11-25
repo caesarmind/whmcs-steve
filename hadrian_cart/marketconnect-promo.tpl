@@ -49,13 +49,13 @@
                     data-upsell-from="{if isset($cartItem.productKey)}{$cartItem.productKey|escape}{/if}">
                 <span class="text">{lang key="addtocart"}</span>
                 <span class="arrow">
-                    <i class="fas fa-chevron-right"></i>
+                    <i aria-hidden="true" class="fas fa-chevron-right"></i>
                 </span>
             </button>
         </div>
 
         <div class="expander mc-promo-expander">
-            <i class="fas fa-chevron-right rotate"
+            <i aria-hidden="true" class="fas fa-chevron-right rotate"
                data-toggle="tooltip"
                data-placement="right"
                title="{lang key='recommendations.learnMore'}"></i>
@@ -78,7 +78,7 @@
                 {assign "promotionFeatures" $promotion->getFeatures()}
                 {foreach $promotionFeatures as $key=>$feature}
                     <li class="mc-feature{if $key < ($promotionFeatures|@count / 2)} left{else} right{/if}">
-                        <i class="fas fa-check"></i>
+                        <i aria-hidden="true" class="fas fa-check"></i>
                         <span>{$feature|escape}</span>
                     </li>
                 {/foreach}

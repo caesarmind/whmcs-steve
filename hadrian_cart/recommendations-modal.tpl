@@ -68,7 +68,7 @@
                    data-dismiss="modal"
                    role="button">
                     <span class="w-hidden hidden">
-                        <i class="fas fa-spinner fa-spin"></i>&nbsp;
+                        <i aria-hidden="true" class="fas fa-spinner fa-spin"></i>&nbsp;
                     </span>
                     {lang key="continue"}
                 </a>
@@ -90,11 +90,11 @@
                 </div>
                 <button type="button" class="btn btn-sm btn-add btn-primary">
                     <span class="text">{lang key="addtocart"}</span>
-                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+                    <span class="arrow"><i aria-hidden="true" class="fas fa-chevron-right"></i></span>
                 </button>
             </div>
             <div class="expander">
-                <i class="fas fa-chevron-right rotate"
+                <i aria-hidden="true" class="fas fa-chevron-right rotate"
                    data-toggle="tooltip"
                    data-placement="right"
                    title="{lang key='recommendations.learnMore'}"></i>

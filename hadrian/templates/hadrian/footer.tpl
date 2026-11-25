@@ -65,6 +65,8 @@
 
 {$footeroutput}
 
+{* Strings the accessibility helpers speak or show (core-layout.js). *}
+<script>window.hadrianA11y = {ldelim}pause: "{$hadrianLang.a11y.pause|default:'Pause'|escape:'javascript'}", play: "{$hadrianLang.a11y.play|default:'Play'|escape:'javascript'}", results: "{$hadrianLang.a11y.results|default:'%s results'|escape:'javascript'}", showDetails: "{$hadrianLang.a11y.showDetails|default:'Show details'|escape:'javascript'}"{rdelim};</script>
 <script src="{$WEB_ROOT}/templates/{$template}/assets/js/core-theme.js?v={$hadrian.version|default:'1.1'}"></script>
 <script src="{$WEB_ROOT}/templates/{$template}/assets/js/core-layout.js?v={$hadrian.version|default:'1.1'}"></script>
 

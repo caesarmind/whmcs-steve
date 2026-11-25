@@ -21,7 +21,7 @@
 
     <div id="containerNewUserSecurity"{if (!$loggedin && $custtype eq "existing") || ($remote_auth_prelinked && !$securityquestions)} class="w-hidden"{/if}{if $remote_auth_prelinked && !$securityquestions} data-keep-hidden{/if}>
 
-        <div class="sub-heading">
+        <div class="sub-heading" role="heading" aria-level="3">
             <span class="primary-bg-color">{$LANG.orderForm.accountSecurity}</span>
         </div>
 
@@ -29,18 +29,20 @@
             <div id="passwdFeedback" class="alert alert-info text-center col-sm-12 w-hidden"></div>
             <div class="col-sm-6">
                 <div class="form-group prepend-icon">
-                    <label for="inputNewPassword1" class="field-icon">
-                        <i class="fas fa-lock"></i>
-                    </label>
-                    <input type="password" name="password" id="inputNewPassword1" data-error-threshold="{$pwStrengthErrorThreshold}" data-warning-threshold="{$pwStrengthWarningThreshold}" class="field form-control" placeholder="{$LANG.clientareapassword}"{if $remote_auth_prelinked} value="{$password}"{/if}>
+                    <label for="inputNewPassword1" class="co-field-label">{$LANG.clientareapassword}</label>
+                    <div class="co-field-wrap">
+                        <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-lock"></i></span>
+                        <input autocomplete="new-password" type="password" name="password" id="inputNewPassword1" data-error-threshold="{$pwStrengthErrorThreshold}" data-warning-threshold="{$pwStrengthWarningThreshold}" class="field form-control" placeholder="{$LANG.clientareapassword}"{if $remote_auth_prelinked} value="{$password}"{/if}>
+                    </div>
                 </div>
             </div>
             <div class="col-sm-6">
                 <div class="form-group prepend-icon">
-                    <label for="inputNewPassword2" class="field-icon">
-                        <i class="fas fa-lock"></i>
-                    </label>
-                    <input type="password" name="password2" id="inputNewPassword2" class="field form-control" placeholder="{$LANG.clientareaconfirmpassword}"{if $remote_auth_prelinked} value="{$password}"{/if}>
+                    <label for="inputNewPassword2" class="co-field-label">{$LANG.clientareaconfirmpassword}</label>
+                    <div class="co-field-wrap">
+                        <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-lock"></i></span>
+                        <input autocomplete="new-password" type="password" name="password2" id="inputNewPassword2" class="field form-control" placeholder="{$LANG.clientareaconfirmpassword}"{if $remote_auth_prelinked} value="{$password}"{/if}>
+                    </div>
                 </div>
             </div>
             <div class="col-sm-6">
@@ -61,7 +63,7 @@
         {if $securityquestions}
             <div class="row">
                 <div class="col-sm-6">
-                    <select name="securityqid" id="inputSecurityQId" class="field form-control">
+                    <select name="securityqid" id="inputSecurityQId" class="field form-control" aria-label="{$LANG.clientareasecurityquestion}">
                         <option value="">{$LANG.clientareasecurityquestion}</option>
                         {foreach $securityquestions as $question}
                             <option value="{$question.id}"{if $question.id eq $securityqid} selected{/if}>
@@ -72,10 +74,11 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="form-group prepend-icon">
-                        <label for="inputSecurityQAns" class="field-icon">
-                            <i class="fas fa-lock"></i>
-                        </label>
-                        <input type="password" name="securityqans" id="inputSecurityQAns" class="field form-control" placeholder="{$LANG.clientareasecurityanswer}">
+                        <label for="inputSecurityQAns" class="co-field-label">{$LANG.clientareasecurityanswer}</label>
+                        <div class="co-field-wrap">
+                            <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-lock"></i></span>
+                            <input type="password" name="securityqans" id="inputSecurityQAns" class="field form-control" placeholder="{$LANG.clientareasecurityanswer}">
+                        </div>
                     </div>
                 </div>
             </div>

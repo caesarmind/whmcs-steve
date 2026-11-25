@@ -864,6 +864,7 @@ body[data-sidebar-side="right"] .main-content { margin-left: 0; margin-right: va
 /* Account for sticky nav when jumping to anchors */
 #overview, #products, #features, #pricing, #faq, #templates, #compare { scroll-margin-top: 104px; }
 html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
 /* Product subnav (sticky product-page TOC style) */
 /* top/left offsets track the top nav's height -- it is sticky above them, so a
@@ -2721,7 +2722,7 @@ body[data-footer="menu-only"] .hp-footer-top .hp-footer-cols {
 .hp-hero-ticker h1 { font-size: var(--text-display); font-weight: var(--fw-semibold); letter-spacing: -0.03em; margin: 0 0 12px; color: var(--color-text-primary); padding: 0 22px; }
 .hp-hero-ticker .ticker-sub { font-size: var(--text-2xl); color: var(--color-text-secondary); margin: 0 0 40px; padding: 0 22px; }
 .hp-ticker-track { display: flex; gap: 48px; animation: ticker-scroll 30s linear infinite; width: max-content; font-size: var(--text-h3); font-weight: var(--fw-semibold); color: var(--color-text-primary); letter-spacing: -0.02em; white-space: nowrap; }
-.hp-ticker-track span { opacity: 0.3; transition: opacity 0.3s; }
+.hp-ticker-track span { opacity: 0.55; transition: opacity 0.3s; }   /* 3:1 for large text (WCAG 1.4.3); was 0.3, about 1.6:1 */
 .hp-ticker-track span.accent { color: var(--color-accent); opacity: 1; }
 @keyframes ticker-scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 
@@ -4405,4 +4406,32 @@ a.auth-link {
 label:has(> input.sr-only:focus-visible) {
     outline: var(--focus-ring-width) solid var(--focus-ring-color);
     outline-offset: var(--focus-ring-offset);
+}
+
+/* Motion (WCAG 2.2.2, and the user's own setting). Anything that moves on
+   its own for more than five seconds can be paused: the testimonial
+   carousel, the hero ticker and the feature marquee get a Pause button
+   (core-layout.js adds it), and they also stop while hovered or focused.
+   Under prefers-reduced-motion nothing animates at all. */
+.hp-hero-ticker, .hp-feature-marquee, .hp-testimonials-grid { position: relative; }
+.is-motion-paused .hp-ticker-track,
+.is-motion-paused .hp-marq-track,
+.hp-hero-ticker:hover .hp-ticker-track,
+.hp-hero-ticker:focus-within .hp-ticker-track,
+.hp-feature-marquee:hover .hp-marq-track,
+.hp-feature-marquee:focus-within .hp-marq-track { animation-play-state: paused; }
+.mt-motion-toggle {
+    position: absolute; top: 12px; right: 16px; z-index: 3;
+    padding: 6px 12px; min-height: 28px; border-radius: var(--radius-pill);
+    border: 1px solid var(--color-input-border); background: var(--color-surface);
+    color: var(--color-text-primary); font: inherit; font-size: var(--text-sm); cursor: pointer;
+}
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    .mt-motion-toggle { display: none; }
 }

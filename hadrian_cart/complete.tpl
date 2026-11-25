@@ -25,7 +25,7 @@
             {* ─── Success hero ─── *}
             <div class="order-complete-hero">
                 <div class="order-complete-ico">
-                    <i class="fas fa-check"></i>
+                    <i aria-hidden="true" class="fas fa-check"></i>
                 </div>
                 <h1 class="font-size-36">{$LANG.orderconfirmation}</h1>
                 <p>{$LANG.orderreceived}</p>
@@ -51,11 +51,11 @@
                 </div>
             {elseif $invoiceid && !$ispaid}
                 <div class="alert alert-warning text-center">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i aria-hidden="true" class="fas fa-exclamation-triangle"></i>
                     {$LANG.ordercompletebutnotpaid}
                     <br /><br />
                     <a href="{$WEB_ROOT}/viewinvoice.php?id={$invoiceid}" target="_blank" class="alert-link">
-                        <i class="fas fa-file-invoice-dollar"></i>
+                        <i aria-hidden="true" class="fas fa-file-invoice-dollar"></i>
                         {$LANG.invoicenumber}{$invoiceid}
                     </a>
                 </div>
@@ -74,7 +74,7 @@
             <div class="text-center order-complete-cta">
                 <a href="{$WEB_ROOT}/clientarea.php" class="btn btn-primary btn-lg">
                     {$LANG.orderForm.continueToClientArea}
-                    &nbsp;<i class="fas fa-arrow-circle-right"></i>
+                    &nbsp;<i aria-hidden="true" class="fas fa-arrow-circle-right"></i>
                 </a>
             </div>
 

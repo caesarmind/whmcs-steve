@@ -20,7 +20,7 @@
  *}
 
 <div class="co-payment-card">
-<div class="sub-heading">
+<div class="sub-heading" role="heading" aria-level="3">
     <span class="primary-bg-color">{$LANG.orderpaymentmethod}</span>
 </div>
 
@@ -143,31 +143,32 @@
         <div class="row" id="newCardInfo">
             <div id="cardNumberContainer" class="col-sm-6 new-card-container">
                 <div class="form-group prepend-icon">
-                    <label for="inputCardNumber" class="field-icon">
-                        <i class="fas fa-credit-card"></i>
-                    </label>
-                    <input type="tel" name="ccnumber" id="inputCardNumber" class="field form-control cc-number-field" placeholder="{$LANG.orderForm.cardNumber}" autocomplete="cc-number" data-message-unsupported="{lang key='paymentMethodsManage.unsupportedCardType'}" data-message-invalid="{lang key='paymentMethodsManage.cardNumberNotValid'}" data-supported-cards="{$supportedCardTypes}" />
+                    <label for="inputCardNumber" class="co-field-label">{$LANG.orderForm.cardNumber}</label>
+                    <div class="co-field-wrap">
+                        <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-credit-card"></i></span>
+                        <input type="tel" name="ccnumber" id="inputCardNumber" class="field form-control cc-number-field" placeholder="{$LANG.orderForm.cardNumber}" autocomplete="cc-number" data-message-unsupported="{lang key='paymentMethodsManage.unsupportedCardType'}" data-message-invalid="{lang key='paymentMethodsManage.cardNumberNotValid'}" data-supported-cards="{$supportedCardTypes}" />
                     <span class="field-error-msg"></span>
+                    </div>
                 </div>
             </div>
             <div class="col-sm-3 new-card-container">
                 <div class="form-group prepend-icon">
-                    <label for="inputCardExpiry" class="field-icon">
-                        <i class="fas fa-calendar-alt"></i>
-                    </label>
-                    <input type="tel" name="ccexpirydate" id="inputCardExpiry" class="field form-control" placeholder="MM / YY{if $showccissuestart} ({$LANG.creditcardcardexpires}){/if}" autocomplete="cc-exp">
+                    <label for="inputCardExpiry" class="co-field-label">{$LANG.creditcardcardexpires}</label>
+                    <div class="co-field-wrap">
+                        <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-calendar-alt"></i></span>
+                        <input type="tel" name="ccexpirydate" id="inputCardExpiry" class="field form-control" placeholder="MM / YY{if $showccissuestart} ({$LANG.creditcardcardexpires}){/if}" autocomplete="cc-exp">
                     <span class="field-error-msg">{lang key="paymentMethodsManage.expiryDateNotValid"}</span>
+                    </div>
                 </div>
             </div>
             <div class="col-sm-3" id="cvv-field-container">
                 <div class="form-group prepend-icon">
-                    <label for="inputCardCVV" class="field-icon">
-                        <i class="fas fa-barcode"></i>
-                    </label>
-                    <div class="input-group">
+                    <label for="inputCardCVV" class="co-field-label">{$LANG.creditcardcvvnumbershort}</label>
+                    <div class="input-group co-field-wrap">
+                        <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-barcode"></i></span>
                         <input type="tel" name="cccvv" id="inputCardCVV" class="field form-control" placeholder="{$LANG.creditcardcvvnumbershort}" autocomplete="cc-cvc">
                         <span class="input-group-btn input-group-append">
-                            <button type="button" class="btn btn-default" data-toggle="popover" data-placement="bottom" data-content="<img src='{$BASE_PATH_IMG}/ccv.gif' width='210' />">
+                            <button type="button" class="btn btn-default" data-toggle="popover" data-placement="bottom" data-content="<img src='{$BASE_PATH_IMG}/ccv.gif' width='210' alt='{$LANG.creditcardcvvwhere|escape}' />" aria-label="{$LANG.creditcardcvvwhere|escape}">
                                 ?
                             </button>
                         </span><br>
@@ -178,18 +179,20 @@
             {if $showccissuestart}
                 <div class="col-sm-3 col-sm-offset-6 new-card-container offset-sm-6">
                     <div class="form-group prepend-icon">
-                        <label for="inputCardStart" class="field-icon">
-                            <i class="far fa-calendar-check"></i>
-                        </label>
-                        <input type="tel" name="ccstartdate" id="inputCardStart" class="field form-control" placeholder="MM / YY ({$LANG.creditcardcardstart})" autocomplete="cc-exp">
+                        <label for="inputCardStart" class="co-field-label">{$LANG.creditcardcardstart}</label>
+                        <div class="co-field-wrap">
+                            <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="far fa-calendar-check"></i></span>
+                            <input type="tel" name="ccstartdate" id="inputCardStart" class="field form-control" placeholder="MM / YY ({$LANG.creditcardcardstart})" autocomplete="cc-exp">
+                        </div>
                     </div>
                 </div>
                 <div class="col-sm-3 new-card-container">
                     <div class="form-group prepend-icon">
-                        <label for="inputCardIssue" class="field-icon">
-                            <i class="fas fa-asterisk"></i>
-                        </label>
-                        <input type="tel" name="ccissuenum" id="inputCardIssue" class="field form-control" placeholder="{$LANG.creditcardcardissuenum}">
+                        <label for="inputCardIssue" class="co-field-label">{$LANG.creditcardcardissuenum}</label>
+                        <div class="co-field-wrap">
+                            <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-asterisk"></i></span>
+                            <input type="tel" name="ccissuenum" id="inputCardIssue" class="field form-control" placeholder="{$LANG.creditcardcardissuenum}">
+                        </div>
                     </div>
                 </div>
             {/if}
@@ -198,10 +201,11 @@
             <div class="row form-group new-card-container">
                 <div id="inputDescriptionContainer" class="col-md-6">
                     <div class="prepend-icon">
-                        <label for="inputDescription" class="field-icon">
-                            <i class="fas fa-pencil"></i>
-                        </label>
+                        <label for="inputDescription" class="co-field-label">{$LANG.paymentMethods.descriptionInput} {$LANG.paymentMethodsManage.optional}</label>
+                        <div class="co-field-wrap">
+                        <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-pencil"></i></span>
                         <input type="text" class="field form-control" id="inputDescription" name="ccdescription" autocomplete="off" value="" placeholder="{$LANG.paymentMethods.descriptionInput} {$LANG.paymentMethodsManage.optional}" />
+                        </div>
                     </div>
                 </div>
                 {if $allowClientsToRemoveCards}

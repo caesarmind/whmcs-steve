@@ -27,14 +27,14 @@
         {if $loggedin && isset($innerTemplate) && $innerTemplate}
             {* WHMCS blocks password reset while signed in. *}
             <div class="pw-error" role="alert">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div>{$LANG.noPasswordResetWhenLoggedIn}</div>
             </div>
             <a href="{$WEB_ROOT}/clientarea.php" class="btn-primary pw-cta">{$LANG.clientareanavhome|default:'Go to dashboard'}</a>
 
         {elseif isset($successMessage) && $successMessage}
             {* Success — "check your email" after step 1, or "password changed" at the end. *}
-            <div class="pw-ico pw-ico-success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="pw-ico pw-ico-success"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             <h1 class="pw-title">{if isset($successTitle) && $successTitle}{$successTitle|strip_tags}{else}{$hadrianLang.auth.pwresetCheckEmailTitle}{/if}</h1>
             <p class="pw-sub">{$successMessage|strip_tags}</p>
             <a href="{$WEB_ROOT}/login" class="btn-primary pw-cta">{$hadrianLang.auth.backToLogin}</a>
@@ -42,7 +42,7 @@
         {else}
             {if isset($errorMessage) && $errorMessage}
             <div class="pw-error" role="alert">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div>{$errorMessage|strip_tags}</div>
             </div>
             {/if}

@@ -18,7 +18,7 @@
 
 {if !empty($error)}
 <div class="dns-alert dns-alert-error">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
     <div>{$error|escape}</div>
 </div>
 {/if}
@@ -54,7 +54,7 @@
                             <tr class="dns-row" data-type="{$rec.type|default:'A'|escape}">
                                 <td>
                                     <input type="hidden" name="dnsrecid[]" value="{$rec.recid|default:''|escape}">
-                                    <input type="text" name="dnsrecordhost[]" value="{$rec.hostname|default:''|escape}" class="dns-input dns-input-host" placeholder="@">
+                                    <input type="text" aria-label="{$LANG.domaindnshostname}" name="dnsrecordhost[]" value="{$rec.hostname|default:''|escape}" class="dns-input dns-input-host" placeholder="@">
                                 </td>
                                 <td>
                                     <select name="dnsrecordtype[]" class="dns-input dns-input-type" aria-label="{$LANG.domaindnsrecordtype|escape}">
@@ -68,7 +68,7 @@
                                         <option value="FRAME" {if $rec.type eq 'FRAME'} selected{/if}>FRAME</option>
                                     </select>
                                 </td>
-                                <td><input type="text" name="dnsrecordaddress[]" value="{$rec.address|default:''|escape}" class="dns-input dns-input-addr" placeholder="—"></td>
+                                <td><input type="text" aria-label="{$LANG.domaindnsaddress}" name="dnsrecordaddress[]" value="{$rec.address|default:''|escape}" class="dns-input dns-input-addr" placeholder="—"></td>
                                 <td>
                                     {if $rec.type eq 'MX'}
                                         <input type="text" name="dnsrecordpriority[]" value="{$rec.priority|default:''|escape}" class="dns-input dns-input-prio" aria-label="{$LANG.domaindnspriority|escape}">
@@ -83,7 +83,7 @@
 
                         {* Empty rows for adding new records *}
                         <tr class="dns-row dns-row-new" data-type="A">
-                            <td><input type="text" name="dnsrecordhost[]" class="dns-input dns-input-host" placeholder="@"></td>
+                            <td><input type="text" aria-label="{$LANG.domaindnshostname}" name="dnsrecordhost[]" class="dns-input dns-input-host" placeholder="@"></td>
                             <td>
                                 <select name="dnsrecordtype[]" class="dns-input dns-input-type" aria-label="{$LANG.domaindnsrecordtype|escape}">
                                     <option value="A">A</option>
@@ -96,7 +96,7 @@
                                     <option value="FRAME">FRAME</option>
                                 </select>
                             </td>
-                            <td><input type="text" name="dnsrecordaddress[]" class="dns-input dns-input-addr" placeholder="—"></td>
+                            <td><input type="text" aria-label="{$LANG.domaindnsaddress}" name="dnsrecordaddress[]" class="dns-input dns-input-addr" placeholder="—"></td>
                             <td><input type="text" name="dnsrecordpriority[]" class="dns-input dns-input-prio" aria-label="{$LANG.domaindnspriority|escape}" placeholder="—"></td>
                         </tr>
                     </tbody>
@@ -119,15 +119,15 @@
         <div class="card subnav-card">
             <div class="subnav-heading">{$LANG.domain|default:'Domain'}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 {$hadrianLang.domains.domainDetails}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=domaindns&domainid={$domainid|escape}" class="subnav-item active">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                 {$LANG.domaindnsmanagement}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=domainemailforwarding&domainid={$domainid|escape}" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                 {$LANG.domainemailforwarding}
             </a>
         </div>

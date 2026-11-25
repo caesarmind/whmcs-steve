@@ -76,7 +76,7 @@
                                 <div class="perm-row-desc">{$perm.description|escape}</div>
                             </div>
                             <label class="perm-toggle">
-                                <input type="checkbox" name="perms[{$perm.key|escape}]" value="1"{if $perm.checked} checked{/if}>
+                                <input type="checkbox" aria-label="{$perm.title|escape}" name="perms[{$perm.key|escape}]" value="1"{if $perm.checked} checked{/if}>
                                 <span class="perm-track"></span>
                             </label>
                         </div>
@@ -89,7 +89,7 @@
                                 {if isset($permission.description) && $permission.description}<div class="perm-row-desc">{$permission.description|escape}</div>{/if}
                             </div>
                             <label class="perm-toggle">
-                                <input type="checkbox" name="perms[{$permission.key|escape}]" value="1"{if isset($userPermissions) && $userPermissions->hasPermission($permission.key)} checked{/if}>
+                                <input type="checkbox" aria-label="{$permission.title|escape}" name="perms[{$permission.key|escape}]" value="1"{if isset($userPermissions) && $userPermissions->hasPermission($permission.key)} checked{/if}>
                                 <span class="perm-track"></span>
                             </label>
                         </div>
@@ -110,7 +110,7 @@
             <div class="card">
                 <div class="perm-empty">
                     <div class="perm-empty-ico">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
                     </div>
                     <p class="perm-empty-title">{$hadrianLang.account.noUserSelected}</p>
                     <p class="perm-empty-sub">{$hadrianLang.account.selectUserSub}</p>
@@ -125,19 +125,19 @@
         <div class="card subnav-card">
             <div class="subnav-heading">{$LANG.accounttab|default:'Account'}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=details" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 {$LANG.accountdetails|default:'Account Details'}
             </a>
             <a href="{routePath('account-users')}" class="subnav-item active">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
                 {$LANG.usermanagement|default:'User Management'}
             </a>
             <a href="{routePath('account-paymentmethods')}" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
                 {$LANG.paymentMethods.title}
             </a>
             <a href="{routePath('account-contacts')}" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 {$LANG.contacts|default:'Contacts'}
             </a>
         </div>

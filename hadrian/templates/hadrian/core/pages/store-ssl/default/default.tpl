@@ -57,11 +57,11 @@
             <div class="visual-box" style="background: linear-gradient(135deg, #eef5ff 0%, #dbeafe 100%); padding: 28px;">
                 <div style="background: var(--color-surface); border-radius: 14px; padding: 16px; width: 100%; max-width: 300px; box-shadow: 0 8px 24px rgba(0,0,0,0.08);">
                     <div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--color-surface-secondary); border-radius: 10px; margin-bottom: 14px;">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                        <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                         <span style="font-size: 13px; color: var(--color-text-primary); font-weight: 500;">https://yourdomain.com</span>
                     </div>
                     <div style="padding: 14px; background: linear-gradient(135deg, #0071e3, #5ac8fa); border-radius: 12px; color: #fff; text-align: center;">
-                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" style="margin-bottom: 8px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+                        <svg aria-hidden="true" focusable="false" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.5" style="margin-bottom: 8px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
                         <div style="font-size: 13px; font-weight: 600;">Secure Connection</div>
                         <div style="font-size: 11px; opacity: 0.8;">256-bit AES encryption</div>
                     </div>
@@ -77,19 +77,19 @@
     {* 2. 3-up certificate types *}
     <section class="hp-icon-grid" style="padding: 40px 22px 48px;">
         <div class="hp-icon-item">
-            <div class="icon-circle blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+            <div class="icon-circle blue"><svg aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
             <h4>{$hadrianLang.store.sslDvTitle}</h4>
             <p>{$hadrianLang.store.sslDvText}</p>
             <a href="#pricing" style="color: var(--color-accent); font-size: 13px; font-weight: 500; margin-top: 8px;">{$hadrianLang.store.sslLearnMore} &rsaquo;</a>
         </div>
         <div class="hp-icon-item">
-            <div class="icon-circle green"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+            <div class="icon-circle green"><svg aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
             <h4>{$hadrianLang.store.sslOvTitle}</h4>
             <p>{$hadrianLang.store.sslOvText}</p>
             <a href="#pricing" style="color: var(--color-accent); font-size: 13px; font-weight: 500; margin-top: 8px;">{$hadrianLang.store.sslLearnMore} &rsaquo;</a>
         </div>
         <div class="hp-icon-item">
-            <div class="icon-circle purple"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+            <div class="icon-circle purple"><svg aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
             <h4>{$hadrianLang.store.sslEvTitle}</h4>
             <p>{$hadrianLang.store.sslEvText}</p>
             <a href="#pricing" style="color: var(--color-accent); font-size: 13px; font-weight: 500; margin-top: 8px;">{$hadrianLang.store.sslLearnMore} &rsaquo;</a>
@@ -110,23 +110,23 @@
                 <div class="visual-box" style="background: var(--color-surface-secondary); padding: 24px;">
                     <div style="width: 100%; max-width: 300px;">
                         <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--color-surface); border-radius: 12px; margin-bottom: 10px;">
-                            <div style="display: flex; align-items: center; gap: 10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span style="font-size: 12px; color: var(--color-text-primary);">Browser</span></div>
+                            <div style="display: flex; align-items: center; gap: 10px;"><svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span style="font-size: 12px; color: var(--color-text-primary);">Browser</span></div>
                         </div>
                         <div style="display: flex; justify-content: center; margin: 6px 0;">
                             <div style="display: flex; flex-direction: column; align-items: center; gap: 4px;">
                                 <div style="width: 2px; height: 12px; background: linear-gradient(180deg, transparent, #0071e3);"></div>
                                 <div style="background: linear-gradient(135deg, #0071e3, #5ac8fa); padding: 6px 12px; border-radius: 8px; display: flex; align-items: center; gap: 6px; color: #fff; font-size: 11px; font-weight: 600;">
-                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                                    <svg aria-hidden="true" focusable="false" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                                     SSL/TLS
                                 </div>
                                 <div style="width: 2px; height: 12px; background: linear-gradient(180deg, #0071e3, transparent);"></div>
                             </div>
                         </div>
                         <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--color-surface); border-radius: 12px;">
-                            <div style="display: flex; align-items: center; gap: 10px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg><span style="font-size: 12px; color: var(--color-text-primary);">Server</span></div>
+                            <div style="display: flex; align-items: center; gap: 10px;"><svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg><span style="font-size: 12px; color: var(--color-text-primary);">Server</span></div>
                         </div>
                         <div style="margin-top: 12px; padding: 10px 12px; background: #e8f8ed; border-radius: 8px; display: flex; align-items: center; gap: 8px;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            <svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                             <span style="font-size: 11px; color: #1a7f37; font-weight: 600;">Encrypted &amp; authenticated</span>
                         </div>
                     </div>
@@ -145,7 +145,7 @@
                 <div class="visual-box" style="background: #eaf4ff; padding: 24px;">
                     <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 14px;">
                         <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 12px;">SEO impact after HTTPS migration</div>
-                        <svg viewBox="0 0 260 80" style="width: 100%; height: 80px;">
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 260 80" style="width: 100%; height: 80px;">
                             <defs><linearGradient id="seoGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#30d158" stop-opacity="0.3"/><stop offset="100%" stop-color="#30d158" stop-opacity="0"/></linearGradient></defs>
                             <path d="M0,65 L32,60 L64,62 L96,50 L128,45 L160,30 L192,22 L224,15 L260,10 L260,80 L0,80 Z" fill="url(#seoGrad)"/>
                             <path d="M0,65 L32,60 L64,62 L96,50 L128,45 L160,30 L192,22 L224,15 L260,10" fill="none" stroke="#30d158" stroke-width="2"/>
@@ -188,27 +188,27 @@
         <h2>{$hadrianLang.store.sslFeaturesTitle}</h2>
         <div class="hp-feature-cards cols-5"  style="margin-top: 40px; max-width: 1024px; margin-left: auto; margin-right: auto">
             <div class="hp-feature-card">
-                <div class="feat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+                <div class="feat-icon blue"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
                 <h4>{$hadrianLang.store.sslFeat1Title}</h4>
                 <p>{$hadrianLang.store.sslFeat1Text}</p>
             </div>
             <div class="hp-feature-card">
-                <div class="feat-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                <div class="feat-icon green"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
                 <h4>{$hadrianLang.store.sslFeat2Title}</h4>
                 <p>{$hadrianLang.store.sslFeat2Text}</p>
             </div>
             <div class="hp-feature-card">
-                <div class="feat-icon purple"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+                <div class="feat-icon purple"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
                 <h4>{$hadrianLang.store.sslFeat3Title}</h4>
                 <p>{$hadrianLang.store.sslFeat3Text}</p>
             </div>
             <div class="hp-feature-card">
-                <div class="feat-icon orange"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+                <div class="feat-icon orange"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
                 <h4>{$hadrianLang.store.sslFeat4Title}</h4>
                 <p>{$hadrianLang.store.sslFeat4Text}</p>
             </div>
             <div class="hp-feature-card">
-                <div class="feat-icon teal"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></div>
+                <div class="feat-icon teal"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg></div>
                 <h4>{$hadrianLang.store.sslFeat5Title}</h4>
                 <p>{$hadrianLang.store.sslFeat5Text}</p>
             </div>
@@ -386,7 +386,7 @@
 
 <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
     <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
     </div>
     <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">{$hadrianLang.store.sslEmptyTitle}</p>
     <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">{$hadrianLang.store.sslEmptyText}</p>

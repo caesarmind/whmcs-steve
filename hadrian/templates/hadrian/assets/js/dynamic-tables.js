@@ -295,10 +295,21 @@
 
     /** Wire the theme footer/search/filter controls to a DataTable (either mode). */
     function wireControls(id, dt, opts) {
+        // After a search or a filter the result count is spoken (WCAG 4.1.3):
+        // the table changes with no page load, so nothing else says so.
+        var announceNext = false;
+        dt.on('draw', function () {
+            if (!announceNext) { return; }
+            announceNext = false;
+            var n = dt.page.info().recordsDisplay;
+            var str = (window.hadrianA11y && window.hadrianA11y.results) || '%s results';
+            if (window.hadrianAnnounce) { window.hadrianAnnounce(str.replace('%s', n)); }
+        });
         // Search box
         var search = ctrl('data-mt-search', id);
         if (search) {
             search.addEventListener('input', debounce(function () {
+                announceNext = true;
                 dt.search(this.value || '').draw();
             }, 300));
         }
@@ -310,6 +321,7 @@
                 e.preventDefault();
                 Array.prototype.forEach.call(filters, function (b) { b.classList.toggle('active', b === btn); });
                 var value = btn.getAttribute('data-mt-filter') || '';
+                announceNext = true;
                 if (opts.mode === 'server') {
                     opts.state.filter = value;
                     dt.ajax.reload();
@@ -380,6 +392,9 @@
             b.setAttribute('data-dir', '');
             b.classList.remove('active');
         });
+        // Sort state for assistive tech (WCAG 1.3.1, 4.1.2): only the sorted
+        // column header carries aria-sort.
+        Array.prototype.forEach.call(thead.querySelectorAll('th[aria-sort]'), function (h) { h.removeAttribute('aria-sort'); });
         var ord = dt.order();
         if (!ord || !ord.length) { return; }
         var th = (thead.rows.length ? thead.rows[0].cells : [])[ord[0][0]];
@@ -387,6 +402,7 @@
             var b = th.querySelector('[data-sort], .svc-sort') || th;
             if (b.setAttribute) { b.setAttribute('data-dir', ord[0][1] || 'asc'); }
             if (b.classList) { b.classList.add('active'); }
+            th.setAttribute('aria-sort', (ord[0][1] || 'asc') === 'desc' ? 'descending' : 'ascending');
         }
     }
 
@@ -565,7 +581,7 @@
                 var btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'mt-expander';
-                btn.setAttribute('aria-label', 'Show details');
+                btn.setAttribute('aria-label', (window.hadrianA11y && window.hadrianA11y.showDetails) || 'Show details');
                 btn.innerHTML = SVG.chevR;
                 first.appendChild(btn);
             }

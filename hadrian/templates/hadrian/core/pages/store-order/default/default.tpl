@@ -46,13 +46,13 @@
     {* Server-side config validation message (real data only). *}
     {if isset($configValidationMessage) && $configValidationMessage}
         <div class="callout danger" style="margin-bottom:20px;">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             {$configValidationMessage}
         </div>
     {/if}
 
     <div class="callout info">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:20px;height:20px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
         {if isset($product)}
             {$hadrianLang.store.ordCalloutLead} {$product->name}. {$hadrianLang.store.ordCalloutTail}
         {else}
@@ -76,8 +76,8 @@
                     {/if}
 
                     <div class="form-group">
-                        <label class="form-label">{$hadrianLang.store.ordBillingCycle}</label>
-                        <select class="form-select" name="billingcycle">
+                        <label class="form-label" for="so-field-1">{$hadrianLang.store.ordBillingCycle}</label>
+                        <select id="so-field-1" class="form-select" name="billingcycle">
                             {foreach $product->pricing()->allAvailableCycles() as $pricing}
                                 <option value="{$pricing->cycle()}"{if (isset($orderFormData.billingcycle) && $orderFormData.billingcycle == $pricing->cycle()) || (!isset($orderFormData.billingcycle) && isset($requestedCycle) && $requestedCycle == $pricing->cycle())} selected{/if}>
                                     {if $pricing->isRecurring()}
@@ -267,22 +267,22 @@
             </div>
             <div class="card-body">
                 <div class="form-group">
-                    <label class="form-label">{$hadrianLang.store.ordBillingCycle}</label>
-                    <select class="form-select">
+                    <label class="form-label" for="so-field-2">{$hadrianLang.store.ordBillingCycle}</label>
+                    <select id="so-field-2" class="form-select">
                         <option>{$hadrianLang.store.ordCycleMonthly}</option>
                         <option selected>{$hadrianLang.store.ordCycleAnnually}</option>
                         <option>{$hadrianLang.store.ordCycleBiennially}</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">{$hadrianLang.store.ordDomainLabel}</label>
-                    <input type="text" class="form-input" placeholder="{$hadrianLang.store.ordDomainPlaceholder}">
+                    <label class="form-label" for="so-field-3">{$hadrianLang.store.ordDomainLabel}</label>
+                    <input id="so-field-3" type="text" class="form-input" placeholder="{$hadrianLang.store.ordDomainPlaceholder}">
                     <div class="form-hint">{$hadrianLang.store.ordDomainHint}</div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
-                        <label class="form-label">{$hadrianLang.store.ordServerType}</label>
-                        <select class="form-select">
+                        <label class="form-label" for="so-field-4">{$hadrianLang.store.ordServerType}</label>
+                        <select id="so-field-4" class="form-select">
                             <option>Apache + mod_ssl</option>
                             <option>Nginx</option>
                             <option>IIS</option>
@@ -290,8 +290,8 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">{$hadrianLang.store.ordCsrLabel}</label>
-                        <textarea class="form-input" placeholder="{$hadrianLang.store.ordCsrPlaceholder}" style="min-height:100px"></textarea>
+                        <label class="form-label" for="so-field-5">{$hadrianLang.store.ordCsrLabel}</label>
+                        <textarea id="so-field-5" class="form-input" placeholder="{$hadrianLang.store.ordCsrPlaceholder}" style="min-height:100px"></textarea>
                     </div>
                 </div>
             </div>
@@ -360,7 +360,7 @@
                 <div class="form-group" style="margin-top:20px">
                     <label class="form-label">{$hadrianLang.store.ordPromoLabel}</label>
                     <div class="form-row">
-                        <input type="text" class="form-input" placeholder="{$hadrianLang.store.ordPromoPlaceholder}">
+                        <input aria-label="{$hadrianLang.store.ordPromoPlaceholder}" type="text" class="form-input" placeholder="{$hadrianLang.store.ordPromoPlaceholder}">
                         <button class="btn-secondary">{$hadrianLang.store.ordPromoApply}</button>
                     </div>
                 </div>
@@ -376,7 +376,7 @@
 
 <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
     <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
     </div>
     <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">{$hadrianLang.store.ordEmptyTitle}</p>
     <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">{$hadrianLang.store.ordEmptyText}</p>

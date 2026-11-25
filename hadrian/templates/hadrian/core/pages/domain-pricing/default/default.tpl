@@ -53,8 +53,8 @@
 <div class="when-full">
     <div class="dp-toolbar">
         <div class="dp-search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="search" id="dpSearch" placeholder="{$hadrianLang.domains.searchExtensions}" autocomplete="off">
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input aria-label="{$hadrianLang.domains.searchExtensions}" type="search" id="dpSearch" placeholder="{$hadrianLang.domains.searchExtensions}" autocomplete="off">
         </div>
         {if isset($tldCategories) && $tldCategories|@count > 0}
         <select class="dp-filter" id="dpFilter" aria-label="{$LANG.category}">
@@ -103,7 +103,7 @@
     <div class="card">
         <div class="dp-empty">
             <div class="dp-empty-ico">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
             </div>
             <p class="dp-empty-title">{$hadrianLang.domains.pricingEmptyTitle}</p>
             <p class="dp-empty-sub">{$hadrianLang.domains.pricingEmptySub}</p>

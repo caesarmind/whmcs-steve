@@ -64,7 +64,7 @@
 
     <div class="ssl-success">
         <div class="ssl-success-ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
         </div>
         <h2>{$LANG.sslconfigcomplete}</h2>
         <p>{if isset($domain) && $domain}{$hadrianLang.ssl.completedForPrefix} {$domain|escape} {$hadrianLang.ssl.completedForSuffix}{else}{$hadrianLang.ssl.completedGeneric}{/if}</p>
@@ -77,12 +77,12 @@
             <div class="card-header"><h2 class="card-title">{$LANG.ssl.emailInformation}</h2></div>
             <div class="card-body">
                 <div class="ssl-alert info">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                     <div>{$LANG.ssl.emailSteps}</div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">{$LANG.email}</label>
-                    <input type="text" class="form-input" value="{$authData->email|escape}" readonly>
+                    <label class="form-label" for="sslc-field-1">{$LANG.email}</label>
+                    <input id="sslc-field-1" type="text" class="form-input" value="{$authData->email|escape}" readonly>
                 </div>
             </div>
         </div>
@@ -91,25 +91,25 @@
             <div class="card-header"><h2 class="card-title">{$LANG.ssl.dnsRecordInformation}</h2></div>
             <div class="card-body">
                 <div class="ssl-alert info">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                     <div>{$LANG.ssl.dnsSteps}</div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">{$LANG.ssl.type}</label>
-                    <input type="text" class="form-input" value="{$authData->type|escape}" readonly>
+                    <label class="form-label" for="sslc-field-2">{$LANG.ssl.type}</label>
+                    <input id="sslc-field-2" type="text" class="form-input" value="{$authData->type|escape}" readonly>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">{$LANG.ssl.host}</label>
+                    <label class="form-label" for="sslDnsHost">{$LANG.ssl.host}</label>
                     <div class="ssl-copy">
                         <input type="text" id="sslDnsHost" class="form-input" value="{$authData->host|escape}" readonly>
-                        <button type="button" data-copy="#sslDnsHost" title="{$LANG.copy}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+                        <button type="button" data-copy="#sslDnsHost" title="{$LANG.copy}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">{$LANG.ssl.value}</label>
+                    <label class="form-label" for="sslDnsValue">{$LANG.ssl.value}</label>
                     <div class="ssl-copy">
                         <input type="text" id="sslDnsValue" class="form-input" value="{$authData->value|escape}" readonly>
-                        <button type="button" data-copy="#sslDnsValue" title="{$LANG.copy}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+                        <button type="button" data-copy="#sslDnsValue" title="{$LANG.copy}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
                     </div>
                 </div>
             </div>
@@ -119,21 +119,21 @@
             <div class="card-header"><h2 class="card-title">{$LANG.ssl.fileInformation}</h2></div>
             <div class="card-body">
                 <div class="ssl-alert info">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                     <div>{$LANG.ssl.fileSteps}</div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">{$LANG.ssl.url}</label>
+                    <label class="form-label" for="sslFileUrl">{$LANG.ssl.url}</label>
                     <div class="ssl-copy">
                         <input type="text" id="sslFileUrl" class="form-input" value="http://{$domain|default:''|escape}/{$authData->filePath()|escape}" readonly>
-                        <button type="button" data-copy="#sslFileUrl" title="{$LANG.copy}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+                        <button type="button" data-copy="#sslFileUrl" title="{$LANG.copy}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
                     </div>
                 </div>
                 <div class="form-group">
-                    <label class="form-label">{$LANG.ssl.value}</label>
+                    <label class="form-label" for="sslFileVal">{$LANG.ssl.value}</label>
                     <div class="ssl-copy">
                         <input type="text" id="sslFileVal" class="form-input" value="{$authData->contents|escape}" readonly>
-                        <button type="button" data-copy="#sslFileVal" title="{$LANG.copy}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
+                        <button type="button" data-copy="#sslFileVal" title="{$LANG.copy}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg></button>
                     </div>
                 </div>
             </div>
@@ -144,7 +144,7 @@
             <div class="card-header"><h2 class="card-title">{$LANG.ssl.dnsRecordInformation}</h2></div>
             <div class="card-body">
                 <div class="ssl-alert info">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
                     <div>{$LANG.ssl.dnsSteps}</div>
                 </div>
                 <dl class="ssl-dl">
@@ -168,7 +168,7 @@
 <div class="when-empty">
     <div class="ssl-notice">
         <div class="ssl-notice-ico">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         </div>
         <p class="ssl-notice-title">{$hadrianLang.ssl.configFailed}</p>
         <p class="ssl-notice-sub">{if isset($errormessage) && $errormessage}{$errormessage|strip_tags}{else}{$hadrianLang.ssl.configFailedSub}{/if}</p>

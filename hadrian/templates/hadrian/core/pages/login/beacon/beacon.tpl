@@ -89,7 +89,7 @@
                      {if !empty($hadrian.branding.logo.dark) && $hadrian.branding.logo.dark != $hadrian.branding.logo.light}data-logo-dark="{$hadrian.branding.logo.dark|escape}"{/if}>
             {else}
                 <span class="mt-bcn-brand-mark">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="7" rx="1.5"/><rect x="2" y="13" width="20" height="7" rx="1.5"/><line x1="6" y1="7.5" x2="6.01" y2="7.5"/><line x1="6" y1="16.5" x2="6.01" y2="16.5"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="7" rx="1.5"/><rect x="2" y="13" width="20" height="7" rx="1.5"/><line x1="6" y1="7.5" x2="6.01" y2="7.5"/><line x1="6" y1="16.5" x2="6.01" y2="16.5"/></svg>
                 </span>
                 <span class="mt-bcn-brand-name">{$companyname|default:'Hostnodes'|escape}</span>
             {/if}
@@ -98,7 +98,7 @@
 
     <section class="mt-bcn-hero">
         <div class="mt-bcn-copy">
-            <h2>{$hadrianLang.auth.welcomeBack}</h2>
+            <h1>{$hadrianLang.auth.welcomeBack}</h1>
             <p>{$hadrianLang.auth.loginWelcomeSub}</p>
         </div>
 
@@ -108,20 +108,20 @@
                var. Both are handled: an install still posting to dologin.php
                sets $incorrect and nothing else. *}
             {if $message = get_flash_message()}
-                <div class="auth-notice{if $message.type == 'success'} success{elseif $message.type == 'warning' || $message.type == 'info'} info{/if}">{$message.text}</div>
+                <div class="auth-notice{if $message.type == 'success'} success{elseif $message.type == 'warning' || $message.type == 'info'} info{/if}"{if $message.type == 'success' || $message.type == 'warning' || $message.type == 'info'} role="status"{else} role="alert" data-error-summary{/if}>{$message.text}</div>
             {/if}
 
             {if $logout}
-                <div class="auth-notice success">{$hadrianLang.auth.logoutSuccessful}</div>
+                <div class="auth-notice success" role="status">{$hadrianLang.auth.logoutSuccessful}</div>
             {/if}
             {if $incorrect}
-                <div class="auth-notice">{$hadrianLang.auth.loginDetailsIncorrect}</div>
+                <div class="auth-notice" role="alert" data-error-summary>{$hadrianLang.auth.loginDetailsIncorrect}</div>
             {/if}
             {if $verifylinkexpired}
-                <div class="auth-notice">{$hadrianLang.auth.verifyLinkExpired}</div>
+                <div class="auth-notice" role="alert" data-error-summary>{$hadrianLang.auth.verifyLinkExpired}</div>
             {/if}
             {if $passwordResetSuccessful}
-                <div class="auth-notice success">{$hadrianLang.auth.pwResetSuccess}</div>
+                <div class="auth-notice success" role="status">{$hadrianLang.auth.pwResetSuccess}</div>
             {/if}
 
             <form class="auth-form" method="post" action="{routePath('login-validate')}">
@@ -137,7 +137,7 @@
                     <div class="password-wrapper">
                         <input type="password" id="loginPassword" name="password" class="form-input" placeholder="{$hadrianLang.auth.passwordPlaceholder}" autocomplete="current-password" required>
                         <button type="button" class="password-toggle" aria-label="{$hadrianLang.auth.togglePassword}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
                     </div>
                 </div>
@@ -194,7 +194,7 @@
         {else}
             <div class="mt-bcn-news-empty">
                 <span class="ico">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
                 </span>
                 <p>{$LANG.noannouncements}</p>
             </div>

@@ -68,7 +68,7 @@
                         <span style="font-size: 10px; color: #30d158; font-weight: 600;">&bull; CLEAN</span>
                     </div>
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #30d158, #5cdb79); border-radius: 14px; display: flex; align-items: center; justify-content: center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+                        <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #30d158, #5cdb79); border-radius: 14px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
                         <div style="flex: 1;">
                             <div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">No threats found</div>
                             <div style="font-size: 11px; color: var(--color-text-tertiary);">Last scan: 2h ago</div>
@@ -179,10 +179,10 @@
                 <div class="visual-box" style="background: #eaf4ff; padding: 24px;">
                     <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 14px;">
                         <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1a7f37; font-weight: 600;">WordPress core &middot; clean</span></div>
-                            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1a7f37; font-weight: 600;">All plugins &middot; verified</span></div>
-                            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1a7f37; font-weight: 600;">Database &middot; encrypted</span></div>
-                            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1a7f37; font-weight: 600;">SSL &middot; valid</span></div>
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1a7f37; font-weight: 600;">WordPress core &middot; clean</span></div>
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1a7f37; font-weight: 600;">All plugins &middot; verified</span></div>
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1a7f37; font-weight: 600;">Database &middot; encrypted</span></div>
+                            <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1a7f37; font-weight: 600;">SSL &middot; valid</span></div>
                         </div>
                     </div>
                 </div>
@@ -197,19 +197,19 @@
         <h2>{$hadrianLang.store.slScanTitle}</h2>
         <div class="hp-feature-cards"  style="margin-top: 40px">
             <div class="hp-feature-card">
-                <div class="feat-icon red"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
+                <div class="feat-icon red"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
                 <h4>{$hadrianLang.store.slScan1Title}</h4>
                 <p>{$hadrianLang.store.slScan1Text}</p>
                 <a href="{$_slOrder|escape}" style="color: var(--color-accent); font-size: 13px; font-weight: 500; margin-top: 8px;">{$hadrianLang.store.slHeroCta} &rsaquo;</a>
             </div>
             <div class="hp-feature-card">
-                <div class="feat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+                <div class="feat-icon blue"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
                 <h4>{$hadrianLang.store.slScan2Title}</h4>
                 <p>{$hadrianLang.store.slScan2Text}</p>
                 <a href="{$_slOrder|escape}" style="color: var(--color-accent); font-size: 13px; font-weight: 500; margin-top: 8px;">{$hadrianLang.store.slHeroCta} &rsaquo;</a>
             </div>
             <div class="hp-feature-card">
-                <div class="feat-icon purple"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+                <div class="feat-icon purple"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
                 <h4>{$hadrianLang.store.slScan3Title}</h4>
                 <p>{$hadrianLang.store.slScan3Text}</p>
                 <a href="{$_slOrder|escape}" style="color: var(--color-accent); font-size: 13px; font-weight: 500; margin-top: 8px;">{$hadrianLang.store.slHeroCta} &rsaquo;</a>
@@ -390,7 +390,7 @@
 
 <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
     <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
     </div>
     <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">{$hadrianLang.store.slEmptyTitle}</p>
     <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">{$hadrianLang.store.slEmptyText}</p>

@@ -35,7 +35,7 @@
 
     {* -- Custom CTA -- *}
     <div style="text-align: center;">
-        <a href="{$WEB_ROOT}/cart.php" style="display: inline-block; background: var(--color-accent); color: #fff; font-size: 15px; font-weight: 500; padding: 13px 28px; border-radius: 12px; text-decoration: none;">A call to action</a>
+        <a href="{$WEB_ROOT}/cart.php" style="display: inline-block; background: var(--color-accent); color: var(--color-on-accent); font-size: 15px; font-weight: 500; padding: 13px 28px; border-radius: 12px; text-decoration: none;">A call to action</a>
     </div>
 
 </div>

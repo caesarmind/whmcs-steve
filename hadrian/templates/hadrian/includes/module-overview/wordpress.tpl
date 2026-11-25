@@ -32,9 +32,9 @@
                has no lang keys for them, and $hadrianLang isn't assigned yet
                when WHMCS renders a module's overview template. *}
             <div class="hn-mo-row" style="margin-top: 12px;">
-                <input type="text" class="pd-field-input" id="wpNewBlogTitle" placeholder="New Blog Title" aria-label="New Blog Title" />
-                <input type="text" class="pd-field-input" id="wpNewPath" placeholder="Path (optional)" aria-label="Path (optional)" />
-                <input type="password" class="pd-field-input" id="wpAdminPass" placeholder="Admin Password" aria-label="Admin Password" autocomplete="new-password" />
+                <input type="text" class="pd-field-input" id="wpNewBlogTitle" placeholder="New Blog Title" aria-label="{$hadrianLang.a11y.wpBlogTitle}" />
+                <input type="text" class="pd-field-input" id="wpNewPath" placeholder="Path (optional)" aria-label="{$hadrianLang.a11y.wpPath}" />
+                <input type="password" class="pd-field-input" id="wpAdminPass" placeholder="Admin Password" aria-label="{$hadrianLang.a11y.wpAdminPassword}" autocomplete="new-password" />
                 <button type="button" class="btn-primary hn-mo-shrink" id="btnInstallWordpress">{lang key='wptk.installWordPressShort'}</button>
             </div>
         </div>

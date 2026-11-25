@@ -8,7 +8,7 @@
         <div class="locale-modal-header">
             <h3 id="localeModalTitle">{$hadrianLang.common.localeChoose}</h3>
             <button type="button" class="locale-modal-close" id="localeModalClose" aria-label="{$LANG.close}">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
             </button>
         </div>
         <div class="locale-modal-body">
@@ -33,7 +33,7 @@
                            the one reader guaranteed not to want it labelled in
                            English. Unmapped codes fall back to |capitalize. *}
                         {assign var=mtLangKey value=$lang|lower}
-                        <button type="button" data-lang="{$lang|escape}"{if isset($language) && $language == $lang} class="active"{/if}>{if isset($hadrian.locales.nativeNames[$mtLangKey])}{$hadrian.locales.nativeNames[$mtLangKey]|escape}{else}{$lang|escape|capitalize}{/if}</button>
+                        <button type="button" data-lang="{$lang|escape}"{if isset($hadrian.locales.codes[$mtLangKey])} lang="{$hadrian.locales.codes[$mtLangKey]|escape}"{/if}{if isset($language) && $language == $lang} class="active"{/if}>{if isset($hadrian.locales.nativeNames[$mtLangKey])}{$hadrian.locales.nativeNames[$mtLangKey]|escape}{else}{$lang|escape|capitalize}{/if}</button>
                     {/foreach}
                 {else}
                     <button type="button" data-lang="arabic">&#1575;&#1604;&#1593;&#1585;&#1576;&#1610;&#1577;</button>

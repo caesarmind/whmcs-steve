@@ -69,7 +69,7 @@
         </div>
         <a href="{$WEB_ROOT}/cart.php" class="page-header-action">
             {$hadrianLang.services.orderAService}
-            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+            <svg aria-hidden="true" focusable="false" class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
         </a>
     </div>
 </header>
@@ -82,7 +82,7 @@
         {* Renewal banner *}
         <div class="svc-banner">
             <span class="svc-banner-ico">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </span>
             <span><strong>{$count_all}</strong> {if $count_all == 1}{$hadrianLang.services.serviceLower}{else}{$hadrianLang.services.servicesLower}{/if} {$hadrianLang.services.onThisAccount}.</span>
             <span class="spacer"></span>
@@ -117,7 +117,7 @@
             {if $avTerminated > 0}<a href="{$WEB_ROOT}/clientarea.php?action=services&status=Terminated" class="filter-tab{if $currentFilter == 'Terminated'} active{/if}" data-mt-for="svcTable" data-mt-filter="Terminated">{$LANG.clientareaterminated}</a>{/if}
             {if $avCancelled > 0}<a href="{$WEB_ROOT}/clientarea.php?action=services&status=Cancelled" class="filter-tab{if $currentFilter == 'Cancelled'} active{/if}" data-mt-for="svcTable" data-mt-filter="Cancelled">{$LANG.clientareacancelled}</a>{/if}
             {if $avFraud > 0}<a href="{$WEB_ROOT}/clientarea.php?action=services&status=Fraud" class="filter-tab{if $currentFilter == 'Fraud'} active{/if}" data-mt-for="svcTable" data-mt-filter="Fraud">{$LANG.clientareafraud}</a>{/if}
-            <span class="mt-list-search"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="search" placeholder="{$LANG.search}…" aria-label="{$LANG.search}" data-mt-search data-mt-for="svcTable"></span>
+            <span class="mt-list-search"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><input type="search" placeholder="{$LANG.search}…" aria-label="{$LANG.search}" data-mt-search data-mt-for="svcTable"></span>
         </div>
 
         {* Services stack: in "inside" mode it renders as one unified white card;
@@ -185,11 +185,11 @@
                                 <td class="svc-cell-actions">
                                     <div class="svc-menu-wrap" data-mt-kebab>
                                         <button type="button" class="svc-menu-btn" aria-label="{$LANG.actions}" aria-haspopup="true" aria-expanded="false" data-mt-kebab-btn>
-                                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+                                            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
                                         </button>
                                         <div class="svc-menu" role="menu">
                                             <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$product.id}" class="svc-menu-item" role="menuitem">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
+                                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z"/></svg>
                                                 {$LANG.manageproduct|default:'Manage Product'}
                                             </a>
                                             {* Gate Upgrade like productdetails: WHMCS sets $product.packagesupgrade
@@ -199,16 +199,16 @@
                                                upgrade option is never hidden. *}
                                             {if !isset($product.packagesupgrade) || $product.packagesupgrade}
                                             <a href="{$WEB_ROOT}/upgrade.php?type=package&id={$product.id}" class="svc-menu-item" role="menuitem">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
+                                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
                                                 {$LANG.upgrade}
                                             </a>
                                             {/if}
                                             <a href="{$WEB_ROOT}/clientarea.php?action=productdetails&id={$product.id}&modop=custom&a=Addons" class="svc-menu-item" role="menuitem">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                                 {$LANG.viewavailableaddons|default:'View Available Addons'}
                                             </a>
                                             <a href="{$WEB_ROOT}/clientarea.php?action=cancel&id={$product.id}" class="svc-menu-item" role="menuitem">
-                                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+                                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
                                                 {$LANG.cancellationrequest|default:'Request Cancellation'}
                                             </a>
                                         </div>
@@ -236,9 +236,9 @@
                 <div class="spacer"></div>
                 <span data-dt-info data-mt-for="svcTable">{$LANG.showing|default:'Showing'} 1&ndash;{$count_all} {$LANG.of|default:'of'} {$count_all}</span>
                 <div class="svc-pages" data-dt-pager data-mt-for="svcTable">
-                    <button type="button" disabled aria-label="{$hadrianLang.common.previousPage}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+                    <button type="button" disabled aria-label="{$hadrianLang.common.previousPage}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
                     <button type="button" class="active">1</button>
-                    <button type="button" disabled aria-label="{$hadrianLang.common.nextPage}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+                    <button type="button" disabled aria-label="{$hadrianLang.common.nextPage}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
                 </div>
             </div>
 
@@ -251,7 +251,7 @@
             <div class="card svc-table-card">
                 <div class="svc-empty">
                     <div class="svc-empty-ico">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
                     </div>
                     <p class="svc-empty-title">{$hadrianLang.services.emptyTitle}</p>
                     <p class="svc-empty-sub">{$hadrianLang.services.emptySub}</p>
@@ -268,20 +268,20 @@
         <div class="card subnav-card">
             <div class="subnav-heading">{$LANG.services|default:'Services'}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=services" class="subnav-item active">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
                 {$LANG.myservices|default:'My Services'}
                 <span class="subnav-count">{$count_all}</span>
             </a>
             <a href="{$WEB_ROOT}/cart.php" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
                 {$LANG.ordernewservices|default:'Order New Services'}
             </a>
             <a href="{$WEB_ROOT}/cart.php?gid=addons" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                 {$LANG.viewavailableaddons|default:'View Available Addons'}
             </a>
             <a href="{$WEB_ROOT}/upgrade.php" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 11 12 6 7 11"/><polyline points="17 18 12 13 7 18"/></svg>
                 {$LANG.upgrade}
             </a>
         </div>

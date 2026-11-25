@@ -88,7 +88,7 @@
                         <input type="hidden" name="billingcycle" value="{$upgrades.0.newproductbillingcycle|default:''|escape}">
                     {/if}
                     {if isset($configoptions)}{foreach $configoptions as $cid => $cval}<input type="hidden" name="configoption[{$cid}]" value="{$cval|escape}">{/foreach}{/if}
-                    <input class="form-input" type="text" name="promocode" placeholder="{$LANG.orderpromotioncode}"{if isset($promocode) && $promocode} value="{$promocode|escape}" disabled{/if}>
+                    <input aria-label="{$LANG.orderpromotioncode}" class="form-input" type="text" name="promocode" placeholder="{$LANG.orderpromotioncode}"{if isset($promocode) && $promocode} value="{$promocode|escape}" disabled{/if}>
                     {if isset($promocode) && $promocode}
                         <button type="submit" name="removepromo" value="1" class="btn-secondary">{$LANG.orderdontusepromo}</button>
                     {else}
@@ -154,7 +154,7 @@
     <div class="card">
         <div class="up-empty">
             <div class="up-empty-ico">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="16 12 12 8 8 12"/><line x1="12" y1="16" x2="12" y2="8"/></svg>
             </div>
             <p class="up-empty-title">{$hadrianLang.services.upgradeNoSummaryTitle}</p>
             <p class="up-empty-sub">{$hadrianLang.services.upgradeNoSummarySub}</p>

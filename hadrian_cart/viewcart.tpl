@@ -891,18 +891,18 @@
                 </p>
             </div>
             <a href="{$WEB_ROOT}/cart.php" class="btn-secondary" style="height: 36px; padding: 0 16px; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; border-radius: 999px;">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 5 12 12 19"/></svg>
+                <svg aria-hidden="true" focusable="false" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 5 12 12 19"/></svg>
                 {$LANG.orderForm.continueShopping}
             </a>
         </header>
 
         {* ── Step strip (Cart = step 4 of 5) ── *}
         <div class="ct-steps" aria-label="{$hadrianLang.cart.checkoutProgress}">
-            <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepChoosePlan}</span>
+            <span class="ct-step done"><span class="ct-step-num"><svg aria-hidden="true" focusable="false" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepChoosePlan}</span>
             <span class="ct-step-sep">&rsaquo;</span>
-            <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepDomain}</span>
+            <span class="ct-step done"><span class="ct-step-num"><svg aria-hidden="true" focusable="false" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepDomain}</span>
             <span class="ct-step-sep">&rsaquo;</span>
-            <span class="ct-step done"><span class="ct-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepConfigure}</span>
+            <span class="ct-step done"><span class="ct-step-num"><svg aria-hidden="true" focusable="false" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepConfigure}</span>
             <span class="ct-step-sep">&rsaquo;</span>
             <span class="ct-step active"><span class="ct-step-num">4</span>{$hadrianLang.cart.stepCart}</span>
             <span class="ct-step-sep">&rsaquo;</span>
@@ -949,7 +949,7 @@
                                     {/if}
                                 </div>
                                 <button type="button" class="ct-product-remove" onclick="removeItem('p','{$num}')" title="{$LANG.orderForm.remove}">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                                 </button>
                             </div>
 
@@ -972,7 +972,7 @@
                                 {foreach $product.addons as $addonnum => $addon}
                                     <div class="ct-addon-row">
                                         <div class="ct-addon-ico">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                         </div>
                                         <div class="ct-addon-meta">
                                             <div class="ct-addon-name">{$addon.name}</div>
@@ -982,7 +982,7 @@
                                         {if $showAddonQtyOptions && $addon.allowqty === 2}
                                             <div class="ct-qty-row" style="grid-column: 1 / -1;">
                                                 <label>{$LANG.orderForm.qty}</label>
-                                                <input type="number" name="paddonqty[{$num}][{$addonnum}]" value="{$addon.qty}" min="0">
+                                                <input type="number" aria-label="{$LANG.orderForm.qty}" name="paddonqty[{$num}][{$addonnum}]" value="{$addon.qty}" min="0">
                                                 <button type="submit">{$LANG.orderForm.update}</button>
                                             </div>
                                         {/if}
@@ -992,7 +992,7 @@
 
                             <div class="ct-manage-addons">
                                 <a href="{$WEB_ROOT}/cart.php?a=confproduct&i={$num}">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                     {$LANG.orderForm.edit}
                                 </a>
                             </div>
@@ -1014,7 +1014,7 @@
                             {if $showqtyoptions && $product.allowqty}
                                 <div class="ct-qty-row" style="padding-bottom: 16px;">
                                     <label>{$LANG.orderForm.qty}</label>
-                                    <input type="number" name="qty[{$num}]" value="{$product.qty}" min="0">
+                                    <input type="number" aria-label="{$LANG.orderForm.qty}" name="qty[{$num}]" value="{$product.qty}" min="0">
                                     <button type="submit">{$LANG.orderForm.update}</button>
                                 </div>
                             {/if}
@@ -1031,7 +1031,7 @@
                                     {if $addon.productname}<div class="ct-product-domain">{$addon.productname}{if $addon.domainname} &middot; {$addon.domainname}{/if}</div>{/if}
                                 </div>
                                 <button type="button" class="ct-product-remove" onclick="removeItem('a','{$num}')" title="{$LANG.orderForm.remove}">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                                 </button>
                             </div>
                             <div class="ct-product-foot">
@@ -1050,7 +1050,7 @@
                             {if $showAddonQtyOptions && $addon.allowqty === 2}
                                 <div class="ct-qty-row" style="padding-bottom: 16px;">
                                     <label>{$LANG.orderForm.qty}</label>
-                                    <input type="number" name="addonqty[{$num}]" value="{$addon.qty}" min="0">
+                                    <input type="number" aria-label="{$LANG.orderForm.qty}" name="addonqty[{$num}]" value="{$addon.qty}" min="0">
                                     <button type="submit">{$LANG.orderForm.update}</button>
                                 </div>
                             {/if}
@@ -1073,12 +1073,12 @@
                                     {/if}
                                 </div>
                                 <button type="button" class="ct-product-remove" onclick="removeItem('d','{$num}')" title="{$LANG.orderForm.remove}">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                                 </button>
                             </div>
                             <div class="ct-manage-addons">
                                 <a href="{$WEB_ROOT}/cart.php?a=confdomains">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
                                     {$LANG.orderForm.edit}
                                 </a>
                             </div>
@@ -1089,7 +1089,7 @@
                                         <span class="ct-cycle-value">{$domain.regperiod} {$domain.yearsLanguage}</span>
                                     {else}
                                         {* Period selector: preserves selectDomainPeriodInCart() *}
-                                        <select class="ct-cycle-value" style="padding: 4px 8px; border: 0.5px solid var(--color-border); border-radius: 6px; background: var(--color-surface); font: inherit;" id="{$domain.domain}Pricing" onchange="(function(o){ var p=o.value.split('|'); selectDomainPeriodInCart('{$domain.domain}', p[0], parseInt(p[1],10), p[2]); })(this)">
+                                        <select class="ct-cycle-value" aria-label="{$LANG.orderregperiod}" style="padding: 4px 8px; border: 0.5px solid var(--color-border); border-radius: 6px; background: var(--color-surface); font: inherit;" id="{$domain.domain}Pricing" onchange="(function(o){ var p=o.value.split('|'); selectDomainPeriodInCart('{$domain.domain}', p[0], parseInt(p[1],10), p[2]); })(this)">
                                             {foreach $domain.pricing as $years => $price}
                                                 <option value="{$price.register}|{$years}|{if $years == 1}{lang key='orderForm.year'}{else}{lang key='orderForm.years'}{/if}"{if $years == $domain.regperiod} selected{/if}>{$years} {if $years == 1}{lang key='orderForm.year'}{else}{lang key='orderForm.years'}{/if} @ {$price.register}</option>
                                             {/foreach}
@@ -1116,7 +1116,7 @@
                                     {if $service.domainName}<div class="ct-product-domain">{$service.domainName}</div>{/if}
                                 </div>
                                 <button type="button" class="ct-product-remove" onclick="removeItem('r','{$num}','service')" title="{$LANG.orderForm.remove}">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                                 </button>
                             </div>
                             <div class="ct-product-foot">
@@ -1139,7 +1139,7 @@
                                     {if $service.domainName}<div class="ct-product-domain">{$service.domainName}</div>{/if}
                                 </div>
                                 <button type="button" class="ct-product-remove" onclick="removeItem('r','{$num}','addon')" title="{$LANG.orderForm.remove}">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                                 </button>
                             </div>
                             <div class="ct-product-foot">
@@ -1168,7 +1168,7 @@
                                     {/if}
                                 </div>
                                 <button type="button" class="ct-product-remove" onclick="removeItem('r','{$num}','domain')" title="{$LANG.orderForm.remove}">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                                 </button>
                             </div>
                             <div class="ct-product-foot">
@@ -1197,7 +1197,7 @@
                                     {if $upgrade->type == 'service' && $upgrade->service->domain}<div class="ct-product-domain">{$upgrade->service->domain}</div>{/if}
                                 </div>
                                 <button type="button" class="ct-product-remove" onclick="removeItem('u','{$num}')" title="{$LANG.orderForm.remove}">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                                 </button>
                             </div>
                             <div class="ct-product-foot">
@@ -1216,7 +1216,7 @@
                             {if $showUpgradeQtyOptions && $upgrade->allowMultipleQuantities}
                                 <div class="ct-qty-row" style="padding-bottom: 16px;">
                                     <label>{$LANG.orderForm.qty}</label>
-                                    <input type="number" name="upgradeqty[{$num}]" value="{$upgrade->qty}" min="{$upgrade->minimumQuantity}">
+                                    <input type="number" aria-label="{$LANG.orderForm.qty}" name="upgradeqty[{$num}]" value="{$upgrade->qty}" min="{$upgrade->minimumQuantity}">
                                     <button type="submit">{$LANG.orderForm.update}</button>
                                 </div>
                             {/if}
@@ -1227,7 +1227,7 @@
 
                 {if $cartitems > 0}
                     <button type="button" class="ct-bulk-empty" id="btnEmptyCart">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
                         {$LANG.emptycart}
                     </button>
                 {/if}
@@ -1249,7 +1249,7 @@
                         {if $promotioncode}
                             <div class="ct-promo-row">
                                 <span class="applied-pill">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                     <strong>{$promotioncode}</strong> &middot; {$promotiondescription}
                                 </span>
                                 <a href="{$WEB_ROOT}/cart.php?a=removepromo" class="ct-promo-remove">{$LANG.orderForm.removePromotionCode}</a>
@@ -1258,8 +1258,8 @@
                             <form method="post" action="{$WEB_ROOT}/cart.php?a=view">
                                 <div class="ct-promo-row">
                                     <div class="ct-promo-input-wrap">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 01-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 00-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
-                                        <input type="text" name="promocode" id="inputPromotionCode" class="ct-promo-input" placeholder="{lang key='orderPromoCodePlaceholder'}" required>
+                                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12V8H6a2 2 0 01-2-2c0-1.1.9-2 2-2h12v4"/><path d="M4 6v12c0 1.1.9 2 2 2h14v-4"/><path d="M18 12a2 2 0 00-2 2c0 1.1.9 2 2 2h4v-4h-4z"/></svg>
+                                        <input aria-label="{lang key='orderPromoCodePlaceholder'}" type="text" name="promocode" id="inputPromotionCode" class="ct-promo-input" placeholder="{lang key='orderPromoCodePlaceholder'}" required>
                                     </div>
                                     <button type="submit" name="validatepromo" class="ct-promo-apply" value="{$LANG.orderpromovalidatebutton}">{$LANG.orderpromovalidatebutton}</button>
                                 </div>
@@ -1346,7 +1346,7 @@
                         <span class="count">
                             {$cartitems} {if $cartitems == 1}{$hadrianLang.cart.itemCount}{else}{$hadrianLang.cart.itemCountPlural}{/if}
                             <span class="loader w-hidden" id="orderSummaryLoader" aria-hidden="true" style="margin-left: 6px;">
-                                <i class="fas fa-fw fa-sync fa-spin"></i>
+                                <i aria-hidden="true" class="fas fa-fw fa-sync fa-spin"></i>
                             </span>
                         </span>
                     </div>
@@ -1485,11 +1485,11 @@
 
                     <div class="ct-summary-footer">
                         <a href="{$WEB_ROOT}/cart.php?a=checkout&e=false" id="checkout" class="ct-checkout-btn{if $cartitems == 0} disabled{/if}">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                             {$LANG.orderForm.checkout}
                         </a>
                         <a href="{$WEB_ROOT}/cart.php" id="continueShopping" class="ct-continue-shop">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                             {$LANG.orderForm.continueShopping}
                         </a>
                     </div>
@@ -1503,17 +1503,17 @@
         <div class="vc-when-empty">
             <div class="card ct-empty">
                 <div class="ct-empty-ico">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
                 </div>
                 <h2 class="ct-empty-title">{$LANG.cartempty}</h2>
                 <p class="ct-empty-desc">{$hadrianLang.cart.emptySub}</p>
                 <div class="ct-empty-actions">
                     <a href="{$WEB_ROOT}/cart.php" class="btn-primary">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                         {$LANG.orderForm.continueShopping}
                     </a>
                     <a href="{$WEB_ROOT}/cart.php?a=add&domain=register" class="btn-secondary">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
                         {$hadrianLang.cart.registerDomain}
                     </a>
                 </div>

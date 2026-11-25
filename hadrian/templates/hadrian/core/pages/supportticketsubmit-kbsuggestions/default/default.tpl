@@ -46,7 +46,7 @@
         <div class="card tk-kb">
             {foreach $kbarticles as $kbarticle}
             <a class="tk-kb-item" href="{$WEB_ROOT}/knowledgebase.php?action=displayarticle&amp;id={$kbarticle.id|escape}" target="_blank" rel="noopener">
-                <span class="tk-kb-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
+                <span class="tk-kb-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>
                 <span>
                     <span class="tk-kb-title">{$kbarticle.title|escape}</span>
                     {if $kbarticle.article}<span class="tk-kb-excerpt">{$kbarticle.article|strip_tags}</span>{/if}
@@ -65,7 +65,7 @@
         <div class="card">
             <div class="tk-empty">
                 <div class="tk-empty-ico">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
                 </div>
                 <p class="tk-empty-title">{$hadrianLang.support.kbNoSuggestionsTitle}</p>
                 <p class="tk-empty-sub">{$hadrianLang.support.kbNoSuggestionsSub}</p>

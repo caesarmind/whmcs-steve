@@ -139,7 +139,7 @@
     display: flex; flex-direction: column; align-items: center;
 }
 .mt-bcn-copy { text-align: center; margin-bottom: 26px; max-width: 34rem; }
-.mt-bcn-copy h2 {
+.mt-bcn-copy :is(h1, h2) {
     margin: 0 0 8px; color: var(--bcn-ink);
     font-size: var(--text-4xl); font-weight: var(--fw-bold); letter-spacing: -0.03em;
 }
@@ -227,7 +227,7 @@
     .mt-bcn-hero { padding: 76px 16px 28px; }
     .mt-bcn-card { padding: 24px; }
     .mt-bcn-news { padding: 0 16px 40px; }
-    .mt-bcn-copy h2 { font-size: var(--text-3xl); }
+    .mt-bcn-copy :is(h1, h2) { font-size: var(--text-3xl); }
 }
 
 /* -- Ink derived from the field, not assumed ---------------------

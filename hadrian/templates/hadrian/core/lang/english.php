@@ -137,10 +137,72 @@ return [
         'sidebar'        => 'Sidebar',
         'breadcrumb'     => 'Breadcrumb',
         'newNotifications' => 'new notifications',
+        'dashboard'      => 'Dashboard',
         'openNavigation' => 'Open navigation',
         'itemsInCart'    => '%s items in cart',
         'configureMenu'  => 'Configure menu...',
         'portalHome'     => 'Portal Home',
+    ],
+
+    // ---------------------------------------------------------------------
+    // A11Y - strings the accessibility helpers in core-layout.js speak or
+    // show (passed to the scripts by footer.tpl as window.hadrianA11y).
+    // ---------------------------------------------------------------------
+    'a11y' => [
+        'pause'   => 'Pause',
+        'play'    => 'Play',
+        'results' => '%s results',
+        'previous' => 'Previous',
+        'next'     => 'Next',
+        'slide'    => 'Show slide %s',
+        'orderProgress' => 'Order progress',
+        'included'      => 'Included',
+        'notIncluded'   => 'Not included',
+        'featuresComparison' => 'Product features comparison',
+        'monitoringMode'     => 'Monitoring mode',
+        'checkWebsite'       => 'Check your website',
+        'probeLocation'      => 'Probe location',
+        'wpBlogTitle'        => 'New blog title',
+        'wpPath'             => 'Path (optional)',
+        'wpAdminPassword'    => 'Admin password',
+        'actions'            => 'Actions',
+        'showDetails'        => 'Show details',
+    ],
+
+    // ---------------------------------------------------------------------
+    // A11Y STATEMENT - core/pages/accessibility (the European Accessibility
+    // Act asks a service to publish this, Directive 2019/882 Annex V). The
+    // site owner fills the parts only they know in the page's options.
+    // ---------------------------------------------------------------------
+    'a11yStatement' => [
+        'title'          => 'Accessibility statement',
+        'eyebrow'        => 'Accessibility',
+        'intro'          => '%s wants everyone to be able to use this website and order our services, including people who use a screen reader, a keyboard, voice control or magnification.',
+        'statusHeading'  => 'How accessible this website is',
+        'statusFull'     => 'This website fully conforms to the Web Content Accessibility Guidelines (WCAG) 2.2 at level AA, the standard behind EN 301 549.',
+        'statusPartial'  => 'This website partially conforms to the Web Content Accessibility Guidelines (WCAG) 2.2 at level AA, the standard behind EN 301 549. The parts that do not yet conform are listed below.',
+        'statusNone'     => 'This website does not yet conform to the Web Content Accessibility Guidelines (WCAG) 2.2 at level AA. The known problems are listed below, with what we are doing about them.',
+        'measuresHeading' => 'What we do to make it accessible',
+        'measure1'       => 'Every page can be used with a keyboard alone, with a visible focus indicator and a link to skip straight to the main content.',
+        'measure2'       => 'Pages are built with headings, landmarks, labelled form fields and named buttons, so screen readers can announce them.',
+        'measure3'       => 'Text and controls meet the WCAG AA contrast ratios in both the light and the dark colour mode.',
+        'measure4'       => 'Pages can be zoomed to 400% and read on a narrow screen without scrolling sideways.',
+        'measure5'       => 'Moving content can be paused, and animation stops when your device is set to reduce motion.',
+        'measure6'       => 'Changes that happen without a page load, such as order totals and domain search results, are announced to screen readers.',
+        'limitsHeading'  => 'Known limitations',
+        'limitsDefault'  => 'Payment pages hosted by our payment providers, and content from other services shown on this site, are outside our control. PDF invoices are not tagged for screen readers: every invoice is also available as a web page in your client area.',
+        'methodHeading'  => 'How we checked',
+        'methodSelf'     => 'We assessed this website ourselves, with automated testing and manual checks by keyboard and screen reader.',
+        'methodThird'    => 'This website was assessed by an independent accessibility specialist.',
+        'feedbackHeading' => 'Feedback and contact',
+        'feedbackText'   => 'If something on this website is hard to use, or you need information in a different format, tell us and we will help.',
+        'feedbackEmail'  => 'Email: %s',
+        'feedbackContact' => 'Use our contact form',
+        'feedbackTicket' => 'Open a support ticket',
+        'enforceHeading' => 'If you are not happy with our response',
+        'datesHeading'   => 'About this statement',
+        'prepared'       => 'This statement was prepared on %s.',
+        'reviewed'       => 'It was last reviewed on %s.',
     ],
 
     // ---------------------------------------------------------------------

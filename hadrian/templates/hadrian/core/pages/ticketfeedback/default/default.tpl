@@ -54,7 +54,7 @@
 {if $fbState == 'stillopen'}
     <div class="card">
         <div class="tk-notice">
-            <div class="tk-notice-ico warn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+            <div class="tk-notice-ico warn"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
             <p class="tk-notice-title">{$hadrianLang.support.feedbackClosedTitle}</p>
             <p class="tk-notice-sub">{$LANG.feedbackclosed}</p>
             <a href="{$WEB_ROOT}/clientarea.php" class="btn-primary">{$LANG.returnclient}</a>
@@ -63,7 +63,7 @@
 {elseif $fbState == 'done' || $fbState == 'success'}
     <div class="card">
         <div class="tk-notice">
-            <div class="tk-notice-ico ok"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="tk-notice-ico ok"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             <p class="tk-notice-title">{if $fbState == 'done'}{$LANG.feedbackprovided}{else}{$LANG.feedbackreceived}{/if}</p>
             <p class="tk-notice-sub">{$LANG.feedbackthankyou}</p>
             <a href="{$WEB_ROOT}/clientarea.php" class="btn-primary">{$LANG.returnclient}</a>
@@ -72,7 +72,7 @@
 {else}
     {if isset($errormessage) && $errormessage}
     <div style="display:flex;gap:10px;padding:13px 16px;border-radius:12px;background:var(--color-red-bg);color:var(--color-red-text);font-size:13px;margin-bottom:16px;">
-        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
         <div>{$errormessage|strip_tags}</div>
     </div>
     {/if}
@@ -104,13 +104,13 @@
                             </label>
                             {/foreach}
                         </div>
-                        <textarea name="comments[{$staffid|escape}]" rows="3" class="form-textarea" placeholder="{$LANG.feedbackpleasecomment1} {$staff|escape}?">{if isset($comments[$staffid])}{$comments[$staffid]|escape}{/if}</textarea>
+                        <textarea aria-label="{$LANG.feedbackpleasecomment1} {$staff|escape}?" name="comments[{$staffid|escape}]" rows="3" class="form-textarea" placeholder="{$LANG.feedbackpleasecomment1} {$staff|escape}?">{if isset($comments[$staffid])}{$comments[$staffid]|escape}{/if}</textarea>
                     </div>
                     {/foreach}
                 {/if}
                 <div class="tk-staff-block">
                     <p class="tk-rate-q">{$LANG.feedbackimprove}</p>
-                    <textarea name="comments[generic]" rows="3" class="form-textarea" placeholder="{$hadrianLang.support.feedbackCommentsPlaceholder}">{if isset($comments.generic)}{$comments.generic|escape}{/if}</textarea>
+                    <textarea aria-label="{$hadrianLang.support.feedbackCommentsPlaceholder}" name="comments[generic]" rows="3" class="form-textarea" placeholder="{$hadrianLang.support.feedbackCommentsPlaceholder}">{if isset($comments.generic)}{$comments.generic|escape}{/if}</textarea>
                 </div>
 
                 <div class="page-actions" style="margin-top:18px;display:flex;gap:10px;">

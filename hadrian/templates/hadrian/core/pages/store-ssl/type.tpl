@@ -98,7 +98,7 @@
     {/if}
     {foreach $sslUses as $sslUse}
     <div class="hp-icon-item">
-        <div class="icon-circle {if $sslUse@index == 0}blue{elseif $sslUse@index == 1}green{else}purple{/if}"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+        <div class="icon-circle {if $sslUse@index == 0}blue{elseif $sslUse@index == 1}green{else}purple{/if}"><svg aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
         {if $sslUse@first}<p style="font-size:var(--text-xs);text-transform:uppercase;letter-spacing:.06em;color:var(--color-text-tertiary);margin:0 0 4px;">{lang key='store.ssl.useCases.title'}</p>{/if}
         <h4>{lang key="store.ssl.useCases.$sslUse"}</h4>
     </div>

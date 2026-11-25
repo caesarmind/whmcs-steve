@@ -15,7 +15,7 @@
    back to the admin's hide_currency_selector setting alone. *}
 {assign var=mtShowCurrencyInLocale value=($mtCurrOn && (!isset($currencies) || !($currencies|@is_array) || $currencies|@count > 1))}
 {if $mtLangOn || $mtShowCurrencyInLocale}
-<button type="button" class="locale-btn" aria-label="{$hadrianLang.common.localeChoose}" data-locale-open>
+<button type="button" class="locale-btn" data-locale-open>
     <span class="flag">{$hadrian.localeFlag|default:'&#127482;&#127480;'}</span>
     {if $mtLangOn}
     {assign var=mtActiveLangKey value=$language|default:'english'|lower}
@@ -25,6 +25,7 @@
     {if $mtLangOn}<span class="sep">/</span>{/if}
     <span>{if isset($activeCurrency.prefix) && $activeCurrency.prefix}{$activeCurrency.prefix|escape} {/if}{$activeCurrency.code|default:'USD'|escape}</span>
     {/if}
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+<span class="sr-only"> - {$hadrianLang.common.localeChoose}</span>
 </button>
 {/if}

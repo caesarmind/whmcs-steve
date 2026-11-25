@@ -59,14 +59,14 @@
 {if $invalid}
 
     <div class="domain-checker-result-headline domain-checker-unavailable">
-        <i class="fas fa-times-circle"></i>
+        <i aria-hidden="true" class="fas fa-times-circle"></i>
         <span>{if $reason}{$reason|escape}{else}{$LANG.cartdomaininvalid}{/if}</span>
     </div>
 
 {elseif $alreadyindb}
 
     <div class="domain-checker-result-headline domain-checker-unavailable">
-        <i class="fas fa-times-circle"></i>
+        <i aria-hidden="true" class="fas fa-times-circle"></i>
         <span>{$LANG.cartdomainexists}</span>
     </div>
 
@@ -79,7 +79,7 @@
         {if $status eq "available" || $status eq "error"}
 
             <div class="domain-checker-result-headline domain-checker-available">
-                <i class="fas fa-check-circle"></i>
+                <i aria-hidden="true" class="fas fa-check-circle"></i>
                 <span>{$LANG.cartcongratsdomainavailable|sprintf2:$domain}</span>
             </div>
 
@@ -131,7 +131,7 @@
         {elseif $status eq "unavailable"}
 
             <div class="domain-checker-result-headline domain-checker-unavailable">
-                <i class="fas fa-times-circle"></i>
+                <i aria-hidden="true" class="fas fa-times-circle"></i>
                 <span>{$LANG.cartdomaintaken|sprintf2:$domain}</span>
             </div>
 
@@ -144,7 +144,7 @@
         {if $status eq "available"}
 
             <div class="domain-checker-result-headline domain-checker-unavailable">
-                <i class="fas fa-times-circle"></i>
+                <i aria-hidden="true" class="fas fa-times-circle"></i>
                 <span>{$LANG.carttransfernotregistered|sprintf2:$domain}</span>
             </div>
             <p class="text-center dp-fallback-hint">
@@ -154,7 +154,7 @@
         {elseif $status eq "unavailable" || $status eq "error"}
 
             <div class="domain-checker-result-headline domain-checker-available">
-                <i class="fas fa-check-circle"></i>
+                <i aria-hidden="true" class="fas fa-check-circle"></i>
                 <span>{$LANG.carttransferpossible|sprintf2:$domain:$transferprice}</span>
             </div>
 
@@ -243,14 +243,14 @@
 
     {if $continueok}
         <div class="alert alert-info info-text-sm dp-cache-note">
-            <i class="fas fa-info-circle"></i>
+            <i aria-hidden="true" class="fas fa-info-circle"></i>
             <span>{$LANG.orderForm.domainAvailabilityCached}</span>
         </div>
 
         <div class="text-center dp-continue-actions">
             <button type="submit" class="btn btn-primary btn-lg">
                 {$LANG.continue}
-                &nbsp;<i class="fas fa-arrow-circle-right"></i>
+                &nbsp;<i aria-hidden="true" class="fas fa-arrow-circle-right"></i>
             </button>
         </div>
     {/if}

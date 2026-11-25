@@ -61,13 +61,13 @@
                     <div style="background: var(--color-surface); border-radius: 0 0 10px 10px; overflow: hidden;">
                         <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 16px; border-bottom: 1px solid var(--color-border);">
                             <div style="display: flex; align-items: center; gap: 8px;">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                                <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.8" stroke-linecap="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                                 <span style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">Inbox</span>
                                 <span style="font-size: 11px; color: var(--color-text-tertiary); background: #f0f0f0; padding: 1px 7px; border-radius: 10px;">4</span>
                             </div>
                             <div style="display: flex; gap: 12px;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+                                <svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.8" stroke-linecap="round"><path d="M3 6h18M3 12h18M3 18h18"/></svg>
+                                <svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
                             </div>
                         </div>
                         <div style="display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #f0f0f0; background: #f0f5ff;">
@@ -137,7 +137,7 @@
                 <p>{$hadrianLang.store.oxStrip2Text}</p>
                 <div class="strip-visual">
                     <div style="width: 120px; height: 120px; position: relative;">
-                        <svg width="120" height="120" viewBox="0 0 120 120" fill="none">
+                        <svg aria-hidden="true" focusable="false" width="120" height="120" viewBox="0 0 120 120" fill="none">
                             <circle cx="60" cy="60" r="50" stroke="rgba(255,255,255,0.1)" stroke-width="8"/>
                             <circle cx="60" cy="60" r="50" stroke="#2997ff" stroke-width="8" stroke-linecap="round" stroke-dasharray="62 314" transform="rotate(-90 60 60)"/>
                         </svg>
@@ -154,9 +154,9 @@
                 <p>{$hadrianLang.store.oxStrip3Text}</p>
                 <div class="strip-visual">
                     <div style="display: flex; flex-direction: column; gap: 8px; width: 100%; max-width: 220px;">
-                        <div style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.15); padding: 10px 14px; border-radius: 10px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><div><div style="font-size: 12px; font-weight: 600;">Team Standup</div><div style="font-size: 10px; opacity: 0.6;">Mon-Fri &middot; 9:00 AM</div></div></div>
-                        <div style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.15); padding: 10px 14px; border-radius: 10px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div><div style="font-size: 12px; font-weight: 600;">Client Review</div><div style="font-size: 10px; opacity: 0.6;">Wed &middot; 2:00 PM</div></div></div>
-                        <div style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.15); padding: 10px 14px; border-radius: 10px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><div><div style="font-size: 12px; font-weight: 600;">128 contacts synced</div><div style="font-size: 10px; opacity: 0.6;">Last sync &middot; 2 min ago</div></div></div>
+                        <div style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.15); padding: 10px 14px; border-radius: 10px;"><svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><div><div style="font-size: 12px; font-weight: 600;">Team Standup</div><div style="font-size: 10px; opacity: 0.6;">Mon-Fri &middot; 9:00 AM</div></div></div>
+                        <div style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.15); padding: 10px 14px; border-radius: 10px;"><svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><div><div style="font-size: 12px; font-weight: 600;">Client Review</div><div style="font-size: 10px; opacity: 0.6;">Wed &middot; 2:00 PM</div></div></div>
+                        <div style="display: flex; align-items: center; gap: 10px; background: rgba(0,0,0,0.15); padding: 10px 14px; border-radius: 10px;"><svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg><div><div style="font-size: 12px; font-weight: 600;">128 contacts synced</div><div style="font-size: 10px; opacity: 0.6;">Last sync &middot; 2 min ago</div></div></div>
                     </div>
                 </div>
             </div>
@@ -166,7 +166,7 @@
                 <p>{$hadrianLang.store.oxStrip4Text}</p>
                 <div class="strip-visual">
                     <div style="position: relative; width: 100px; height: 120px;">
-                        <svg width="100" height="120" viewBox="0 0 100 120" fill="none">
+                        <svg aria-hidden="true" focusable="false" width="100" height="120" viewBox="0 0 100 120" fill="none">
                             <path d="M50 8 L92 28 L92 60 C92 88 50 112 50 112 C50 112 8 88 8 60 L8 28 Z" fill="rgba(255,59,48,0.15)" stroke="#ff3b30" stroke-width="2.5"/>
                             <path d="M36 60 L46 70 L66 50" stroke="#ff3b30" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
                         </svg>
@@ -279,7 +279,7 @@
             <div class="hp-alt-visual">
                 <div class="visual-box dark" style="position: relative;">
                     <div style="width: 100%; display: flex; flex-direction: column; align-items: center; gap: 20px; padding: 10px 0;">
-                        <svg width="80" height="96" viewBox="0 0 100 120" fill="none">
+                        <svg aria-hidden="true" focusable="false" width="80" height="96" viewBox="0 0 100 120" fill="none">
                             <path d="M50 8 L92 28 L92 60 C92 88 50 112 50 112 C50 112 8 88 8 60 L8 28 Z" fill="rgba(48,209,88,0.1)" stroke="#30d158" stroke-width="2"/>
                             <rect x="38" y="48" width="24" height="20" rx="3" fill="none" stroke="#30d158" stroke-width="2"/>
                             <path d="M43 48 V42 C43 36 57 36 57 42 V48" fill="none" stroke="#30d158" stroke-width="2" stroke-linecap="round"/>
@@ -344,12 +344,12 @@
         <h2>{$hadrianLang.store.oxFeaturesTitle}</h2>
         <p class="feat-sub">{$hadrianLang.store.oxFeaturesSub}</p>
         <div class="hp-feature-cards">
-            <div class="hp-feature-card"><div class="feat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div><h4>{$hadrianLang.store.oxFeat1Title}</h4><p>{$hadrianLang.store.oxFeat1Text}</p></div>
-            <div class="hp-feature-card"><div class="feat-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></div><h4>{$hadrianLang.store.oxFeat2Title}</h4><p>{$hadrianLang.store.oxFeat2Text}</p></div>
-            <div class="hp-feature-card"><div class="feat-icon purple"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><h4>{$hadrianLang.store.oxFeat3Title}</h4><p>{$hadrianLang.store.oxFeat3Text}</p></div>
-            <div class="hp-feature-card"><div class="feat-icon orange"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h4>{$hadrianLang.store.oxFeat4Title}</h4><p>{$hadrianLang.store.oxFeat4Text}</p></div>
-            <div class="hp-feature-card"><div class="feat-icon teal"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div><h4>{$hadrianLang.store.oxFeat5Title}</h4><p>{$hadrianLang.store.oxFeat5Text}</p></div>
-            <div class="hp-feature-card"><div class="feat-icon red"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><h4>{$hadrianLang.store.oxFeat6Title}</h4><p>{$hadrianLang.store.oxFeat6Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon blue"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div><h4>{$hadrianLang.store.oxFeat1Title}</h4><p>{$hadrianLang.store.oxFeat1Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon green"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></div><h4>{$hadrianLang.store.oxFeat2Title}</h4><p>{$hadrianLang.store.oxFeat2Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon purple"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><h4>{$hadrianLang.store.oxFeat3Title}</h4><p>{$hadrianLang.store.oxFeat3Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon orange"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h4>{$hadrianLang.store.oxFeat4Title}</h4><p>{$hadrianLang.store.oxFeat4Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon teal"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg></div><h4>{$hadrianLang.store.oxFeat5Title}</h4><p>{$hadrianLang.store.oxFeat5Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon red"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div><h4>{$hadrianLang.store.oxFeat6Title}</h4><p>{$hadrianLang.store.oxFeat6Text}</p></div>
         </div>
     </section>
 
@@ -362,7 +362,7 @@
             <div class="hp-testi-slide"><div class="stars">&starf;&starf;&starf;&starf;&starf;</div><div class="quote">50 GB per mailbox means I never have to worry about storage. The spam filter is so good I forgot what junk mail looks like.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=juliaross') center/cover;">JR</div><div><div class="author-name">Julia Ross</div><div class="author-role">Freelance Consultant</div></div></div></div>
             <div class="hp-testi-slide"><div class="stars">&starf;&starf;&starf;&starf;&starf;</div><div class="quote">We moved 200+ mailboxes from another provider. The migration was seamless and we&rsquo;re saving $3,000/year. Support helped with every step.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=benharper') center/cover;">BH</div><div><div class="author-name">Ben Harper</div><div class="author-role">IT Director, TechVentures</div></div></div></div>
         </div>
-        <div class="carousel-scroll-nav"><button class="carousel-arrow prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><button class="carousel-arrow next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button></div>
+        <div class="carousel-scroll-nav"><button type="button" class="carousel-arrow prev" aria-label="{$hadrianLang.a11y.previous}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><button type="button" class="carousel-arrow next" aria-label="{$hadrianLang.a11y.next}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button></div>
     </section>
 
     {* 10. FAQ *}
@@ -388,7 +388,7 @@
 
 <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
     <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 7l-10 7L2 7"/></svg>
     </div>
     <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">{$hadrianLang.store.oxEmptyTitle}</p>
     <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">{$hadrianLang.store.oxEmptyText}</p>

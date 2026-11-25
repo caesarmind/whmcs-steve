@@ -72,7 +72,7 @@
         {* ── Main column: step strip + chooser card ── *}
         <div style="min-width: 0;">
 
-                <div class="dp-steps" aria-label="Order progress">
+                <div class="dp-steps" aria-label="{$hadrianLang.a11y.orderProgress}">
                     <span class="dp-step done">
                         <span class="dp-step-num">
                             <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -217,7 +217,7 @@
                                 <div class="dp-search-row">
                                     <div class="dp-input-wrap">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                                        <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{$hadrianLang.cart.registerSldPlaceholder}" autocomplete="off" autocapitalize="none">
+                                        <input aria-label="{$LANG.domainname}" type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{$hadrianLang.cart.registerSldPlaceholder}" autocomplete="off" autocapitalize="none">
                                     </div>
                                     <select class="dp-input no-ico" data-input="tld" aria-label="{$LANG.tld|escape}" style="flex: 0 0 130px;">
                                         {foreach from=$registertlds item=listtld}
@@ -250,7 +250,7 @@
                                 <div class="dp-search-row">
                                     <div class="dp-input-wrap">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-                                        <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{$hadrianLang.cart.transferSldPlaceholder}" autocomplete="off" autocapitalize="none">
+                                        <input aria-label="{$LANG.domainname}" type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{$hadrianLang.cart.transferSldPlaceholder}" autocomplete="off" autocapitalize="none">
                                     </div>
                                     <select class="dp-input no-ico" data-input="tld" aria-label="{$LANG.tld|escape}" style="flex: 0 0 130px;">
                                         {foreach from=$transfertlds item=listtld}
@@ -278,9 +278,9 @@
                                 <div class="dp-search-row">
                                     <div class="dp-input-wrap">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                                        <input type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{lang key='yourdomainplaceholder'}" autocomplete="off" autocapitalize="none">
+                                        <input aria-label="{$LANG.domainname}" type="text" class="dp-input" data-input="sld" value="{$sld}" placeholder="{lang key='yourdomainplaceholder'}" autocomplete="off" autocapitalize="none">
                                     </div>
-                                    <input type="text" class="dp-input no-ico" data-input="tld" value="{$tld|substr:1}" placeholder="{$LANG.yourtldplaceholder}" autocomplete="off" autocapitalize="none" style="flex: 0 0 130px;">
+                                    <input aria-label="{$LANG.domaintld}" type="text" class="dp-input no-ico" data-input="tld" value="{$tld|substr:1}" placeholder="{$LANG.yourtldplaceholder}" autocomplete="off" autocapitalize="none" style="flex: 0 0 130px;">
                                     <button type="submit" class="dp-search-cta">{$LANG.orderForm.use}</button>
                                 </div>
                             </div>
@@ -290,7 +290,7 @@
                             <div class="dp-panel{if $domainoption eq "subdomain"} is-active{/if}" data-panel="subdomain">
                                 <p class="dp-panel-hint">{$hadrianLang.cart.subdomainPanelHint}</p>
                                 <div class="dp-search-row">
-                                    <input type="text" class="dp-input no-ico" data-input="sld" value="{$sld}" placeholder="{$hadrianLang.cart.subdomainSldPlaceholder}" autocomplete="off" autocapitalize="none">
+                                    <input aria-label="{$LANG.domainname}" type="text" class="dp-input no-ico" data-input="sld" value="{$sld}" placeholder="{$hadrianLang.cart.subdomainSldPlaceholder}" autocomplete="off" autocapitalize="none">
                                     <select class="dp-input no-ico" data-input="tld" aria-label="{$LANG.tld|escape}" style="flex: 0 0 200px;">
                                         {foreach $subdomains as $subid => $subdomain}
                                             <option value="{$subdomain}">.{$subdomain}</option>

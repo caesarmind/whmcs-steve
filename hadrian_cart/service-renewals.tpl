@@ -56,7 +56,7 @@
                         <span class="to-show">{lang key='renewService.hideShowServices.show'}</span>
                     </button>
                     {if $totalResults > 5}
-                        <input id="serviceRenewalFilter"
+                        <input aria-label="{lang key='renewService.searchPlaceholder'}" id="serviceRenewalFilter"
                                type="search"
                                class="service-renewals-filter form-control"
                                placeholder="{lang key='renewService.searchPlaceholder'}">
@@ -70,12 +70,12 @@
                 <div id="no-services"
                      class="alert alert-warning text-center service-renewals-empty"
                      role="alert">
-                    <i class="fas fa-info-circle"></i>
+                    <i aria-hidden="true" class="fas fa-info-circle"></i>
                     {lang key='renewService.noServices'}
                 </div>
                 <p class="text-center">
                     <a href="{$WEB_ROOT}/clientarea.php" class="btn btn-default">
-                        <i class="fas fa-arrow-circle-left"></i>
+                        <i aria-hidden="true" class="fas fa-arrow-circle-left"></i>
                         {lang key='orderForm.returnToClientArea'}
                     </a>
                 </p>
@@ -104,7 +104,7 @@
                         <div id="orderSummary">
                             <div class="order-summary">
                                 <div class="loader" id="orderSummaryLoader">
-                                    <i class="fas fa-fw fa-sync fa-spin"></i>
+                                    <i aria-hidden="true" class="fas fa-fw fa-sync fa-spin"></i>
                                 </div>
                                 <h2 class="font-size-30">{lang key='ordersummary'}</h2>
                                 <div class="summary-container" id="producttotal"></div>
@@ -115,7 +115,7 @@
                                    class="btn btn-primary btn-lg"
                                    href="{$WEB_ROOT}/cart.php?a=view">
                                     {lang key='viewcart'}
-                                    &nbsp;<i class="far fa-shopping-cart"></i>
+                                    &nbsp;<i aria-hidden="true" class="far fa-shopping-cart"></i>
                                 </a>
                             </div>
                         </div>
@@ -149,7 +149,7 @@
                                     aria-label="{lang key='orderForm.close'}">
                                 <span aria-hidden="true">&times;</span>
                             </button>
-                            <i class="fas fa-times fa-3x"></i>
+                            <i aria-hidden="true" class="fas fa-times fa-3x"></i>
                             <span>{lang key='orderForm.removeItem'}</span>
                         </h4>
                     </div>

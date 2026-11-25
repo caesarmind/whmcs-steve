@@ -16,7 +16,7 @@
 
 {function name=mtTopnavIcon iconName=''}
     {if $iconName && isset($mtIcons[$iconName])}
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{$mtIcons[$iconName] nofilter}</svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">{$mtIcons[$iconName] nofilter}</svg>
     {elseif $iconName}
         <i class="{$iconName|escape}"></i>
     {/if}
@@ -46,7 +46,7 @@
             <button type="button" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
                 {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
                 {$item.label|escape}
-                <svg class="nav-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
+                <svg aria-hidden="true" focusable="false" class="nav-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
             </button>
             {if $item.children}
                 {if $mtDropdownStyle == 'mega'}
@@ -62,7 +62,7 @@
                                 {assign var=childIcon value=$child.icon|default:''}
                                 {if $childType == 'header'}
                                     {if $_megaOpen}</div>{/if}
-                                    <div class="nav-mega-col"><h4>{$child.label|escape}</h4>
+                                    <div class="nav-mega-col"><h4 aria-level="2">{$child.label|escape}</h4>
                                     {assign var=_megaOpen value=true}
                                 {elseif $childType != 'divider'}
                                     {if !$_megaOpen}<div class="nav-mega-col">{assign var=_megaOpen value=true}{/if}
@@ -134,7 +134,7 @@
            data-nav-toggle wires it to the shared body.nav-open drawer (core-layout.js);
            the off-canvas sidebar (rendered on this layout too) is what slides in. *}
         <button type="button" class="nav-mobile-toggle" aria-label="{$hadrianLang.nav.openNavigation}" aria-controls="appSidebar" aria-expanded="false" data-nav-toggle>
-            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
         </button>
         {* Admin Branding tab: prefer uploaded logo over the company-name
            fallback. Light variant is the default; the dark URL ships as a
@@ -163,7 +163,7 @@
         {if $loggedin}
             <div class="notification-wrapper only-in" id="navNotifyWrap">
                 <button type="button" class="topbar-btn" aria-haspopup="true" aria-expanded="false" aria-label="{$LANG.notifications}{if (isset($clientAlerts) && $clientAlerts|count > 0) || (isset($publishedAnnouncements) && $publishedAnnouncements|count > 0)}, {$hadrianLang.nav.newNotifications}{/if}" title="{$LANG.notifications}" onclick="togglePortalNotifications && togglePortalNotifications(event, 'nav')">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
                     {if (isset($clientAlerts) && $clientAlerts|count > 0) || (isset($publishedAnnouncements) && $publishedAnnouncements|count > 0)}<div class="topbar-notification-dot"></div>{/if}
                 </button>
                 <div class="notification-dropdown" id="notificationDropdownNav">
@@ -223,8 +223,8 @@
             {include file="`$template`/includes/partials/locale-btn.tpl"}
         </span>
 
-        <a href="{$WEB_ROOT}/cart.php?a=view" class="topbar-btn topbar-cart-btn" title="{$LANG.carttitle}">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
+        <a href="{$WEB_ROOT}/cart.php?a=view" class="topbar-btn topbar-cart-btn" title="{$LANG.carttitle}"><span class="sr-only">{$LANG.carttitle}</span>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 002 1.61h9.72a2 2 0 002-1.61L23 6H6"/></svg>
             {* Cart-count badge.
                $globalCartCount is injected on every client-area page by
                Hadrian's ClientAreaPage hook (see hooks.php). $cartitems is
@@ -248,7 +248,7 @@
             <a href="{$WEB_ROOT}/login.php" class="nav-signin only-out">{$LANG.login}</a>
             {if $mtShowDarkToggle}
             <button type="button" onclick="toggleDarkMode && toggleDarkMode();" class="topbar-btn only-out" aria-label="{$hadrianLang.common.toggleTheme}">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             </button>
             {/if}
         {/if}

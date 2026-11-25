@@ -131,8 +131,8 @@
             </span>
         </a>
         <span class="pblk-inline-acts">
-            <a href="{$WEB_ROOT}/clientarea.php?action=details" class="pblk-ibtn" title="{$LANG.navchangedetails|default:'My Details'|escape}" aria-label="{$LANG.navchangedetails|default:'My Details'|escape}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></a>
-            <a href="{routePath('user-security')}" class="pblk-ibtn" title="{$LANG.navsecuritysettings|default:'Security'|escape}" aria-label="{$LANG.navsecuritysettings|default:'Security'|escape}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></a>
+            <a href="{$WEB_ROOT}/clientarea.php?action=details" class="pblk-ibtn" title="{$LANG.navchangedetails|default:'My Details'|escape}" aria-label="{$LANG.navchangedetails|default:'My Details'|escape}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></a>
+            <a href="{routePath('user-security')}" class="pblk-ibtn" title="{$LANG.navsecuritysettings|default:'Security'|escape}" aria-label="{$LANG.navsecuritysettings|default:'Security'|escape}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></a>
         </span>
     </div>
 </div>
@@ -165,15 +165,15 @@
 {if $minActs}
 <div class="min-actions">
     <a href="{$WEB_ROOT}/cart.php" class="min-act primary">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
         {$LANG.orderproducts|default:'Order a service'}
     </a>
     <a href="{$WEB_ROOT}/cart.php?a=add&amp;domain=register" class="min-act">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><path d="M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18z"/></svg>
         {$LANG.registerdomain|default:'Register a domain'}
     </a>
     <a href="{$WEB_ROOT}/submitticket.php" class="min-act">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         {$LANG.navopenticket|default:'Open a ticket'}
     </a>
 </div>

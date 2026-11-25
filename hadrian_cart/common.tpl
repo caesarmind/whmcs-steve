@@ -25,7 +25,7 @@
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/style.min.css?v={$hadrian.assetVersion|default:'30'}">
 
 {* --vl-* token overrides (safety net -- applies inside any Vue Shadow DOM that loads) *}
-<link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/custom.css?v={$hadrian.assetVersion|default:'22'}">
+<link rel="stylesheet" href="{$WEB_ROOT}/templates/orderforms/{$carttpl}/css/custom.css?v={$hadrian.assetVersion|default:'23'}">
 
 {* Inherited from standard_cart: scripts.min.js defines recalctotals(),
    selectChangeNavigate(), the addon-recommendations modal trigger, and

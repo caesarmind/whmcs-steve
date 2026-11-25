@@ -35,31 +35,31 @@
            notices) through get_flash_message(), NOT the legacy $incorrect var —
            render it so failed sign-ins actually surface an error. *}
         {if $message = get_flash_message()}
-            <div class="auth-notice{if $message.type == 'success'} success{elseif $message.type == 'warning' || $message.type == 'info'} info{/if}">
+            <div class="auth-notice{if $message.type == 'success'} success{elseif $message.type == 'warning' || $message.type == 'info'} info{/if}"{if $message.type == 'success' || $message.type == 'warning' || $message.type == 'info'} role="status"{else} role="alert" data-error-summary{/if}>
                 {$message.text}
             </div>
         {/if}
 
         {if $logout}
-            <div class="auth-notice success">
+            <div class="auth-notice success" role="status">
                 {$hadrianLang.auth.logoutSuccessful}
             </div>
         {/if}
 
         {if $incorrect}
-            <div class="auth-notice">
+            <div class="auth-notice" role="alert" data-error-summary>
                 {$hadrianLang.auth.loginDetailsIncorrect}
             </div>
         {/if}
 
         {if $verifylinkexpired}
-            <div class="auth-notice">
+            <div class="auth-notice" role="alert" data-error-summary>
                 {$hadrianLang.auth.verifyLinkExpired}
             </div>
         {/if}
 
         {if $passwordResetSuccessful}
-            <div class="auth-notice success">
+            <div class="auth-notice success" role="status">
                 {$hadrianLang.auth.pwResetSuccess}
             </div>
         {/if}
@@ -77,7 +77,7 @@
                 <div class="password-wrapper">
                     <input type="password" id="loginPassword" name="password" class="form-input" placeholder="{$hadrianLang.auth.passwordPlaceholder}" autocomplete="current-password" required>
                     <button type="button" class="password-toggle" aria-label="{$hadrianLang.auth.togglePassword}">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                     </button>
                 </div>
             </div>

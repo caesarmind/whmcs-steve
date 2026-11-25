@@ -64,7 +64,7 @@
                     {if $totalResults > 1}{lang key='navrenewdomains'}{else}{lang key='domainrenew'}{/if}
                     {if $totalResults > 5}
                         <div class="pull-right float-right domain-renewals-search">
-                            <input id="domainRenewalFilter"
+                            <input aria-label="{lang key='searchenterdomain'}" id="domainRenewalFilter"
                                    type="search"
                                    class="domain-renewals-filter form-control input-inline-100"
                                    placeholder="{lang key='searchenterdomain'}">
@@ -79,12 +79,12 @@
                 <div id="no-domains"
                      class="alert alert-warning text-center domain-renewals-empty"
                      role="alert">
-                    <i class="fas fa-info-circle"></i>
+                    <i aria-hidden="true" class="fas fa-info-circle"></i>
                     {$LANG.domainRenewal.noDomains}
                 </div>
                 <p class="text-center">
                     <a href="{$WEB_ROOT}/clientarea.php" class="btn btn-default">
-                        <i class="fas fa-arrow-circle-left"></i>
+                        <i aria-hidden="true" class="fas fa-arrow-circle-left"></i>
                         {$LANG.orderForm.returnToClientArea}
                     </a>
                 </p>
@@ -151,7 +151,7 @@
 
                                     {if $renewalData.freeDomainRenewal}
                                         <p class="domain-renewal-desc">
-                                            <i class="fas fa-info-circle"></i>
+                                            <i aria-hidden="true" class="fas fa-info-circle"></i>
                                             {lang key='domainRenewal.freeWithServiceDesc'}
                                         </p>
                                     {/if}
@@ -195,11 +195,11 @@
                                                     class="btn btn-default btn-sm btn-add-renewal-to-cart"
                                                     data-domain-id="{$renewalData.id}">
                                                 <span class="to-add">
-                                                    <i class="fas fa-fw fa-spinner fa-spin"></i>
+                                                    <i aria-hidden="true" class="fas fa-fw fa-spinner fa-spin"></i>
                                                     {lang key='addtocart'}
                                                 </span>
                                                 <span class="added">
-                                                    <i class="fas fa-check"></i>&nbsp;{lang key='domaincheckeradded'}
+                                                    <i aria-hidden="true" class="fas fa-check"></i>&nbsp;{lang key='domaincheckeradded'}
                                                 </span>
                                             </button>
                                         {/if}
@@ -224,7 +224,7 @@
                         <div id="orderSummary">
                             <div class="order-summary">
                                 <div class="loader" id="orderSummaryLoader">
-                                    <i class="fas fa-fw fa-sync fa-spin"></i>
+                                    <i aria-hidden="true" class="fas fa-fw fa-sync fa-spin"></i>
                                 </div>
                                 <h2 class="font-size-30">{lang key='ordersummary'}</h2>
                                 <div class="summary-container" id="producttotal"></div>
@@ -235,7 +235,7 @@
                                    class="btn btn-primary btn-lg"
                                    href="{$WEB_ROOT}/cart.php?a=view">
                                     {lang key='viewcart'}
-                                    &nbsp;<i class="far fa-shopping-cart"></i>
+                                    &nbsp;<i aria-hidden="true" class="far fa-shopping-cart"></i>
                                 </a>
                             </div>
                         </div>
@@ -264,7 +264,7 @@
                                     aria-label="{lang key='orderForm.close'}">
                                 <span aria-hidden="true">&times;</span>
                             </button>
-                            <i class="fas fa-times fa-3x"></i>
+                            <i aria-hidden="true" class="fas fa-times fa-3x"></i>
                             <span>{lang key='orderForm.removeItem'}</span>
                         </h4>
                     </div>

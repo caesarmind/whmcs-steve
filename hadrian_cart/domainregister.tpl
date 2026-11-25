@@ -112,13 +112,13 @@
                     <button type="button" class="dr-mode-tab active"
                             role="tab" data-mode="ai"
                             aria-selected="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l2 5 5 2-5 2-2 5-2-5-5-2 5-2z"/></svg>
                         {$hadrianLang.cart.aiGenerator}
                     </button>
                     <button type="button" class="dr-mode-tab"
                             role="tab" data-mode="classic"
                             aria-selected="false">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                         {$hadrianLang.cart.classicSearch}
                     </button>
                 </div>
@@ -145,7 +145,7 @@
                                     <p>{lang key="cartSimpleCaptcha"}</p>
                                     <div>
                                         <img id="inputCaptchaImage" src="{$systemurl}includes/verifyimage.php" align="middle" alt="{$LANG.captchatitle|escape}" />
-                                        <input id="inputCaptcha" type="text" name="code" maxlength="6" class="form-control input-sm" data-toggle="tooltip" data-placement="right" data-trigger="manual" title="{lang key='orderForm.required'}" />
+                                        <input id="inputCaptcha" aria-label="{$LANG.captchatitle|escape}" type="text" name="code" maxlength="6" class="form-control input-sm" data-toggle="tooltip" data-placement="right" data-trigger="manual" title="{lang key='orderForm.required'}" />
                                     </div>
                                 </div>
                             {/if}
@@ -166,8 +166,8 @@
                         <input type="hidden" name="a" value="checkDomain">
 
                         <div class="dr-search-box input-group input-group-lg input-group-box">
-                            <svg class="dr-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                            <input type="text"
+                            <svg aria-hidden="true" focusable="false" class="dr-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <input aria-label="{$LANG.findyourdomain}" type="text"
                                    name="domain"
                                    class="dr-search-input form-control"
                                    {if !$showAdvancedSearchOptions}id="inputDomain"{else}id="dr-alt-domain"{/if}
@@ -200,8 +200,8 @@
 
                         <div class="dr-search-form" data-mode-form="ai">
                         <div class="dr-search-box input-group input-group-lg input-group-box">
-                            <svg class="dr-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                            <textarea name="message"
+                            <svg aria-hidden="true" focusable="false" class="dr-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            <textarea aria-label="{lang key='domainSearch.domainOrAiInstruction'}" name="message"
                                       class="dr-search-input"
                                       id="message"
                                       rows="1"
@@ -231,10 +231,10 @@
 
                             <div class="dr-filters" data-dr-filters>
                                 <button type="button" class="dr-filters-toggle" data-dr-filters-toggle aria-expanded="false" aria-haspopup="true">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
+                                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/></svg>
                                     <span>{$hadrianLang.cart.filters}</span>
                                     <span class="dr-filters-count" data-dr-tld-count>{$selectedTlds|count}</span>
-                                    <svg class="dr-filters-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+                                    <svg aria-hidden="true" focusable="false" class="dr-filters-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                                 </button>
 
                                 <div class="dr-filters-panel" data-dr-filters-panel hidden>
@@ -242,8 +242,8 @@
                                     <div class="dr-filters-group">
                                         <div class="dr-filters-label">{lang key='domainSearch.tlds'}</div>
                                         <div class="dr-tld-search">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                                            <input type="text" class="dr-tld-search-input" placeholder="{lang key='search'}" data-dr-tld-search>
+                                            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                                            <input aria-label="{lang key='search'}" type="text" class="dr-tld-search-input" placeholder="{lang key='search'}" data-dr-tld-search>
                                         </div>
                                         <div class="dr-tld-list" data-dr-tld-list>
                                             {foreach $tlds as $tld}
@@ -303,7 +303,7 @@
                        by JS depending on whether result is exact or
                        suggested-primary). *}
                     <div id="primarySuggestionHeading" class="primary-domain-header dr-results-heading">
-                        <i class="fa-regular fa-sparkles"></i> {$LANG.domainSearch.topSuggestion}
+                        <i aria-hidden="true" class="fa-regular fa-sparkles"></i> {$LANG.domainSearch.topSuggestion}
                     </div>
                     <div id="primaryExactHeading" class="primary-domain-header dr-results-heading">
                         {$LANG.domainSearch.exactMatch}
@@ -314,7 +314,7 @@
                        tld-unavailable / available). *}
                     <div id="searchDomainInfo" class="dr-result-card domain-checker-result-headline">
                         <p id="primaryLookupSearching" class="domain-lookup-loader domain-lookup-primary-loader domain-searching">
-                            <i class="fas fa-spinner fa-spin"></i> {lang key='orderForm.searching'}...
+                            <i aria-hidden="true" class="fas fa-spinner fa-spin"></i> {lang key='orderForm.searching'}...
                         </p>
                         <div id="primaryLookupResult" class="domain-lookup-result w-hidden">
                             <p class="domain-invalid domain-checker-invalid">
@@ -328,7 +328,7 @@
                                 <div class="margin-10 text-center">
                                     {lang key='cart.idnLanguageDescription'}
                                 </div>
-                                <select name="idnlanguage" class="form-control">
+                                <select name="idnlanguage" class="form-control" aria-label="{lang key='cart.idnLanguage'}">
                                     <option value="">{lang key='cart.idnLanguage'}</option>
                                     {foreach $idnLanguages as $idnLanguageKey => $idnLanguage}
                                         <option value="{$idnLanguageKey}">{lang key='idnLanguage.'|cat:$idnLanguageKey}</option>
@@ -343,9 +343,9 @@
                                 <button class="btn btn-primary btn-add-to-cart dr-add-btn" data-whois="0" data-domain="">
                                     <span class="to-add">{$LANG.addtocart}</span>
                                     <span class="loading">
-                                        <i class="fas fa-spinner fa-spin"></i> {lang key='loading'}
+                                        <i aria-hidden="true" class="fas fa-spinner fa-spin"></i> {lang key='loading'}
                                     </span>
-                                    <span class="added"><i class="far fa-shopping-cart"></i> {lang key='checkout'}</span>
+                                    <span class="added"><i aria-hidden="true" class="far fa-shopping-cart"></i> {lang key='checkout'}</span>
                                     <span class="unavailable">{$LANG.domaincheckertaken}</span>
                                 </button>
                             </p>
@@ -369,7 +369,7 @@
                                             {/if}
                                             <div class="dr-tld-name">{$data.tld}</div>
                                             <span class="domain-lookup-loader domain-lookup-spotlight-loader">
-                                                <i class="fas fa-spinner fa-spin"></i>
+                                                <i aria-hidden="true" class="fas fa-spinner fa-spin"></i>
                                             </span>
                                             <div class="domain-lookup-result">
                                                 <span class="dr-tld-status unavailable w-hidden" data-tld-state="unavailable">{lang key='domainunavailable'}</span>
@@ -383,9 +383,9 @@
                                                 <button type="button" class="btn btn-add-to-cart dr-tld-btn w-hidden" data-whois="0" data-domain="">
                                                     <span class="to-add">{lang key='orderForm.add'}</span>
                                                     <span class="loading">
-                                                        <i class="fas fa-spinner fa-spin"></i> {lang key='loading'}
+                                                        <i aria-hidden="true" class="fas fa-spinner fa-spin"></i> {lang key='loading'}
                                                     </span>
-                                                    <span class="added"><i class="far fa-shopping-cart"></i> {lang key='checkout'}</span>
+                                                    <span class="added"><i aria-hidden="true" class="far fa-shopping-cart"></i> {lang key='checkout'}</span>
                                                     <span class="unavailable">{$LANG.domaincheckertaken}</span>
                                                 </button>
                                                 <button type="button" class="btn btn-primary domain-contact-support dr-tld-btn w-hidden">
@@ -406,7 +406,7 @@
                             <p>{$hadrianLang.cart.suggestedDomainsHint}</p>
                         </div>
                         <div id="suggestionsLoader" class="panel-body card-body domain-lookup-loader domain-lookup-suggestions-loader">
-                            <i class="fas fa-spinner fa-spin"></i> {lang key='orderForm.generatingSuggestions'}
+                            <i aria-hidden="true" class="fas fa-spinner fa-spin"></i> {lang key='orderForm.generatingSuggestions'}
                         </div>
                         <div class="panel-body card-body domain-lookup-message domain-lookup-suggestions-message">
                             {lang key='domainSearch.errors.noSuggestions'}
@@ -433,9 +433,9 @@
                                     <button type="button" class="btn btn-add-to-cart dr-add-btn outline" data-whois="1" data-domain="">
                                         <span class="to-add">{$LANG.addtocart}</span>
                                         <span class="loading">
-                                            <i class="fas fa-spinner fa-spin"></i> {lang key='loading'}
+                                            <i aria-hidden="true" class="fas fa-spinner fa-spin"></i> {lang key='loading'}
                                         </span>
-                                        <span class="added"><i class="far fa-shopping-cart"></i> {lang key='checkout'}</span>
+                                        <span class="added"><i aria-hidden="true" class="far fa-shopping-cart"></i> {lang key='checkout'}</span>
                                         <span class="unavailable">{$LANG.domaincheckertaken}</span>
                                     </button>
                                     <button type="button" class="btn btn-primary domain-contact-support dr-add-btn w-hidden">
@@ -584,7 +584,7 @@
             {* ---- EMPTY STATE ---- *}
             <div class="dr-results-empty">
                 <div class="dr-empty-ico">
-                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
                 </div>
                 <p class="dr-empty-title">{$hadrianLang.cart.searchDomainTitle}</p>
                 <p class="dr-empty-desc">{$hadrianLang.cart.searchDomainHint}</p>

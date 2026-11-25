@@ -36,7 +36,7 @@
             {* ─── Fraud-hold hero ─── *}
             <div class="order-fraud-hero">
                 <div class="order-fraud-ico">
-                    <i class="fas fa-shield-alt"></i>
+                    <i aria-hidden="true" class="fas fa-shield-alt"></i>
                 </div>
                 <h1 class="font-size-36">{$LANG.cartfraudcheck}</h1>
                 {if $errortitle}
@@ -50,7 +50,7 @@
                     {if $userValidation && !$userValidation.submittedAt && $userValidation.token eq true}
 
                         <div class="alert alert-warning order-fraud-body">
-                            <i class="fas fa-id-card"></i>
+                            <i aria-hidden="true" class="fas fa-id-card"></i>
                             <span>{lang key='fraud.furtherVal'}</span>
                         </div>
 
@@ -60,7 +60,7 @@
                                data-url="{$userValidationUrl}"
                                onclick="openValidationSubmitModal(this);return false;">
                                 {lang key='fraud.submitDocs'}
-                                &nbsp;<i class="fas fa-arrow-right"></i>
+                                &nbsp;<i aria-hidden="true" class="fas fa-arrow-right"></i>
                             </a>
                         </div>
 
@@ -88,7 +88,7 @@
 
                         {if $error}
                             <div class="alert alert-danger order-fraud-body">
-                                <i class="fas fa-info-circle"></i>
+                                <i aria-hidden="true" class="fas fa-info-circle"></i>
                                 <span>{$error}</span>
                             </div>
                         {/if}
@@ -96,11 +96,11 @@
                         <div class="order-fraud-actions">
                             <a href="{$WEB_ROOT}/submitticket.php" class="btn btn-primary btn-lg">
                                 {$LANG.orderForm.submitTicket}
-                                &nbsp;<i class="fas fa-arrow-right"></i>
+                                &nbsp;<i aria-hidden="true" class="fas fa-arrow-right"></i>
                             </a>
                             <br><br>
                             <a href="{$WEB_ROOT}/clientarea.php" class="btn-link order-fraud-back">
-                                <i class="fas fa-arrow-circle-left"></i>
+                                <i aria-hidden="true" class="fas fa-arrow-circle-left"></i>
                                 {$LANG.orderForm.returnToClientArea}
                             </a>
                         </div>

@@ -184,7 +184,7 @@
                 <h3>{$hadrianLang.store.sibStrip4Title}</h3>
                 <p>{$hadrianLang.store.sibStrip4Text}</p>
                 <div class="strip-visual">
-                    <div style="background: rgba(255,255,255,0.4); border-radius: 10px; padding: 12px 16px; display: inline-flex; align-items: center; gap: 8px;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg><span style="font-size: 13px; font-weight: 600;">mysite.com</span></div>
+                    <div style="background: rgba(255,255,255,0.4); border-radius: 10px; padding: 12px 16px; display: inline-flex; align-items: center; gap: 8px;"><svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg><span style="font-size: 13px; font-weight: 600;">mysite.com</span></div>
                 </div>
             </div>
             <div class="hp-strip-card e">
@@ -248,7 +248,7 @@
             <div class="hp-testi-slide"><div class="stars">&starf;&starf;&starf;&starf;&starf;</div><div class="quote">I&rsquo;ve tried the big builders. This is the cleanest, fastest one I&rsquo;ve used. The free tier is genuinely useful &mdash; not just a demo.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=nadiarusso') center/cover;">NR</div><div><div class="author-name">Nadia Russo</div><div class="author-role">Blogger</div></div></div></div>
             <div class="hp-testi-slide"><div class="stars">&starf;&starf;&starf;&starf;&starf;</div><div class="quote">Built 8 client sites on this platform. The business plan is incredibly good value &mdash; unlimited sites, all templates, and the support team is phenomenal.</div><div class="author"><div class="author-avatar" style="background: url('https://i.pravatar.cc/96?u=alextorres') center/cover;">AT</div><div><div class="author-name">Alex Torres</div><div class="author-role">Freelance Designer</div></div></div></div>
         </div>
-        <div class="carousel-scroll-nav"><button class="carousel-arrow prev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><button class="carousel-arrow next"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button></div>
+        <div class="carousel-scroll-nav"><button type="button" class="carousel-arrow prev" aria-label="{$hadrianLang.a11y.previous}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg></button><button type="button" class="carousel-arrow next" aria-label="{$hadrianLang.a11y.next}"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 6 15 12 9 18"/></svg></button></div>
     </section>
 
     {* 8. Locations *}
@@ -282,7 +282,7 @@
 
 <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
     <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
     </div>
     <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">{$hadrianLang.store.sibEmptyTitle}</p>
     <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">{$hadrianLang.store.sibEmptyText}</p>

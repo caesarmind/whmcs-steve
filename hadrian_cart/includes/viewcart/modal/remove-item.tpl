@@ -19,7 +19,7 @@
                         <button type="button" class="close" data-dismiss="modal" aria-label="{lang key='orderForm.close'}"><span aria-hidden="true">&times;</span></button>
                     </div>
                     <h4 class="modal-title margin-bottom mb-3">
-                        <i class="fas fa-times fa-3x"></i>
+                        <i aria-hidden="true" class="fas fa-times fa-3x"></i>
                         <span>{lang key='orderForm.removeItem'}</span>
                     </h4>
                     {lang key='cartremoveitemconfirm'}

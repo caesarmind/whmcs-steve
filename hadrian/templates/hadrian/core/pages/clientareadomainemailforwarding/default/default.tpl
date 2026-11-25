@@ -17,7 +17,7 @@
 
 {if !empty($error)}
 <div class="ef-alert ef-alert-error">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
+    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/></svg>
     <div>{$error|escape}</div>
 </div>
 {/if}
@@ -47,17 +47,17 @@
                         {if isset($emailforwarders) && $emailforwarders|@count > 0}
                         {foreach $emailforwarders as $num => $fwd}
                             <tr class="ef-row">
-                                <td><input type="text" name="emailforwarderprefix[{$num}]" value="{$fwd.prefix|default:''|escape}" class="ef-input ef-input-prefix" placeholder="info"></td>
+                                <td><input type="text" aria-label="{$LANG.domainemailforwardingprefix}" name="emailforwarderprefix[{$num}]" value="{$fwd.prefix|default:''|escape}" class="ef-input ef-input-prefix" placeholder="info"></td>
                                 <td class="ef-at">@{$domain|escape}</td>
-                                <td><input type="text" name="emailforwarderforwardto[{$num}]" value="{$fwd.forwardto|default:''|escape}" class="ef-input" placeholder="you@example.com"></td>
+                                <td><input type="text" aria-label="{$LANG.domainemailforwardingforwardto}" name="emailforwarderforwardto[{$num}]" value="{$fwd.forwardto|default:''|escape}" class="ef-input" placeholder="you@example.com"></td>
                             </tr>
                         {/foreach}
                         {/if}
 
                         <tr class="ef-row ef-row-new">
-                            <td><input type="text" name="emailforwarderprefixnew" class="ef-input ef-input-prefix" placeholder="info"></td>
+                            <td><input type="text" aria-label="{$LANG.domainemailforwardingprefix}" name="emailforwarderprefixnew" class="ef-input ef-input-prefix" placeholder="info"></td>
                             <td class="ef-at">@{$domain|escape}</td>
-                            <td><input type="text" name="emailforwarderforwardtonew" class="ef-input" placeholder="you@example.com"></td>
+                            <td><input type="text" aria-label="{$LANG.domainemailforwardingforwardto}" name="emailforwarderforwardtonew" class="ef-input" placeholder="you@example.com"></td>
                         </tr>
                     </tbody>
                 </table>
@@ -76,15 +76,15 @@
         <div class="card subnav-card">
             <div class="subnav-heading">{$LANG.domain|default:'Domain'}</div>
             <a href="{$WEB_ROOT}/clientarea.php?action=domaindetails&id={$domainid|escape}" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 {$hadrianLang.domains.domainDetails}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=domaindns&domainid={$domainid|escape}" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
                 {$LANG.domaindnsmanagement}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=domainemailforwarding&domainid={$domainid|escape}" class="subnav-item active">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
                 {$LANG.domainemailforwarding}
             </a>
         </div>

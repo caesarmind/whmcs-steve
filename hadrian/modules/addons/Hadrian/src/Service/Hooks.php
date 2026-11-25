@@ -238,6 +238,9 @@ final class Hooks
                     // modal can label each language for its own readers
                     // instead of |capitalize-ing the English code name.
                     'nativeNames' => LocaleHelper::nativeNamesFor($mtLocaleList),
+                    // code => BCP-47 tag, so each native name carries its own
+                    // lang attribute in the modal (WCAG 3.1.2).
+                    'codes'       => array_filter(array_combine($mtLocaleList, array_map([LocaleHelper::class, 'codeFor'], $mtLocaleList)) ?: []),
                 ],
                 // Flag emoji for the ACTIVE language. The locale button read
                 // $hadrian.localeFlag since day one, but nothing ever assigned

@@ -65,7 +65,7 @@
                             <div style="font-size: 16px; font-weight: 700; color: #30d158;">+ 47%</div>
                         </div>
                     </div>
-                    <svg viewBox="0 0 240 60" style="width: 100%; height: 60px;">
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 240 60" style="width: 100%; height: 60px;">
                         <path d="M0,45 L30,40 L60,42 L90,30 L120,25 L150,18 L180,20 L210,12 L240,8" fill="none" stroke="#0071e3" stroke-width="2"/>
                     </svg>
                 </div>
@@ -81,7 +81,7 @@
             <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 18px; padding: 32px 24px; text-align: center; position: relative;">
                 <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">1</div>
                 <div style="width: 72px; height: 72px; margin: 8px auto 16px; background: linear-gradient(135deg, #eaf4ff, #dbeafe); border-radius: 18px; display: flex; align-items: center; justify-content: center;">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
+                    <svg aria-hidden="true" focusable="false" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
                 </div>
                 <h4 style="font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.mgStep1Title}</h4>
                 <p style="font-size: 14px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.mgStep1Text}</p>
@@ -89,7 +89,7 @@
             <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 18px; padding: 32px 24px; text-align: center; position: relative;">
                 <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">2</div>
                 <div style="width: 72px; height: 72px; margin: 8px auto 16px; background: linear-gradient(135deg, #eaf8ee, #d4f0dc); border-radius: 18px; display: flex; align-items: center; justify-content: center;">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <svg aria-hidden="true" focusable="false" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                 </div>
                 <h4 style="font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.mgStep2Title}</h4>
                 <p style="font-size: 14px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.mgStep2Text}</p>
@@ -97,7 +97,7 @@
             <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 18px; padding: 32px 24px; text-align: center; position: relative;">
                 <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">3</div>
                 <div style="width: 72px; height: 72px; margin: 8px auto 16px; background: linear-gradient(135deg, #faf0ff, #f0dbff); border-radius: 18px; display: flex; align-items: center; justify-content: center;">
-                    <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#bf5af2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                    <svg aria-hidden="true" focusable="false" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#bf5af2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
                 </div>
                 <h4 style="font-size: 17px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">{$hadrianLang.store.mgStep3Title}</h4>
                 <p style="font-size: 14px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.mgStep3Text}</p>
@@ -129,9 +129,9 @@
                             </div>
                         </div>
                         <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1a7f37; font-weight: 500;">Add meta descriptions</span></div>
-                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span style="font-size: 11px; color: var(--color-text-primary);">Optimize images</span></div>
-                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span style="font-size: 11px; color: var(--color-text-primary);">Add internal links</span></div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span style="font-size: 11px; color: #1a7f37; font-weight: 500;">Add meta descriptions</span></div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span style="font-size: 11px; color: var(--color-text-primary);">Optimize images</span></div>
+                            <div style="display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#86868b" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg><span style="font-size: 11px; color: var(--color-text-primary);">Add internal links</span></div>
                         </div>
                     </div>
                 </div>
@@ -149,9 +149,9 @@
                     <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 14px;">
                         <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 10px;">Keyword tracking</div>
                         <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">best hosting 2026</span><span style="display: flex; align-items: center; gap: 4px; color: #30d158; font-size: 11px; font-weight: 600;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>#3</span></div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">cloud hosting deals</span><span style="display: flex; align-items: center; gap: 4px; color: #30d158; font-size: 11px; font-weight: 600;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>#7</span></div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">vps server</span><span style="display: flex; align-items: center; gap: 4px; color: #ff9f0a; font-size: 11px; font-weight: 600;"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>#12</span></div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">best hosting 2026</span><span style="display: flex; align-items: center; gap: 4px; color: #30d158; font-size: 11px; font-weight: 600;"><svg aria-hidden="true" focusable="false" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>#3</span></div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">cloud hosting deals</span><span style="display: flex; align-items: center; gap: 4px; color: #30d158; font-size: 11px; font-weight: 600;"><svg aria-hidden="true" focusable="false" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="18 15 12 9 6 15"/></svg>#7</span></div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">vps server</span><span style="display: flex; align-items: center; gap: 4px; color: #ff9f0a; font-size: 11px; font-weight: 600;"><svg aria-hidden="true" focusable="false" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>#12</span></div>
                         </div>
                     </div>
                 </div>
@@ -308,7 +308,7 @@
 
 <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
     <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.3-4.3"/></svg>
     </div>
     <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">{$hadrianLang.store.mgEmptyTitle}</p>
     <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">{$hadrianLang.store.mgEmptyText}</p>

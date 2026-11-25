@@ -31,7 +31,7 @@
 
 {* ─── Existing account picker (logged-in client) ─── *}
 {if $custtype neq "new" && $loggedin}
-    <div class="sub-heading">
+    <div class="sub-heading" role="heading" aria-level="3">
         <span class="primary-bg-color">
             {lang key='switchAccount.title'}
         </span>
@@ -129,129 +129,138 @@
         {include file="orderforms/$carttpl/linkedaccounts.tpl" linkContext="checkout-new"}
     </div>
 
-    <div class="sub-heading">
+    <div class="sub-heading" role="heading" aria-level="3">
         <span class="primary-bg-color">{$LANG.orderForm.personalInformation}</span>
     </div>
 
     <div class="row">
         <div class="col-sm-6">
             <div class="form-group prepend-icon">
-                <label for="inputFirstName" class="field-icon">
-                    <i class="fas fa-user"></i>
-                </label>
-                <input type="text" name="firstname" id="inputFirstName" class="field form-control" placeholder="{$LANG.orderForm.firstName}" value="{$clientsdetails.firstname}" autofocus>
+                <label for="inputFirstName" class="co-field-label">{$LANG.orderForm.firstName}</label>
+                <div class="co-field-wrap">
+                    <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-user"></i></span>
+                    <input autocomplete="given-name" type="text" name="firstname" id="inputFirstName" class="field form-control" placeholder="{$LANG.orderForm.firstName}" value="{$clientsdetails.firstname}" autofocus>
+                </div>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group prepend-icon">
-                <label for="inputLastName" class="field-icon">
-                    <i class="fas fa-user"></i>
-                </label>
-                <input type="text" name="lastname" id="inputLastName" class="field form-control" placeholder="{$LANG.orderForm.lastName}" value="{$clientsdetails.lastname}">
+                <label for="inputLastName" class="co-field-label">{$LANG.orderForm.lastName}</label>
+                <div class="co-field-wrap">
+                    <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-user"></i></span>
+                    <input autocomplete="family-name" type="text" name="lastname" id="inputLastName" class="field form-control" placeholder="{$LANG.orderForm.lastName}" value="{$clientsdetails.lastname}">
+                </div>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group prepend-icon">
-                <label for="inputEmail" class="field-icon">
-                    <i class="fas fa-envelope"></i>
-                </label>
-                <input type="email" name="email" id="inputEmail" class="field form-control" placeholder="{$LANG.orderForm.emailAddress}" value="{$clientsdetails.email}">
+                <label for="inputEmail" class="co-field-label">{$LANG.orderForm.emailAddress}</label>
+                <div class="co-field-wrap">
+                    <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-envelope"></i></span>
+                    <input autocomplete="email" type="email" name="email" id="inputEmail" class="field form-control" placeholder="{$LANG.orderForm.emailAddress}" value="{$clientsdetails.email}">
+                </div>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group prepend-icon">
-                <label for="inputPhone" class="field-icon">
-                    <i class="fas fa-phone"></i>
-                </label>
-                <input type="tel" name="phonenumber" id="inputPhone" class="field form-control" placeholder="{$LANG.orderForm.phoneNumber}" value="{$clientsdetails.phonenumber}">
+                <label for="inputPhone" class="co-field-label">{$LANG.orderForm.phoneNumber}</label>
+                <div class="co-field-wrap">
+                    <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-phone"></i></span>
+                    <input autocomplete="tel-national" type="tel" name="phonenumber" id="inputPhone" class="field form-control" placeholder="{$LANG.orderForm.phoneNumber}" value="{$clientsdetails.phonenumber}">
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="sub-heading">
+    <div class="sub-heading" role="heading" aria-level="3">
         <span class="primary-bg-color">{$LANG.orderForm.billingAddress}</span>
     </div>
 
     <div class="row">
         <div class="col-sm-12">
             <div class="form-group prepend-icon">
-                <label for="inputCompanyName" class="field-icon">
-                    <i class="fas fa-building"></i>
-                </label>
-                <input type="text" name="companyname" id="inputCompanyName" class="field form-control" placeholder="{$LANG.orderForm.companyName} ({$LANG.orderForm.optional})" value="{$clientsdetails.companyname}">
+                <label for="inputCompanyName" class="co-field-label">{$LANG.orderForm.companyName} ({$LANG.orderForm.optional})</label>
+                <div class="co-field-wrap">
+                    <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-building"></i></span>
+                    <input autocomplete="organization" type="text" name="companyname" id="inputCompanyName" class="field form-control" placeholder="{$LANG.orderForm.companyName} ({$LANG.orderForm.optional})" value="{$clientsdetails.companyname}">
+                </div>
             </div>
         </div>
         <div class="col-sm-12">
             <div class="form-group prepend-icon">
-                <label for="inputAddress1" class="field-icon">
-                    <i class="far fa-building"></i>
-                </label>
-                <input type="text" name="address1" id="inputAddress1" class="field form-control" placeholder="{$LANG.orderForm.streetAddress}" value="{$clientsdetails.address1}">
+                <label for="inputAddress1" class="co-field-label">{$LANG.orderForm.streetAddress}</label>
+                <div class="co-field-wrap">
+                    <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="far fa-building"></i></span>
+                    <input autocomplete="address-line1" type="text" name="address1" id="inputAddress1" class="field form-control" placeholder="{$LANG.orderForm.streetAddress}" value="{$clientsdetails.address1}">
+                </div>
             </div>
         </div>
         <div class="col-sm-12">
             <div class="form-group prepend-icon">
-                <label for="inputAddress2" class="field-icon">
-                    <i class="fas fa-map-marker-alt"></i>
-                </label>
-                <input type="text" name="address2" id="inputAddress2" class="field form-control" placeholder="{$LANG.orderForm.streetAddress2}" value="{$clientsdetails.address2}">
+                <label for="inputAddress2" class="co-field-label">{$LANG.orderForm.streetAddress2}</label>
+                <div class="co-field-wrap">
+                    <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-map-marker-alt"></i></span>
+                    <input autocomplete="address-line2" type="text" name="address2" id="inputAddress2" class="field form-control" placeholder="{$LANG.orderForm.streetAddress2}" value="{$clientsdetails.address2}">
+                </div>
             </div>
         </div>
         <div class="col-sm-4">
             <div class="form-group prepend-icon">
-                <label for="inputCity" class="field-icon">
-                    <i class="far fa-building"></i>
-                </label>
-                <input type="text" name="city" id="inputCity" class="field form-control" placeholder="{$LANG.orderForm.city}" value="{$clientsdetails.city}">
+                <label for="inputCity" class="co-field-label">{$LANG.orderForm.city}</label>
+                <div class="co-field-wrap">
+                    <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="far fa-building"></i></span>
+                    <input autocomplete="address-level2" type="text" name="city" id="inputCity" class="field form-control" placeholder="{$LANG.orderForm.city}" value="{$clientsdetails.city}">
+                </div>
             </div>
         </div>
         <div class="col-sm-5">
             <div class="form-group prepend-icon">
-                <label for="state" class="field-icon" id="inputStateIcon">
-                    <i class="fas fa-map-signs"></i>
-                </label>
-                <label for="stateinput" class="field-icon" id="inputStateIcon">
-                    <i class="fas fa-map-signs"></i>
-                </label>
-                <input type="text" name="state" id="inputState" class="field form-control" placeholder="{$LANG.orderForm.state}" value="{$clientsdetails.state}">
+                <label for="inputState" class="co-field-label">{$LANG.orderForm.state}</label>
+                <div class="co-field-wrap">
+                    <span class="field-icon" id="inputStateIcon" aria-hidden="true"><i aria-hidden="true" class="fas fa-map-signs"></i></span>
+                    <input autocomplete="address-level1" type="text" name="state" id="inputState" class="field form-control" placeholder="{$LANG.orderForm.state}" value="{$clientsdetails.state}">
+                </div>
             </div>
         </div>
         <div class="col-sm-3">
             <div class="form-group prepend-icon">
-                <label for="inputPostcode" class="field-icon">
-                    <i class="fas fa-certificate"></i>
-                </label>
-                <input type="text" name="postcode" id="inputPostcode" class="field form-control" placeholder="{$LANG.orderForm.postcode}" value="{$clientsdetails.postcode}">
+                <label for="inputPostcode" class="co-field-label">{$LANG.orderForm.postcode}</label>
+                <div class="co-field-wrap">
+                    <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-certificate"></i></span>
+                    <input autocomplete="postal-code" type="text" name="postcode" id="inputPostcode" class="field form-control" placeholder="{$LANG.orderForm.postcode}" value="{$clientsdetails.postcode}">
+                </div>
             </div>
         </div>
         <div class="col-sm-12">
             <div class="form-group prepend-icon">
-                <label for="inputCountry" class="field-icon" id="inputCountryIcon">
-                    <i class="fas fa-globe"></i>
-                </label>
-                <select name="country" id="inputCountry" class="field form-control">
-                    {foreach $countries as $countrycode => $countrylabel}
-                        <option value="{$countrycode}"{if (!$country && $countrycode == $defaultcountry) || $countrycode eq $country} selected{/if}>
-                            {$countrylabel}
-                        </option>
-                    {/foreach}
-                </select>
+                <label for="inputCountry" class="co-field-label">{$LANG.orderForm.country}</label>
+                <div class="co-field-wrap">
+                    <span class="field-icon" id="inputCountryIcon" aria-hidden="true"><i aria-hidden="true" class="fas fa-globe"></i></span>
+                    <select autocomplete="country" name="country" id="inputCountry" class="field form-control">
+                        {foreach $countries as $countrycode => $countrylabel}
+                            <option value="{$countrycode}"{if (!$country && $countrycode == $defaultcountry) || $countrycode eq $country} selected{/if}>
+                                {$countrylabel}
+                            </option>
+                        {/foreach}
+                    </select>
+                </div>
             </div>
         </div>
         {if $showTaxIdField}
             <div class="col-sm-12">
                 <div class="form-group prepend-icon">
-                    <label for="inputTaxId" class="field-icon">
-                        <i class="fas fa-building"></i>
-                    </label>
-                    <input type="text" name="tax_id" id="inputTaxId" class="field form-control" placeholder="{$taxLabel}" value="{$clientsdetails.tax_id}" autocomplete="off">
+                    <label for="inputTaxId" class="co-field-label">{$taxLabel}</label>
+                    <div class="co-field-wrap">
+                        <span class="field-icon" aria-hidden="true"><i aria-hidden="true" class="fas fa-building"></i></span>
+                        <input type="text" name="tax_id" id="inputTaxId" class="field form-control" placeholder="{$taxLabel}" value="{$clientsdetails.tax_id}" autocomplete="off">
+                    </div>
                 </div>
             </div>
         {/if}
     </div>
 
     {if $customfields}
-        <div class="sub-heading">
+        <div class="sub-heading" role="heading" aria-level="3">
             <span class="primary-bg-color">{$LANG.orderadditionalrequiredinfo}<br><i><small>{lang key='orderForm.requiredField'}</small></i></span>
         </div>
         <div class="field-container">
@@ -319,7 +328,7 @@
 {/if}
 
 {if isset($checkoutExtraFields) && !empty($checkoutExtraFields)}
-    <div class="sub-heading">
+    <div class="sub-heading" role="heading" aria-level="3">
         <span class="primary-bg-color">{lang key='orderForm.additionalInformation'}</span>
     </div>
     <div class="row">

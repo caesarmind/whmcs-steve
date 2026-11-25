@@ -13,7 +13,7 @@
 <div class="ct-wrap">
     <div class="card ct-card">
         {if isset($sent) && $sent}
-            <div class="ct-ico ct-ico-success"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <div class="ct-ico ct-ico-success"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>
             <h1 class="ct-title">{$LANG.contactsent}</h1>
             <p class="ct-sub">{$hadrianLang.support.contactSentSub}</p>
             <a href="{$WEB_ROOT}/" class="btn-primary">{$LANG.errorPage.404.home}</a>
@@ -22,8 +22,8 @@
             <p class="ct-sub">{$hadrianLang.support.contactSubtitle}</p>
 
             {if isset($errormessage) && $errormessage}
-            <div class="ct-error">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <div class="ct-error" role="alert" data-error-summary>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 <div>
                     {if is_array($errormessage)}{foreach $errormessage as $err}<div>{$err|strip_tags|escape}</div>{/foreach}{else}{$errormessage|strip_tags|escape}{/if}
                 </div>

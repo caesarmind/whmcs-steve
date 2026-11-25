@@ -36,7 +36,7 @@
             {* ─── Error hero ─── *}
             <div class="order-error-hero">
                 <div class="order-error-ico">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i aria-hidden="true" class="fas fa-exclamation-triangle"></i>
                 </div>
                 <h1 class="font-size-36">{$LANG.thereisaproblem}</h1>
                 {if $errortitle}
@@ -48,20 +48,20 @@
                 <div class="col-sm-8 col-sm-offset-2 offset-sm-2">
                     {if $errormsg}
                         <div class="alert alert-danger error-heading order-error-body">
-                            <i class="fas fa-info-circle"></i>
+                            <i aria-hidden="true" class="fas fa-info-circle"></i>
                             <span>{$errormsg}</span>
                         </div>
                     {/if}
 
                     <div class="text-center order-error-actions">
                         <a href="javascript:history.go(-1)" class="btn btn-primary btn-lg">
-                            <i class="fas fa-arrow-left"></i>&nbsp;
+                            <i aria-hidden="true" class="fas fa-arrow-left"></i>&nbsp;
                             {$LANG.problemgoback}
                         </a>
                         <br><br>
                         <a href="{$WEB_ROOT}/submitticket.php" class="btn-link order-error-support">
                             {$LANG.orderForm.submitTicket}
-                            &nbsp;<i class="fas fa-arrow-right"></i>
+                            &nbsp;<i aria-hidden="true" class="fas fa-arrow-right"></i>
                         </a>
                     </div>
                 </div>

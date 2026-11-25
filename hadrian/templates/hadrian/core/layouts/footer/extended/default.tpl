@@ -23,7 +23,7 @@
                 {foreach $mtFooterItems as $col}
                     {if $col.type == 'dropdown_parent' && $col.children}
                         <div class="hp-footer-col">
-                            <h4>{$col.label|escape}</h4>
+                            <h4 aria-level="2">{$col.label|escape}</h4>
                             <ul>
                                 {foreach $col.children as $link}
                                     {if $link.type == 'divider' || $link.type == 'header'}{continue}{/if}
@@ -34,7 +34,7 @@
                     {elseif $col.type != 'divider' && $col.type != 'header'}
                         {* Stray top-level link — promote to a single-link column *}
                         <div class="hp-footer-col">
-                            <h4><a href="{$col.uri|escape}"{if $col.target} target="{$col.target|escape}"{/if}>{$col.label|escape}</a></h4>
+                            <h4 aria-level="2"><a href="{$col.uri|escape}"{if $col.target} target="{$col.target|escape}"{/if}>{$col.label|escape}</a></h4>
                         </div>
                     {/if}
                 {/foreach}

@@ -44,7 +44,7 @@
     <div class="product-added-panel panel card">
         <div class="panel-body card-body">
             <span class="text-muted product-added-eyebrow">
-                <i class="far fa-check-circle"></i>&nbsp;{lang key="recommendations.productAdded"}
+                <i aria-hidden="true" class="far fa-check-circle"></i>&nbsp;{lang key="recommendations.productAdded"}
             </span>
             <div class="product-added-row">
                 <span class="product-name">&nbsp;{$lastProduct.product.name|escape}</span>
@@ -142,19 +142,19 @@
                                        style="background-color:{$recommendation->color};">
                                         <span class="text">{lang key="addtocart"}</span>
                                         <span class="arrow" style="background-color:{$recommendation->color};">
-                                            <i class="fas fa-chevron-right"></i>
+                                            <i aria-hidden="true" class="fas fa-chevron-right"></i>
                                         </span>
                                     </a>
                                 </div>
 
                                 <div class="expander" style="color:{$recommendation->color};">
                                     {if $recommendation.shortDescription}
-                                        <i class="fas fa-chevron-right rotate"
+                                        <i aria-hidden="true" class="fas fa-chevron-right rotate"
                                            data-toggle="tooltip"
                                            data-placement="right"
                                            title="{lang key='recommendations.learnMore'}"></i>
                                     {else}
-                                        <i class="fas fa-square fa-xs"></i>
+                                        <i aria-hidden="true" class="fas fa-square fa-xs"></i>
                                     {/if}
                                 </div>
 

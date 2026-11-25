@@ -225,6 +225,7 @@ document.addEventListener('click', function(e) {
 (function() {
     // Skip auto-advance on pages that showcase components (gallery, styleguide)
     var isShowcase = /components\.html|styleguide\.html/.test(location.pathname);
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     document.querySelectorAll('.hp-testimonials-grid').forEach(function(section) {
         var strip = section.querySelector('.hp-testimonial-cards');
@@ -240,23 +241,28 @@ document.addEventListener('click', function(e) {
             var stripRect = strip.getBoundingClientRect();
             var cardRect = card.getBoundingClientRect();
             var delta = cardRect.left - stripRect.left;
-            strip.scrollTo({ left: strip.scrollLeft + delta, behavior: 'smooth' });
+            strip.scrollTo({ left: strip.scrollLeft + delta, behavior: reduceMotion ? 'auto' : 'smooth' });
             dots.forEach(function(d, j) { d.classList.toggle('active', j === idx); });
         }
         dots.forEach(function(d, i) { d.addEventListener('click', function() { goTo(i); }); });
         if (prevBtn) prevBtn.addEventListener('click', function() { goTo(idx - 1); });
         if (nextBtn) nextBtn.addEventListener('click', function() { goTo(idx + 1); });
 
-        // Auto-advance only when in viewport + not hovering + not on showcase pages
-        if (isShowcase) return;
+        // Auto-advance only when in viewport + not hovering + not on showcase pages.
+        // Never under prefers-reduced-motion; never while it has keyboard focus
+        // or after the Pause button core-layout.js adds (WCAG 2.2.2).
+        if (isShowcase || reduceMotion) return;
         var timer = null;
         var hovered = false;
+        var focused = false;
         var visible = false;
-        function tick() { if (visible && !hovered) goTo(idx + 1); }
+        function tick() { if (visible && !hovered && !focused && !section.classList.contains('is-motion-paused')) goTo(idx + 1); }
         function start() { if (!timer) timer = setInterval(tick, 5000); }
         function stop() { if (timer) { clearInterval(timer); timer = null; } }
         section.addEventListener('mouseenter', function() { hovered = true; });
         section.addEventListener('mouseleave', function() { hovered = false; });
+        section.addEventListener('focusin', function() { focused = true; });
+        section.addEventListener('focusout', function(e) { if (!section.contains(e.relatedTarget)) focused = false; });
         if ('IntersectionObserver' in window) {
             var io = new IntersectionObserver(function(entries) {
                 entries.forEach(function(e) { visible = e.isIntersecting; visible ? start() : stop(); });

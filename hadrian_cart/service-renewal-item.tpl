@@ -90,7 +90,7 @@
             <div class="pull-left float-left service-renewal-meta">
                 {if $renewableItem.renewable === false}
                     <div class="div-renewal-ineligible">
-                        <i class="fas fa-info-circle"></i>
+                        <i aria-hidden="true" class="fas fa-info-circle"></i>
                         <span>{$renewableItem.reason|escape}</span>
                     </div>
                 {else}
@@ -108,11 +108,11 @@
                         class="btn btn-default btn-add-renewal-to-cart pull-right float-right"
                         data-service-id="{$prefix}{$renewableItem.serviceId}">
                     <span class="to-add">
-                        <i class="fas fa-fw fa-spinner fa-spin"></i>
+                        <i aria-hidden="true" class="fas fa-fw fa-spinner fa-spin"></i>
                         {lang key='addtocart'}
                     </span>
                     <span class="added">
-                        <i class="fas fa-check"></i>&nbsp;{lang key='domaincheckeradded'}
+                        <i aria-hidden="true" class="fas fa-check"></i>&nbsp;{lang key='domaincheckeradded'}
                     </span>
                 </button>
             {/if}

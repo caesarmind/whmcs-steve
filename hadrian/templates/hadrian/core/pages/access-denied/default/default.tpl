@@ -21,7 +21,7 @@
 
 <div class="card err-card">
     <div class="err-ico">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/><line x1="12" y1="15" x2="12" y2="17"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/><line x1="12" y1="15" x2="12" y2="17"/></svg>
     </div>
     <h2 class="err-title">{$LANG.subaccountpermissiondenied}</h2>
     <p class="err-sub">{if isset($errormessage) && $errormessage}{$errormessage|strip_tags}{else}{$hadrianLang.error.accessDeniedSub}{/if}</p>

@@ -58,8 +58,8 @@
             <button type="button" data-dtab="transfer" role="tab" aria-selected="false">{$LANG.transferdomain}</button>
         </div>
         <div class="ph-domain-box">
-            <svg class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" name="domain" placeholder="{$LANG.exampledomain}" autocapitalize="none" autocomplete="off">
+            <svg aria-hidden="true" focusable="false" class="search-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input aria-label="{$LANG.findyourdomain}" type="text" name="domain" placeholder="{$LANG.exampledomain}" autocapitalize="none" autocomplete="off">
             <button type="submit" id="domainCta" class="{if isset($captcha) && $captcha}{$captcha->getButtonClass($captchaForm)}{/if}">{$LANG.search}</button>
         </div>
         {if isset($captcha) && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
@@ -121,23 +121,23 @@
         <p style="font-size: 17px; color: #6e6e73;">{$hadrianLang.home.isoSub}</p>
     </div>
     <div class="hp-icon-item">
-        <div class="icon-circle blue"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4.03 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/></svg></div>
-        <h4>{$hadrianLang.home.iso1Title}</h4>
+        <div class="icon-circle blue"><svg aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4.03 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4.03 3 9 3s9-1.34 9-3V5"/></svg></div>
+        <h4 aria-level="3">{$hadrianLang.home.iso1Title}</h4>
         <p>{$hadrianLang.home.iso1Text}</p>
     </div>
     <div class="hp-icon-item">
-        <div class="icon-circle purple"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-        <h4>{$hadrianLang.home.iso2Title}</h4>
+        <div class="icon-circle purple"><svg aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <h4 aria-level="3">{$hadrianLang.home.iso2Title}</h4>
         <p>{$hadrianLang.home.iso2Text}</p>
     </div>
     <div class="hp-icon-item">
-        <div class="icon-circle red"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
-        <h4>{$hadrianLang.home.iso3Title}</h4>
+        <div class="icon-circle red"><svg aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg></div>
+        <h4 aria-level="3">{$hadrianLang.home.iso3Title}</h4>
         <p>{$hadrianLang.home.iso3Text}</p>
     </div>
     <div class="hp-icon-item">
-        <div class="icon-circle green"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg></div>
-        <h4>{$hadrianLang.home.iso4Title}</h4>
+        <div class="icon-circle green"><svg aria-hidden="true" focusable="false" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/></svg></div>
+        <h4 aria-level="3">{$hadrianLang.home.iso4Title}</h4>
         <p>{$hadrianLang.home.iso4Text}</p>
     </div>
 </section>
@@ -163,9 +163,9 @@
                 <div style="font-size: 11px; font-weight: 600; color: #1d1d1f; margin-bottom: 12px;">PHP version</div>
                 <div style="display: flex; flex-wrap: wrap; gap: 6px;"><span style="padding: 6px 12px; background: #0071e3; color: #fff; border-radius: 999px; font-size: 11px; font-weight: 600;">8.3</span><span style="padding: 6px 12px; background: #f5f5f7; color: #1d1d1f; border-radius: 999px; font-size: 11px;">8.2</span><span style="padding: 6px 12px; background: #f5f5f7; color: #1d1d1f; border-radius: 999px; font-size: 11px;">8.1</span><span style="padding: 6px 12px; background: #f5f5f7; color: #1d1d1f; border-radius: 999px; font-size: 11px;">8.0</span><span style="padding: 6px 12px; background: #f5f5f7; color: #1d1d1f; border-radius: 999px; font-size: 11px;">7.4</span></div>
                 <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid #f5f5f7; display: flex; flex-direction: column; gap: 6px;">
-                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #1d1d1f;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>SSH &amp; SFTP access</div>
-                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #1d1d1f;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Redis &amp; Memcached</div>
-                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #1d1d1f;"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Auto SSL via Let&rsquo;s Encrypt</div>
+                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #1d1d1f;"><svg aria-hidden="true" focusable="false" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>SSH &amp; SFTP access</div>
+                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #1d1d1f;"><svg aria-hidden="true" focusable="false" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Redis &amp; Memcached</div>
+                    <div style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #1d1d1f;"><svg aria-hidden="true" focusable="false" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>Auto SSL via Let&rsquo;s Encrypt</div>
                 </div>
             </div>
         </div>
@@ -184,19 +184,19 @@
     <div class="hp-columns-row">
         <div class="hp-column-item">
             <div class="col-num">{$hadrianLang.home.col1Num}</div>
-            <h4>{$hadrianLang.home.col1Title}</h4>
+            <h4 aria-level="3">{$hadrianLang.home.col1Title}</h4>
             <p>{$hadrianLang.home.col1Text}</p>
             <a href="{$WEB_ROOT}/knowledgebase.php" class="col-link">{$hadrianLang.home.col1Link} &rsaquo;</a>
         </div>
         <div class="hp-column-item">
             <div class="col-num">{$hadrianLang.home.col2Num}</div>
-            <h4>{$hadrianLang.home.col2Title}</h4>
+            <h4 aria-level="3">{$hadrianLang.home.col2Title}</h4>
             <p>{$hadrianLang.home.col2Text}</p>
             <a href="{$WEB_ROOT}/cart.php" class="col-link">{$hadrianLang.home.col2Link} &rsaquo;</a>
         </div>
         <div class="hp-column-item">
             <div class="col-num">{$hadrianLang.home.col3Num}</div>
-            <h4>{$hadrianLang.home.col3Title}</h4>
+            <h4 aria-level="3">{$hadrianLang.home.col3Title}</h4>
             <p>{$hadrianLang.home.col3Text}</p>
             <a href="{$WEB_ROOT}/cart.php" class="col-link">{$hadrianLang.home.col3Link} &rsaquo;</a>
         </div>

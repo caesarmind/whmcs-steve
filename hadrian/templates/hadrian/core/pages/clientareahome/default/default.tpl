@@ -112,7 +112,7 @@
             {if $clientsstats.numoverdueinvoices > 0 || $clientsstats.numunpaidinvoices > 0}
             <div class="notice">
                 <div class="notice-ico">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 </div>
                 <div class="notice-text">
                     {if $clientsstats.numoverdueinvoices}{assign var=nUnpaid value=$clientsstats.numoverdueinvoices}{elseif $clientsstats.numunpaidinvoices}{assign var=nUnpaid value=$clientsstats.numunpaidinvoices}{else}{assign var=nUnpaid value=0}{/if}
@@ -120,21 +120,21 @@
                     <a href="{$WEB_ROOT}/clientarea.php?action=invoices">{$LANG.invoicespaynow}</a>.
                 </div>
                 <button class="notice-dismiss" aria-label="{$hadrianLang.dashboard.dismiss}" data-dismiss>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
             {/if}
             {if $clientsstats.numexpiringdomains > 0}
             <div class="notice">
                 <div class="notice-ico">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="13"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                 </div>
                 <div class="notice-text">
                     <strong>{$clientsstats.numexpiringdomains} {if $clientsstats.numexpiringdomains == 1}{$hadrianLang.dashboard.domainSingular}{else}{$hadrianLang.dashboard.domainPlural}{/if}</strong> {$hadrianLang.dashboard.expireWithin45}.
                     <a href="{$WEB_ROOT}/clientarea.php?action=domains">{$LANG.domainrenew}</a> {$hadrianLang.dashboard.toKeepActive}.
                 </div>
                 <button class="notice-dismiss" aria-label="{$hadrianLang.dashboard.dismiss}" data-dismiss>
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                 </button>
             </div>
             {/if}
@@ -144,7 +144,7 @@
         {* ─── Welcome notice (empty state) ─── *}
         <div class="notice when-empty">
             <div class="notice-ico">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             </div>
             <div class="notice-text">
                 {$hadrianLang.dashboard.welcomeTo} {$companyname|escape}. {$hadrianLang.dashboard.startBy} <a href="{$WEB_ROOT}/cart.php">{$hadrianLang.dashboard.orderingAService}</a> {$LANG.or} <a href="{$WEB_ROOT}/cart.php?a=add&domain=register">{$hadrianLang.dashboard.registeringADomain}</a>.
@@ -161,22 +161,22 @@
             <p class="variant-label">Variant A — vertical</p>
             <div class="tiles-row">
                 <a href="{$WEB_ROOT}/clientarea.php?action=services" class="tile">
-                    <div class="tile-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
+                    <div class="tile-icon blue"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
                     <div class="tile-value">{$clientsstats.productsnumactive|default:0}</div>
                     <div class="tile-label">{$LANG.servicesactive|default:'Services'}</div>
                 </a>
                 <a href="{$WEB_ROOT}/clientarea.php?action=domains" class="tile">
-                    <div class="tile-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+                    <div class="tile-icon green"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
                     <div class="tile-value">{$clientsstats.numactivedomains|default:0}</div>
                     <div class="tile-label">{$LANG.navdomains}</div>
                 </a>
                 <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="tile">
-                    <div class="tile-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                    <div class="tile-icon red"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
                     <div class="tile-value">{$clientsstats.numunpaidinvoices|default:0}</div>
                     <div class="tile-label">{$LANG.clientHomePanels.unpaidInvoices}</div>
                 </a>
                 <a href="{$WEB_ROOT}/supporttickets.php" class="tile">
-                    <div class="tile-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                    <div class="tile-icon orange"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
                     <div class="tile-value">{$clientsstats.numactivetickets|default:0}</div>
                     <div class="tile-label">{$LANG.supporttickets|default:'Support'}</div>
                 </a>
@@ -188,28 +188,28 @@
             <p class="variant-label">Variant B — horizontal</p>
             <div class="tiles-row-b">
                 <a href="{$WEB_ROOT}/clientarea.php?action=services" class="tile-h">
-                    <div class="tile-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
+                    <div class="tile-icon blue"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
                     <div class="tile-h-info">
                         <div class="tile-h-value">{$clientsstats.productsnumactive|default:0}</div>
                         <div class="tile-h-label">{$LANG.servicesactive|default:'Services'}</div>
                     </div>
                 </a>
                 <a href="{$WEB_ROOT}/clientarea.php?action=domains" class="tile-h">
-                    <div class="tile-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+                    <div class="tile-icon green"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
                     <div class="tile-h-info">
                         <div class="tile-h-value">{$clientsstats.numactivedomains|default:0}</div>
                         <div class="tile-h-label">{$LANG.navdomains}</div>
                     </div>
                 </a>
                 <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="tile-h">
-                    <div class="tile-icon red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                    <div class="tile-icon red"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
                     <div class="tile-h-info">
                         <div class="tile-h-value">{$clientsstats.numunpaidinvoices|default:0}</div>
                         <div class="tile-h-label">{$LANG.clientHomePanels.unpaidInvoices}</div>
                     </div>
                 </a>
                 <a href="{$WEB_ROOT}/supporttickets.php" class="tile-h">
-                    <div class="tile-icon orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                    <div class="tile-icon orange"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
                     <div class="tile-h-info">
                         <div class="tile-h-value">{$clientsstats.numactivetickets|default:0}</div>
                         <div class="tile-h-label">{$LANG.supporttickets|default:'Support'}</div>
@@ -223,22 +223,22 @@
             <p class="variant-label">Variant C — tinted</p>
             <div class="tiles-row-c">
                 <a href="{$WEB_ROOT}/clientarea.php?action=services" class="tile-c blue">
-                    <span class="tile-c-ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></span>
+                    <span class="tile-c-ghost"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></span>
                     <div class="tile-c-value">{$clientsstats.productsnumactive|default:0}</div>
                     <div class="tile-c-label">{$LANG.servicesactive|default:'Services'}</div>
                 </a>
                 <a href="{$WEB_ROOT}/clientarea.php?action=domains" class="tile-c green">
-                    <span class="tile-c-ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></span>
+                    <span class="tile-c-ghost"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></span>
                     <div class="tile-c-value">{$clientsstats.numactivedomains|default:0}</div>
                     <div class="tile-c-label">{$LANG.navdomains}</div>
                 </a>
                 <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="tile-c red">
-                    <span class="tile-c-ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
+                    <span class="tile-c-ghost"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>
                     <div class="tile-c-value">{$clientsstats.numunpaidinvoices|default:0}</div>
                     <div class="tile-c-label">{$LANG.clientHomePanels.unpaidInvoices}</div>
                 </a>
                 <a href="{$WEB_ROOT}/supporttickets.php" class="tile-c orange">
-                    <span class="tile-c-ghost"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
+                    <span class="tile-c-ghost"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></span>
                     <div class="tile-c-value">{$clientsstats.numactivetickets|default:0}</div>
                     <div class="tile-c-label">{$LANG.supporttickets|default:'Support'}</div>
                 </a>
@@ -250,28 +250,28 @@
             <p class="variant-label">Variant D — list</p>
             <div class="tile-d-card">
                 <a href="{$WEB_ROOT}/clientarea.php?action=services" class="tile-d-row">
-                    <div class="tile-d-ico blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
+                    <div class="tile-d-ico blue"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
                     <div class="tile-d-label">{$LANG.servicesactive|default:'Services'}</div>
                     <div class="tile-d-value">{$clientsstats.productsnumactive|default:0}</div>
-                    <svg class="tile-d-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    <svg aria-hidden="true" focusable="false" class="tile-d-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
                 <a href="{$WEB_ROOT}/clientarea.php?action=domains" class="tile-d-row">
-                    <div class="tile-d-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+                    <div class="tile-d-ico green"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
                     <div class="tile-d-label">{$LANG.navdomains}</div>
                     <div class="tile-d-value">{$clientsstats.numactivedomains|default:0}</div>
-                    <svg class="tile-d-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    <svg aria-hidden="true" focusable="false" class="tile-d-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
                 <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="tile-d-row{if $clientsstats.numunpaidinvoices > 0} alert{/if}">
-                    <div class="tile-d-ico red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                    <div class="tile-d-ico red"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
                     <div class="tile-d-label">{$LANG.clientHomePanels.unpaidInvoices}</div>
                     <div class="tile-d-value">{$clientsstats.numunpaidinvoices|default:0}</div>
-                    <svg class="tile-d-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    <svg aria-hidden="true" focusable="false" class="tile-d-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
                 <a href="{$WEB_ROOT}/supporttickets.php" class="tile-d-row">
-                    <div class="tile-d-ico orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                    <div class="tile-d-ico orange"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
                     <div class="tile-d-label">{$LANG.supporttickets|default:'Support'}</div>
                     <div class="tile-d-value">{$clientsstats.numactivetickets|default:0}</div>
-                    <svg class="tile-d-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    <svg aria-hidden="true" focusable="false" class="tile-d-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
             </div>
         </div>
@@ -281,28 +281,28 @@
             <p class="variant-label">Variant F — list (horizontal)</p>
             <div class="tile-f-card">
                 <a href="{$WEB_ROOT}/clientarea.php?action=services" class="tile-f-cell">
-                    <div class="tile-f-ico blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
+                    <div class="tile-f-ico blue"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg></div>
                     <div class="tile-f-text">
                         <div class="tile-f-label">{$LANG.servicesactive|default:'Services'}</div>
                         <div class="tile-f-value">{$clientsstats.productsnumactive|default:0}</div>
                     </div>
                 </a>
                 <a href="{$WEB_ROOT}/clientarea.php?action=domains" class="tile-f-cell">
-                    <div class="tile-f-ico green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+                    <div class="tile-f-ico green"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
                     <div class="tile-f-text">
                         <div class="tile-f-label">{$LANG.navdomains}</div>
                         <div class="tile-f-value">{$clientsstats.numactivedomains|default:0}</div>
                     </div>
                 </a>
                 <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="tile-f-cell{if $clientsstats.numunpaidinvoices > 0} alert{/if}">
-                    <div class="tile-f-ico red"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+                    <div class="tile-f-ico red"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
                     <div class="tile-f-text">
                         <div class="tile-f-label">{$LANG.unpaid|default:'Unpaid'}</div>
                         <div class="tile-f-value">{$clientsstats.numunpaidinvoices|default:0}</div>
                     </div>
                 </a>
                 <a href="{$WEB_ROOT}/supporttickets.php" class="tile-f-cell">
-                    <div class="tile-f-ico orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+                    <div class="tile-f-ico orange"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
                     <div class="tile-f-text">
                         <div class="tile-f-label">{$LANG.supporttickets|default:'Support'}</div>
                         <div class="tile-f-value">{$clientsstats.numactivetickets|default:0}</div>
@@ -317,28 +317,28 @@
             <div class="tiles-row-e">
                 <a href="{$WEB_ROOT}/clientarea.php?action=services" class="tile-e blue">
                     <div class="tile-e-ring">
-                        <svg viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="27"/><circle class="fg" cx="32" cy="32" r="27"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="27"/><circle class="fg" cx="32" cy="32" r="27"/></svg>
                         <div class="tile-e-value">{$clientsstats.productsnumactive|default:0}</div>
                     </div>
                     <div class="tile-e-label">{$LANG.servicesactive|default:'Services'}</div>
                 </a>
                 <a href="{$WEB_ROOT}/clientarea.php?action=domains" class="tile-e green">
                     <div class="tile-e-ring">
-                        <svg viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="27"/><circle class="fg" cx="32" cy="32" r="27"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="27"/><circle class="fg" cx="32" cy="32" r="27"/></svg>
                         <div class="tile-e-value">{$clientsstats.numactivedomains|default:0}</div>
                     </div>
                     <div class="tile-e-label">{$LANG.navdomains}</div>
                 </a>
                 <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="tile-e red">
                     <div class="tile-e-ring">
-                        <svg viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="27"/><circle class="fg" cx="32" cy="32" r="27"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="27"/><circle class="fg" cx="32" cy="32" r="27"/></svg>
                         <div class="tile-e-value">{$clientsstats.numunpaidinvoices|default:0}</div>
                     </div>
                     <div class="tile-e-label">{$LANG.clientHomePanels.unpaidInvoices}</div>
                 </a>
                 <a href="{$WEB_ROOT}/supporttickets.php" class="tile-e orange">
                     <div class="tile-e-ring">
-                        <svg viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="27"/><circle class="fg" cx="32" cy="32" r="27"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 64 64"><circle class="bg" cx="32" cy="32" r="27"/><circle class="fg" cx="32" cy="32" r="27"/></svg>
                         <div class="tile-e-value">{$clientsstats.numactivetickets|default:0}</div>
                     </div>
                     <div class="tile-e-label">{$LANG.supporttickets|default:'Support'}</div>
@@ -353,7 +353,7 @@
             <div class="card-header">
                 <h2 class="card-title">{$LANG.clientHomePanels.activeProductsServices|default:'Your Active Products/Services'}</h2>
                 <a href="{$WEB_ROOT}/clientarea.php?action=services" class="card-action">
-                    {$LANG.viewall|default:'View All'} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    {$LANG.viewall|default:'View All'} <svg aria-hidden="true" focusable="false" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
             </div>
             {if $hasNativeServices}
@@ -366,14 +366,14 @@
                         <div menuItemName="{$serviceItem->getName()}" class="service-item native-home-row service-row{if $serviceItem->getClass()} {$serviceItem->getClass()}{/if}" id="{$serviceItem->getId()}">
                     {/if}
                             <div class="service-icon">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
                             </div>
                             <div class="service-info">
                                 <div class="service-name">{$serviceItem->getLabel()}</div>
                                 {if $serviceItem->hasBadge()}<div class="service-domain">{$serviceItem->getBadge()}</div>{/if}
                             </div>
                             {if $serviceItem->getUri()}
-                                <span class="service-chevron"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
+                                <span class="service-chevron"><svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></span>
                             {/if}
                     {if $serviceItem->getUri()}
                         </a>
@@ -388,7 +388,7 @@
                     {assign var=svcTitle value=$svc.groupname|default:$svc.product|default:$svc.name|default:'Service'}
                     <a href="{$svc.manageUrl|default:"`$WEB_ROOT`/clientarea.php?action=productdetails&id=`$svc.id`"}" class="service-item">
                         <div class="service-icon">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
                         </div>
                         <div class="service-info">
                             <div class="service-name"><strong>{$svcTitle|escape}</strong>{if $svc.name && $svc.name != $svcTitle} — {$svc.name|escape}{/if}</div>
@@ -405,7 +405,7 @@
             <div class="card-body">
                 <div class="empty-state">
                     <div class="empty-ico">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
                     </div>
                     <h3 class="empty-state-title">{$hadrianLang.dashboard.noServicesTitle}</h3>
                     <p class="empty-state-sub">{$hadrianLang.dashboard.noServicesSub}</p>
@@ -421,7 +421,7 @@
                 <div class="card-header">
                     <h2 class="card-title">{$LANG.recentSupportTickets|default:'Recent Support Tickets'}</h2>
                     <a href="{$WEB_ROOT}/submitticket.php" class="card-action">
-                        {$LANG.navopenticket} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        {$LANG.navopenticket} <svg aria-hidden="true" focusable="false" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                     </a>
                 </div>
                 {if $hasNativeTickets}
@@ -479,7 +479,7 @@
                 <div class="card-body">
                     <div class="empty-state">
                         <div class="empty-ico">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
                         </div>
                         <h3 class="empty-state-title">{$hadrianLang.dashboard.noTicketsTitle}</h3>
                         <p class="empty-state-sub">{$hadrianLang.dashboard.noTicketsSub}</p>
@@ -495,7 +495,7 @@
                 </div>
                 <div class="card-body">
                     <form class="rd-form" id="rdForm" action="{$WEB_ROOT}/domainchecker.php" method="post">
-                        <input type="text" name="search" class="rd-input" id="rdInput" placeholder="{$LANG.domainsfindyournew|default:'Find your new domain name'}" autocapitalize="none" autocomplete="off" required>
+                        <input aria-label="{$LANG.domainsfindyournew|default:'Find your new domain name'}" type="text" name="search" class="rd-input" id="rdInput" placeholder="{$LANG.domainsfindyournew|default:'Find your new domain name'}" autocapitalize="none" autocomplete="off" required>
                         <div class="rd-actions">
                             <button type="submit" class="btn-secondary" name="transfer" value="1" formaction="{$WEB_ROOT}/cart.php?a=add&domain=transfer">{$LANG.transferdomain}</button>
                             <button type="submit" class="btn-primary" name="register" value="1" formaction="{$WEB_ROOT}/cart.php?a=add&domain=register">{$LANG.registerdomain}</button>
@@ -510,7 +510,7 @@
             <div class="card-header">
                 <h2 class="card-title">{$LANG.recentNews|default:'Recent News'}</h2>
                 <a href="{$WEB_ROOT}/announcements.php" class="card-action">
-                    {$LANG.viewall|default:'View All'} <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                    {$LANG.viewall|default:'View All'} <svg aria-hidden="true" focusable="false" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </a>
             </div>
             {if $hasNativeNews}
@@ -549,7 +549,7 @@
             <div class="card-body">
                 <div class="empty-state">
                     <div class="empty-ico">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
                     </div>
                     <h3 class="empty-state-title">{$hadrianLang.dashboard.noAnnouncements}</h3>
                     <p class="empty-state-sub">{$hadrianLang.dashboard.noAnnouncementsSub}</p>
@@ -566,31 +566,31 @@
         <div class="card subnav-card">
             <div class="subnav-heading">{$LANG.accounttab|default:'Account'}</div>
             <a href="{$WEB_ROOT}/clientarea.php" class="subnav-item active">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                 {$LANG.clientareanavhome|default:'Go to dashboard'}
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=services" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 17v4"/></svg>
                 {$LANG.navservices}
                 <span class="subnav-count">{$clientsstats.productsnumactive|default:0}</span>
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=domains" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
                 {$LANG.navdomains}
                 <span class="subnav-count">{$clientsstats.numactivedomains|default:0}</span>
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
                 {$LANG.navinvoices}
                 <span class="subnav-count">{$clientsstats.numunpaidinvoices|default:0}</span>
             </a>
             <a href="{$WEB_ROOT}/supporttickets.php" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
                 {$LANG.navtickets}
                 <span class="subnav-count">{$clientsstats.numactivetickets|default:0}</span>
             </a>
             <a href="{$WEB_ROOT}/clientarea.php?action=details" class="subnav-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
                 {$LANG.navchangedetails|default:'My Details'}
             </a>
         </div>

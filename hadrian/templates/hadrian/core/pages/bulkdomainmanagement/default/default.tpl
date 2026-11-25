@@ -52,12 +52,12 @@
     {if isset($save) && $save}
         {if isset($errors) && $errors|@count > 0}
         <div class="bdm-alert error">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <div>{$LANG.clientareaerrors}<ul>{foreach $errors as $error}<li>{$error|strip_tags}</li>{/foreach}</ul></div>
         </div>
         {else}
         <div class="bdm-alert success">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
             <div>{$LANG.changessavedsuccessfully}</div>
         </div>
         {/if}
@@ -67,7 +67,7 @@
     <div class="bdm-domains">
         {foreach $domains as $domain}
         <span class="bdm-domain-item">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
             {$domain|escape}
         </span>
         {/foreach}
@@ -106,7 +106,7 @@
 
             {elseif $bdmUpdate == 'autorenew'}
                 <h2 class="card-title" style="font-size:16px;margin-bottom:8px;">{$LANG.domainsautorenew}</h2>
-                <div class="bdm-alert info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><div>{$LANG.domainautorenewrecommend}</div></div>
+                <div class="bdm-alert info"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><div>{$LANG.domainautorenewrecommend}</div></div>
                 <div class="bdm-actions">
                     <button type="submit" name="enable" value="1" class="btn-primary">{$LANG.domainsautorenewenable}</button>
                     <span class="bdm-or">{$LANG.or}</span>
@@ -115,7 +115,7 @@
 
             {elseif $bdmUpdate == 'reglock'}
                 <h2 class="card-title" style="font-size:16px;margin-bottom:8px;">{$LANG.domainregistrarlock}</h2>
-                <div class="bdm-alert info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg><div>{$LANG.domainreglockrecommend}</div></div>
+                <div class="bdm-alert info"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg><div>{$LANG.domainreglockrecommend}</div></div>
                 <div class="bdm-actions">
                     <button type="submit" name="enable" value="1" class="btn-primary">{$LANG.domainreglockenable}</button>
                     <span class="bdm-or">{$LANG.or}</span>
@@ -124,7 +124,7 @@
 
             {else}
                 <h2 class="card-title" style="font-size:16px;margin-bottom:8px;">{$LANG.domaincontactinfo}</h2>
-                <div class="bdm-alert info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><div>{$hadrianLang.domains.bulkContactInfo}</div></div>
+                <div class="bdm-alert info"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg><div>{$hadrianLang.domains.bulkContactInfo}</div></div>
                 <div class="bdm-actions">
                     <a href="{$WEB_ROOT}/clientarea.php?action=domains" class="btn-primary">{$hadrianLang.domains.goToMyDomains}</a>
                 </div>
@@ -141,7 +141,7 @@
     <div class="card">
         <div class="bdm-empty">
             <div class="bdm-empty-ico">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
             </div>
             <p class="bdm-empty-title">{$hadrianLang.domains.bulkNoneTitle}</p>
             <p class="bdm-empty-sub">{$hadrianLang.domains.bulkNoneSub}</p>

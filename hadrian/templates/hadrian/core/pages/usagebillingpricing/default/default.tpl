@@ -107,7 +107,7 @@
     <div class="card">
         <div class="ub-empty">
             <div class="ub-empty-ico">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg>
             </div>
             <p class="ub-empty-title">{$hadrianLang.services.usagePricingNoneTitle}</p>
             <p class="ub-empty-sub">{$hadrianLang.services.usagePricingNoneSub}</p>

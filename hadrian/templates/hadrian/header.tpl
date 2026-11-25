@@ -238,30 +238,30 @@
 {assign var=_tf value=$templatefile|default:''}
 {if $_tf == 'clientareahome'}
     {assign var=mt_activeNav value='dashboard'}
-    {assign var=mt_pageLabel value='Dashboard'}
+    {assign var=mt_pageLabel value=$hadrianLang.nav.dashboard|default:'Dashboard'}
 {elseif $_tf == 'clientareaproducts'}
     {assign var=mt_activeNav value='services'}
-    {assign var=mt_pageLabel value='My Products & Services'}
+    {assign var=mt_pageLabel value=$LANG.clientareaproducts}
 {elseif $_tf == 'clientareaproductdetails'}
     {assign var=mt_activeNav value='services'}
 {elseif $_tf == 'clientareadomains'}
     {assign var=mt_activeNav value='domains'}
-    {assign var=mt_pageLabel value='My Domains'}
+    {assign var=mt_pageLabel value=$LANG.clientareanavdomains}
 {elseif $_tf == 'clientareainvoices'}
     {assign var=mt_activeNav value='invoices'}
-    {assign var=mt_pageLabel value='My Invoices'}
+    {assign var=mt_pageLabel value=$LANG.invoices}
 {elseif $_tf == 'viewinvoice'}
     {assign var=mt_activeNav value='invoices'}
 {elseif $_tf == 'supporttickets' || $_tf == 'supportticketslist'}
     {assign var=mt_activeNav value='tickets'}
-    {assign var=mt_pageLabel value='Support Tickets'}
+    {assign var=mt_pageLabel value=$LANG.supportticketspagetitle}
 {elseif $_tf == 'viewticket'}
     {assign var=mt_activeNav value='tickets'}
 {elseif $_tf == 'clientareadetails'}
     {assign var=mt_activeNav value='details'}
-    {assign var=mt_pageLabel value='My Details'}
+    {assign var=mt_pageLabel value=$LANG.clientareanavdetails}
 {elseif $_tf == 'announcements'}
-    {assign var=mt_pageLabel value='Announcements'}
+    {assign var=mt_pageLabel value=$LANG.announcementstitle}
 {/if}
 <!DOCTYPE html>
 <!-- hadrian header v11 -->
@@ -478,7 +478,7 @@
     <nav class="ph-breadcrumb ph-breadcrumb-back only-top" aria-label="{$hadrianLang.nav.breadcrumb}">
         <div class="ph-breadcrumb-inner">
             <a href="{$WEB_ROOT}/" class="ph-back-link">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 {$LANG.home|default:'Portal Home'}
             </a>
         </div>

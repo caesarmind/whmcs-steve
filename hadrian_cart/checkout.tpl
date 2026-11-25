@@ -555,12 +555,17 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
     margin: 0;
 }
 .co-left .form-group.prepend-icon .field-icon i { line-height: 1; }
+/* Visible field labels (WCAG 1.3.1, 3.3.2), above the field as on the
+   register page; they replaced labels that held only an icon. The icon sits
+   in .co-field-wrap so it stays centred on the input, not input + label. */
+.co-left .co-field-label { display: block; margin: 0 0 6px; font-size: 13px; font-weight: 500; line-height: 1.3; color: var(--color-text-primary); }
+.co-left .co-field-wrap { position: relative; }
 .co-left .form-control,
 .co-left .field {
     width: 100%;
     height: 42px;
     padding: 0 14px 0 38px;
-    border: 0.5px solid var(--color-border);
+    border: 1px solid var(--color-input-border, #8a8a8f);   /* 3:1, WCAG 1.4.11 */
     border-radius: 10px;
     background: var(--color-surface);
     font-size: 13.5px;
@@ -571,7 +576,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
     transition: all 0.15s;
 }
 .co-left textarea.form-control { height: auto; padding: 10px 14px; }
-.co-left select.form-control { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 32px; }
+.co-left select.form-control { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;utf8,<svg aria-hidden="true" focusable="false" xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%238e8e93' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 32px; }
 .co-left .form-control:focus,
 .co-left .field:focus {
     outline: none;
@@ -1741,19 +1746,19 @@ button.generate-password:hover {
                 <p class="co-sub">{$hadrianLang.cart.checkoutSubtitle}</p>
             </div>
             <a href="{$WEB_ROOT}/cart.php?a=view" class="co-back-cart">
-                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                <svg aria-hidden="true" focusable="false" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 {$hadrianLang.cart.backToCart}
             </a>
         </header>
 
         <div class="co-steps" aria-label="{$hadrianLang.cart.checkoutProgress}">
-            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepChoosePlan}</span>
+            <span class="co-step done"><span class="co-step-num"><svg aria-hidden="true" focusable="false" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepChoosePlan}</span>
             <span class="co-step-sep">&rsaquo;</span>
-            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepDomain}</span>
+            <span class="co-step done"><span class="co-step-num"><svg aria-hidden="true" focusable="false" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepDomain}</span>
             <span class="co-step-sep">&rsaquo;</span>
-            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepConfigure}</span>
+            <span class="co-step done"><span class="co-step-num"><svg aria-hidden="true" focusable="false" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepConfigure}</span>
             <span class="co-step-sep">&rsaquo;</span>
-            <span class="co-step done"><span class="co-step-num"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepCart}</span>
+            <span class="co-step done"><span class="co-step-num"><svg aria-hidden="true" focusable="false" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></span>{$hadrianLang.cart.stepCart}</span>
             <span class="co-step-sep">&rsaquo;</span>
             <span class="co-step active"><span class="co-step-num">5</span>{$LANG.checkout}</span>
         </div>
@@ -1770,7 +1775,7 @@ button.generate-password:hover {
                 <button type="button" id="btnNewUserSignup" class="w-hidden"></button>
             </div>
 
-            <div class="alert alert-danger checkout-error-feedback {if !$errormessage}d-none{/if}" role="alert">
+            <div class="alert alert-danger checkout-error-feedback {if !$errormessage}d-none{/if}" role="alert"{if $errormessage} data-error-summary{/if}>
                 <p>{$LANG.orderForm.correctErrors}:</p>
                 <ul>
                     {if $errormessage}
@@ -1822,7 +1827,7 @@ button.generate-password:hover {
                         </div>
                         <div class="co-lastchance-body">
                             {foreach $hookOutput as $output}
-                                {* Inner <div class="sub-heading"> is hidden
+                                {* Inner <div class="sub-heading" role="heading" aria-level="3"> is hidden
                                    via the `.co-lastchance-body .mc-promo
                                    .sub-heading { display: none }` CSS rule
                                    above. Earlier attempts to strip it with
@@ -1838,7 +1843,7 @@ button.generate-password:hover {
                 {if $captcha && $captcha->isEnabled() && $captcha->isEnabledForForm($captchaForm)}
                     <div class="co-captcha-card">
                         {if !$captcha->isInvisible()}
-                            <div class="sub-heading">
+                            <div class="sub-heading" role="heading" aria-level="3">
                                 <span class="primary-bg-color">{$LANG.captchatitle}</span>
                             </div>
                         {/if}
@@ -1873,14 +1878,14 @@ button.generate-password:hover {
                 {if $showMarketingEmailOptIn}
                     <div class="co-mailing marketing-email-optin" style="margin-bottom: 16px;">
                         <div class="co-mailing-icon" aria-hidden="true">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
+                            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22 6 12 13 2 6"/></svg>
                         </div>
                         <div class="co-mailing-meta">
-                            <h4 class="co-mailing-title">{lang key='emailMarketing.joinOurMailingList'}</h4>
+                            <h4 class="co-mailing-title" id="coMailingTitle" aria-level="3">{lang key='emailMarketing.joinOurMailingList'}</h4>
                             <p class="co-mailing-desc">{$marketingEmailOptInMessage}</p>
                         </div>
                         <label class="co-mailing-toggle">
-                            <input type="checkbox" name="marketingoptin" value="1" class="no-icheck" data-no-icheck="true"{if $marketingEmailOptIn} checked{/if}>
+                            <input type="checkbox" aria-labelledby="coMailingTitle" name="marketingoptin" value="1" class="no-icheck" data-no-icheck="true"{if $marketingEmailOptIn} checked{/if}>
                             <span class="co-mailing-switch" aria-hidden="true">
                                 <span class="co-mailing-handle"></span>
                             </span>
@@ -1907,7 +1912,7 @@ button.generate-password:hover {
 
             {if $servedOverSsl}
                 <div class="alert alert-warning checkout-security-msg">
-                    <i class="fas fa-lock"></i>
+                    <i aria-hidden="true" class="fas fa-lock"></i>
                     {$LANG.ordersecure} (<strong>{$ipaddress}</strong>) {$LANG.ordersecure2}
                     <div class="clearfix"></div>
                 </div>

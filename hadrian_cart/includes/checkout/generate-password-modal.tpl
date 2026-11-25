@@ -40,7 +40,7 @@
                         <div class="gp-output-row">
                             <input type="text" class="form-control" id="inputGeneratePasswordOutput" readonly placeholder="—">
                             <button type="submit" class="gp-btn gp-btn-ghost" title="{lang key='generatePassword.generateNew'}">
-                                <i class="fas fa-sync-alt"></i>
+                                <i aria-hidden="true" class="fas fa-sync-alt"></i>
                                 <span>{lang key='generatePassword.generateNew'}</span>
                             </button>
                         </div>

@@ -51,10 +51,10 @@
                         <span style="font-size: 10px; color: #30d158; font-weight: 600;">&bull; Active</span>
                     </div>
                     <div style="display: flex; flex-direction: column; gap: 6px;">
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><span style="font-size: 11px; color: #1a7f37;">Today &middot; 03:00 AM</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">Yesterday &middot; 03:00 AM</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">2 days ago &middot; 03:00 AM</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">3 days ago &middot; 03:00 AM</span><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: #e8f8ed; border-radius: 8px;"><span style="font-size: 11px; color: #1a7f37;">Today &middot; 03:00 AM</span><svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">Yesterday &middot; 03:00 AM</span><svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">2 days ago &middot; 03:00 AM</span><svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 8px 10px; background: var(--color-surface-secondary); border-radius: 8px;"><span style="font-size: 11px; color: var(--color-text-primary);">3 days ago &middot; 03:00 AM</span><svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg></div>
                     </div>
                 </div>
             </div>
@@ -130,12 +130,12 @@
                     <div style="background: var(--color-surface); border-radius: 14px; padding: 20px; width: 100%; max-width: 260px; box-shadow: 0 8px 24px rgba(0,0,0,0.08); position: relative;">
                         <div style="display: flex; gap: 4px; margin-bottom: 14px;"><span style="width: 8px; height: 8px; background: #ff453a; border-radius: 50%;"></span><span style="width: 8px; height: 8px; background: #ff9f0a; border-radius: 50%;"></span><span style="width: 8px; height: 8px; background: #30d158; border-radius: 50%;"></span></div>
                         <div style="background: #ffefec; border-radius: 10px; padding: 14px; text-align: center;">
-                            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff453a" stroke-width="2" style="margin-bottom: 8px;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <svg aria-hidden="true" focusable="false" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ff453a" stroke-width="2" style="margin-bottom: 8px;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                             <div style="font-size: 13px; font-weight: 600; color: #ff453a;">Malware detected</div>
                             <div style="font-size: 11px; color: var(--color-text-tertiary); margin-top: 4px;">wp-config.php</div>
                         </div>
                         <div style="margin-top: 12px; padding: 10px; background: #e8f8ed; border-radius: 10px; display: flex; align-items: center; gap: 8px;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                            <svg aria-hidden="true" focusable="false" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1a7f37" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                             <span style="font-size: 11px; color: #1a7f37; font-weight: 600;">Restored from backup</span>
                         </div>
                     </div>
@@ -157,7 +157,7 @@
                     <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 16px;">
                         <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 10px;">One-click restore</div>
                         <div style="display: flex; align-items: center; gap: 10px;">
-                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #0071e3, #5ac8fa); border-radius: 12px; display: flex; align-items: center; justify-content: center;"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></div>
+                            <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #0071e3, #5ac8fa); border-radius: 12px; display: flex; align-items: center; justify-content: center;"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg></div>
                             <div style="flex: 1;">
                                 <div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">Restore to yesterday</div>
                                 <div style="font-size: 11px; color: var(--color-text-tertiary);">Estimated time: 3 min</div>
@@ -178,7 +178,7 @@
                 <div class="visual-box" style="background: #eaf4ff; padding: 24px;">
                     <div style="width: 100%; max-width: 300px; background: var(--color-surface); border-radius: 14px; padding: 14px;">
                         <div style="font-size: 11px; font-weight: 600; color: var(--color-text-primary); margin-bottom: 10px;">Snapshot timeline</div>
-                        <svg viewBox="0 0 260 80" style="width: 100%; height: 80px;">
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 260 80" style="width: 100%; height: 80px;">
                             <line x1="10" y1="40" x2="250" y2="40" stroke="#e8e8ed" stroke-width="2"/>
                             <circle cx="20" cy="40" r="8" fill="#30d158"/>
                             <circle cx="70" cy="40" r="6" fill="#0071e3"/>
@@ -202,14 +202,14 @@
     <section class="hp-features-section" style="padding: 72px 22px;">
         <h2>{$hadrianLang.store.cgFeaturesTitle}</h2>
         <div class="hp-feature-cards" style="margin-top: 40px;">
-            <div class="hp-feature-card"><div class="feat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><h4>{$hadrianLang.store.cgFeat1Title}</h4><p>{$hadrianLang.store.cgFeat1Text}</p></div>
-            <div class="hp-feature-card"><div class="feat-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><h4>{$hadrianLang.store.cgFeat2Title}</h4><p>{$hadrianLang.store.cgFeat2Text}</p></div>
-            <div class="hp-feature-card"><div class="feat-icon purple"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg></div><h4>{$hadrianLang.store.cgFeat3Title}</h4><p>{$hadrianLang.store.cgFeat3Text}</p></div>
-            <div class="hp-feature-card"><div class="feat-icon orange"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><h4>{$hadrianLang.store.cgFeat4Title}</h4><p>{$hadrianLang.store.cgFeat4Text}</p></div>
-            <div class="hp-feature-card"><div class="feat-icon teal"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/></svg></div><h4>{$hadrianLang.store.cgFeat5Title}</h4><p>{$hadrianLang.store.cgFeat5Text}</p></div>
-            <div class="hp-feature-card"><div class="feat-icon red"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><h4>{$hadrianLang.store.cgFeat6Title}</h4><p>{$hadrianLang.store.cgFeat6Text}</p></div>
-            <div class="hp-feature-card"><div class="feat-icon blue"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h4>{$hadrianLang.store.cgFeat7Title}</h4><p>{$hadrianLang.store.cgFeat7Text}</p></div>
-            <div class="hp-feature-card"><div class="feat-icon green"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></div><h4>{$hadrianLang.store.cgFeat8Title}</h4><p>{$hadrianLang.store.cgFeat8Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon blue"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div><h4>{$hadrianLang.store.cgFeat1Title}</h4><p>{$hadrianLang.store.cgFeat1Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon green"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></div><h4>{$hadrianLang.store.cgFeat2Title}</h4><p>{$hadrianLang.store.cgFeat2Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon purple"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/></svg></div><h4>{$hadrianLang.store.cgFeat3Title}</h4><p>{$hadrianLang.store.cgFeat3Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon orange"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div><h4>{$hadrianLang.store.cgFeat4Title}</h4><p>{$hadrianLang.store.cgFeat4Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon teal"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/></svg></div><h4>{$hadrianLang.store.cgFeat5Title}</h4><p>{$hadrianLang.store.cgFeat5Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon red"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div><h4>{$hadrianLang.store.cgFeat6Title}</h4><p>{$hadrianLang.store.cgFeat6Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon blue"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><h4>{$hadrianLang.store.cgFeat7Title}</h4><p>{$hadrianLang.store.cgFeat7Text}</p></div>
+            <div class="hp-feature-card"><div class="feat-icon green"><svg aria-hidden="true" focusable="false" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M22 6l-10 7L2 6"/></svg></div><h4>{$hadrianLang.store.cgFeat8Title}</h4><p>{$hadrianLang.store.cgFeat8Text}</p></div>
         </div>
         <div style="text-align: center; margin-top: 32px;">
             <a href="#pricing" class="hp-buy-btn">{$hadrianLang.store.cgHeroCta}</a>
@@ -289,7 +289,7 @@
 
 <div class="when-empty" style="text-align:center;padding:60px 24px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:14px;">
     <div style="width:56px;height:56px;border-radius:50%;background:var(--color-bg);display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;color:var(--color-text-tertiary);">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
     </div>
     <p style="font-size:17px;font-weight:600;color:var(--color-text-primary);margin:0 0 6px;">{$hadrianLang.store.cgEmptyTitle}</p>
     <p style="font-size:14px;color:var(--color-text-secondary);margin:0 0 20px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.5;">{$hadrianLang.store.cgEmptyText}</p>

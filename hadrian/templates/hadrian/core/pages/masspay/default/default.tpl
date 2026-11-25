@@ -42,7 +42,7 @@
 
 <div class="mp-wrap">
     {if isset($errormessage) && $errormessage}
-    <div class="mp-error">{if is_array($errormessage)}{foreach $errormessage as $err}{$err|strip_tags|escape}{/foreach}{else}{$errormessage|strip_tags|escape}{/if}</div>
+    <div class="mp-error" role="alert" data-error-summary>{if is_array($errormessage)}{foreach $errormessage as $err}{$err|strip_tags|escape}{/foreach}{else}{$errormessage|strip_tags|escape}{/if}</div>
     {/if}
 
     <div class="when-full">
@@ -105,7 +105,7 @@
     </div>
 
     <div class="when-empty mp-empty">
-        <div class="mp-empty-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        <div class="mp-empty-ico"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
         <p class="mp-empty-title">{$LANG.nounpaidinvoices|default:'No unpaid invoices'}</p>
         <p class="mp-empty-sub">{$hadrianLang.billing.noUnpaidInvoicesSub}</p>
         <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-secondary">{$LANG.navinvoices}</a>

@@ -313,7 +313,7 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
                     <div class="dt-search">
                         <div class="dt-search-box">
                             <svg class="dt-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                            <input type="text"
+                            <input aria-label="{$LANG.domainname}" type="text"
                                    class="dt-search-input"
                                    id="inputTransferDomain"
                                    name="domain"
@@ -326,7 +326,7 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
                                     id="btnTransferDomain"
                                     class="dt-transfer-btn btn-transfer{$captcha->getButtonClass($captchaForm)}">
                                 <span class="loader w-hidden" id="addTransferLoader" aria-hidden="true">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
+                                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
                                 </span>
                                 <span id="addToCart">{$LANG.orderForm.addToCart}</span>
                             </button>
@@ -359,8 +359,8 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
                             {if $captcha->isEnabled() && !$captcha->recaptcha->isEnabled()}
                                 <div class="dt-captcha" id="captchaContainer">
                                     <p>{$LANG.cartSimpleCaptcha}</p>
-                                    <img id="inputCaptchaImage" src="{$systemurl}includes/verifyimage.php" alt="captcha" />
-                                    <input id="inputCaptcha"
+                                    <img id="inputCaptchaImage" src="{$systemurl}includes/verifyimage.php" alt="{$LANG.captchatitle|escape}" />
+                                    <input id="inputCaptcha" aria-label="{$LANG.captchatitle|escape}"
                                            type="text" name="code" maxlength="6"
                                            data-toggle="tooltip" data-placement="right" data-trigger="manual"
                                            title="{$LANG.orderForm.required}"
@@ -388,21 +388,21 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
                     <div class="dt-steps">
                         <div class="dt-step">
                             <div class="dt-step-ico blue" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                             </div>
                             <h4>{$hadrianLang.domains.transferStep1Title}</h4>
                             <p>{$hadrianLang.domains.transferStep1Desc}</p>
                         </div>
                         <div class="dt-step">
                             <div class="dt-step-ico green" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
+                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
                             </div>
                             <h4>{$hadrianLang.domains.transferStep2Title}</h4>
                             <p>{$hadrianLang.domains.transferStep2Desc}</p>
                         </div>
                         <div class="dt-step">
                             <div class="dt-step-ico orange" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
+                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
                             </div>
                             <h4>{$hadrianLang.domains.transferStep3Title}</h4>
                             <p>{$hadrianLang.domains.transferStep3Desc}</p>
@@ -418,21 +418,21 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
                     <div class="dt-steps">
                         <div class="dt-step">
                             <div class="dt-step-ico purple" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                             </div>
                             <h4>{$hadrianLang.domains.transferWhyExtendTitle}</h4>
                             <p>{$hadrianLang.domains.transferWhyExtendDesc}</p>
                         </div>
                         <div class="dt-step">
                             <div class="dt-step-ico blue" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                             </div>
                             <h4>{$hadrianLang.domains.transferWhy24Title}</h4>
                             <p>{$hadrianLang.domains.transferWhy24Desc}</p>
                         </div>
                         <div class="dt-step">
                             <div class="dt-step-ico green" aria-hidden="true">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                             </div>
                             <h4>{$hadrianLang.domains.transferWhyPrivacyTitle}</h4>
                             <p>{$hadrianLang.domains.transferWhyPrivacyDesc}</p>
@@ -452,7 +452,7 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
             <div class="dt-when-empty">
                 <div class="card dt-empty">
                     <div class="dt-empty-ico" aria-hidden="true">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h13"/><polyline points="11 7 16 12 11 17"/><path d="M19 5v14"/></svg>
+                        <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h13"/><polyline points="11 7 16 12 11 17"/><path d="M19 5v14"/></svg>
                     </div>
                     <h2>{$hadrianLang.domains.transferEmptyTitle}</h2>
                     <p>{$hadrianLang.domains.transferEmptyDesc}</p>
