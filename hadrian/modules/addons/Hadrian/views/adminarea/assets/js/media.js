@@ -671,6 +671,35 @@
         });
     });
 
+    // Quality and largest size: each saves on its own when it changes, and
+    // goes back to what it was if the save fails.
+    function setting(select, field, done) {
+        if (!select) return;
+        var was = select.value;
+        select.addEventListener('change', function () {
+            var fd = new FormData();
+            fd.append(field, select.value);
+            select.disabled = true;
+            post('settings', fd, function (res) {
+                select.disabled = false;
+                was = select.value;
+                say(done(res), 'ok');
+            }, function (err) {
+                select.disabled = false;
+                select.value = was;
+                say(err, 'error');
+            });
+        });
+    }
+    setting($('mt-ml-quality'), 'quality', function () {
+        return 'Quality saved. It applies to images optimised from now on.';
+    });
+    setting($('mt-ml-maxedge'), 'max_edge', function (res) {
+        return res.maxEdge
+            ? 'Saved. Images larger than ' + res.maxEdge + ' px are scaled down when they are optimised.'
+            : 'Saved. Images keep their own size when they are optimised.';
+    });
+
     // For the tests: the list as the screen holds it, and whether it is busy.
     window.hadrianMedia = {
         state: state,

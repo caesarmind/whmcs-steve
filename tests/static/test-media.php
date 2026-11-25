@@ -247,6 +247,31 @@ namespace {
         O::forget($big);
         same('forget() removes the original', O::hasOriginal($big), false);
 
+        // The two things an admin can set: quality and the largest size.
+        $sized = static function (string $file, int $quality, int $edge) use ($dir): array {
+            $path = $dir . '/' . $file;
+            imagejpeg(photo(3000, 2000), $path, 97);
+            return O::optimize($path, $quality, $edge) + ['bytes' => (int)filesize($path)];
+        };
+        $high  = $sized('q-high.jpg', 90, 2560);
+        $small = $sized('q-small.jpg', 70, 2560);
+        same('both qualities optimise', [$high['status'], $small['status']], ['optimized', 'optimized']);
+        truthy('a lower quality gives a smaller file', $small['after'] < $high['after'] * 0.9);
+        same('a smaller largest size scales further', array_slice($sized('edge-1600.jpg', 82, 1600), 4, 2), ['width' => 1600, 'height' => 1067]);
+        same('"do not resize" keeps the image\'s own size', array_slice($sized('edge-none.jpg', 82, 0), 4, 2), ['width' => 3000, 'height' => 2000]);
+        same('an image under the limit is never enlarged', array_slice($sized('edge-4k.jpg', 82, 3840), 4, 2), ['width' => 3000, 'height' => 2000]);
+        same('a nonsense quality is pulled into range, not obeyed', $sized('q-zero.jpg', 0, 2560)['status'], 'optimized');
+        truthy('(and still decodes)', getimagesize($dir . '/q-zero.jpg') !== false);
+        foreach (['q-high', 'q-small', 'edge-1600', 'edge-none', 'edge-4k', 'q-zero'] as $f) {
+            O::forget($dir . '/' . $f . '.jpg');
+            unlink($dir . '/' . $f . '.jpg');
+        }
+
+        // The choices offered are the only values that can be stored.
+        same('the default quality is one of the choices', isset(L::QUALITIES[O::QUALITY]), true);
+        same('the default size is one of the choices', isset(L::MAX_EDGES[O::MAX_EDGE]), true);
+        same('with no settings table the defaults apply', [L::quality(), L::maxEdge()], [O::QUALITY, O::MAX_EDGE]);
+
         // The library lists none of the working folders or files.
         $names = array_column(L::uploaderFor('library')->listStored(0), 'name');
         sort($names);

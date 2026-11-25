@@ -251,6 +251,72 @@ test('media screen: the optimise switch is saved, and an upload then stays as se
   expect(listing(dir), 'the library folder is as it was').toEqual(before);
 });
 
+test('media screen: quality and largest size are saved and used', async ({ page }) => {
+  const dir = path.join(IMG, 'media');
+  const before = listing(dir);
+  await page.goto(`${H}&action=media`);
+  await mediaIdle(page);
+  const quality = page.locator('#mt-ml-quality');
+  const edge = page.locator('#mt-ml-maxedge');
+  const was = { quality: await quality.inputValue(), edge: await edge.inputValue() };
+  const pick = async (select, value) => {
+    if ((await select.inputValue()) === value) return;
+    const saved = jsonFrom(page, 'settings');
+    await select.selectOption(value);
+    return (await saved).json();
+  };
+  const token = () => page.evaluate(() => JSON.parse(document.getElementById('mt-ml-data').textContent).token);
+  try {
+    expect((await pick(quality, '70')).quality, 'the answer carries the saved quality').toBe(70);
+    expect((await pick(edge, '1600')).maxEdge).toBe(1600);
+    await page.reload();
+    await mediaIdle(page);
+    await expect(quality, 'quality survives a reload').toHaveValue('70');
+    await expect(edge, 'so does the largest size').toHaveValue('1600');
+
+    // A value that is not one of the choices is refused and changes nothing.
+    const bad = await page.request.post(`${H}&action=media&sub=settings`, {
+      form: { collection: 'library', quality: '5', token: await token() }, headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    });
+    expect(bad.status(), 'quality 5 is not offered').toBe(422);
+    await page.reload();
+    await mediaIdle(page);
+    await expect(quality).toHaveValue('70');
+
+    // An upload is scaled to the size that was set. (The optimise switch is
+    // on by default; the test above restores it.)
+    const big = Buffer.from(await page.evaluate(async () => {
+      const c = document.createElement('canvas');
+      c.width = 2400; c.height = 1200;
+      const g = c.getContext('2d');
+      for (let i = 0; i < 300; i++) {
+        g.fillStyle = `hsl(${(i * 61) % 360} 75% ${25 + (i * 17) % 55}%)`;
+        g.fillRect((i * 173) % 2400, (i * 89) % 1200, 60 + (i * 29) % 300, 40 + (i * 23) % 200);
+      }
+      const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.97));
+      return Array.from(new Uint8Array(await blob.arrayBuffer()));
+    }));
+    const uploaded = jsonFrom(page, 'upload');
+    await page.locator('#mt-ml-file').setInputFiles({ name: 'e2e-wide.jpg', mimeType: 'image/jpeg', buffer: big });
+    const up = await (await uploaded).json();
+    expect(up.optimized, JSON.stringify(up)).toBe(true);
+    expect([up.item.w, up.item.h], 'scaled to 1600 on its longest side').toEqual([1600, 800]);
+    await mediaIdle(page);
+
+    await page.locator(`.mt-ml-tile[data-name="${up.item.name}"]`).click();
+    await page.locator('#mt-ml-detail .mt-ml-del').click();
+    const deleted = jsonFrom(page, 'delete');
+    await page.locator('#mt-ml-dialog-yes').click();
+    expect((await (await deleted).json()).deleted).toBe(1);
+  } finally {
+    await page.goto(`${H}&action=media`);
+    await mediaIdle(page);
+    await pick(quality, was.quality);
+    await pick(edge, was.edge);
+  }
+  expect(listing(dir), 'the library folder is as it was').toEqual(before);
+});
+
 test('a signed-in admin still needs the CSRF token', async ({ page }) => {
   // Another site cannot make an admin's browser do this: it has no token.
   await page.goto(`${H}&action=branding`);

@@ -269,16 +269,35 @@ final class MediaController
         $this->respondJson(['ok' => true, 'item' => $this->itemFor($name)]);
     }
 
-    /** POST sub=settings (optimize=0|1) -> { ok, optimizeUploads } */
+    /**
+     * POST sub=settings -> { ok, optimizeUploads, quality, maxEdge }
+     *
+     * Each field is optional and saved on its own, so the screen can send
+     * the one control that changed: optimize=0|1, quality=<one of
+     * MediaLibrary::QUALITIES>, max_edge=<one of MediaLibrary::MAX_EDGES>.
+     */
     public function settingsAction(): never
     {
         $this->boot();
         try {
-            MediaLibrary::setOptimizesUploads(!empty($_POST['optimize']));
+            if (isset($_POST['optimize'])) {
+                MediaLibrary::setOptimizesUploads(!empty($_POST['optimize']));
+            }
+            if (isset($_POST['quality']) && !MediaLibrary::setQuality((int)$_POST['quality'])) {
+                $this->respondJson(['ok' => false, 'error' => 'That quality is not one of the choices.'], 422);
+            }
+            if (isset($_POST['max_edge']) && !MediaLibrary::setMaxEdge((int)$_POST['max_edge'])) {
+                $this->respondJson(['ok' => false, 'error' => 'That size is not one of the choices.'], 422);
+            }
         } catch (\Throwable $e) {
             $this->respondJson(['ok' => false, 'error' => 'The setting could not be saved.'], 500);
         }
-        $this->respondJson(['ok' => true, 'optimizeUploads' => MediaLibrary::optimizesUploads()]);
+        $this->respondJson([
+            'ok'              => true,
+            'optimizeUploads' => MediaLibrary::optimizesUploads(),
+            'quality'         => MediaLibrary::quality(),
+            'maxEdge'         => MediaLibrary::maxEdge(),
+        ]);
     }
 
     // ------------------------------------------------------------- internals
@@ -331,7 +350,7 @@ final class MediaController
     private function optimizeOne(string $name): array
     {
         $path = $this->uploader->diskPathFor($name);
-        $r    = MediaOptimizer::optimize($path);
+        $r    = MediaOptimizer::optimize($path, MediaLibrary::quality(), MediaLibrary::maxEdge());
         clearstatcache(true, $path);
         if ($r['status'] === 'optimized') {
             MediaLibrary::patch($this->collection, $name, ['w' => $r['width'], 'h' => $r['height'], 'skipOptimize' => 0]);

@@ -85,7 +85,7 @@
             <div class="mt-row">
                 <div>
                     <div class="mt-row-label mt-tip-line">Optimise new uploads
-                        {include file="includes/tip.tpl" text="Makes each upload smaller as it arrives: an image larger than `$mediaMaxEdge` pixels is scaled down, and JPEG, PNG and WebP files are compressed. The original is kept, so you can put it back from the image's details." article="media" anchor="optimising-images"}
+                        {include file="includes/tip.tpl" text="Makes each upload smaller as it arrives: an image larger than the size below is scaled down, and JPEG, PNG and WebP files are compressed. The original is kept, so you can put it back from the image's details." article="media" anchor="optimising-images"}
                     </div>
                     <div class="mt-row-help">
                         {if $mediaOptimizer}
@@ -101,6 +101,35 @@
                 </label>
             </div>
             {if $mediaOptimizer}
+            {* How optimising works. Used for new uploads and for every
+               "Optimise" on this screen, so these stay usable while the
+               switch above is off. Saved one at a time, as they change. *}
+            <div class="mt-row">
+                <div>
+                    <div class="mt-row-label mt-tip-line">Quality
+                        {include file="includes/tip.tpl" text="How hard JPEG and WebP images are compressed. PNG images are always compressed without loss, whatever is chosen here." article="media" anchor="quality-and-size"}
+                    </div>
+                    <div class="mt-row-help">Applies to images optimised from now on. One already optimised keeps the quality it got; restore its original to run it again.</div>
+                </div>
+                <select class="mt-select mt-ml-set" id="mt-ml-quality" aria-label="Quality">
+                    {foreach $mediaQualities as $value => $label}
+                        <option value="{$value}" {if $value == $mediaQuality}selected{/if}>{$label|escape}</option>
+                    {/foreach}
+                </select>
+            </div>
+            <div class="mt-row">
+                <div>
+                    <div class="mt-row-label mt-tip-line">Largest size
+                        {include file="includes/tip.tpl" text="An image wider or taller than this is scaled down to it, keeping its proportions. A smaller image is never enlarged." article="media" anchor="quality-and-size"}
+                    </div>
+                    <div class="mt-row-help">The longest side an optimised image keeps. 2560 px is enough for a full-width picture on a high-density screen.</div>
+                </div>
+                <select class="mt-select mt-ml-set" id="mt-ml-maxedge" aria-label="Largest size">
+                    {foreach $mediaMaxEdges as $value => $label}
+                        <option value="{$value}" {if $value == $mediaMaxEdge}selected{/if}>{$label|escape}</option>
+                    {/foreach}
+                </select>
+            </div>
             <div class="mt-row">
                 <div>
                     <div class="mt-row-label">Optimise the library</div>

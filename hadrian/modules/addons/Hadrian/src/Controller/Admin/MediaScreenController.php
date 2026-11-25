@@ -46,7 +46,10 @@ final class MediaScreenController extends AbstractController
             'mediaJs'        => $script,
             'mediaOptimizer' => MediaOptimizer::available(),
             'mediaOptimize'  => MediaLibrary::optimizesUploads(),
-            'mediaMaxEdge'   => MediaOptimizer::MAX_EDGE,
+            'mediaQuality'   => MediaLibrary::quality(),
+            'mediaQualities' => MediaLibrary::QUALITIES,
+            'mediaMaxEdge'   => MediaLibrary::maxEdge(),
+            'mediaMaxEdges'  => MediaLibrary::MAX_EDGES,
             'mediaMaxFiles'  => MediaController::MAX_FILES,
         ]);
     }

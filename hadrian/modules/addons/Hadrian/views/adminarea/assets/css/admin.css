@@ -1173,6 +1173,8 @@ body:has(#mt-admin-root) h1:not(.mt-page-title) { display: none !important; }
 .mt-ml-bar { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 .mt-ml-search { flex: 1 1 220px; max-width: 320px; }
 .mt-ml-sort { width: auto; min-width: 150px; }
+/* The optimise settings' selects, at the right of their row. */
+.mt-ml-set { width: auto; min-width: 200px; max-width: 100%; flex-shrink: 0; }
 .mt-ml-gap { flex: 1; }
 
 /* Segmented filter: the top nav's pill, at control size. */

@@ -71,14 +71,30 @@ A new image takes the name of the file you uploaded. To change it, edit **Name**
 
 Large images are the most common reason a page loads slowly. With **Optimise new uploads** switched on, which it is by default, Hadrian makes each image smaller as it arrives:
 
-- An image wider or taller than 2560 pixels is scaled down to that. Nothing on a client page is drawn larger.
-- JPEG and WebP files are saved again at a quality that looks the same at normal sizes. PNG files are compressed without any loss.
+- An image wider or taller than the **Largest size** is scaled down to it.
+- JPEG and WebP files are saved again at the **Quality** you chose. PNG files are compressed without any loss.
 
 The image keeps its address, so nothing that uses it has to change. The result replaces the file only when it is clearly smaller. Otherwise the upload is stored exactly as you sent it.
 
 The upload you sent is kept. An optimised image shows **Optimised** and how much it saved in its details, with **Restore original** beside it. Restoring puts your file back, byte for byte.
 
 To run the same pass over images that were uploaded earlier, use **Optimise all** at the bottom of the screen, or tick a few tiles and choose **Optimise**. An image you restored on purpose is skipped by **Optimise all**.
+
+### Quality and size
+
+Two settings under the grid decide how optimising works. They apply to new uploads and to every **Optimise** on the screen, and they stay usable while **Optimise new uploads** is off.
+
+**Quality** sets how hard JPEG and WebP images are compressed:
+
+| Quality | Use it when |
+| --- | --- |
+| High | Photography is the product and files may be larger |
+| Balanced | The default. Smaller files that look the same at normal sizes |
+| Small | Page speed matters most. Fine detail softens a little |
+
+**Largest size** is the longest side an optimised image keeps: 1600, 1920, 2560 or 3840 pixels, or **Do not resize**. The default is 2560, enough for a full-width picture on a high-density screen. A smaller image is never enlarged.
+
+A change applies to images optimised from then on. An image that is already optimised keeps what it got. To run it again with the new settings, open it, click **Restore original**, then **Optimise**.
 
 Some images are always left as they are:
 

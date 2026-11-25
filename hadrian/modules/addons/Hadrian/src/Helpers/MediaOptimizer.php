@@ -31,10 +31,13 @@ namespace Hadrian\Helpers;
  */
 final class MediaOptimizer
 {
-    /** JPEG and WebP quality. Visually clean at normal sizes, about half the bytes of 95. */
+    /**
+     * Default JPEG and WebP quality. Visually clean at normal sizes, about
+     * half the bytes of 95. The admin can pick another on the Media screen.
+     */
     public const QUALITY = 82;
 
-    /** Longest edge, in pixels, an optimised image keeps. */
+    /** Default longest edge, in pixels, an optimised image keeps. */
     public const MAX_EDGE = 2560;
 
     /** The result must be at most this share of the original to replace it. */
@@ -59,8 +62,14 @@ final class MediaOptimizer
      *         kept       already as small as this can make it; nothing changed
      *         skipped    not attempted; `reason` says why, in words for the admin
      */
-    public static function optimize(string $path): array
+    public static function optimize(string $path, int $quality = self::QUALITY, int $maxEdge = self::MAX_EDGE): array
     {
+        // What the admin chose on the Media screen (MediaLibrary::quality(),
+        // ::maxEdge()). Kept inside what makes sense whatever is passed: a
+        // quality under 40 is visibly broken, and 0 for the edge means
+        // "do not scale".
+        $quality = max(40, min(95, $quality));
+        $maxEdge = $maxEdge <= 0 ? 0 : max(320, $maxEdge);
         $before = is_file($path) ? (int)@filesize($path) : 0;
         $out = static fn(string $status, string $reason = '', int $after = 0, int $w = 0, int $h = 0): array => [
             'status' => $status, 'reason' => $reason, 'before' => $before,
@@ -91,7 +100,7 @@ final class MediaOptimizer
         if ($why !== '') {
             return $out('skipped', $why, 0, $w, $h);
         }
-        if (!self::fitsInMemory($w, $h)) {
+        if (!self::fitsInMemory($w, $h, $maxEdge)) {
             return $out('skipped', 'Too large to process on this server (' . $w . ' x ' . $h . ').', 0, $w, $h);
         }
 
@@ -110,7 +119,7 @@ final class MediaOptimizer
             [$w, $h] = [imagesx($src), imagesy($src)];
         }
 
-        [$nw, $nh] = self::fit($w, $h);
+        [$nw, $nh] = self::fit($w, $h, $maxEdge);
         $resized   = $nw !== $w || $nh !== $h;
         if ($resized) {
             $dst = imagecreatetruecolor($nw, $nh);
@@ -134,9 +143,9 @@ final class MediaOptimizer
             imageinterlace($src, true);          // progressive: usually a little smaller, paints sooner
         }
         $written = match ($mime) {
-            'image/jpeg' => @imagejpeg($src, $tmp, self::QUALITY),
+            'image/jpeg' => @imagejpeg($src, $tmp, $quality),
             'image/png'  => @imagepng($src, $tmp, 9),
-            'image/webp' => @imagewebp($src, $tmp, self::QUALITY),
+            'image/webp' => @imagewebp($src, $tmp, $quality),
             default      => false,
         };
         imagedestroy($src);
@@ -339,14 +348,14 @@ final class MediaOptimizer
         return $img;
     }
 
-    /** @return array{0:int,1:int} the size after scaling the longest edge to MAX_EDGE */
-    private static function fit(int $w, int $h): array
+    /** @return array{0:int,1:int} the size after scaling the longest edge to $maxEdge (0: as it is) */
+    private static function fit(int $w, int $h, int $maxEdge): array
     {
         $long = max($w, $h);
-        if ($long <= self::MAX_EDGE) {
+        if ($maxEdge <= 0 || $long <= $maxEdge) {
             return [$w, $h];
         }
-        $k = self::MAX_EDGE / $long;
+        $k = $maxEdge / $long;
         return [max(1, (int)round($w * $k)), max(1, (int)round($h * $k))];
     }
 
@@ -355,13 +364,13 @@ final class MediaOptimizer
      * PHP has left? A failed allocation in GD is a fatal error, not something
      * to catch, so this is asked first.
      */
-    private static function fitsInMemory(int $w, int $h): bool
+    private static function fitsInMemory(int $w, int $h, int $maxEdge): bool
     {
         $limit = self::bytes((string)ini_get('memory_limit'));
         if ($limit <= 0) {
             return true;                         // -1: no limit
         }
-        [$nw, $nh] = self::fit($w, $h);
+        [$nw, $nh] = self::fit($w, $h, $maxEdge);
         // ~5 bytes a pixel for a truecolour GD canvas, with headroom.
         $need = (int)(($w * $h + $nw * $nh) * 5 * 1.3);
         return $need < $limit - memory_get_usage(true) - 8 * 1024 * 1024;

@@ -219,6 +219,77 @@ final class MediaLibrary
         \Hadrian\Models\Settings::setValue(self::OPTIMIZE_SETTING, $on ? '1' : '0');
     }
 
+    public const QUALITY_SETTING  = 'media_optimize_quality';
+    public const MAX_EDGE_SETTING = 'media_optimize_max_edge';
+
+    /**
+     * The quality choices on the Media screen: JPEG/WebP quality => what the
+     * admin reads. Three named levels, not a 1-100 slider: nobody knows what
+     * 74 looks like, and the useful range is narrow.
+     */
+    public const QUALITIES = [
+        90 => 'High: closest to the original',
+        82 => 'Balanced: smaller, looks the same at normal sizes',
+        70 => 'Small: smallest files, fine detail softens',
+    ];
+
+    /** The size choices: longest edge in pixels => label. 0 keeps every image at its own size. */
+    public const MAX_EDGES = [
+        1600 => '1600 px',
+        1920 => '1920 px',
+        2560 => '2560 px',
+        3840 => '3840 px',
+        0    => 'Do not resize',
+    ];
+
+    /** The quality optimising uses. Always one of QUALITIES. */
+    public static function quality(): int
+    {
+        return self::choice(self::QUALITY_SETTING, self::QUALITIES, MediaOptimizer::QUALITY);
+    }
+
+    /** The longest edge optimising scales down to; 0 for none. Always one of MAX_EDGES. */
+    public static function maxEdge(): int
+    {
+        return self::choice(self::MAX_EDGE_SETTING, self::MAX_EDGES, MediaOptimizer::MAX_EDGE);
+    }
+
+    /** Save a quality; false when it is not one of the choices. */
+    public static function setQuality(int $quality): bool
+    {
+        if (!isset(self::QUALITIES[$quality])) {
+            return false;
+        }
+        \Hadrian\Models\Settings::setValue(self::QUALITY_SETTING, (string)$quality);
+        return true;
+    }
+
+    /** Save a longest edge; false when it is not one of the choices. */
+    public static function setMaxEdge(int $edge): bool
+    {
+        if (!isset(self::MAX_EDGES[$edge])) {
+            return false;
+        }
+        \Hadrian\Models\Settings::setValue(self::MAX_EDGE_SETTING, (string)$edge);
+        return true;
+    }
+
+    /**
+     * A stored setting, if it is still one of the choices; the default
+     * otherwise (never saved, no table, or a value a later version dropped).
+     *
+     * @param array<int,string> $choices
+     */
+    private static function choice(string $key, array $choices, int $default): int
+    {
+        try {
+            $raw = \Hadrian\Models\Settings::getValue($key);
+        } catch (\Throwable $e) {
+            return $default;
+        }
+        return is_numeric($raw) && isset($choices[(int)$raw]) ? (int)$raw : $default;
+    }
+
     /**
      * Derive a human label from the browser-supplied upload name.
      * Never trusted as a path — basename, extension dropped, control chars
