@@ -36,7 +36,7 @@ Playwright report (screenshots, traces, the HTML of every failing page).
 | **static** | 32 checkers: every page is tested or has a stated reason why not, CSS is ASCII-only, PHP parses, Smarty balance, every `$hadrianLang` key resolves, colour defaults match the CSS, the three "Free" implementations agree, admin JS parses, docs anchors, ... | no | ~30 s |
 | **compile** | every one of the 314 templates compiled by **WHMCS's own Smarty** (its modifiers + security policy) | WHMCS files | ~12 s |
 | **smoke** | every page x persona over HTTP, every Hadrian admin screen, and a crawl that follows every link the theme renders | yes | ~3 min |
-| **browser** | real Chromium: every key page in 3 layouts x light/dark + phone width; JS errors, failed assets, layout geometry, unreadable text; six user flows | yes | ~3 min |
+| **browser** | real Chromium: every key page in 3 layouts x light/dark + phone width; JS errors, failed assets, layout geometry, unreadable text; the user flows; one test per client-area and order-form feature that needs no setting changed (`client-area.spec`, `order.spec`, the TH and OF rows of [FEATURES.md](FEATURES.md)) | yes | ~15 min |
 | **visual** | screenshots compared against approved baselines - **advisory**, never fails the run | yes | ~2 min |
 
 ### Hadrian Email Templates

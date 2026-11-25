@@ -5,10 +5,12 @@
  *   php tests/php/settings.php snapshot
  *   php tests/php/settings.php set '{"hide_breadcrumb":["1","bool"]}'
  *   php tests/php/settings.php variant '{"login":"split"}'
+ *   php tests/php/settings.php page '{"knowledgebase":{"visibility":"auth","settings":{"subnav":"off"}}}'
  *   php tests/php/settings.php restore
  *
- * snapshot copies every hadrian_settings row and every hadrian_pages variant
- * and per-page settings blob of the hadrian template to
+ * snapshot copies every hadrian_settings row and every hadrian_pages variant,
+ * per-page settings blob, visibility, indexing and SEO column of the hadrian
+ * template to
  * tests/.local/settings-snapshot.json. restore puts
  * that state back EXACTLY (rows added since are deleted) and removes the file.
  * The preflight runs restore whenever the file exists, so a run that died
@@ -46,6 +48,10 @@ $now = date('Y-m-d H:i:s');
 // a test sets, and the addon rewrites them on its own; leave them alone.
 $isCache = fn(string $k) => in_array($k, ['hadrian_pages_discovered', 'hadrian_layouts_discovered'], true);
 
+// hadrian_pages columns the `page` command writes (besides variant + settings,
+// which have their own snapshot keys). Restored exactly by `restore`.
+const PAGE_COLUMNS = ['visibility', 'indexing', 'seo_enabled', 'seo_title', 'seo_description', 'seo_image'];
+
 switch ($cmd) {
     case 'snapshot':
         if (is_file($snapFile)) { echo "snapshot already exists - keeping the older one\n"; break; }
@@ -57,7 +63,12 @@ switch ($cmd) {
         // The per-page settings blob (options, layout overrides, sub-nav, area),
         // as stored: a test that saves through the page editor rewrites it.
         $pageSettings = DB::table('hadrian_pages')->where('template', TEMPLATE)->pluck('settings', 'page')->all();
-        file_put_contents($snapFile, json_encode(['takenAt' => $now, 'settings' => $settings, 'variants' => $variants, 'pageSettings' => $pageSettings], JSON_PRETTY_PRINT));
+        // Every other column the `page` command can change, per row.
+        $pageRows = [];
+        foreach (DB::table('hadrian_pages')->where('template', TEMPLATE)->get(array_merge(['page'], PAGE_COLUMNS)) as $r) {
+            $pageRows[$r->page] = array_intersect_key((array) $r, array_flip(PAGE_COLUMNS));
+        }
+        file_put_contents($snapFile, json_encode(['takenAt' => $now, 'settings' => $settings, 'variants' => $variants, 'pageSettings' => $pageSettings, 'pageRows' => $pageRows], JSON_PRETTY_PRINT));
         echo 'snapshot: ' . count($settings) . " settings\n";
         break;
 
@@ -81,6 +92,36 @@ switch ($cmd) {
         echo "variant\n";
         break;
 
+    case 'page':
+        // php settings.php page '{"knowledgebase":{"visibility":"auth","seo_title":{"english":"X"},"settings":{"options":{"full_page":"1"}}}}'
+        // `settings` is MERGED one level deep into the stored blob (so a test
+        // setting options keeps the row's layout_overrides); every other key
+        // replaces its column. Arrays are JSON-encoded, as Models\Page does.
+        if (!is_file($snapFile)) { fwrite(STDERR, "take a snapshot first\n"); exit(3); }
+        foreach ((array) $arg as $page => $cols) {
+            $row = DB::table('hadrian_pages')->where('template', TEMPLATE)->where('page', $page)->first();
+            if (!$row) { fwrite(STDERR, "no hadrian_pages row for page '$page' (open the admin Pages tab once to seed the registry)\n"); exit(4); }
+            $update = ['updated_at' => $now];
+            foreach ((array) $cols as $col => $v) {
+                if ($col === 'settings') {
+                    $blob = json_decode((string) ($row->settings ?? ''), true);
+                    if (!is_array($blob)) $blob = [];
+                    foreach ((array) $v as $k => $sv) {
+                        $blob[$k] = (is_array($sv) && is_array($blob[$k] ?? null)) ? array_merge($blob[$k], $sv) : $sv;
+                        if ($sv === null) unset($blob[$k]);
+                    }
+                    $update['settings'] = json_encode($blob);
+                } elseif (in_array($col, PAGE_COLUMNS, true) || $col === 'variant') {
+                    $update[$col] = is_array($v) ? json_encode($v) : $v;
+                } else {
+                    fwrite(STDERR, "unknown hadrian_pages column '$col'\n"); exit(5);
+                }
+            }
+            DB::table('hadrian_pages')->where('template', TEMPLATE)->where('page', $page)->update($update);
+        }
+        echo "page\n";
+        break;
+
     case 'restore':
         if (!is_file($snapFile)) { echo "nothing to restore\n"; break; }
         $snap = json_decode((string) file_get_contents($snapFile), true);
@@ -97,11 +138,14 @@ switch ($cmd) {
         foreach (($snap['pageSettings'] ?? []) as $page => $blob) {
             DB::table('hadrian_pages')->where('template', TEMPLATE)->where('page', $page)->update(['settings' => $blob]);
         }
+        foreach (($snap['pageRows'] ?? []) as $page => $cols) {
+            DB::table('hadrian_pages')->where('template', TEMPLATE)->where('page', $page)->update($cols);
+        }
         unlink($snapFile);
         echo "restored the settings snapshot from {$snap['takenAt']}\n";
         break;
 
     default:
-        fwrite(STDERR, "usage: settings.php snapshot | set <json> | variant <json> | restore\n");
+        fwrite(STDERR, "usage: settings.php snapshot | set <json> | variant <json> | page <json> | restore\n");
         exit(1);
 }

@@ -35,7 +35,10 @@ for (const m of read('routes.mjs').matchAll(/tpl:\s*(\[[^\]]*\]|'[^']*')/g)) {
 // A route whose page has no data-tpl (a standalone popup) names what it covers.
 for (const m of read('routes.mjs').matchAll(/covers:\s*'([^']+)'/g)) rendered.add(m[1]);
 // expect(await tpl(page)).toBe('x'), expect(await tpl(page), 'why').toBe('x'), expect(got.tpl).toBe('x')
-for (const m of ['flows.spec.mjs', 'flows-more.spec.mjs'].map(read).join('\n').matchAll(/(?:tpl\(page\)(?:,\s*[^)]*)?\)|got\.tpl\))\.toBe\('([^']+)'\)/g)) rendered.add(m[1]);
+// The feature specs (client-area, order, theme-settings) assert data-tpl the same way.
+const FLOW_SPECS = ['flows.spec.mjs', 'flows-more.spec.mjs', 'client-area.spec.mjs', 'order.spec.mjs', 'theme-settings.spec.mjs']
+  .filter(f => fs.existsSync(path.join(TESTS, 'e2e', f)));
+for (const m of FLOW_SPECS.map(read).join('\n').matchAll(/(?:tpl\(page\)(?:,\s*[^)]*)?\)|got\.tpl\))\.toBe\('([^']+)'\)/g)) rendered.add(m[1]);
 // Page variants the settings tier switches on and renders: ['page', 'variant', '.marker', persona, url]
 for (const m of read('settings.spec.mjs').matchAll(/\['([a-z0-9-]+)', '([a-z0-9-]+)', '[.#][^']+', '(?:guest|full|empty)'/g)) rendered.add(`${m[1]}/${m[2]}`);
 

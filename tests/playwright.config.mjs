@@ -46,7 +46,9 @@ export default defineConfig({
     { name: 'setup', testMatch: /auth\.setup\.mjs/ },
     { name: 'smoke', testMatch: /(smoke|admin|links)\.spec\.mjs/, dependencies: ['setup'] },
     {
-      name: 'browser', testMatch: /(browser|flows|flows-more|sweep)\.spec\.mjs/, dependencies: ['setup'],
+      // client-area.spec and order.spec: one test per feature in tests/FEATURES.md (TH-*, OF-*)
+      // that needs no setting changed. The ones that do are in theme-settings.spec (settings project).
+      name: 'browser', testMatch: /(browser|flows|flows-more|sweep|client-area|order)\.spec\.mjs/, dependencies: ['setup'],
       use: { ...devices['Desktop Chrome'], userAgent: USER_AGENT, viewport: { width: 1280, height: 860 } },
     },
     {

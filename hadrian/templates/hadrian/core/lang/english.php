@@ -893,11 +893,13 @@ return [
     // deduped to one per English string (stepper, trust, last-chance, etc).
     // ---------------------------------------------------------------------
     'cart' => [
-        // configureproductdomain own-domain JS validation (B03; inside a
-        // {literal} block, seeded via _localLang). "not valid" uses real
-        // {$LANG.cartdomaininvalid}; these two have no WHMCS key.
+        // configureproductdomain domain check (inside a {literal} block,
+        // seeded via _localLang). The results use WHMCS's own strings
+        // ($LANG.cartdomaininvalid, orderForm.*); these four have no WHMCS key.
         'ownDomainNeedBoth' => 'Please enter both the domain name and the TLD.',
+        'domainNameRequired' => 'Please enter a domain name.',
         'domainChecking'    => 'Checking...',
+        'domainCheckFailed' => 'We could not check that domain just now. Please try again.',
         // Step strip (shared viewcart / configureproduct / configureproductdomain /
         // configuredomains / checkout).
         'stepChoosePlan'   => 'Choose plan',

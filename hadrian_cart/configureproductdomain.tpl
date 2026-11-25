@@ -16,11 +16,24 @@
  *       domains[]     — full <sld>.<tld> (everything except incart)
  *       incartdomain  — full domain string (only when option=incart)
  *
+ * The domain check: every option asks WHMCS's /domain/check first, as
+ * standard_cart does (scripts.js, #frmProductDomain submit), because the
+ * a=add&domainselect=1 POST itself validates nothing.
+ *   - owndomain / subdomain / incart: the check ADDS the plan to the cart
+ *     and answers its cart index (result[].num); the page then goes to
+ *     cart.php?a=confproduct&i=<num>. The form is never submitted, or the
+ *     plan would be added twice.
+ *   - register / transfer: the check only looks the name up. The form is
+ *     submitted (with the name WHMCS returned) when it is valid and free
+ *     (register) or registered elsewhere (transfer).
+ *   - The check needs the CSRF token (window.csrfToken, header.tpl). Without
+ *     it WHMCS answers 302 and resets the session: that once signed the
+ *     customer out and emptied the cart (tests/FEATURES.md, bugs 37-39).
+ *
  * JS contract DROPPED (per user direction "replace JS where it
  * conflicts"):
- *   - scripts.min.js's AJAX domain-availability check.
- *     The "Search" button just submits the form; WHMCS server-side
- *     validates the domain and bounces back with an error if invalid.
+ *   - scripts.min.js's result UI (#DomainSearchResults, spotlight,
+ *     suggestions); the inline script below runs the check instead.
  *   - $showAdvancedSearchOptions AI search variant + tlds[] / maxLength
  *     / safe-search multiselect. Re-introduce as a separate panel later.
  *   - $spotlightTlds card grid + $domainSuggestions / suggested-domains
@@ -30,8 +43,8 @@
  *
  * The inline <script> at the bottom owns the new behavior:
  *   - Swap visible .dp-panel when the radio in .dp-options changes.
- *   - On form submit, read the active panel's [data-input] fields and
- *     write the result into the hidden #resultDomain / #resultIncart.
+ *   - On form submit, read the active panel's [data-input] fields, run
+ *     the domain check above, and show WHMCS's answer in the panel.
  *   - Clear panel error state on input.
  *}
 
@@ -312,13 +325,18 @@
 
 {include file="orderforms/$carttpl/recommendations-modal.tpl"}
 
-{* Smarty-to-JS lang seed for the own-domain validator below. That script runs
+{* Smarty-to-JS lang seed for the domain check below. That script runs
    inside a Smarty literal block and cannot read Smarty vars directly. *}
 <script>
 var _localLang = {
     ownDomainNeedBoth: '{$hadrianLang.cart.ownDomainNeedBoth|escape:"javascript"}',
+    domainNameRequired: '{$hadrianLang.cart.domainNameRequired|escape:"javascript"}',
     domainChecking: '{$hadrianLang.cart.domainChecking|escape:"javascript"}',
-    domainInvalid: '{$LANG.cartdomaininvalid|escape:"javascript"}'
+    domainCheckFailed: '{$hadrianLang.cart.domainCheckFailed|escape:"javascript"}',
+    domainInvalid: '{$LANG.cartdomaininvalid|escape:"javascript"}',
+    domainUnavailable: '{$LANG.orderForm.domainIsUnavailable|default:":domain is unavailable"|escape:"javascript"}',
+    transferNotRegistered: '{$LANG.orderForm.transferNotRegistered|default:"The domain you entered does not appear to be registered."|escape:"javascript"}',
+    contactSupport: '{$LANG.domainChecker.contactSupport|default:"Contact Support to Purchase"|escape:"javascript"}'
 };
 </script>
 <script>
@@ -382,141 +400,187 @@ var _localLang = {
         });
     });
 
-    // Populate the hidden submit fields based on the chosen option.
-    form.addEventListener('submit', function () {
+    // ── The domain check (see the header comment) ──
+    // One submit handler for every option. It always stops the native
+    // submit, asks /domain/check, then either submits the form itself
+    // (register, transfer) or goes to the configure step of the plan the
+    // check just added (owndomain, subdomain, incart).
+    var pid = (form.querySelector('input[name="pid"]') || {}).value || '';
+    var submitting = false;
+
+    function csrf() {
+        if (typeof window.csrfToken === 'string' && window.csrfToken) return window.csrfToken;
+        var input = form.querySelector('input[name="token"]');
+        return input ? input.value : '';
+    }
+
+    // What the active panel asks for, in /domain/check's terms; null when
+    // a field is empty.
+    function query(opt, panel) {
+        var sld, tld;
+        if (opt === 'incart') {
+            sld = readInput(panel, 'incartsld');
+            return sld ? { sld: sld, tld: '', domain: sld } : null;
+        }
+        sld = readInput(panel, 'sld').toLowerCase();
+        tld = readInput(panel, 'tld').toLowerCase().replace(/^\./, '');
+        if (!sld || !tld) return null;
+        return { sld: sld, tld: '.' + tld, domain: sld + '.' + tld };
+    }
+
+    function checkDomain(type, q) {
+        var url = (window.WHMCS && WHMCS.utils && WHMCS.utils.getRouteUrl)
+            ? WHMCS.utils.getRouteUrl('/domain/check')
+            : (window.whmcsBaseUrl || window.WEB_ROOT || '') + '/index.php?rp=/domain/check';
+        var body = new URLSearchParams();
+        body.set('token', csrf());
+        body.set('type', type);
+        body.set('pid', pid);
+        body.set('domain', q.domain);
+        body.set('sld', q.sld);
+        body.set('tld', q.tld);
+        body.set('source', 'cartAddDomain');
+        return fetch(url, {
+            method: 'POST', credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: body.toString()
+        }).then(function (r) {
+            // A refused token answers with a redirect to an HTML page, which
+            // fails here and is reported as a failed check.
+            if (!r.ok) throw new Error('HTTP ' + r.status);
+            return r.json();
+        });
+    }
+
+    // data.result is a list of results, or an object such as
+    // {"error": "The domain you entered is not valid"}.
+    function results(data) {
+        var r = data && data.result;
+        if (Array.isArray(r)) return r;
+        if (r && typeof r === 'object') {
+            return Object.keys(r).map(function (k) { return k === 'error' ? { error: r[k] } : r[k]; });
+        }
+        return [];
+    }
+    function errorText(item) {
+        if (typeof item === 'string') return item;
+        if (item && item.error) return String(item.error).replace(/<br\s*\/?>/gi, ' ');
+        return '';
+    }
+    function plainText(html) {
+        var d = document.createElement('div');
+        d.innerHTML = html;
+        return d.textContent || '';
+    }
+
+    function goConfigure(num) {
+        var url = (window.whmcsBaseUrl || window.WEB_ROOT || '') + '/cart.php?a=confproduct&i=' + encodeURIComponent(num);
+        // standard_cart's recommendations modal, when the product has any.
+        if (window.jQuery && typeof window.displayRecommendations === 'function') {
+            try {
+                window.displayRecommendations((window.whmcsBaseUrl || window.WEB_ROOT || '') + '/cart.php', 'addproductajax=1&a=confproduct&i=' + encodeURIComponent(num), false)
+                    .done(function () { window.location = url; });
+                return;
+            } catch (e) {}
+        }
+        window.location = url;
+    }
+
+    function submitWith(domainName) {
+        resultDomain.value = domainName;
+        resultIncart.value = '';
+        submitting = true;
+        form.submit();
+    }
+
+    function handle(opt, panel, data) {
+        var list = results(data);
+        var item = list[0];
+        var err = errorText(item);
+
+        if (opt === 'owndomain' || opt === 'subdomain' || opt === 'incart') {
+            if (item && item.status === true && item.num !== undefined && item.num !== null) {
+                goConfigure(item.num);
+                return true;
+            }
+            showPanelError(panel, err || _localLang.domainInvalid);
+            return false;
+        }
+
+        if (!item) {
+            showPanelError(panel, opt === 'transfer' ? _localLang.transferNotRegistered : _localLang.domainInvalid);
+        } else if (err) {
+            showPanelError(panel, err);
+        } else if (!item.isValidDomain) {
+            showPanelError(panel, item.domainErrorMessage || _localLang.domainInvalid);
+        } else if (opt === 'transfer') {
+            if (item.isRegistered) { submitWith(item.domainName); return true; }
+            showPanelError(panel, _localLang.transferNotRegistered);
+        } else if (item.isAvailable && typeof item.pricing !== 'string') {
+            submitWith(item.domainName);
+            return true;
+        } else if (item.pricing === 'ContactUs') {
+            showPanelError(panel, _localLang.contactSupport);
+        } else {
+            showPanelError(panel, plainText(_localLang.domainUnavailable.replace(':domain', item.domainName || '')));
+        }
+        return false;
+    }
+
+    form.addEventListener('submit', function (ev) {
+        if (submitting) return;
+        ev.preventDefault();
         var checked = form.querySelector('input[name="domainoption"]:checked');
         var opt = checked ? checked.value : 'register';
-        var panel = form.querySelector('.dp-panel.is-active') ||
-                    form.querySelector('[data-panel="' + opt + '"]');
+        var panel = form.querySelector('[data-panel="' + opt + '"]');
         if (!panel) return;
+        clearPanelError(panel);
 
-        resultDomain.value = '';
-        resultIncart.value = '';
-
-        if (opt === 'incart') {
-            resultIncart.value = readInput(panel, 'incartsld');
-        } else if (opt === 'register' || opt === 'transfer') {
-            var sld = readInput(panel, 'sld').toLowerCase();
-            var tld = readInput(panel, 'tld');
-            if (sld) resultDomain.value = sld + tld;
-        } else if (opt === 'owndomain') {
-            // Split SLD + free-text TLD (mirrors standard_cart). User can enter
-            // any TLD — WHMCS server-side validates the join is parseable.
-            var sld = readInput(panel, 'sld').toLowerCase();
-            var tld = readInput(panel, 'tld').toLowerCase().replace(/^\./, '');
-            if (sld && tld) resultDomain.value = sld + '.' + tld;
-        } else if (opt === 'subdomain') {
-            var sld = readInput(panel, 'sld').toLowerCase();
-            var parent = readInput(panel, 'tld');
-            if (sld && parent) resultDomain.value = sld + '.' + parent;
+        var q = query(opt, panel);
+        if (!q) {
+            showPanelError(panel, opt === 'owndomain' ? _localLang.ownDomainNeedBoth : _localLang.domainNameRequired);
+            return;
         }
+
+        var buttons = form.querySelectorAll('button[type="submit"]');
+        var btn = panel.querySelector('button.dp-search-cta');
+        var btnHtml = btn ? btn.innerHTML : null;
+        buttons.forEach(function (b) { b.disabled = true; });
+        if (btn) btn.textContent = _localLang.domainChecking;
+        function idle() {
+            buttons.forEach(function (b) { b.disabled = false; });
+            if (btn) btn.innerHTML = btnHtml;
+        }
+
+        checkDomain(opt === 'register' ? 'domain' : opt, q).then(function (data) {
+            // On success the page is leaving: keep the buttons disabled.
+            if (!handle(opt, panel, data)) idle();
+        }).catch(function () {
+            idle();
+            showPanelError(panel, _localLang.domainCheckFailed);
+        });
     });
 
-        // ── WHMCS owndomain validation (mirrors standard_cart) ──
-        // Standard_cart's domain panel POSTs to WHMCS's /domain/check
-        // endpoint to verify the entered domain (right format, not
-        // already in cart, etc.) BEFORE accepting the submission.
-        // Mirror that here so an invalid domain in the owndomain panel
-        // shows a proper error instead of getting silently bounced
-        // back by the server.
-        //
-        // Implementation: hook another submit listener that runs FIRST
-        // (capture phase). For owndomain only, intercept, AJAX-call
-        // /domain/check, then re-fire form.submit() with the bypass
-        // flag set so we don't loop.
-        var ownValidationBypass = false;
-        form.addEventListener('submit', function (ev) {
-            if (ownValidationBypass) return; // re-fire from successful AJAX
-            var checked = form.querySelector('input[name="domainoption"]:checked');
-            if (!checked || checked.value !== 'owndomain') return;
-            var panel = form.querySelector('[data-panel="owndomain"]');
-            if (!panel) return;
-            var sld = readInput(panel, 'sld').toLowerCase();
-            var tld = readInput(panel, 'tld').toLowerCase().replace(/^\./, '');
-            if (!sld || !tld) {
-                ev.preventDefault();
-                showOwndomainError(panel, _localLang.ownDomainNeedBoth);
-                return;
-            }
-
-            ev.preventDefault();
-            clearOwndomainError(panel);
-            var btn = panel.querySelector('button.dp-search-cta');
-            var btnOriginalText = btn ? btn.textContent : null;
-            if (btn) { btn.disabled = true; btn.textContent = _localLang.domainChecking; }
-
-            var pid = (form.querySelector('input[name="pid"]') || {}).value || '';
-            var csrfMeta = document.querySelector('meta[name="csrf-token"]');
-            var csrf = csrfMeta ? csrfMeta.getAttribute('content') : '';
-            var routeBase = (window.WHMCS_BASE_URL || '');
-
-            // POST to /domain/check via the WHMCS jQuery helper if
-            // available (handles the WHMCS CSRF / route prefixing
-            // internals); otherwise fall through to a plain fetch.
-            var doRequest;
-            if (window.WHMCS && WHMCS.utils && WHMCS.utils.getRouteUrl) {
-                doRequest = window.jQuery.post(
-                    WHMCS.utils.getRouteUrl('/domain/check'),
-                    { token: csrf, type: 'owndomain', pid: pid, domain: sld + '.' + tld, sld: sld, tld: '.' + tld, source: 'cartAddDomain' },
-                    null, 'json'
-                );
-            } else {
-                doRequest = fetch(routeBase + '/index.php/domain/check', {
-                    method: 'POST', credentials: 'include',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded', 'Accept': 'application/json' },
-                    body: 'token=' + encodeURIComponent(csrf) + '&type=owndomain&pid=' + encodeURIComponent(pid) +
-                          '&domain=' + encodeURIComponent(sld + '.' + tld) +
-                          '&sld=' + encodeURIComponent(sld) + '&tld=' + encodeURIComponent('.' + tld) +
-                          '&source=cartAddDomain'
-                }).then(function (r) { return r.json(); });
-            }
-
-            (window.jQuery && doRequest.done ? doRequest.done.bind(doRequest) : doRequest.then.bind(doRequest))(function (data) {
-                var ok = false;
-                if (data && data.result) {
-                    var first = Array.isArray(data.result) ? data.result[0] : data.result;
-                    if (first && first.status === true) ok = true;
-                }
-                if (ok) {
-                    if (btn) { btn.disabled = false; btn.textContent = btnOriginalText; }
-                    ownValidationBypass = true;
-                    form.submit();
-                } else {
-                    if (btn) { btn.disabled = false; btn.textContent = btnOriginalText; }
-                    var msg = '';
-                    if (data && data.result) {
-                        var first = Array.isArray(data.result) ? data.result[0] : data.result;
-                        if (typeof first === 'string') msg = first;
-                        else if (first && first.message) msg = first.message;
-                    }
-                    showOwndomainError(panel, msg || _localLang.domainInvalid);
-                }
-            });
-            (window.jQuery && doRequest.fail ? doRequest.fail.bind(doRequest) : doRequest.catch.bind(doRequest))(function () {
-                if (btn) { btn.disabled = false; btn.textContent = btnOriginalText; }
-                // On network / route failure, fall back to the previous
-                // behaviour: let the form submit and let WHMCS server-side
-                // do its own validation.
-                ownValidationBypass = true;
-                form.submit();
-            });
-        }, true); // capture so this runs before the field-populating handler
-
-        function showOwndomainError(panel, message) {
-            clearOwndomainError(panel);
-            var box = document.createElement('div');
-            box.className = 'dp-error compact';
-            box.setAttribute('data-hadrian-owndomain-error', '1');
-            box.style.cssText = 'margin: 12px 24px 0; padding: 10px 14px; background: var(--color-red-bg, rgba(255,59,48,0.08)); color: var(--color-red-text, #d70015); border: 0.5px solid var(--color-red-text, #d70015); border-radius: 8px; font-size: 12.5px; line-height: 1.5;';
-            box.textContent = message;
-            panel.appendChild(box);
-            panel.setAttribute('data-state', 'error');
-        }
-        function clearOwndomainError(panel) {
-            var existing = panel.querySelector('[data-hadrian-owndomain-error]');
-            if (existing) existing.parentNode.removeChild(existing);
-            panel.removeAttribute('data-state');
-        }
+    function showPanelError(panel, message) {
+        clearPanelError(panel);
+        var box = document.createElement('div');
+        box.className = 'dp-error compact';
+        box.setAttribute('data-hadrian-domain-error', '1');
+        box.setAttribute('role', 'alert');
+        box.style.cssText = 'margin: 12px 24px 0; padding: 10px 14px; background: var(--color-red-bg, rgba(255,59,48,0.08)); color: var(--color-red-text, #d70015); border: 0.5px solid var(--color-red-text, #d70015); border-radius: 8px; font-size: 12.5px; line-height: 1.5;';
+        box.textContent = message;
+        panel.appendChild(box);
+        panel.setAttribute('data-state', 'error');
+    }
+    function clearPanelError(panel) {
+        var existing = panel.querySelector('[data-hadrian-domain-error]');
+        if (existing) existing.parentNode.removeChild(existing);
+        panel.removeAttribute('data-state');
+    }
 
         // Sync panel to whichever radio is initially checked.
         var initial = form.querySelector('input[name="domainoption"]:checked');

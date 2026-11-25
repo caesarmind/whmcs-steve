@@ -33,11 +33,9 @@ export const PAGES = {
   'password-reset-security-prompt': { status: 'todo', step: 6, needs: 'a reset token for a user with a security question' },
   'password-reset-change-prompt':  { status: 'inner', in: 'password-reset-container, on the emailed redeem link (the password-reset flow sets a new password through it)' },
   'banned':                         { status: 'todo', step: 4, needs: 'a banned IP or email that is NOT 127.0.0.1, set and cleared inside one test' },
-  'subscription-manage':            { status: 'todo', step: 4, needs: 'a marketing-email preference link (signed user + token)' },
   'account-paymentmethods-billing-contacts': { status: 'inner', in: 'account-paymentmethods-manage (AJAX fragment; see known-issues.mjs billing-contacts-fragment)' },
 
   // --- billing ---------------------------------------------------------------
-  'invoice-payment':                { status: 'todo', step: 6, needs: 'paying an unpaid invoice with the offline card gateway' },
   'usagebillingpricing':            { status: 'local', stub: 'a server module that reports usage metrics (WHMCS Usage Billing)' },
   '3dsecure':                       { status: 'local', stub: 'a card gateway that answers with a 3-D Secure challenge' },
 
@@ -45,9 +43,6 @@ export const PAGES = {
   'configuressl-stepone':           { status: 'local', stub: 'an SSL provisioning module (MarketConnect / registrar SSL)' },
   'configuressl-steptwo':           { status: 'local', stub: 'an SSL provisioning module' },
   'configuressl-complete':          { status: 'local', stub: 'an SSL provisioning module' },
-
-  // --- domains ---------------------------------------------------------------
-  'clientareadomainaddons':         { status: 'todo', step: 4, needs: 'a domain on a registrar module (stub registrar)' },
 
   // --- support, knowledgebase, downloads, content ------------------------------
   'supportticketsubmit-customfields': { status: 'inner', in: 'supportticketsubmit-steptwo (custom-fields AJAX fragment)' },
@@ -89,6 +84,5 @@ export const CART = {
   'domainoptions':                { status: 'inner', in: 'configureproductdomain / domainregister (AJAX availability result)' },
   'linkedaccounts':               { status: 'inner', in: 'checkout sign-in panel, only with a social-login provider' },
   'checkout':                     { status: 'inner', in: 'viewcart (WHMCS renders cart.php?a=checkout through the $checkout branch of viewcart.tpl; the checkout flows fill #frmCheckout)' },
-  'error':                        { status: 'todo', step: 4, needs: 'probe an invalid cart request, e.g. a=add&pid=999999' },
   'fraudcheck':                   { status: 'local', stub: 'a fraud module that flags the order' },
 };

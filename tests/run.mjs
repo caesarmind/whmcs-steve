@@ -118,9 +118,18 @@ async function playwright(projects, tag, extra = []) {
   const walk = (s, trail) => {
     for (const sp of s.specs || []) for (const t of sp.tests) {
       const last = t.results.at(-1) || {};
-      tests.push({ project: t.projectName, title: [...trail, sp.title].filter(Boolean).join(' > '), file: sp.file, status: last.status || 'skipped', ms: last.duration,
-        errors: (last.errors || []).map(e => (e.message || '').replace(/\x1b\[[0-9;]*m/g, '').split('\n').slice(0, 14).join('\n')),
-        annotations: t.annotations || [] });
+      let status = last.status || 'skipped';
+      let errors = (last.errors || []).map(e => (e.message || '').replace(/\x1b\[[0-9;]*m/g, '').split('\n').slice(0, 14).join('\n'));
+      const annotations = [...(t.annotations || [])];
+      // test.fail('BUG: ...'): the test proves a known bug, so failing is the
+      // expected outcome and is reported as a known issue. Passing means the bug
+      // was fixed, and the run fails until the test.fail() line is removed.
+      if (t.expectedStatus === 'failed') {
+        const why = annotations.find(a => a.type === 'fail')?.description || 'known bug';
+        if (status === 'failed' || status === 'timedOut') { status = 'passed'; errors = []; annotations.push({ type: 'known issue', description: `${sp.title}: ${why}` }); }
+        else if (status === 'passed') { status = 'failed'; errors = [`marked test.fail() (${why}) but it passed: the bug looks fixed, remove the test.fail() line`]; }
+      }
+      tests.push({ project: t.projectName, title: [...trail, sp.title].filter(Boolean).join(' > '), file: sp.file, status, ms: last.duration, errors, annotations });
     }
     for (const ch of s.suites || []) walk(ch, s.file && !trail.length ? [ch.title] : [...trail, ch.title]);
   };
@@ -187,8 +196,9 @@ if (logMark) {
 // ----------------------------------------------------------------- known issues
 const known = summary.sections.flatMap(s => s.known || []);
 if (known.length) {
-  console.log('\n' + bold('Known issues') + dim(' (reported, not blocking - see tests/e2e/known-issues.mjs)'));
+  console.log('\n' + bold('Known issues') + dim(' (reported, not blocking - see tests/e2e/known-issues.mjs and the test.fail() lines)'));
   for (const k of KNOWN_ISSUES) console.log(`  ${yellow('!')} ${k.id}: ${k.what.slice(0, 150)}...`);
+  for (const k of [...new Set(known)].filter(k => !KNOWN_ISSUES.some(e => k.startsWith(e.id)))) console.log(`  ${yellow('!')} ${k.slice(0, 200)}`);
 }
 
 summary.finishedAt = new Date().toISOString();
