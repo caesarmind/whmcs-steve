@@ -1,0 +1,471 @@
+{
+  "note": "Accessibility markup findings accepted for now: file -> rule -> count. Written by `node tests/static/check-a11y-markup.mjs --update`; it may only shrink.",
+  "totals": {
+    "literal-name": 35,
+    "svg-not-hidden": 965,
+    "unlabelled-field": 70,
+    "icon-only-control": 9,
+    "icon-only-label": 34
+  },
+  "files": {
+    "hadrian_cart/checkout.tpl": {
+      "svg-not-hidden": 7
+    },
+    "hadrian_cart/configuredomains.tpl": {
+      "literal-name": 1,
+      "svg-not-hidden": 6,
+      "unlabelled-field": 1
+    },
+    "hadrian_cart/configureproduct.tpl": {
+      "literal-name": 1,
+      "svg-not-hidden": 8,
+      "unlabelled-field": 1
+    },
+    "hadrian_cart/configureproductdomain.tpl": {
+      "literal-name": 1,
+      "svg-not-hidden": 19,
+      "unlabelled-field": 5
+    },
+    "hadrian_cart/domain-renewals.tpl": {
+      "unlabelled-field": 1
+    },
+    "hadrian_cart/domainregister.tpl": {
+      "svg-not-hidden": 8,
+      "unlabelled-field": 9
+    },
+    "hadrian_cart/domaintransfer.tpl": {
+      "literal-name": 1,
+      "svg-not-hidden": 8,
+      "unlabelled-field": 2
+    },
+    "hadrian_cart/includes/checkout/account.tpl": {
+      "icon-only-label": 13,
+      "unlabelled-field": 1
+    },
+    "hadrian_cart/includes/checkout/domain-registrant.tpl": {
+      "icon-only-label": 12,
+      "unlabelled-field": 1
+    },
+    "hadrian_cart/includes/checkout/payment.tpl": {
+      "icon-only-label": 6
+    },
+    "hadrian_cart/includes/checkout/security.tpl": {
+      "icon-only-label": 3,
+      "unlabelled-field": 1
+    },
+    "hadrian_cart/includes/checkout/summary-aside.tpl": {
+      "svg-not-hidden": 2
+    },
+    "hadrian_cart/includes/existing-paymethods.tpl": {
+      "unlabelled-field": 1
+    },
+    "hadrian_cart/ordersummary.tpl": {
+      "icon-only-control": 3
+    },
+    "hadrian_cart/products.tpl": {
+      "literal-name": 1,
+      "svg-not-hidden": 17
+    },
+    "hadrian_cart/service-renewals.tpl": {
+      "unlabelled-field": 1
+    },
+    "hadrian_cart/sidebar-categories-selector.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian_cart/sidebar-categories.tpl": {
+      "svg-not-hidden": 7
+    },
+    "hadrian_cart/viewcart.tpl": {
+      "svg-not-hidden": 22,
+      "unlabelled-field": 6
+    },
+    "hadrian/templates/hadrian/core/layouts/footer/extended-info/default.tpl": {
+      "literal-name": 6,
+      "svg-not-hidden": 7
+    },
+    "hadrian/templates/hadrian/core/pages/3dsecure/default/default.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/access-denied/default/default.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/account-contacts-manage/default/default.tpl": {
+      "svg-not-hidden": 5
+    },
+    "hadrian/templates/hadrian/core/pages/account-contacts-new/default/default.tpl": {
+      "svg-not-hidden": 5
+    },
+    "hadrian/templates/hadrian/core/pages/account-paymentmethods-manage/default/default.tpl": {
+      "svg-not-hidden": 3,
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/core/pages/account-paymentmethods/default/default.tpl": {
+      "svg-not-hidden": 8
+    },
+    "hadrian/templates/hadrian/core/pages/account-user-management/default/default.tpl": {
+      "svg-not-hidden": 9
+    },
+    "hadrian/templates/hadrian/core/pages/account-user-permissions/default/default.tpl": {
+      "svg-not-hidden": 5
+    },
+    "hadrian/templates/hadrian/core/pages/affiliates/default/default.tpl": {
+      "svg-not-hidden": 9
+    },
+    "hadrian/templates/hadrian/core/pages/affiliatessignup/default/default.tpl": {
+      "svg-not-hidden": 5
+    },
+    "hadrian/templates/hadrian/core/pages/announcements/default/default.tpl": {
+      "svg-not-hidden": 10
+    },
+    "hadrian/templates/hadrian/core/pages/banned/default/default.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/bulkdomainmanagement/default/default.tpl": {
+      "svg-not-hidden": 7
+    },
+    "hadrian/templates/hadrian/core/pages/clientareaaddfunds/default/default.tpl": {
+      "svg-not-hidden": 6
+    },
+    "hadrian/templates/hadrian/core/pages/clientareacancelrequest/default/default.tpl": {
+      "svg-not-hidden": 5
+    },
+    "hadrian/templates/hadrian/core/pages/clientareadetails/default/default.tpl": {
+      "svg-not-hidden": 6
+    },
+    "hadrian/templates/hadrian/core/pages/clientareadomainaddons/default/default.tpl": {
+      "svg-not-hidden": 5
+    },
+    "hadrian/templates/hadrian/core/pages/clientareadomaincontactinfo/default/default.tpl": {
+      "svg-not-hidden": 6
+    },
+    "hadrian/templates/hadrian/core/pages/clientareadomaindetails/default/default.tpl": {
+      "svg-not-hidden": 23
+    },
+    "hadrian/templates/hadrian/core/pages/clientareadomaindns/default/default.tpl": {
+      "svg-not-hidden": 4,
+      "unlabelled-field": 4
+    },
+    "hadrian/templates/hadrian/core/pages/clientareadomainemailforwarding/default/default.tpl": {
+      "svg-not-hidden": 4,
+      "unlabelled-field": 4
+    },
+    "hadrian/templates/hadrian/core/pages/clientareadomaingetepp/default/default.tpl": {
+      "svg-not-hidden": 5
+    },
+    "hadrian/templates/hadrian/core/pages/clientareadomainregisterns/default/default.tpl": {
+      "svg-not-hidden": 3
+    },
+    "hadrian/templates/hadrian/core/pages/clientareadomains/default/default.tpl": {
+      "svg-not-hidden": 20
+    },
+    "hadrian/templates/hadrian/core/pages/clientareaemails/default/default.tpl": {
+      "svg-not-hidden": 7
+    },
+    "hadrian/templates/hadrian/core/pages/clientareahome/bento/cell.tpl": {
+      "svg-not-hidden": 6
+    },
+    "hadrian/templates/hadrian/core/pages/clientareahome/default/default.tpl": {
+      "svg-not-hidden": 48,
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/core/pages/clientareahome/minimal/minimal.tpl": {
+      "svg-not-hidden": 5
+    },
+    "hadrian/templates/hadrian/core/pages/clientareahome/minimal/rows.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/clientareainvoices/default/default.tpl": {
+      "svg-not-hidden": 16
+    },
+    "hadrian/templates/hadrian/core/pages/clientareaproductdetails/default/default.tpl": {
+      "svg-not-hidden": 49
+    },
+    "hadrian/templates/hadrian/core/pages/clientareaproducts/default/default.tpl": {
+      "svg-not-hidden": 15
+    },
+    "hadrian/templates/hadrian/core/pages/clientareaquotes/default/default.tpl": {
+      "svg-not-hidden": 15
+    },
+    "hadrian/templates/hadrian/core/pages/clientareasecurity/default/default.tpl": {
+      "svg-not-hidden": 6,
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/core/pages/clientregister/default/default.tpl": {
+      "svg-not-hidden": 5
+    },
+    "hadrian/templates/hadrian/core/pages/configuressl-complete/default/default.tpl": {
+      "svg-not-hidden": 10,
+      "unlabelled-field": 6
+    },
+    "hadrian/templates/hadrian/core/pages/configuressl-stepone/default/default.tpl": {
+      "svg-not-hidden": 4
+    },
+    "hadrian/templates/hadrian/core/pages/configuressl-steptwo/default/default.tpl": {
+      "svg-not-hidden": 2
+    },
+    "hadrian/templates/hadrian/core/pages/contact/default/default.tpl": {
+      "svg-not-hidden": 2
+    },
+    "hadrian/templates/hadrian/core/pages/domain-pricing/default/default.tpl": {
+      "svg-not-hidden": 2,
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/core/pages/downloaddenied/default/default.tpl": {
+      "svg-not-hidden": 2
+    },
+    "hadrian/templates/hadrian/core/pages/downloads/default/default.tpl": {
+      "svg-not-hidden": 14,
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/core/pages/downloadscat/default/default.tpl": {
+      "svg-not-hidden": 15,
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/core/pages/homepage/default/default.tpl": {
+      "svg-not-hidden": 8,
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/core/pages/homepage/portal/portal.tpl": {
+      "svg-not-hidden": 14,
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/core/pages/knowledgebase/default/default.tpl": {
+      "svg-not-hidden": 7,
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/core/pages/knowledgebasearticle/default/default.tpl": {
+      "svg-not-hidden": 8
+    },
+    "hadrian/templates/hadrian/core/pages/knowledgebasecat/default/default.tpl": {
+      "svg-not-hidden": 10,
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/core/pages/login/beacon/beacon.tpl": {
+      "svg-not-hidden": 3
+    },
+    "hadrian/templates/hadrian/core/pages/login/default/default.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/login/split/split.tpl": {
+      "svg-not-hidden": 3
+    },
+    "hadrian/templates/hadrian/core/pages/managessl/default/default.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/markdown-guide/default/default.tpl": {
+      "svg-not-hidden": 7
+    },
+    "hadrian/templates/hadrian/core/pages/masspay/default/default.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/pwreset/default/default.tpl": {
+      "svg-not-hidden": 3
+    },
+    "hadrian/templates/hadrian/core/pages/serverstatus/default/default.tpl": {
+      "svg-not-hidden": 15
+    },
+    "hadrian/templates/hadrian/core/pages/store-codeguard/default/default.tpl": {
+      "svg-not-hidden": 17
+    },
+    "hadrian/templates/hadrian/core/pages/store-marketgoo/default/default.tpl": {
+      "svg-not-hidden": 11
+    },
+    "hadrian/templates/hadrian/core/pages/store-nordvpn/default/default.tpl": {
+      "svg-not-hidden": 26
+    },
+    "hadrian/templates/hadrian/core/pages/store-not-found/default/default.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/store-order/default/default.tpl": {
+      "svg-not-hidden": 3,
+      "unlabelled-field": 6
+    },
+    "hadrian/templates/hadrian/core/pages/store-ox/default/default.tpl": {
+      "icon-only-control": 2,
+      "svg-not-hidden": 18
+    },
+    "hadrian/templates/hadrian/core/pages/store-sitebuilder/default/default.tpl": {
+      "icon-only-control": 2,
+      "svg-not-hidden": 4
+    },
+    "hadrian/templates/hadrian/core/pages/store-sitelock/default/default.tpl": {
+      "literal-name": 1,
+      "svg-not-hidden": 9
+    },
+    "hadrian/templates/hadrian/core/pages/store-socialbee/default/default.tpl": {
+      "svg-not-hidden": 14
+    },
+    "hadrian/templates/hadrian/core/pages/store-spamexperts/default/default.tpl": {
+      "svg-not-hidden": 19
+    },
+    "hadrian/templates/hadrian/core/pages/store-ssl/default/default.tpl": {
+      "svg-not-hidden": 16
+    },
+    "hadrian/templates/hadrian/core/pages/store-ssl/type.tpl": {
+      "literal-name": 3,
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/store-threesixtymonitoring/default/default.tpl": {
+      "literal-name": 3,
+      "svg-not-hidden": 40
+    },
+    "hadrian/templates/hadrian/core/pages/store-weebly/default/default.tpl": {
+      "icon-only-control": 2,
+      "svg-not-hidden": 13
+    },
+    "hadrian/templates/hadrian/core/pages/subscription-manage/default/default.tpl": {
+      "svg-not-hidden": 5
+    },
+    "hadrian/templates/hadrian/core/pages/supporttickets/default/default.tpl": {
+      "svg-not-hidden": 12
+    },
+    "hadrian/templates/hadrian/core/pages/supportticketsubmit-confirm/default/default.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/supportticketsubmit-customfields/default/default.tpl": {
+      "svg-not-hidden": 1,
+      "unlabelled-field": 2
+    },
+    "hadrian/templates/hadrian/core/pages/supportticketsubmit-kbsuggestions/default/default.tpl": {
+      "svg-not-hidden": 2
+    },
+    "hadrian/templates/hadrian/core/pages/supportticketsubmit/default/default.tpl": {
+      "svg-not-hidden": 15
+    },
+    "hadrian/templates/hadrian/core/pages/ticketfeedback/default/default.tpl": {
+      "svg-not-hidden": 3,
+      "unlabelled-field": 2
+    },
+    "hadrian/templates/hadrian/core/pages/two-factor-challenge/default/default.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/two-factor-new-backup-code/default/default.tpl": {
+      "svg-not-hidden": 3
+    },
+    "hadrian/templates/hadrian/core/pages/upgrade-configure/default/default.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/upgrade/default/default.tpl": {
+      "svg-not-hidden": 8
+    },
+    "hadrian/templates/hadrian/core/pages/upgradesummary/default/default.tpl": {
+      "svg-not-hidden": 1,
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/core/pages/usagebillingpricing/default/default.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/user-invite-accept/default/default.tpl": {
+      "svg-not-hidden": 4
+    },
+    "hadrian/templates/hadrian/core/pages/user-password/default/default.tpl": {
+      "svg-not-hidden": 5
+    },
+    "hadrian/templates/hadrian/core/pages/user-profile/default/default.tpl": {
+      "svg-not-hidden": 4
+    },
+    "hadrian/templates/hadrian/core/pages/user-security/default/default.tpl": {
+      "literal-name": 1,
+      "svg-not-hidden": 7
+    },
+    "hadrian/templates/hadrian/core/pages/user-switch-account/default/default.tpl": {
+      "svg-not-hidden": 5
+    },
+    "hadrian/templates/hadrian/core/pages/user-verify-email/default/default.tpl": {
+      "svg-not-hidden": 4
+    },
+    "hadrian/templates/hadrian/core/pages/viewannouncement/default/default.tpl": {
+      "svg-not-hidden": 10
+    },
+    "hadrian/templates/hadrian/core/pages/viewemail/default/default.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/core/pages/viewinvoice/default/default.tpl": {
+      "svg-not-hidden": 7
+    },
+    "hadrian/templates/hadrian/core/pages/viewquote/default/default.tpl": {
+      "svg-not-hidden": 6
+    },
+    "hadrian/templates/hadrian/core/pages/viewticket/default/default.tpl": {
+      "svg-not-hidden": 14,
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/header.tpl": {
+      "literal-name": 1,
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/includes/breadcrumb.tpl": {
+      "literal-name": 1
+    },
+    "hadrian/templates/hadrian/includes/captcha.tpl": {
+      "literal-name": 1
+    },
+    "hadrian/templates/hadrian/includes/menu/main-menu.tpl": {
+      "literal-name": 1
+    },
+    "hadrian/templates/hadrian/includes/menu/top-nav.tpl": {
+      "literal-name": 1
+    },
+    "hadrian/templates/hadrian/includes/module-overview/sitejet.tpl": {
+      "literal-name": 1
+    },
+    "hadrian/templates/hadrian/includes/module-overview/wordpress.tpl": {
+      "literal-name": 4
+    },
+    "hadrian/templates/hadrian/includes/network-issues-notifications.tpl": {
+      "svg-not-hidden": 2
+    },
+    "hadrian/templates/hadrian/includes/partials/cookie-box.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/includes/partials/inner-topbar.tpl": {
+      "svg-not-hidden": 4
+    },
+    "hadrian/templates/hadrian/includes/partials/locale-btn.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/includes/partials/locale-modal.tpl": {
+      "svg-not-hidden": 1
+    },
+    "hadrian/templates/hadrian/includes/partials/profile-dropdown.tpl": {
+      "svg-not-hidden": 11
+    },
+    "hadrian/templates/hadrian/includes/partials/rail-panels.tpl": {
+      "svg-not-hidden": 30
+    },
+    "hadrian/templates/hadrian/includes/partials/rail.tpl": {
+      "svg-not-hidden": 11
+    },
+    "hadrian/templates/hadrian/includes/partials/sidebar.tpl": {
+      "svg-not-hidden": 7,
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/includes/partials/state-chip.tpl": {
+      "literal-name": 2
+    },
+    "hadrian/templates/hadrian/includes/partials/topnav.tpl": {
+      "svg-not-hidden": 6
+    },
+    "hadrian/templates/hadrian/includes/store-wptk.tpl": {
+      "literal-name": 1
+    },
+    "hadrian/templates/hadrian/includes/validateuser.tpl": {
+      "svg-not-hidden": 2
+    },
+    "hadrian/templates/hadrian/includes/verifyemail.tpl": {
+      "svg-not-hidden": 2
+    },
+    "hadrian/templates/hadrian/store/config-fields/input.tpl": {
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/store/config-fields/select.tpl": {
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/store/config-fields/textarea.tpl": {
+      "unlabelled-field": 1
+    },
+    "hadrian/templates/hadrian/store/dynamic/partial/price_comparison.tpl": {
+      "literal-name": 3
+    }
+  }
+}

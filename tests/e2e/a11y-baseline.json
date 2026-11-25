@@ -1,0 +1,2466 @@
+{
+  "note": "Accessibility findings accepted for now: page -> axe rule -> failing elements. Written by HADRIAN_A11Y_UPDATE=1 (tests/e2e/a11y.spec.mjs); shrink it, never grow it by hand.",
+  "axe": "4.14.0",
+  "tags": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa",
+    "wcag22aa",
+    "best-practice"
+  ],
+  "pages": {
+    "rail/dark | full | clientareahome": {
+      "color-contrast": 11,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "link-in-text-block": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "rail/dark | full | clientareaproducts": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 27,
+      "target-size": 15
+    },
+    "rail/dark | guest | homepage": {
+      "color-contrast": 17,
+      "heading-order": 3,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 29,
+      "target-size": 15
+    },
+    "rail/dark | guest | login": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "rail/dark | guest | store group": {
+      "aria-required-children": 1,
+      "color-contrast": 20,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 22,
+      "target-size": 12
+    },
+    "rail/dark | guest | viewcart": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 6,
+      "target-size": 12
+    },
+    "rail/light | full | clientareahome": {
+      "color-contrast": 10,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "link-in-text-block": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "rail/light | full | clientareaproducts": {
+      "color-contrast": 17,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 27,
+      "target-size": 15
+    },
+    "rail/light | guest | homepage": {
+      "color-contrast": 16,
+      "heading-order": 3,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 29,
+      "target-size": 15
+    },
+    "rail/light | guest | login": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "rail/light | guest | store group": {
+      "aria-required-children": 1,
+      "color-contrast": 18,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 22,
+      "target-size": 12
+    },
+    "rail/light | guest | viewcart": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 6,
+      "target-size": 12
+    },
+    "sidebar/dark | empty | account-contacts-manage": {
+      "color-contrast": 18,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 28,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | account-paymentmethods": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | account-paymentmethods-manage": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 19,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | account-user-management": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | affiliate signup": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | clientareadetails": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | clientareadomains": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | clientareaemails": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | clientareahome": {
+      "color-contrast": 12,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 25,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | clientareainvoices": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | clientareaproducts": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | clientareaquotes": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | managessl": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | supportticketslist": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | supportticketsubmit-stepone": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | user-password": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | user-profile": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 15
+    },
+    "sidebar/dark | empty | user-security": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/dark | full | account-contacts-manage": {
+      "color-contrast": 18,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 26,
+      "target-size": 15
+    },
+    "sidebar/dark | full | account-paymentmethods": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/dark | full | account-paymentmethods-manage": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 18,
+      "target-size": 15
+    },
+    "sidebar/dark | full | account-user-management": {
+      "color-contrast": 14,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 14,
+      "target-size": 15
+    },
+    "sidebar/dark | full | account-user-permissions": {
+      "color-contrast": 18,
+      "heading-order": 1,
+      "label": 13,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/dark | full | addons": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-no-duplicate-contentinfo": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 3,
+      "region": 8,
+      "target-size": 12
+    },
+    "sidebar/dark | full | affiliate dashboard": {
+      "color-contrast": 11,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 20,
+      "target-size": 15
+    },
+    "sidebar/dark | full | announcements": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 16,
+      "target-size": 15
+    },
+    "sidebar/dark | full | cart: cart": {
+      "aria-required-children": 1,
+      "color-contrast": 16,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 12,
+      "target-size": 12
+    },
+    "sidebar/dark | full | cart: checkout": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 12
+    },
+    "sidebar/dark | full | cart: configure": {
+      "color-contrast": 12,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 12
+    },
+    "sidebar/dark | full | cart: product domain step": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 10,
+      "target-size": 12
+    },
+    "sidebar/dark | full | clientareaaddfunds": {
+      "color-contrast": 17,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 11,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareacancelrequest": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 11,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareadetails": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareadomaincontactinfo": {
+      "aria-required-children": 1,
+      "color-contrast": 18,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareadomaindetails": {
+      "aria-required-children": 1,
+      "color-contrast": 12,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareadomaindns": {
+      "color-contrast": 14,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 22,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareadomainemailforwarding": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareadomaingetepp": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareadomainregisterns": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareadomains": {
+      "color-contrast": 12,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 17,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareaemails": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareahome": {
+      "color-contrast": 11,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "link-in-text-block": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareainvoices": {
+      "color-contrast": 11,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 36,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareaproductdetails": {
+      "color-contrast": 15,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareaproducts": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 27,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareaquotes": {
+      "color-contrast": 14,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "sidebar/dark | full | clientareasecurity": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/dark | full | closed ticket": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/dark | full | contact": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 9,
+      "target-size": 15
+    },
+    "sidebar/dark | full | custom-page": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/dark | full | domain-pricing": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/dark | full | domain-renewals": {
+      "color-contrast": 6,
+      "heading-order": 2,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 2,
+      "region": 14,
+      "target-size": 12
+    },
+    "sidebar/dark | full | domainregister": {
+      "color-contrast": 37,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "label-title-only": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 12
+    },
+    "sidebar/dark | full | downloaddenied": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/dark | full | downloads": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 10,
+      "target-size": 15
+    },
+    "sidebar/dark | full | downloadscat": {
+      "aria-required-children": 1,
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 15
+    },
+    "sidebar/dark | full | edit contact": {
+      "color-contrast": 18,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 26,
+      "target-size": 15
+    },
+    "sidebar/dark | full | homepage": {
+      "color-contrast": 17,
+      "heading-order": 3,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 30,
+      "target-size": 15
+    },
+    "sidebar/dark | full | knowledgebase": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 15
+    },
+    "sidebar/dark | full | knowledgebasearticle": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/dark | full | knowledgebasecat": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | full | managessl": {
+      "color-contrast": 6,
+      "empty-table-header": 1,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 10,
+      "target-size": 15
+    },
+    "sidebar/dark | full | masspay": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 11,
+      "target-size": 15
+    },
+    "sidebar/dark | full | missing ticket": {
+      "color-contrast": 2,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "page-has-heading-one": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/dark | full | overdue invoice": {
+      "color-contrast": 22,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 12,
+      "target-size": 15
+    },
+    "sidebar/dark | full | products": {
+      "aria-required-children": 1,
+      "color-contrast": 20,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 24,
+      "target-size": 12
+    },
+    "sidebar/dark | full | serverstatus": {
+      "color-contrast": 9,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/dark | full | service-renewals": {
+      "color-contrast": 6,
+      "heading-order": 2,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 2,
+      "region": 13,
+      "target-size": 12
+    },
+    "sidebar/dark | full | store group": {
+      "aria-required-children": 1,
+      "color-contrast": 20,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 24,
+      "target-size": 12
+    },
+    "sidebar/dark | full | supportticketslist": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 16,
+      "target-size": 15
+    },
+    "sidebar/dark | full | supportticketsubmit-stepone": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 12,
+      "target-size": 15
+    },
+    "sidebar/dark | full | supportticketsubmit-steptwo": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 15
+    },
+    "sidebar/dark | full | ticketfeedback": {
+      "color-contrast": 6,
+      "definition-list": 1,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/dark | full | upgrade": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 10,
+      "target-size": 15
+    },
+    "sidebar/dark | full | upgrade options": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/dark | full | user-password": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | full | user-profile": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | full | user-security": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/dark | full | user-switch-account": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 4,
+      "target-size": 15
+    },
+    "sidebar/dark | full | viewcart": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 8,
+      "target-size": 12
+    },
+    "sidebar/dark | full | viewemail": {
+      "color-contrast": 1,
+      "hadrian-theme-not-applied": 1,
+      "landmark-one-main": 1,
+      "region": 1
+    },
+    "sidebar/dark | full | viewinvoice": {
+      "color-contrast": 21,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | full | viewquote": {
+      "color-contrast": 16,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 15
+    },
+    "sidebar/dark | full | viewticket": {
+      "color-contrast": 15,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | announcements": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 14,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | cart: cart": {
+      "aria-required-children": 1,
+      "color-contrast": 17,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 10,
+      "target-size": 12
+    },
+    "sidebar/dark | guest | cart: checkout": {
+      "aria-progressbar-name": 1,
+      "aria-required-children": 1,
+      "color-contrast": 18,
+      "heading-order": 2,
+      "label": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 33,
+      "select-name": 2,
+      "target-size": 12
+    },
+    "sidebar/dark | guest | cart: configure": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 12
+    },
+    "sidebar/dark | guest | cart: product domain step": {
+      "color-contrast": 10,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 12
+    },
+    "sidebar/dark | guest | clientregister": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 4,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | contact": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | custom-page": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 3,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | domain search results": {
+      "color-contrast": 38,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "label-title-only": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 12
+    },
+    "sidebar/dark | guest | domain-pricing": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | domainregister": {
+      "color-contrast": 38,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "label-title-only": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 12
+    },
+    "sidebar/dark | guest | domaintransfer": {
+      "color-contrast": 6,
+      "heading-order": 2,
+      "label-content-name-mismatch": 1,
+      "label-title-only": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 20,
+      "target-size": 12
+    },
+    "sidebar/dark | guest | downloads": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | downloadscat": {
+      "aria-required-children": 1,
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | homepage": {
+      "color-contrast": 18,
+      "heading-order": 3,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 29,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | knowledgebase": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | knowledgebasearticle": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 4,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | knowledgebasecat": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | login": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | password-reset-container": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | products": {
+      "aria-required-children": 1,
+      "color-contrast": 21,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 22,
+      "target-size": 12
+    },
+    "sidebar/dark | guest | store group": {
+      "aria-required-children": 1,
+      "color-contrast": 21,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 22,
+      "target-size": 12
+    },
+    "sidebar/dark | guest | store product": {
+      "color-contrast": 10,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 12
+    },
+    "sidebar/dark | guest | user-invite-accept": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 14,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | viewannouncement": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/dark | guest | viewcart": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 6,
+      "target-size": 12
+    },
+    "sidebar/dark | subuser | access-denied": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/dark | subuser | sub-user dashboard": {
+      "color-contrast": 11,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "link-in-text-block": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "sidebar/dark | suspended | clientareahome": {
+      "color-contrast": 11,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "sidebar/dark | suspended | clientareaproducts": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 16,
+      "target-size": 15
+    },
+    "sidebar/dark | suspended | suspended service": {
+      "color-contrast": 12,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 10,
+      "target-size": 15
+    },
+    "sidebar/light | empty | account-contacts-manage": {
+      "color-contrast": 19,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 28,
+      "target-size": 15
+    },
+    "sidebar/light | empty | account-paymentmethods": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/light | empty | account-paymentmethods-manage": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 19,
+      "target-size": 15
+    },
+    "sidebar/light | empty | account-user-management": {
+      "color-contrast": 10,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/light | empty | affiliate signup": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/light | empty | clientareadetails": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 15
+    },
+    "sidebar/light | empty | clientareadomains": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | empty | clientareaemails": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | empty | clientareahome": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 25,
+      "target-size": 15
+    },
+    "sidebar/light | empty | clientareainvoices": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | empty | clientareaproducts": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | empty | clientareaquotes": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | empty | managessl": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | empty | supportticketslist": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | empty | supportticketsubmit-stepone": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 15
+    },
+    "sidebar/light | empty | user-password": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 15
+    },
+    "sidebar/light | empty | user-profile": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 15
+    },
+    "sidebar/light | empty | user-security": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/light | full | account-contacts-manage": {
+      "color-contrast": 17,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 26,
+      "target-size": 15
+    },
+    "sidebar/light | full | account-paymentmethods": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/light | full | account-paymentmethods-manage": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 18,
+      "target-size": 15
+    },
+    "sidebar/light | full | account-user-management": {
+      "color-contrast": 15,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 14,
+      "target-size": 15
+    },
+    "sidebar/light | full | account-user-permissions": {
+      "color-contrast": 20,
+      "heading-order": 1,
+      "label": 13,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/light | full | addons": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-no-duplicate-contentinfo": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 3,
+      "region": 8,
+      "target-size": 12
+    },
+    "sidebar/light | full | affiliate dashboard": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 20,
+      "target-size": 15
+    },
+    "sidebar/light | full | announcements": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 16,
+      "target-size": 15
+    },
+    "sidebar/light | full | cart: cart": {
+      "aria-required-children": 1,
+      "color-contrast": 18,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 12,
+      "target-size": 12
+    },
+    "sidebar/light | full | cart: checkout": {
+      "color-contrast": 15,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 12
+    },
+    "sidebar/light | full | cart: configure": {
+      "color-contrast": 18,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 12
+    },
+    "sidebar/light | full | cart: product domain step": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 10,
+      "target-size": 12
+    },
+    "sidebar/light | full | clientareaaddfunds": {
+      "color-contrast": 14,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 11,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareacancelrequest": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 11,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareadetails": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareadomaincontactinfo": {
+      "aria-required-children": 1,
+      "color-contrast": 20,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareadomaindetails": {
+      "aria-required-children": 1,
+      "color-contrast": 16,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareadomaindns": {
+      "color-contrast": 16,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 22,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareadomainemailforwarding": {
+      "color-contrast": 11,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareadomaingetepp": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareadomainregisterns": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareadomains": {
+      "color-contrast": 12,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 17,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareaemails": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareahome": {
+      "color-contrast": 10,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "link-in-text-block": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareainvoices": {
+      "color-contrast": 15,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 36,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareaproductdetails": {
+      "color-contrast": 18,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareaproducts": {
+      "color-contrast": 17,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 27,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareaquotes": {
+      "color-contrast": 12,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "sidebar/light | full | clientareasecurity": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/light | full | closed ticket": {
+      "color-contrast": 15,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/light | full | contact": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 9,
+      "target-size": 15
+    },
+    "sidebar/light | full | custom-page": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/light | full | domain-pricing": {
+      "color-contrast": 11,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/light | full | domain-renewals": {
+      "color-contrast": 8,
+      "heading-order": 2,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 2,
+      "region": 14,
+      "target-size": 12
+    },
+    "sidebar/light | full | domainregister": {
+      "color-contrast": 34,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "label-title-only": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 12
+    },
+    "sidebar/light | full | downloaddenied": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/light | full | downloads": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 10,
+      "target-size": 15
+    },
+    "sidebar/light | full | downloadscat": {
+      "aria-required-children": 1,
+      "color-contrast": 10,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 15
+    },
+    "sidebar/light | full | edit contact": {
+      "color-contrast": 17,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 26,
+      "target-size": 15
+    },
+    "sidebar/light | full | homepage": {
+      "color-contrast": 16,
+      "heading-order": 3,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 30,
+      "target-size": 15
+    },
+    "sidebar/light | full | knowledgebase": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 15
+    },
+    "sidebar/light | full | knowledgebasearticle": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/light | full | knowledgebasecat": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | full | managessl": {
+      "color-contrast": 9,
+      "empty-table-header": 1,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 10,
+      "target-size": 15
+    },
+    "sidebar/light | full | masspay": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 11,
+      "target-size": 15
+    },
+    "sidebar/light | full | missing ticket": {
+      "color-contrast": 3,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "page-has-heading-one": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/light | full | overdue invoice": {
+      "color-contrast": 25,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 12,
+      "target-size": 15
+    },
+    "sidebar/light | full | products": {
+      "aria-required-children": 1,
+      "color-contrast": 18,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 24,
+      "target-size": 12
+    },
+    "sidebar/light | full | serverstatus": {
+      "color-contrast": 13,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/light | full | service-renewals": {
+      "color-contrast": 8,
+      "heading-order": 2,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 2,
+      "region": 13,
+      "target-size": 12
+    },
+    "sidebar/light | full | store group": {
+      "aria-required-children": 1,
+      "color-contrast": 18,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 24,
+      "target-size": 12
+    },
+    "sidebar/light | full | supportticketslist": {
+      "color-contrast": 11,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 16,
+      "target-size": 15
+    },
+    "sidebar/light | full | supportticketsubmit-stepone": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 12,
+      "target-size": 15
+    },
+    "sidebar/light | full | supportticketsubmit-steptwo": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 15
+    },
+    "sidebar/light | full | ticketfeedback": {
+      "color-contrast": 8,
+      "definition-list": 1,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/light | full | upgrade": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 10,
+      "target-size": 15
+    },
+    "sidebar/light | full | upgrade options": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/light | full | user-password": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | full | user-profile": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | full | user-security": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/light | full | user-switch-account": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 4,
+      "target-size": 15
+    },
+    "sidebar/light | full | viewcart": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 8,
+      "target-size": 12
+    },
+    "sidebar/light | full | viewemail": {
+      "color-contrast": 1,
+      "landmark-one-main": 1,
+      "region": 1
+    },
+    "sidebar/light | full | viewinvoice": {
+      "color-contrast": 25,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | full | viewquote": {
+      "color-contrast": 23,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 15
+    },
+    "sidebar/light | full | viewticket": {
+      "color-contrast": 16,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 15
+    },
+    "sidebar/light | guest | announcements": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 14,
+      "target-size": 15
+    },
+    "sidebar/light | guest | cart: cart": {
+      "aria-required-children": 1,
+      "color-contrast": 19,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 10,
+      "target-size": 12
+    },
+    "sidebar/light | guest | cart: checkout": {
+      "aria-progressbar-name": 1,
+      "aria-required-children": 1,
+      "color-contrast": 22,
+      "heading-order": 2,
+      "label": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 33,
+      "select-name": 2,
+      "target-size": 12
+    },
+    "sidebar/light | guest | cart: configure": {
+      "color-contrast": 18,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 12
+    },
+    "sidebar/light | guest | cart: product domain step": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 12
+    },
+    "sidebar/light | guest | clientregister": {
+      "color-contrast": 6,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 4,
+      "target-size": 15
+    },
+    "sidebar/light | guest | contact": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | guest | custom-page": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 3,
+      "target-size": 15
+    },
+    "sidebar/light | guest | domain search results": {
+      "color-contrast": 34,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "label-title-only": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 9,
+      "target-size": 12
+    },
+    "sidebar/light | guest | domain-pricing": {
+      "color-contrast": 11,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/light | guest | domainregister": {
+      "color-contrast": 34,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "label-title-only": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 12
+    },
+    "sidebar/light | guest | domaintransfer": {
+      "color-contrast": 7,
+      "heading-order": 2,
+      "label-content-name-mismatch": 1,
+      "label-title-only": 2,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 20,
+      "target-size": 12
+    },
+    "sidebar/light | guest | downloads": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 15
+    },
+    "sidebar/light | guest | downloadscat": {
+      "aria-required-children": 1,
+      "color-contrast": 10,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/light | guest | homepage": {
+      "color-contrast": 16,
+      "heading-order": 3,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 29,
+      "target-size": 15
+    },
+    "sidebar/light | guest | knowledgebase": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/light | guest | knowledgebasearticle": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 4,
+      "target-size": 15
+    },
+    "sidebar/light | guest | knowledgebasecat": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/light | guest | login": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/light | guest | password-reset-container": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "sidebar/light | guest | products": {
+      "aria-required-children": 1,
+      "color-contrast": 18,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 22,
+      "target-size": 12
+    },
+    "sidebar/light | guest | store group": {
+      "aria-required-children": 1,
+      "color-contrast": 18,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 22,
+      "target-size": 12
+    },
+    "sidebar/light | guest | store product": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 12
+    },
+    "sidebar/light | guest | user-invite-accept": {
+      "color-contrast": 11,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 14,
+      "target-size": 15
+    },
+    "sidebar/light | guest | viewannouncement": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "sidebar/light | guest | viewcart": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 6,
+      "target-size": 12
+    },
+    "sidebar/light | subuser | access-denied": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "sidebar/light | subuser | sub-user dashboard": {
+      "color-contrast": 10,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "link-in-text-block": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "sidebar/light | suspended | clientareahome": {
+      "color-contrast": 7,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "sidebar/light | suspended | clientareaproducts": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 16,
+      "target-size": 15
+    },
+    "sidebar/light | suspended | suspended service": {
+      "color-contrast": 14,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 10,
+      "target-size": 15
+    },
+    "sidebar/light/320px | full | clientareahome": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "link-in-text-block": 1,
+      "region": 23,
+      "target-size": 18
+    },
+    "sidebar/light/320px | full | clientareainvoices": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 16,
+      "target-size": 18
+    },
+    "sidebar/light/320px | full | clientareaproducts": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 15,
+      "target-size": 18
+    },
+    "sidebar/light/320px | full | viewinvoice": {
+      "color-contrast": 24,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 8,
+      "target-size": 18
+    },
+    "sidebar/light/320px | full | viewticket": {
+      "color-contrast": 15,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 13,
+      "target-size": 18
+    },
+    "sidebar/light/320px | guest | clientregister": {
+      "color-contrast": 5,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 4,
+      "target-size": 18
+    },
+    "sidebar/light/320px | guest | homepage": {
+      "color-contrast": 15,
+      "heading-order": 3,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 29,
+      "target-size": 18
+    },
+    "sidebar/light/320px | guest | login": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 7,
+      "target-size": 18
+    },
+    "sidebar/light/320px | guest | store group": {
+      "aria-required-children": 1,
+      "color-contrast": 17,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "landmark-unique": 1,
+      "region": 22,
+      "target-size": 15
+    },
+    "sidebar/light/320px | guest | viewcart": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 6,
+      "target-size": 15
+    },
+    "top/dark | full | clientareahome": {
+      "color-contrast": 11,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 19,
+      "target-size": 15
+    },
+    "top/dark | full | clientareaproducts": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "top/dark | guest | homepage": {
+      "color-contrast": 17,
+      "heading-order": 3,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "region": 27,
+      "target-size": 15
+    },
+    "top/dark | guest | login": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "top/dark | guest | store group": {
+      "aria-required-children": 1,
+      "color-contrast": 20,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "region": 20,
+      "target-size": 12
+    },
+    "top/dark | guest | viewcart": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "region": 4,
+      "target-size": 12
+    },
+    "top/light | full | clientareahome": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 19,
+      "target-size": 15
+    },
+    "top/light | full | clientareaproducts": {
+      "color-contrast": 16,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "top/light | guest | homepage": {
+      "color-contrast": 15,
+      "heading-order": 3,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "region": 27,
+      "target-size": 15
+    },
+    "top/light | guest | login": {
+      "color-contrast": 3,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 5,
+      "target-size": 15
+    },
+    "top/light | guest | store group": {
+      "aria-required-children": 1,
+      "color-contrast": 17,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "region": 20,
+      "target-size": 12
+    },
+    "top/light | guest | viewcart": {
+      "color-contrast": 8,
+      "heading-order": 1,
+      "label-content-name-mismatch": 2,
+      "landmark-one-main": 1,
+      "region": 4,
+      "target-size": 12
+    },
+    "topbar-minimal/dark | full | clientareahome": {
+      "color-contrast": 11,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "topbar-minimal/dark | full | clientareaproducts": {
+      "color-contrast": 13,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 27,
+      "target-size": 15
+    },
+    "topbar-minimal/dark | guest | homepage": {
+      "color-contrast": 17,
+      "heading-order": 3,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 29,
+      "target-size": 15
+    },
+    "topbar-minimal/dark | guest | login": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "topbar-minimal/dark | guest | store group": {
+      "aria-required-children": 1,
+      "color-contrast": 20,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 22,
+      "target-size": 12
+    },
+    "topbar-minimal/dark | guest | viewcart": {
+      "color-contrast": 2,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 6,
+      "target-size": 12
+    },
+    "topbar-minimal/light | full | clientareahome": {
+      "color-contrast": 10,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 23,
+      "target-size": 15
+    },
+    "topbar-minimal/light | full | clientareaproducts": {
+      "color-contrast": 17,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 27,
+      "target-size": 15
+    },
+    "topbar-minimal/light | guest | homepage": {
+      "color-contrast": 16,
+      "heading-order": 3,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 29,
+      "target-size": 15
+    },
+    "topbar-minimal/light | guest | login": {
+      "color-contrast": 4,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "link-in-text-block": 1,
+      "region": 7,
+      "target-size": 15
+    },
+    "topbar-minimal/light | guest | store group": {
+      "aria-required-children": 1,
+      "color-contrast": 18,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 22,
+      "target-size": 12
+    },
+    "topbar-minimal/light | guest | viewcart": {
+      "color-contrast": 9,
+      "heading-order": 1,
+      "label-content-name-mismatch": 1,
+      "landmark-one-main": 1,
+      "region": 6,
+      "target-size": 12
+    }
+  }
+}

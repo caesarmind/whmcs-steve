@@ -63,6 +63,12 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], userAgent: USER_AGENT, viewport: { width: 1280, height: 860 } },
     },
     {
+      // axe-core, WCAG 2.2 A + AA, against tests/e2e/a11y-baseline.json. Switches
+      // the stored layout pointers, so like settings it runs on its own, one worker.
+      name: 'a11y', testMatch: /a11y\.spec\.mjs/, dependencies: ['setup'],
+      use: { ...devices['Desktop Chrome'], userAgent: USER_AGENT, viewport: { width: 1280, height: 860 } },
+    },
+    {
       name: 'visual', testMatch: /visual\.spec\.mjs/, dependencies: ['setup'],
       use: { ...devices['Desktop Chrome'], userAgent: USER_AGENT, viewport: { width: 1280, height: 860 } },
     },

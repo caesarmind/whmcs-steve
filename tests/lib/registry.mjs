@@ -47,6 +47,8 @@ export const CHECKS = [
     blocking: true, why: 'The 2FA challenge posted to itself (405: nobody with 2FA could sign in); the card form used field names WHMCS ignores.' },
   { id: 'coverage-manifest', title: 'Every page/variant/cart tpl is tested or listed', cmd: [node, STATIC('check-coverage.mjs')], cwd: REPO_ROOT,
     blocking: true, why: 'A new page or variant must not ship without a decision on how it is tested (tests/e2e/coverage.mjs).' },
+  { id: 'a11y-markup', title: 'Accessibility markup no worse than baseline', cmd: [node, STATIC('check-a11y-markup.mjs')], cwd: REPO_ROOT,
+    blocking: true, why: 'Icon-only buttons, unlabelled fields, untranslated names and unhidden icons, against tests/static/a11y-markup-baseline.json; a fix must shrink the baseline (--update) in the same change.' },
 
   // --- hadrian/scripts (tracked) --------------------------------------------
   { id: 'smarty-balance', title: 'Smarty block tags balance', cmd: [node, 'scripts/check-smarty-balance.mjs'], cwd: HADRIAN, blocking: true },

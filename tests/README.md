@@ -33,11 +33,21 @@ Playwright report (screenshots, traces, the HTML of every failing page).
 | Tier | What it checks | Needs the site | Time |
 |---|---|---|---|
 | **preflight** | the stack is up, serves *this* checkout, the template is `hadrian`, the addon's hooks load, data is seeded, a gateway is active | yes | ~5 s |
-| **static** | 32 checkers: every page is tested or has a stated reason why not, CSS is ASCII-only, PHP parses, Smarty balance, every `$hadrianLang` key resolves, colour defaults match the CSS, the three "Free" implementations agree, admin JS parses, docs anchors, ... | no | ~30 s |
+| **static** | 33 checkers: every page is tested or has a stated reason why not, CSS is ASCII-only, PHP parses, Smarty balance, every `$hadrianLang` key resolves, colour defaults match the CSS, the three "Free" implementations agree, admin JS parses, docs anchors, ... | no | ~30 s |
 | **compile** | every one of the 314 templates compiled by **WHMCS's own Smarty** (its modifiers + security policy) | WHMCS files | ~12 s |
 | **smoke** | every page x persona over HTTP, every Hadrian admin screen, and a crawl that follows every link the theme renders | yes | ~3 min |
 | **browser** | real Chromium: every key page in 3 layouts x light/dark + phone width; JS errors, failed assets, layout geometry, unreadable text; the user flows; one test per client-area and order-form feature that needs no setting changed (`client-area.spec`, `order.spec`, the TH and OF rows of [FEATURES.md](FEATURES.md)) | yes | ~15 min |
+| **a11y** | axe-core, WCAG 2.2 A + AA: every route in the sidebar layout, the order steps with a cart, six pages in each other layout, ten pages at 320 px; light and dark. Compared with `e2e/a11y-baseline.json` (see below). **Not in `--gate` yet** | yes | ~15 min |
 | **visual** | screenshots compared against approved baselines - **advisory**, never fails the run | yes | ~2 min |
+
+### Accessibility
+
+Plan: [docs/accessibility-hadrian-plan.md](../docs/accessibility-hadrian-plan.md). The site does not pass WCAG 2.2 AA yet, so both accessibility checks compare against a baseline of what fails today and fail on anything worse, and on anything better. A fix shrinks the baseline in the same change, so a finding cannot quietly come back.
+
+- `tests/e2e/a11y-baseline.json` (a11y tier): page -> axe rule -> number of failing elements. After a fix, run `HADRIAN_A11Y_UPDATE=1 node tests/run.mjs --tier a11y` and review the diff. `node tests/lib/a11y-summary.mjs` turns the last run's detail (`tests/reports/a11y-detail/`) into `tests/reports/a11y-summary.md`.
+- `tests/static/a11y-markup-baseline.json` (static tier, in the gate): template -> rule -> count for five source heuristics (icon-only buttons, icon-only labels, unlabelled fields, English names written into templates, inline SVGs not hidden). `node tests/static/check-a11y-markup.mjs --update` after a fix; `--list <rule> [file]` prints every hit.
+- Layouts are switched through the stored layout pointers, never `?preview=1&layout=`: preview draws every layout's chrome at once, so landmarks and ids would be counted twice.
+- axe does not see everything. It accepts a placeholder as a field's name, so the checkout's icon-only labels pass it; the static check catches those. Keyboard behaviour, focus order and what a screen reader announces still need a person.
 
 ### Hadrian Email Templates
 

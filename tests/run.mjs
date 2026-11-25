@@ -7,6 +7,7 @@
 //   node tests/run.mjs --tier smoke          HTTP: every page x persona, admin screens, link crawl
 //   node tests/run.mjs --tier browser        Chromium: layouts, dark mode, JS errors, user flows
 //   node tests/run.mjs --tier settings       every admin setting, layout and page variant, switched on for real
+//   node tests/run.mjs --tier a11y           axe-core WCAG 2.2 AA scan against tests/e2e/a11y-baseline.json
 //   node tests/run.mjs --tier visual         screenshot comparison (advisory)
 //   node tests/run.mjs --approve             accept the current look as the visual baseline
 //   node tests/run.mjs --open                open the HTML report when done
@@ -26,7 +27,9 @@ const argv = process.argv.slice(2);
 const flag = f => argv.includes(f);
 const opt = name => { const i = argv.indexOf(name); return i >= 0 ? argv[i + 1] : null; };
 
-const ALL = ['static', 'compile', 'smoke', 'browser', 'settings', 'visual'];
+// a11y is not in --gate yet: the baseline still holds every finding that exists
+// today (docs/accessibility-hadrian-plan.md, phase 0), and it takes ~15 minutes.
+const ALL = ['static', 'compile', 'smoke', 'browser', 'settings', 'a11y', 'visual'];
 const tiers = new Set(opt('--tier') ? opt('--tier').split(',') : flag('--gate') ? ['static', 'compile', 'smoke', 'browser', 'settings'] : ALL);
 for (const t of tiers) if (!ALL.includes(t)) { console.error(`unknown tier "${t}" (use ${ALL.join(', ')})`); process.exit(2); }
 if (flag('--approve')) tiers.add('visual');
@@ -60,11 +63,11 @@ console.log(bold(`Hadrian test suite`) + dim(`  ${[...tiers].join(' + ')}  @ ${s
 // The static tier needs no site, but four of its checkers need the Smarty that
 // `composer install -d tests/static` provides; every other tier needs the local
 // stack. Both are environment problems, not theme bugs: exit 2, with the fix.
-const needsSite = ['compile', 'smoke', 'browser', 'settings', 'visual'].some(t => tiers.has(t));
+const needsSite = ['compile', 'smoke', 'browser', 'settings', 'a11y', 'visual'].some(t => tiers.has(t));
 if (needsSite || tiers.has('static')) {
   console.log('\n' + bold('Preflight'));
   const checks = tiers.has('static') ? staticPreflight() : [];
-  if (needsSite) checks.push(...(await preflight({ ensureFixtures: ['smoke', 'browser', 'settings', 'visual'].some(t => tiers.has(t)) })).checks);
+  if (needsSite) checks.push(...(await preflight({ ensureFixtures: ['smoke', 'browser', 'settings', 'a11y', 'visual'].some(t => tiers.has(t)) })).checks);
   const pfOk = checks.every(ch => ch.ok);
   for (const ch of checks) console.log(`  ${ch.ok ? green('ok  ') : red('FAIL')}  ${ch.name.padEnd(36)} ${dim(ch.detail.slice(0, 80))}`);
   summary.sections.push({ name: 'Preflight', blocking: true, ok: pfOk, items: checks.map(ch => ({ name: ch.name, ok: ch.ok, detail: ch.detail, fix: ch.fix })) });
@@ -158,7 +161,7 @@ function reportTests(title, res, { blocking }) {
 // (a missing {include}, $key@iteration, an array offset on null) into its own
 // logs and still answers 200 with a normal-looking page - the log is the only
 // place they show. Read after the site tiers below.
-const usesSite = ['smoke', 'browser', 'settings', 'visual'].some(t => tiers.has(t));
+const usesSite = ['smoke', 'browser', 'settings', 'a11y', 'visual'].some(t => tiers.has(t));
 let logMark = null;
 if (usesSite) {
   const r = await run(PHP, [path.join(TESTS_DIR, 'php', 'whmcs-log.php'), 'mark']);
@@ -169,6 +172,8 @@ const site = ['smoke', 'browser'].filter(t => tiers.has(t));
 if (site.length) ok = reportTests('Site tests', await playwright(site, 'site'), { blocking: true }) && ok;
 // Settings change what every request sees, so they run alone, after the rest.
 if (tiers.has('settings')) ok = reportTests('Settings, layouts and variants', await playwright(['settings'], 'settings', ['--workers', '1']), { blocking: true }) && ok;
+// Switches the stored layout pointers too, so it also runs alone.
+if (tiers.has('a11y')) ok = reportTests('Accessibility (WCAG 2.2 AA, axe-core)', await playwright(['a11y'], 'a11y', ['--workers', '1']), { blocking: true }) && ok;
 if (tiers.has('visual')) {
   // The flows just created (and closed) a ticket for the full persona, with a
   // timestamped subject that lands on its dashboard. Clean up first so the
