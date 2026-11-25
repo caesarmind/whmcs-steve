@@ -32,6 +32,7 @@ final class ViewHelper
         'sitemap'    => 'Sitemap',
         'menu'       => 'Menu',
         'branding'   => 'Branding',
+        'media'      => 'Media',
         'extensions' => 'Extensions',
         'tools'      => 'Tools',
     ];

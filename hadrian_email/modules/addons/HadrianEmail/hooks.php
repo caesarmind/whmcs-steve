@@ -77,4 +77,8 @@ if (defined('ADMINAREA')) {
         'url'         => AdminController::BASE,
         'version'     => '1.0.0',
     ]);
+
+    // Which library images the emails use, for Hadrian's Media screen.
+    // Read only when that screen, or a delete in the picker, asks.
+    Bridge::registerMediaSource('email', [\HadrianEmail\MediaSource::class, 'rows']);
 }

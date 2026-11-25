@@ -91,12 +91,176 @@ test('media picker: lists, uploads and deletes', async ({ page }) => {
   expect(listing(path.join(IMG, 'media')), 'the library folder is as it was').toEqual(before);
 });
 
+// A picture with enough detail that re-encoding it at a lower quality is
+// clearly smaller, drawn in the page so the test needs no image file.
+const photo = page => page.evaluate(async () => {
+  const c = document.createElement('canvas');
+  c.width = 1400; c.height = 900;
+  const g = c.getContext('2d');
+  for (let i = 0; i < 400; i++) {
+    g.fillStyle = `hsl(${(i * 47) % 360} 80% ${30 + (i * 13) % 50}%)`;
+    g.beginPath();
+    g.arc((i * 211) % 1400, (i * 97) % 900, 20 + (i * 31) % 160, 0, 7);
+    g.fill();
+  }
+  const blob = await new Promise(r => c.toBlob(r, 'image/jpeg', 0.98));
+  return Array.from(new Uint8Array(await blob.arrayBuffer()));
+});
+const mediaIdle = page => page.waitForFunction(() => window.hadrianMedia && window.hadrianMedia.idle());
+
+test('media screen: upload, optimise, rename, where it is used, delete', async ({ page }) => {
+  test.setTimeout(120_000);
+  const dir = path.join(IMG, 'media');
+  const before = listing(dir);
+  const originals = () => listing(path.join(dir, '.originals'));
+  const originalsBefore = originals();
+
+  await page.goto(`${H}&action=media`);
+  await mediaIdle(page);
+  await expect(page.locator('.mt-topnav-item.is-active'), 'Media has its own tab').toHaveText('Media');
+  await expect(page.locator('#mt-ml-opt-toggle'), 'new uploads are optimised unless switched off').toBeChecked();
+
+  // Upload: the photo comes back smaller, with its original set aside.
+  const bytes = Buffer.from(await photo(page));
+  const uploaded = jsonFrom(page, 'upload');
+  await page.locator('#mt-ml-file').setInputFiles({ name: 'e2e hero photo.jpg', mimeType: 'image/jpeg', buffer: bytes });
+  const up = await (await uploaded).json();
+  expect(up.ok, JSON.stringify(up)).toBe(true);
+  const name = up.item.name;
+  expect(up.optimized, 'the upload was optimised').toBe(true);
+  expect(up.item.bytes, 'and is smaller than what was sent').toBeLessThan(bytes.length * 0.8);
+  expect([up.item.w, up.item.h], 'its size is recorded').toEqual([1400, 900]);
+  expect(fs.statSync(path.join(dir, name)).size, 'the file on disk is the smaller one').toBe(up.item.bytes);
+  expect(fs.statSync(path.join(dir, '.originals', name)).size, 'the original is kept, untouched').toBe(bytes.length);
+  await mediaIdle(page);
+
+  const tile = page.locator(`.mt-ml-tile[data-name="${name}"]`);
+  await expect(tile, 'it is in the grid under the name it was uploaded with').toContainText('e2e hero photo');
+  await expect(tile.locator('.mt-ml-flag'), 'and flagged as not used yet').toHaveText('Unused');
+  await expect(page.locator('#mt-ml-detail'), 'its details are open').toContainText('Optimised');
+  await expect(page.locator('#mt-ml-url'), 'with an absolute address to copy').toHaveValue(new RegExp(`^https?://.+/assets/img/media/${name}$`));
+
+  // Rename: the name changes, the file does not.
+  const renamed = jsonFrom(page, 'rename');
+  await page.locator('#mt-ml-name').fill('E2E hero');
+  await page.locator('#mt-ml-name').press('Enter');
+  expect((await (await renamed).json()).item.label).toBe('E2E hero');
+  await expect(tile).toContainText('E2E hero');
+  expect(fs.existsSync(path.join(dir, name)), 'the file keeps its own name').toBe(true);
+
+  // Restore, then optimise again from the details.
+  const restored = jsonFrom(page, 'restore');
+  await page.locator('#mt-ml-detail button', { hasText: 'Restore original' }).click();
+  expect((await (await restored).json()).item.bytes, 'restore puts back every byte').toBe(bytes.length);
+  expect(originals(), 'and nothing is left set aside').toEqual(originalsBefore);
+  const optimized = jsonFrom(page, 'optimize');
+  await page.locator('#mt-ml-detail button', { hasText: /^Optimise$/ }).click();
+  expect((await (await optimized).json()).results[name].status).toBe('optimized');
+  await mediaIdle(page);
+
+  // Use it as a page's social image: Media now says where, and the picker
+  // refuses to delete it.
+  await page.goto(`${H}&action=pages`);
+  const edit = await page.locator('a[href*="action=pages"][href*="sub=edit"]').first().getAttribute('href');
+  const EDIT = `${H}${edit.replace(/^\?module=Hadrian/, '')}`;
+  const setSocial = async value => {
+    await page.goto(EDIT);
+    const field = page.locator('input[name="seo_social_image"]');
+    const was = await field.inputValue();
+    await field.evaluate((el, v) => { el.value = v; }, value);
+    await Promise.all([page.waitForURL(/flash=saved/), field.evaluate(el => el.form.requestSubmit())]);
+    return was;
+  };
+  const socialBefore = await setSocial(up.item.absUrl);
+  try {
+    await page.goto(`${H}&action=media`);
+    await mediaIdle(page);
+    await expect(tile.locator('.mt-ml-flag'), 'no longer flagged unused').toHaveCount(0);
+    await tile.click();
+    await expect(page.locator('#mt-ml-detail .mt-ml-usedlist a'), 'the details link to the page that uses it').toHaveAttribute('href', /action=pages&sub=edit&page=/);
+    await page.locator('#mt-ml-show [data-show="unused"]').click();
+    await expect(tile, 'the Unused filter leaves it out').toHaveCount(0);
+    await page.locator('#mt-ml-show [data-show="used"]').click();
+    await expect(tile, 'and In use shows it').toBeVisible();
+
+    const token = await page.evaluate(() => JSON.parse(document.getElementById('mt-ml-data').textContent).token);
+    const kept = await page.request.post(`${H}&action=media&sub=delete`, {
+      form: { collection: 'library', 'name[]': name, token }, headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    });
+    const keptBody = await kept.json();
+    expect(keptBody.results[name], 'a delete that does not say "anyway" keeps an image in use').toBe('in-use');
+    expect(keptBody.usage[name][0].where, 'and says where').toContain('Social image');
+    expect(fs.existsSync(path.join(dir, name))).toBe(true);
+
+    // The screen warns, names the place, and deletes on "Delete anyway".
+    await page.locator('#mt-ml-detail .mt-ml-del').click();
+    const dialog = page.locator('#mt-ml-dialog');
+    await expect(dialog).toContainText('This image is in use');
+    await expect(dialog).toContainText('Social image');
+    const deleted = jsonFrom(page, 'delete');
+    await dialog.locator('#mt-ml-dialog-yes', { hasText: 'Delete anyway' }).click();
+    expect((await (await deleted).json()).results[name]).toBe('deleted');
+    await expect(tile).toHaveCount(0);
+  } finally {
+    await setSocial(socialBefore);
+  }
+
+  expect(listing(dir), 'the library folder is as it was').toEqual(before);
+  expect(originals(), 'and so is the folder of originals').toEqual(originalsBefore);
+});
+
+test('media screen: the optimise switch is saved, and an upload then stays as sent', async ({ page }) => {
+  const dir = path.join(IMG, 'media');
+  const before = listing(dir);
+  await page.goto(`${H}&action=media`);
+  await mediaIdle(page);
+  const toggle = page.locator('#mt-ml-opt-toggle');
+  const set = async on => {
+    if ((await toggle.isChecked()) === on) return;
+    const saved = jsonFrom(page, 'settings');
+    await toggle.evaluate(el => el.click());      // the input itself is visually hidden behind its track
+    expect((await (await saved).json()).optimizeUploads).toBe(on);
+  };
+  const was = await toggle.isChecked();
+  try {
+    await set(false);
+    await page.reload();
+    await mediaIdle(page);
+    await expect(toggle, 'off survives a reload').not.toBeChecked();
+
+    const bytes = Buffer.from(await photo(page));
+    const uploaded = jsonFrom(page, 'upload');
+    await page.locator('#mt-ml-file').setInputFiles({ name: 'e2e-as-sent.jpg', mimeType: 'image/jpeg', buffer: bytes });
+    const up = await (await uploaded).json();
+    expect(up.optimized, 'not optimised').toBe(false);
+    expect(up.item.bytes, 'stored byte for byte').toBe(bytes.length);
+    await mediaIdle(page);
+
+    // Ticked and deleted through the bulk bar.
+    const tile = page.locator(`.mt-ml-tile[data-name="${up.item.name}"]`);
+    await tile.locator('.mt-ml-pick input').check({ force: true });
+    await expect(page.locator('#mt-ml-bulk-count')).toHaveText('1 image selected');
+    await page.locator('#mt-ml-bulk-del').click();
+    const deleted = jsonFrom(page, 'delete');
+    await page.locator('#mt-ml-dialog-yes').click();
+    expect((await (await deleted).json()).deleted).toBe(1);
+    await expect(tile).toHaveCount(0);
+  } finally {
+    await set(was);
+  }
+  expect(listing(dir), 'the library folder is as it was').toEqual(before);
+});
+
 test('a signed-in admin still needs the CSRF token', async ({ page }) => {
   // Another site cannot make an admin's browser do this: it has no token.
   await page.goto(`${H}&action=branding`);
   for (const [sub, form, extra] of [
     ['action=media&sub=list', { collection: 'library', token: 'not-the-token' }, { 'X-Requested-With': 'XMLHttpRequest' }],
     ['action=media&sub=delete', { collection: 'library', 'name[]': 'x.png' }, { 'X-Requested-With': 'XMLHttpRequest' }],
+    ['action=media&sub=rename', { collection: 'library', name: 'x.png', label: 'x' }, { 'X-Requested-With': 'XMLHttpRequest' }],
+    ['action=media&sub=optimize', { collection: 'library', name: 'x.png', token: 'not-the-token' }, { 'X-Requested-With': 'XMLHttpRequest' }],
+    ['action=media&sub=restore', { collection: 'library', name: 'x.png' }, { 'X-Requested-With': 'XMLHttpRequest' }],
+    ['action=media&sub=settings', { collection: 'library', optimize: '0', token: 'not-the-token' }, { 'X-Requested-With': 'XMLHttpRequest' }],
     ['action=branding&sub=upload-ajax', { field: 'logo_light', token: 'not-the-token' }, {}],
     ['action=branding&sub=remove-ajax', { field: 'logo_light' }, {}],
   ]) {

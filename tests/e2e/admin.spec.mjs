@@ -57,6 +57,10 @@ test.describe('admin', () => {
         ['action=media&sub=list', { collection: 'library', token }],
         ['action=media&sub=upload', { collection: 'library', token }],
         ['action=media&sub=delete', { collection: 'library', token }],
+        ['action=media&sub=rename', { collection: 'library', name: 'x.png', label: 'x', token }],
+        ['action=media&sub=optimize', { collection: 'library', name: 'x.png', token }],
+        ['action=media&sub=restore', { collection: 'library', name: 'x.png', token }],
+        ['action=media&sub=settings', { collection: 'library', optimize: '1', token }],
         ['action=branding&sub=upload-ajax', { field: 'no-such-field', token }],
         ['action=branding&sub=remove-ajax', { field: 'no-such-field', token }],
       ]) {

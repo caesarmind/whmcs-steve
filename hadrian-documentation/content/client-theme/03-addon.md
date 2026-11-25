@@ -18,7 +18,8 @@ The Hadrian addon mirrors the theme's aesthetic inside WHMCS admin: a fixed-widt
 - **Menu** - build client and guest menus per location.
 - **Pages** - per-page template, SEO, and visibility.
 - **Settings** - global behaviour, including the dark-mode controls under Appearance.
-- **Branding** - logo, favicon and the media library.
+- **Branding** - logo, favicon and company details.
+- **Media** - every image you have uploaded: where it is used, optimising, clearing out.
 - **Sitemap** - the generated sitemap and its inclusion rules.
 - **Extensions** - the companion modules detected on this install.
 - **Tools** - maintenance actions such as cache clearing.

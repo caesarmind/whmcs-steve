@@ -228,6 +228,18 @@ final class Bridge
         }
     }
 
+    /**
+     * Tell Hadrian's Media screen where this module keeps image addresses, so
+     * it can show "used in" and warn before a delete (see MediaSource). An
+     * older Hadrian has no such screen and nothing is registered.
+     */
+    public static function registerMediaSource(string $id, callable $source): void
+    {
+        if (self::boot() && class_exists('\\Hadrian\\Helpers\\MediaUsage')) {
+            \Hadrian\Helpers\MediaUsage::register($id, $source);
+        }
+    }
+
     /** Hadrian is recent enough to list a module's pages in its Pages screen. */
     public static function listsPages(): bool
     {

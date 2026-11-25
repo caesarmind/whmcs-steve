@@ -96,4 +96,8 @@ if (defined('ADMINAREA')) {
         'version'     => AdminController::VERSION,
         'tab'         => false,
     ]);
+
+    // Which library images built pages use, for Hadrian's Media screen.
+    // Read only when that screen, or a delete in the picker, asks.
+    Bridge::registerMediaSource('builder', [\HadrianBuilder\MediaSource::class, 'rows']);
 }

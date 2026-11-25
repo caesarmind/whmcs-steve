@@ -36,7 +36,7 @@
                    2000, so it correctly paints above the dialog. *}
                 <div class="mt-modal-title mt-tip-line">
                     <span id="mt-media-title">Media</span>
-                    {include file="includes/tip.tpl" text="One shared library for the whole admin. Uploads stay here until you delete them, and the same image can be used on any number of pages." article="branding" anchor="uploading-replacing-and-removing"}
+                    {include file="includes/tip.tpl" text="One shared library for the whole admin. Uploads stay here until you delete them, and the same image can be used on any number of pages." article="media" anchor="choosing-an-image"}
                 </div>
                 <div class="mt-modal-sub" id="mt-media-sub">Choose an image or upload a new one.</div>
             </div>
@@ -88,6 +88,12 @@
 
         <div class="mt-modal-foot">
             <span class="mt-media-footinfo" id="mt-media-selinfo"></span>
+            {* The library's own screen: where an image is used, renaming,
+               optimising, deleting several. A literal address, not
+               $viewHelper: this partial is also drawn by the extension
+               modules and the harnesses, whose helpers differ. New tab, so
+               the form the picker was opened from is not lost. *}
+            <a class="mt-media-manage" href="?module=Hadrian&amp;action=media" target="_blank" rel="noopener">Manage library</a>
             <button type="button" class="mt-btn mt-btn-secondary mt-btn-sm" id="mt-media-cancel">Cancel</button>
             <button type="button" class="mt-btn mt-btn-primary mt-btn-sm" id="mt-media-use" disabled>Use image</button>
         </div>
@@ -367,6 +373,14 @@
                 } else {
                     say('Deleted "' + item.label + '".', 'ok');
                 }
+            } else if (outcome === 'in-use') {
+                // The server keeps an image that something still shows. The
+                // Media screen can delete it anyway, after listing where.
+                if (box) box.remove();
+                var places = (res.usage && res.usage[item.name]) || [];
+                say('"' + item.label + '" is in use'
+                    + (places.length ? ' (' + places[0].where + (places.length > 1 ? ' and ' + (places.length - 1) + ' more' : '') + ')' : '')
+                    + ', so it was kept. Open Media to delete it anyway.', 'error');
             } else {
                 if (box) box.remove();
                 say('Could not delete "' + item.label + '" (' + outcome + ').', 'error');

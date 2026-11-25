@@ -172,6 +172,54 @@ final class MediaLibrary
     }
 
     /**
+     * Change some fields of one entry and keep the rest. Makes the entry when
+     * the file has none (it arrived by FTP or git).
+     *
+     * @param array<string,mixed> $fields
+     */
+    public static function patch(string $key, string $storedName, array $fields): void
+    {
+        self::mutate($key, static function (array $map) use ($storedName, $fields): array {
+            $entry = is_array($map[$storedName] ?? null) ? $map[$storedName] : ['label' => '', 'w' => 0, 'h' => 0, 'at' => 0];
+            $map[$storedName] = $fields + $entry;
+            return $map;
+        });
+    }
+
+    /**
+     * Clean a name an admin typed for an image. Display text only: it is
+     * never a path, and the file on disk keeps its own name.
+     */
+    public static function cleanLabel(string $label): string
+    {
+        $label = (string)preg_replace('/[\x00-\x1F\x7F]/u', '', $label);
+        $label = trim((string)preg_replace('/\s+/u', ' ', $label));
+        return function_exists('mb_substr')
+            ? mb_substr($label, 0, self::LABEL_MAX)
+            : substr($label, 0, self::LABEL_MAX);
+    }
+
+    // ---------------------------------------------------------- optimising
+
+    /** The Hadrian setting behind "Optimise new uploads". On unless switched off. */
+    public const OPTIMIZE_SETTING = 'media_optimize_uploads';
+
+    /** Are new uploads optimised as they arrive? */
+    public static function optimizesUploads(): bool
+    {
+        try {
+            return (string)\Hadrian\Models\Settings::getValue(self::OPTIMIZE_SETTING, '1') !== '0';
+        } catch (\Throwable $e) {
+            return false;                       // no settings table: leave uploads as they are
+        }
+    }
+
+    public static function setOptimizesUploads(bool $on): void
+    {
+        \Hadrian\Models\Settings::setValue(self::OPTIMIZE_SETTING, $on ? '1' : '0');
+    }
+
+    /**
      * Derive a human label from the browser-supplied upload name.
      * Never trusted as a path — basename, extension dropped, control chars
      * stripped, length capped. It is display text only.

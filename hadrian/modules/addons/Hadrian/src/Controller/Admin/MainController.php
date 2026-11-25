@@ -20,7 +20,8 @@ use Hadrian\Controller\AbstractController;
  *   ?action=menu             → menu list
  *   ?action=editMenu         → menu editor (drag-drop tree)
  *   ?action=branding         → logo / favicon uploads (sub=upload-ajax|remove-ajax: JSON)
- *   ?action=media            → media library JSON (sub=list|upload|delete)
+ *   ?action=media            → Media screen; with a sub, the library's JSON
+ *                              (sub=list|upload|delete|rename|optimize|restore|settings)
  *   ?action=extensions       → theme extensions
  *   ?action=tools            → cache, license refresh, htaccess gen
  *   ?action=templates        → list installed templates (rare)
@@ -98,15 +99,27 @@ final class MainController extends AbstractController
             default       => $ctl->indexAction(),
         };
     }
-    /** The media library behind every [data-mt-media] field. JSON only. */
+    /**
+     * The media library. With no sub it is the Media screen; every sub is a
+     * JSON endpoint, used by that screen and by the picker behind every
+     * [data-mt-media] field.
+     */
     public function mediaAction(): string
     {
+        $sub = (string)($_GET['sub'] ?? '');
+        if ($sub === '' && ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'GET') {
+            return (new MediaScreenController())->indexAction();
+        }
         $ctl = new MediaController();
-        return match ((string)($_GET['sub'] ?? '')) {
-            'list'   => $ctl->listAction(),
-            'upload' => $ctl->uploadAction(),
-            'delete' => $ctl->deleteAction(),
-            default  => \Hadrian\Helpers\AdminAjax::refuse('Unknown media action.', 404),
+        return match ($sub) {
+            'list'     => $ctl->listAction(),
+            'upload'   => $ctl->uploadAction(),
+            'delete'   => $ctl->deleteAction(),
+            'rename'   => $ctl->renameAction(),
+            'optimize' => $ctl->optimizeAction(),
+            'restore'  => $ctl->restoreAction(),
+            'settings' => $ctl->settingsAction(),
+            default    => \Hadrian\Helpers\AdminAjax::refuse('Unknown media action.', 404),
         };
     }
     public function extensionsAction(): string { return (new ExtensionsController())->indexAction(); }

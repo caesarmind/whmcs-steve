@@ -70,6 +70,7 @@
                 <a class="mt-topnav-item {if $mt_nav == 'sitemap'}is-active{/if}" href="{$viewHelper->url('sitemap')}">Sitemap</a>
                 <a class="mt-topnav-item {if $mt_nav == 'menu'}is-active{/if}" href="{$viewHelper->url('menu')}">Menu</a>
                 <a class="mt-topnav-item {if $mt_nav == 'branding'}is-active{/if}" href="{$viewHelper->url('branding')}">Branding</a>
+                <a class="mt-topnav-item {if $mt_nav == 'media'}is-active{/if}" href="{$viewHelper->url('media')}">Media</a>
                 {* One tab per installed extension module (a separate WHMCS
                    addon that registered itself; see Helpers\Extensions). On an
                    extension's own page $currentAction is its nav key. *}

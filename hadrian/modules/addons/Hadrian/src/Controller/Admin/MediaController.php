@@ -5,6 +5,8 @@ namespace Hadrian\Controller\Admin;
 
 use Hadrian\Helpers\AdminAjax;
 use Hadrian\Helpers\MediaLibrary;
+use Hadrian\Helpers\MediaOptimizer;
+use Hadrian\Helpers\MediaUsage;
 use Hadrian\Helpers\Uploader;
 
 /**
@@ -16,6 +18,14 @@ use Hadrian\Helpers\Uploader;
  *   ?module=Hadrian&action=media&sub=list     -> browse
  *   ?module=Hadrian&action=media&sub=upload   -> add one file
  *   ?module=Hadrian&action=media&sub=delete   -> remove one or more
+ *   ?module=Hadrian&action=media&sub=rename   -> change an image's name
+ *   ?module=Hadrian&action=media&sub=optimize -> make one or more smaller
+ *   ?module=Hadrian&action=media&sub=restore  -> put an original back
+ *   ?module=Hadrian&action=media&sub=settings -> optimise new uploads, on or off
+ *
+ * The first three serve the picker on every admin page. The rest, and
+ * `list` with usage=1, serve the Media screen (MediaScreenController), which
+ * is the same library with room to manage it.
  *
  * `list` is a POST despite being semantically a read: it carries the CSRF
  * token like the other two, and AdminAjax::guard() refuses anything else.
@@ -36,7 +46,10 @@ final class MediaController
     private const REQUIRED_HEADER = 'XMLHttpRequest';
 
     /** Directory-level cap; keeps the modal payload and the disk bounded. */
-    private const MAX_FILES = 500;
+    public const MAX_FILES = 500;
+
+    /** Seconds one optimize request may spend; the screen sends the rest again. */
+    private const OPTIMIZE_BUDGET = 8;
 
     private string $collection = MediaLibrary::DEFAULT_COLLECTION;
     private Uploader $uploader;
@@ -49,10 +62,15 @@ final class MediaController
     public function listAction(): never
     {
         $this->boot();
-        $items = $this->items();
+        // Usage costs a read of every place an image can be saved in, so only
+        // the Media screen asks for it; the picker's list stays cheap.
+        $items = $this->items(!empty($_POST['usage']));
         $this->respondJson([
             'ok'        => true,
             'collection'=> $this->collection,
+            'maxFiles'  => self::MAX_FILES,
+            'optimizer' => MediaOptimizer::available(),
+            'optimizeUploads' => MediaLibrary::optimizesUploads(),
             'deletable' => (bool)$this->cfg['deletable'],
             'accept'    => (string)$this->cfg['accept'],
             'maxBytes'  => (int)$this->cfg['maxBytes'],
@@ -105,16 +123,25 @@ final class MediaController
         }
 
         $stored = (string)$result['filename'];
+        $path   = $this->uploader->diskPathFor($stored);
         $label  = MediaLibrary::labelFromUpload((string)($upload['name'] ?? ''));
-        if ($label !== '') {
-            MediaLibrary::remember($this->collection, $stored, $label);
+        $size   = @getimagesize($path);
+        MediaLibrary::remember(
+            $this->collection,
+            $stored,
+            $label !== '' ? $label : $stored,
+            (int)($size[0] ?? 0),
+            (int)($size[1] ?? 0)
+        );
+
+        // Never fails the upload: an image that cannot be made smaller is
+        // simply stored as it came.
+        $status = '';
+        if (MediaLibrary::optimizesUploads() && MediaOptimizer::available()) {
+            $status = $this->optimizeOne($stored)['status'];
         }
 
-        $this->respondJson(['ok' => true, 'item' => $this->decorate([
-            'name'  => $stored,
-            'bytes' => (int)@filesize($this->uploader->diskPathFor($stored)),
-            'mtime' => time(),
-        ], MediaLibrary::manifest($this->collection))]);
+        $this->respondJson(['ok' => true, 'optimized' => $status === 'optimized', 'item' => $this->itemFor($stored, false)]);
     }
 
     /** POST sub=delete (name[] or name) -> { ok, deleted, results{} } */
@@ -141,6 +168,12 @@ final class MediaController
             $present[$row['name']] = true;
         }
 
+        // An image that a page, an email or a menu still points at is not
+        // deleted unless the caller says so (force=1, which the Media screen
+        // sends after showing where it is used). The picker never forces.
+        $force = !empty($_POST['force']);
+        $inUse = $force ? [] : MediaUsage::of(array_values(array_filter($names, 'is_string')));
+
         $results = [];
         $deleted = 0;
         foreach ($names as $name) {
@@ -153,6 +186,11 @@ final class MediaController
                 $results[$name] = 'not-found';
                 continue;
             }
+            if (isset($inUse[$name])) {
+                $results[$name] = 'in-use';
+                continue;
+            }
+            MediaOptimizer::forget($this->uploader->diskPathFor($name));
             $this->uploader->deleteFileSafe($name);
             MediaLibrary::forget($this->collection, $name);
             $results[$name] = 'deleted';
@@ -160,7 +198,87 @@ final class MediaController
         }
 
         // Always 200: a partial failure is data, not an error condition.
-        $this->respondJson(['ok' => true, 'deleted' => $deleted, 'results' => $results]);
+        $this->respondJson(['ok' => true, 'deleted' => $deleted, 'results' => $results, 'usage' => (object)$inUse]);
+    }
+
+    /** POST sub=rename (name, label) -> { ok, item } */
+    public function renameAction(): never
+    {
+        $this->boot();
+        $name  = $this->storedName((string)($_POST['name'] ?? ''));
+        $label = MediaLibrary::cleanLabel((string)($_POST['label'] ?? ''));
+        if ($label === '') {
+            $this->respondJson(['ok' => false, 'error' => 'Give the image a name.'], 422);
+        }
+        MediaLibrary::patch($this->collection, $name, ['label' => $label]);
+        $this->respondJson(['ok' => true, 'item' => $this->itemFor($name)]);
+    }
+
+    /**
+     * POST sub=optimize (name[] or name) -> { ok, results{name: {status, reason, item}}, pending[] }
+     *
+     * Works through the names until OPTIMIZE_BUDGET runs out and hands back
+     * the ones it did not reach, so a large library never times a request out.
+     */
+    public function optimizeAction(): never
+    {
+        $this->boot();
+        if (!MediaOptimizer::available()) {
+            $this->respondJson(['ok' => false, 'error' => 'This server has no GD image library, so images cannot be optimised.'], 422);
+        }
+        $raw   = $_POST['name'] ?? [];
+        $names = array_values(array_filter(is_array($raw) ? $raw : [$raw], 'is_string'));
+        if ($names === []) {
+            $this->respondJson(['ok' => false, 'error' => 'No file name given.'], 400);
+        }
+
+        $until   = microtime(true) + self::OPTIMIZE_BUDGET;
+        $results = [];
+        $pending = [];
+        foreach ($names as $i => $name) {
+            if ($i > 0 && microtime(true) > $until) {
+                $pending[] = $name;
+                continue;
+            }
+            if (!$this->uploader->isLibraryName($name) || $this->uploader->diskPathFor($name) === '') {
+                $results[$name] = ['status' => 'skipped', 'reason' => 'No such image.', 'item' => null];
+                continue;
+            }
+            $r = $this->optimizeOne($name);
+            $results[$name] = ['status' => $r['status'], 'reason' => $r['reason'], 'item' => $this->itemFor($name)];
+        }
+        $this->respondJson(['ok' => true, 'results' => $results, 'pending' => $pending]);
+    }
+
+    /** POST sub=restore (name) -> { ok, item } */
+    public function restoreAction(): never
+    {
+        $this->boot();
+        $name = $this->storedName((string)($_POST['name'] ?? ''));
+        $path = $this->uploader->diskPathFor($name);
+        if (!MediaOptimizer::restore($path)) {
+            $this->respondJson(['ok' => false, 'error' => 'There is no original to restore for this image.'], 422);
+        }
+        clearstatcache(true, $path);
+        $size = @getimagesize($path);
+        // skipOptimize: "Optimise library" leaves an image alone once its
+        // original was put back on purpose.
+        MediaLibrary::patch($this->collection, $name, [
+            'w' => (int)($size[0] ?? 0), 'h' => (int)($size[1] ?? 0), 'skipOptimize' => 1,
+        ]);
+        $this->respondJson(['ok' => true, 'item' => $this->itemFor($name)]);
+    }
+
+    /** POST sub=settings (optimize=0|1) -> { ok, optimizeUploads } */
+    public function settingsAction(): never
+    {
+        $this->boot();
+        try {
+            MediaLibrary::setOptimizesUploads(!empty($_POST['optimize']));
+        } catch (\Throwable $e) {
+            $this->respondJson(['ok' => false, 'error' => 'The setting could not be saved.'], 500);
+        }
+        $this->respondJson(['ok' => true, 'optimizeUploads' => MediaLibrary::optimizesUploads()]);
     }
 
     // ------------------------------------------------------------- internals
@@ -193,13 +311,61 @@ final class MediaController
         $this->uploader->prepareStorage();
     }
 
+    /**
+     * A name from the request that is a real library image, or a 404.
+     * Same two checks as delete: shaped like a library image, and on disk.
+     */
+    private function storedName(string $name): string
+    {
+        if (!$this->uploader->isLibraryName($name) || $this->uploader->diskPathFor($name) === '') {
+            $this->respondJson(['ok' => false, 'error' => 'No such image.'], 404);
+        }
+        return $name;
+    }
+
+    /**
+     * Optimise one stored image and record its new size in the manifest.
+     *
+     * @return array{status:string,reason:string,before:int,after:int,width:int,height:int}
+     */
+    private function optimizeOne(string $name): array
+    {
+        $path = $this->uploader->diskPathFor($name);
+        $r    = MediaOptimizer::optimize($path);
+        clearstatcache(true, $path);
+        if ($r['status'] === 'optimized') {
+            MediaLibrary::patch($this->collection, $name, ['w' => $r['width'], 'h' => $r['height'], 'skipOptimize' => 0]);
+        }
+        return $r;
+    }
+
+    /** @return array<string,mixed> the tile for one stored image, read fresh from disk */
+    private function itemFor(string $name, bool $withUsage = true): array
+    {
+        $path = $this->uploader->diskPathFor($name);
+        clearstatcache(true, $path);
+        $item = $this->decorate([
+            'name'  => $name,
+            'bytes' => (int)@filesize($path),
+            'mtime' => (int)@filemtime($path),
+        ], MediaLibrary::manifest($this->collection));
+        // A new upload cannot be in use yet, so its tile skips the lookup.
+        $item['usage'] = $withUsage ? (MediaUsage::of([$name])[$name] ?? []) : [];
+        return $item;
+    }
+
     /** @return list<array<string,mixed>> */
-    private function items(): array
+    private function items(bool $withUsage = false): array
     {
         $manifest = MediaLibrary::manifest($this->collection);
+        $usage    = $withUsage ? MediaUsage::map() : null;
         $out = [];
         foreach ($this->uploader->listStored(self::MAX_FILES) as $row) {
-            $out[] = $this->decorate($row, $manifest);
+            $item = $this->decorate($row, $manifest);
+            if ($usage !== null) {
+                $item['usage'] = $usage[$row['name']] ?? [];
+            }
+            $out[] = $item;
         }
         return $out;
     }
@@ -217,15 +383,28 @@ final class MediaController
         $name  = $row['name'];
         $entry = is_array($manifest[$name] ?? null) ? $manifest[$name] : [];
         $label = trim((string)($entry['label'] ?? ''));
+        // The original's size on disk is the truth about "optimised": it is
+        // there exactly while the image can be restored.
+        $before = MediaOptimizer::originalBytes($this->uploader->diskPathFor($name));
+        $bytes  = (int)$row['bytes'];
 
         return [
             'name'   => $name,
             'label'  => $label !== '' ? $label : $name,
             'url'    => $this->uploader->webUrlFor($name),
             'absUrl' => MediaLibrary::absUrlFor($this->collection, $name),
-            'bytes'  => (int)$row['bytes'],
-            'human'  => $this->humanBytes((int)$row['bytes']),
+            'bytes'  => $bytes,
+            'human'  => $this->humanBytes($bytes),
             'mtime'  => (int)$row['mtime'],
+            'ext'    => strtolower((string)pathinfo($name, PATHINFO_EXTENSION)),
+            // 0 x 0 for a file that came in before sizes were recorded, or by
+            // FTP; the browser reads the size off the image it loads instead.
+            'w'      => (int)($entry['w'] ?? 0),
+            'h'      => (int)($entry['h'] ?? 0),
+            'optimized'    => $before > 0,
+            'saved'        => $before > 0 ? max(0, $before - $bytes) : 0,
+            'savedHuman'   => $before > 0 ? $this->humanBytes(max(0, $before - $bytes)) : '',
+            'skipOptimize' => !empty($entry['skipOptimize']),
         ];
     }
 
