@@ -13,6 +13,11 @@ namespace HadrianBuilder;
  *   delete    POST remove a page
  *   mode      POST set "Website served by" (Theme or Page Builder)
  *   replace   POST choose the theme page a built page stands in for, and when
+ *   duplicate POST copy a page as a new draft
+ *   export    POST download pages and their images as one file (PageFile)
+ *   import    POST take a pages file in and show what it holds; then
+ *             import-review (the same screen again), import-apply (POST, do
+ *             what was chosen per page) or import-cancel (POST)
  *
  * The editor talks JSON to its endpoints (api-preview, api-save, api-publish,
  * api-unpublish), and the section list on a built page's settings in Pages
@@ -75,6 +80,12 @@ final class AdminController
             'delete' => $this->delete(),
             'mode'    => $this->setMode(),
             'replace' => $this->setReplaces(),
+            'duplicate'     => $this->duplicate(),
+            'export'        => $this->export(),
+            'import'        => $this->importUpload(),
+            'import-review' => $this->importReview(),
+            'import-apply'  => $this->importApply(),
+            'import-cancel' => $this->importCancel(),
             // No screen of its own: the pages are in Hadrian's Pages.
             default  => $this->redirect(SitePages::listUrl()),
         };
@@ -152,6 +163,362 @@ final class AdminController
         $this->done($target === ''
             ? '"' . $page['name'] . '" no longer replaces a theme page.'
             : '"' . $page['name'] . '" now replaces ' . Replace::TARGETS[$target] . '.', $id);
+    }
+
+    // ------------------------------------------------- copying and moving pages
+
+    private function duplicate(): string
+    {
+        $this->requirePost();
+        $page = Page::find((int)($_POST['id'] ?? 0));
+        if ($page === null) {
+            $this->fail('That page no longer exists.');
+        }
+        $languages = Bridge::languages();
+        $name = Page::freeName((string)$page['name'], 'copy');
+        // A draft with an address of its own, replacing nothing: ready to
+        // edit, and nothing visitors see has changed.
+        $id = Page::create([
+            'name'  => $name,
+            'slug'  => Page::freeSlug((string)$page['slug']),
+            'meta'  => Document::normalizeMeta((array)$page['meta'], $languages),
+            'draft' => Document::normalize((array)$page['draft'], $languages),
+        ]);
+        Bridge::pagesChanged();
+        $this->done('"' . $page['name'] . '" was duplicated. This is the copy, "' . $name . '": a draft, until you publish it.', $id);
+    }
+
+    private function export(): string
+    {
+        $this->requirePost();
+        $ids = !empty($_POST['all'])
+            ? array_column(Page::all(), 'id')
+            : array_map('intval', (array)($_POST['id'] ?? []));
+        $pages = [];
+        foreach (array_slice(array_unique($ids), 0, 500) as $id) {
+            $page = Page::find((int)$id);
+            if ($page !== null) {
+                $pages[] = $page;
+            }
+        }
+        if ($pages === []) {
+            $this->fail('There are no pages to export.');
+        }
+        @set_time_limit(300);
+        $zip    = PageFile::zipAvailable();
+        $bundle = PageFile::build($pages, new Site(), $zip);
+        $name   = PageFile::fileName($pages, $zip);
+
+        if (!$zip) {
+            // No zip extension: the description alone, images left as addresses.
+            $this->send(PageFile::json($bundle['manifest']), $name, 'application/json');
+        }
+        $tmp = tempnam(sys_get_temp_dir(), 'hbx');
+        if ($tmp === false || !PageFile::writeZip($bundle, $tmp)) {
+            if ($tmp !== false) {
+                @unlink($tmp);
+            }
+            $this->fail('The export file could not be written. Check that PHP can write to its temporary folder.');
+        }
+        $this->send('', $name, 'application/zip', $tmp);
+    }
+
+    /**
+     * Take an uploaded pages file in. It is read and checked here, kept
+     * outside the web root under a random name, and the admin is sent to the
+     * review. Nothing is imported yet.
+     */
+    private function importUpload(): string
+    {
+        // PHP throws the whole request away when it is larger than
+        // post_max_size: no fields, no file, and so no token either. Say what
+        // happened instead of "your session expired".
+        if (($_SERVER['REQUEST_METHOD'] ?? '') === 'POST' && $_POST === [] && $_FILES === []
+            && (int)($_SERVER['CONTENT_LENGTH'] ?? 0) > 0) {
+            $this->fail('That file is larger than this server accepts in one upload (post_max_size is '
+                . ini_get('post_max_size') . ').');
+        }
+        $this->requirePost();
+
+        $file  = is_array($_FILES['file'] ?? null) ? $_FILES['file'] : [];
+        $error = is_int($file['error'] ?? null) ? $file['error'] : UPLOAD_ERR_NO_FILE;
+        $tmp   = is_string($file['tmp_name'] ?? null) ? $file['tmp_name'] : '';
+        if ($error === UPLOAD_ERR_INI_SIZE || $error === UPLOAD_ERR_FORM_SIZE) {
+            $this->fail('That file is larger than this server accepts (upload_max_filesize is ' . ini_get('upload_max_filesize') . ').');
+        }
+        if ($error === UPLOAD_ERR_NO_FILE) {
+            $this->fail('Choose a pages file to import.');
+        }
+        if ($error !== UPLOAD_ERR_OK || $tmp === '' || !is_uploaded_file($tmp)) {
+            $this->fail('The upload did not complete. Try again.');
+        }
+        $read = PageFile::read($tmp);
+        if (!$read['ok']) {
+            $this->fail($read['error']);
+        }
+
+        $dir = self::importDir();
+        if ($dir === '') {
+            $this->fail('The file could not be kept for review. Check that PHP can write to its temporary folder.');
+        }
+        $token = bin2hex(random_bytes(16));
+        if (!@move_uploaded_file($tmp, $dir . '/' . $token . '.pages')) {
+            $this->fail('The file could not be kept for review. Check that PHP can write to its temporary folder.');
+        }
+        @chmod($dir . '/' . $token . '.pages', 0600);
+
+        if (!is_array($_SESSION[self::IMPORT_SESSION] ?? null)) {
+            $_SESSION[self::IMPORT_SESSION] = [];
+        }
+        // The name the admin's file had, to show it back. Display text only.
+        $label = Text::line(basename(str_replace('\\', '/', (string)($file['name'] ?? ''))), 120);
+        $_SESSION[self::IMPORT_SESSION][$token] = ['at' => time(), 'label' => $label !== '' ? $label : 'Pages file'];
+
+        $this->redirect(self::BASE . '&action=import-review&t=' . $token);
+    }
+
+    private function importReview(): string
+    {
+        [$token, $path, $label] = $this->parkedImport((string)($_GET['t'] ?? ''));
+        $read = PageFile::read($path);
+        if (!$read['ok']) {
+            $this->forgetImport($token);
+            $this->fail($read['error']);
+        }
+        $manifest = $read['manifest'];
+        $site     = new Site();
+        $inFile   = $read['kind'] === 'zip' ? PageFile::mediaIn($path, array_keys($manifest['media'])) : [];
+        $pages    = [];
+        foreach (Importer::review($manifest, Page::all(), $inFile, $site) as $r) {
+            $pages[] = self::describeImport($r, $site->movesMedia());
+        }
+        return $this->view('import', [
+            'step'      => 'review',
+            'fileLabel' => $label,
+            'exported'  => self::dateOf($manifest['exported']),
+            'pages'     => $pages,
+            't'         => $token,
+            'token'     => $this->token(),
+        ]);
+    }
+
+    private function importApply(): string
+    {
+        $this->requirePost();
+        [$token, $path, $label] = $this->parkedImport((string)($_POST['t'] ?? ''));
+        $read = PageFile::read($path);
+        if (!$read['ok']) {
+            $this->forgetImport($token);
+            $this->fail($read['error']);
+        }
+        $manifest = $read['manifest'];
+        $site     = new Site();
+        $isZip    = $read['kind'] === 'zip';
+        $inFile   = $isZip ? PageFile::mediaIn($path, array_keys($manifest['media'])) : [];
+
+        // A page's sections may only go into a page the review offered for it.
+        $posted  = is_array($_POST['choice'] ?? null) ? $_POST['choice'] : [];
+        $choices = [];
+        foreach (Importer::review($manifest, Page::all(), $inFile, $site) as $r) {
+            $choice  = is_scalar($posted[$r['index']] ?? null) ? (string)$posted[$r['index']] : Importer::SKIP;
+            $allowed = [Importer::NEW => true, Importer::SKIP => true];
+            foreach ($r['matches'] as $match) {
+                $allowed['replace:' . $match['id']] = true;
+            }
+            $choices[$r['index']] = isset($allowed[$choice]) ? $choice : Importer::SKIP;
+        }
+
+        @set_time_limit(300);
+        $result = Importer::run(
+            $manifest,
+            $choices,
+            static fn(string $name, string $dest): string => $isZip
+                ? PageFile::extractMedia($path, $name, $dest)
+                : 'this kind of file carries no images',
+            $site
+        );
+        $this->forgetImport($token);
+        Bridge::pagesChanged();
+
+        $link = static fn(array $page): array => $page + [
+            'editUrl'     => self::BASE . '&action=edit&id=' . $page['id'],
+            'settingsUrl' => SitePages::settingsUrl($page['id']),
+        ];
+        return $this->view('import', [
+            'step'      => 'done',
+            'fileLabel' => $label,
+            'created'   => array_map($link, $result['created']),
+            'replaced'  => array_map($link, $result['replaced']),
+            'skipped'   => $result['skipped'],
+            'images'    => $result['images'],
+            'notes'     => array_values(array_unique($result['notes'])),
+        ]);
+    }
+
+    private function importCancel(): string
+    {
+        $this->requirePost();
+        $this->forgetImport((string)($_POST['t'] ?? ''));
+        $this->redirect(SitePages::listUrl());
+    }
+
+    /**
+     * One page of the review as the screen shows it: what it brings, what
+     * will not come across, and what can be done with it.
+     *
+     * @param array<string,mixed> $r one entry of Importer::review()
+     * @return array<string,mixed>
+     */
+    private static function describeImport(array $r, bool $movesMedia): array
+    {
+        $count = static fn(int $n, string $one, string $many): string => $n . ' ' . ($n === 1 ? $one : $many);
+        $quote = static fn(array $names): string => '"' . implode('", "', array_slice($names, 0, 6)) . '"'
+            . (count($names) > 6 ? ' and ' . (count($names) - 6) . ' more' : '');
+
+        $brings = [$count($r['sections'], 'section', 'sections')];
+        if ($r['images'] > 0) {
+            $brings[] = $count($r['images'], 'image', 'images');
+        }
+
+        $warnings = [];
+        if ($r['unknown'] !== []) {
+            $n = (int)array_sum($r['unknown']);
+            $warnings[] = $count($n, 'section is', 'sections are') . ' of a type this site does not have ('
+                . $quote(array_keys($r['unknown'])) . ') and will be left out.';
+        }
+        if ($r['over'] > 0) {
+            $warnings[] = 'A page holds ' . Document::maxSections() . ' sections. The last ' . $count($r['over'], 'section', 'sections') . ' will be left out.';
+        }
+        if ($r['images'] > 0 && !$movesMedia) {
+            $warnings[] = 'The installed Hadrian addon cannot take images in from a file, so the image fields will be empty. Update Hadrian to bring them along.';
+        }
+        if ($r['missing'] > 0) {
+            $warnings[] = $count($r['missing'], 'image is', 'images are') . ' named by the page but not in the file. Those fields will be empty.';
+        }
+        if ($r['products'] !== []) {
+            $warnings[] = 'No product here is called ' . $quote($r['products']) . '. Where the page shows '
+                . (count($r['products']) === 1 ? 'it' : 'them') . ', pick a product after importing.';
+        }
+        if ($r['languages'] !== []) {
+            $warnings[] = 'Text in ' . implode(', ', array_map('ucfirst', $r['languages']))
+                . ' will be left out: ' . (count($r['languages']) === 1 ? 'that language is' : 'those languages are') . ' not installed here.';
+        }
+
+        $notes = [];
+        if ($r['linked'] > 0) {
+            $notes[] = $count($r['linked'], 'image is a web address and stays', 'images are web addresses and stay') . ' as typed.';
+        }
+        if ($r['replaces'] !== '') {
+            $notes[] = 'Where it came from, this page replaced the ' . $r['replaces'] . '. That is not carried over: choose it in the page\'s settings if you want it here.';
+        }
+
+        $newName = Page::freeName($r['name'], 'imported');
+        $newSlug = Page::freeSlug($r['slug']);
+        $options = [['value' => Importer::NEW, 'label' => 'Add as a new page']];
+        foreach ($r['matches'] as $match) {
+            $options[] = [
+                'value' => 'replace:' . $match['id'],
+                'label' => 'Put its sections in "' . $match['name'] . '"' . ($match['slug'] !== '' ? ' (/' . $match['slug'] . ')' : ''),
+            ];
+        }
+        $options[] = ['value' => Importer::SKIP, 'label' => 'Leave it out'];
+
+        return [
+            'index'    => $r['index'],
+            'name'     => $r['name'],
+            'slug'     => $r['slug'],
+            'empty'    => $r['sections'] === 0,
+            'brings'   => implode(', ', $brings),
+            'warnings' => $warnings,
+            'notes'    => $notes,
+            'match'    => $r['matches'] !== []
+                ? 'A page here already has that ' . $r['matches'][0]['why'] . ': "' . $r['matches'][0]['name'] . '".'
+                : '',
+            'asNew'    => 'Becomes "' . $newName . '"' . ($newSlug !== '' ? ' at /' . $newSlug : ', with no address yet') . ', as a draft.',
+            'options'  => $options,
+        ];
+    }
+
+    // The files waiting for a review. Kept in PHP's temporary folder, outside
+    // the web root, under a random name that only this admin's session knows.
+
+    private const IMPORT_SESSION = 'hadrianBuilderImport';
+
+    /** How long an uploaded file waits for its review. */
+    private const IMPORT_KEEP = 6 * 3600;
+
+    /** The folder, made on demand and cleared of files nobody came back for. '' when it cannot be used. */
+    private static function importDir(): string
+    {
+        $dir = rtrim(str_replace('\\', '/', sys_get_temp_dir()), '/') . '/hadrian-builder-import';
+        if (!is_dir($dir) && !@mkdir($dir, 0700, true) && !is_dir($dir)) {
+            return '';
+        }
+        foreach (glob($dir . '/*.pages') ?: [] as $old) {
+            if (time() - (int)@filemtime($old) > self::IMPORT_KEEP) {
+                @unlink($old);
+            }
+        }
+        return is_writable($dir) ? $dir : '';
+    }
+
+    /**
+     * The file a review token stands for, or back to Pages when there is none.
+     *
+     * @return array{0:string, 1:string, 2:string} token, path, the name the file was uploaded with
+     */
+    private function parkedImport(string $token): array
+    {
+        $entry = preg_match('/^[a-f0-9]{32}$/', $token) ? ($_SESSION[self::IMPORT_SESSION][$token] ?? null) : null;
+        $path  = is_array($entry) ? self::importDir() . '/' . $token . '.pages' : '';
+        if (!is_array($entry) || time() - (int)($entry['at'] ?? 0) > self::IMPORT_KEEP || !is_file($path)) {
+            $this->forgetImport($token);
+            $this->fail('That import is no longer waiting. Choose the file again.');
+        }
+        return [$token, $path, (string)($entry['label'] ?? 'Pages file')];
+    }
+
+    private function forgetImport(string $token): void
+    {
+        if (!preg_match('/^[a-f0-9]{32}$/', $token)) {
+            return;
+        }
+        unset($_SESSION[self::IMPORT_SESSION][$token]);
+        $dir = self::importDir();
+        if ($dir !== '') {
+            @unlink($dir . '/' . $token . '.pages');
+        }
+    }
+
+    /** "25 November 2026" from the file's own timestamp; '' when it has none worth showing. */
+    private static function dateOf(string $iso): string
+    {
+        $time = $iso !== '' ? strtotime($iso) : false;
+        return $time !== false && $time > 0 ? date('j F Y', $time) : '';
+    }
+
+    /**
+     * Answer with a file to save, and end the request. The content is $body,
+     * or the file at $tempFile, which is streamed and then removed.
+     */
+    private function send(string $body, string $name, string $type, string $tempFile = ''): never
+    {
+        while (ob_get_level() > 0) {
+            @ob_end_clean();
+        }
+        $name = (string)preg_replace('/[^A-Za-z0-9._-]/', '-', $name);
+        header('Content-Type: ' . $type);
+        header('Content-Disposition: attachment; filename="' . $name . '"');
+        header('Content-Length: ' . ($tempFile !== '' ? (int)@filesize($tempFile) : strlen($body)));
+        header('Cache-Control: no-store');
+        header('X-Content-Type-Options: nosniff');
+        if ($tempFile !== '') {
+            readfile($tempFile);
+            @unlink($tempFile);
+        } else {
+            echo $body;
+        }
+        exit;
     }
 
     // --------------------------------------------------------------- editor

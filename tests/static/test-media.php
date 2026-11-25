@@ -279,6 +279,56 @@ namespace {
     }
 
     // ------------------------------------------------------------------
+    // An image that arrives inside a file (an imported page brings its
+    // pictures) is checked exactly like an upload, and stored once.
+    if (function_exists('imagecreatetruecolor') && function_exists('finfo_open')) {
+        $section = 'images that arrive in a file';
+        $up  = L::uploaderFor('library');
+        $cfg = ['allowedMimes' => \Hadrian\Helpers\Uploader::IMAGE_MEDIA, 'maxBytes' => 5 * 1024 * 1024, 'maxPixels' => 50000000];
+        $in  = $root . '/incoming';
+        mkdir($in);
+        $count = static fn (): int => count($up->listStored(0));
+        $before = $count();
+
+        imagepng(imagecreatetruecolor(40, 30), $in . '/whatever.dat');
+        $r = $up->ingest($in . '/whatever.dat', $cfg);
+        truthy('a real image is stored', !empty($r['ok']));
+        truthy('under a name of our own, with the extension of what it is', (bool)preg_match('/^[a-f0-9]{32}\.png$/', (string)($r['filename'] ?? '')));
+        truthy('the file it came from stays where it was', is_file($in . '/whatever.dat'));
+        truthy('the folder got its no-scripts rule', is_file($dir . '/.htaccess'));
+
+        file_put_contents($in . '/shell.png', '<?php echo "x";');
+        same('a script named like an image is refused', $up->ingest($in . '/shell.png', $cfg)['ok'], false);
+        file_put_contents($in . '/drawing.png', '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>');
+        same('an SVG is refused: the library is raster only', $up->ingest($in . '/drawing.png', $cfg)['ok'], false);
+        same('a file that is not there is refused', $up->ingest($in . '/nope.png', $cfg)['ok'], false);
+        same('one over the size limit is refused', $up->ingest($in . '/whatever.dat', ['maxBytes' => 10] + $cfg)['ok'], false);
+        same('one with too many pixels is refused', $up->ingest($in . '/whatever.dat', ['maxPixels' => 100] + $cfg)['ok'], false);
+        same('only the one good file was written', $count(), $before + 1);
+
+        imagepng(photo(60, 40), $in . '/team.png');
+        $a1 = L::add($in . '/team.png', "Team   photo\x01");
+        truthy('add() stores it', !empty($a1['ok']) && empty($a1['reused']));
+        $stored = (string)($a1['name'] ?? '');
+        same('with the address the image picker would give', $a1['url'] ?? '', '/templates/hadrian/assets/img/media/' . $stored);
+        same('and its label and size on record', array_intersect_key(L::manifest('library')[$stored] ?? [], ['label' => 1, 'w' => 1, 'h' => 1]), ['label' => 'Team photo', 'w' => 60, 'h' => 40]);
+        $a2 = L::add($in . '/team.png', 'Again');
+        same('the same image a second time is the first one', [$a2['name'] ?? '', $a2['reused'] ?? null], [$stored, true]);
+        same('(and keeps the name it was given)', L::manifest('library')[$stored]['label'] ?? '', 'Team photo');
+        // Optimising rewrites the stored file; the image is still known by
+        // what it was when it arrived.
+        imagepng(photo(60, 41), $dir . '/' . $stored);
+        clearstatcache();
+        $a3 = L::add($in . '/team.png', 'Again');
+        same('also after the stored copy was made smaller', [$a3['name'] ?? '', $a3['reused'] ?? null], [$stored, true]);
+        same('what is not an image is not added', L::add($in . '/shell.png', 'x')['ok'], false);
+        same('nor a file that is not there', L::add($in . '/nope.png', 'x')['ok'], false);
+
+        same('file() says where an image is and what it is called', [is_file((string)(L::file($stored)['path'] ?? '')), L::file($stored)['label'] ?? ''], [true, 'Team photo']);
+        same('and nothing for a name that is not a library image', [L::file('.htaccess'), L::file('../' . $stored), L::file('never.png')], [null, null, null]);
+    }
+
+    // ------------------------------------------------------------------
     // Clean up the temporary root.
     $it = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($root, \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::CHILD_FIRST);
     foreach ($it as $f) {

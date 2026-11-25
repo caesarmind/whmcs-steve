@@ -141,6 +141,51 @@ final class Page
         }
     }
 
+    /**
+     * A name no other page has, for a page that arrives with a name already
+     * in use: "Hosting" becomes "Hosting (imported)", then "Hosting (imported 2)".
+     * Names need not be unique; this only keeps two rows in Pages apart.
+     */
+    public static function freeName(string $name, string $word): string
+    {
+        $taken = [];
+        foreach (self::all() as $row) {
+            $taken[strtolower((string)$row['name'])] = true;
+        }
+        $name = Text::line($name, 120) ?: 'Page';
+        if (!isset($taken[strtolower($name)])) {
+            return $name;
+        }
+        for ($n = 1; $n < 200; $n++) {
+            $tail = ' (' . $word . ($n > 1 ? ' ' . $n : '') . ')';
+            $try  = Text::cut($name, 120 - strlen($tail)) . $tail;
+            if (!isset($taken[strtolower($try)])) {
+                return $try;
+            }
+        }
+        return $name;
+    }
+
+    /**
+     * This address if no page has it, else the first of "<address>-2",
+     * "<address>-3" that is free. '' stays '' (a page with no address yet),
+     * and '' is also the answer when nothing free can be made.
+     */
+    public static function freeSlug(string $slug): string
+    {
+        $slug = Text::slug($slug);
+        if ($slug === '' || !self::slugTaken($slug)) {
+            return $slug;
+        }
+        for ($n = 2; $n < 200; $n++) {
+            $try = Text::slug($slug . '-' . $n);
+            if ($try !== '' && !self::slugTaken($try)) {
+                return $try;
+            }
+        }
+        return '';
+    }
+
     /** @param array<string,mixed> $data */
     public static function create(array $data): int
     {

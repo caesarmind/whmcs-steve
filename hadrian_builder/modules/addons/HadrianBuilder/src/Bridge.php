@@ -240,6 +240,76 @@ final class Bridge
         }
     }
 
+    // -------------------------------------------------------- media library
+    // For moving pages between sites (PageFile, Importer, through Site): an
+    // exported page takes its library images with it, and an imported one
+    // puts them in this site's library. An older Hadrian has no way to take
+    // a file in; pages then travel without their images.
+
+    /** Hadrian can hand over a library image and take one in. */
+    public static function movesMedia(): bool
+    {
+        return self::boot() && class_exists('\\Hadrian\\Helpers\\MediaUsage')
+            && method_exists('\\Hadrian\\Helpers\\MediaLibrary', 'add');
+    }
+
+    /** @return list<string> the library file names an image address (or any text) points at */
+    public static function mediaNamesIn(string $text): array
+    {
+        if (!self::movesMedia()) {
+            return [];
+        }
+        try {
+            return \Hadrian\Helpers\MediaUsage::namesIn($text);
+        } catch (\Throwable $e) {
+            return [];
+        }
+    }
+
+    /** @return array{path:string,label:string,w:int,h:int}|null */
+    public static function mediaFile(string $name): ?array
+    {
+        if (!self::movesMedia()) {
+            return null;
+        }
+        try {
+            return \Hadrian\Helpers\MediaLibrary::file($name);
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
+
+    /** The address a page stores for a library image: what the image picker gives. */
+    public static function mediaUrl(string $name): string
+    {
+        if (!self::movesMedia()) {
+            return '';
+        }
+        try {
+            return \Hadrian\Helpers\MediaLibrary::uploaderFor(\Hadrian\Helpers\MediaLibrary::DEFAULT_COLLECTION)->webUrlFor($name);
+        } catch (\Throwable $e) {
+            return '';
+        }
+    }
+
+    /**
+     * Put a local file in the library, checked the way an upload is.
+     *
+     * @return array{ok:bool, name?:string, url?:string, reused?:bool, error?:string}
+     */
+    public static function mediaAdd(string $path, string $label): array
+    {
+        if (!self::movesMedia()) {
+            return ['ok' => false, 'error' => 'The installed Hadrian addon cannot take images in from a file. Update Hadrian.'];
+        }
+        try {
+            return \Hadrian\Helpers\MediaLibrary::add($path, $label);
+        } catch (\Throwable $e) {
+            error_log('Hadrian Page Builder: could not store an imported image: ' . $e->getMessage());
+            return ['ok' => false, 'error' => 'The image could not be stored.'];
+        }
+    }
+
     /** Hadrian is recent enough to list a module's pages in its Pages screen. */
     public static function listsPages(): bool
     {

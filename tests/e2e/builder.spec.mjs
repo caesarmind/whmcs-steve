@@ -17,6 +17,8 @@
 //     switched for the whole site or page by page, and switched back
 //   - a built page is a row in Hadrian's Pages screen, and what is set there
 //     (visibility, SEO) applies to it; the sitemap lists it only while live
+//   - a page leaves as one file with its images, and comes back through a
+//     review as a draft; putting it in an existing page touches the draft only
 //   - nothing answers a visitor who is not signed in, and the writes are
 //     CSRF-protected for one who is
 //
@@ -26,6 +28,8 @@
 
 import { test, expect } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
+import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 import { PHP, TESTS_DIR, BASE_URL, USER_AGENT } from '../lib/env.mjs';
 import { loginAdmin } from './helpers.mjs';
@@ -115,6 +119,7 @@ test('it is its own module, and it plugs into the Hadrian admin', async ({ page 
   await page.goto(MODULE);
   await expect(page).toHaveURL(/module=Hadrian&action=pages#tab=Built$/);
   await expect(page.locator('[data-view^="ext-"]'), 'the list shows the built pages').toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-view-panel^="ext-"]'), 'with the module\'s own controls above them').toBeVisible();
   await expect(page.locator('[data-add-page]'), 'Add page makes a built page').toBeVisible();
   await expect(page.locator('.mt-pl-head #pb-site'), 'and the switch for who serves the website is in the header').toBeVisible();
 
@@ -662,6 +667,122 @@ test("a built page is a row in Hadrian's Pages, and what is set there applies to
   }
 });
 
+test('a page is exported with its images, imported after a review, and duplicated', async ({ page }) => {
+  // A draft with one library image and one product on it.
+  const seeded = builder('seed', 'E2E Port', 'hb-e2e-port');
+  const [imageType, imageKey] = seeded.fields.image.split('.');
+  const [productType, productKey] = seeded.fields.product.split('.');
+  const valueOf = (doc, type, key) => doc.sections.find(s => s.type === type).props[key];
+  // The sections in the order the page has them (the catalogue's order).
+  const seededTypes = builder('doc', seeded.id).draft.sections.map(s => s.type);
+  expect([...seededTypes].sort(), 'one section with an image, one with a product').toEqual([imageType, productType].sort());
+  const file = path.join(os.tmpdir(), `hb-e2e-${Date.now()}.hadrian-pages.zip`);
+
+  try {
+    // --- Export, from the page's settings in Pages.
+    await page.goto(settingsOf(seeded.id));
+    const panel = page.locator('[data-page-extension-panel]');
+    const [download] = await Promise.all([page.waitForEvent('download'), panel.locator('[data-pb-export]').click()]);
+    expect(download.suggestedFilename(), 'named after the page').toBe('hb-e2e-port.hadrian-pages.zip');
+    await download.saveAs(file);
+
+    const held = builder('file', file);
+    expect(held, 'the download is a pages file').toMatchObject({ ok: true, kind: 'zip', pages: [{ name: 'E2E Port', slug: 'hb-e2e-port', sections: 2 }] });
+    expect(held.media, 'it lists the image').toEqual([seeded.image]);
+    expect(held.inZip, 'and holds the file').toEqual([seeded.image]);
+    expect(held.text, 'the page names the image, not where it was').toContain(`media:${seeded.image}`);
+    expect(held.text).not.toContain(seeded.imageUrl.replace(/\//g, '\\/'));
+    expect(Object.keys(held.products), 'the product is described by name').toEqual([String(seeded.product)]);
+
+    // The image leaves the library, as it would be missing on another site.
+    expect(builder('media', seeded.image, 'drop').exists).toBe(false);
+
+    // --- Import: choosing the file shows what it holds. Nothing is added yet.
+    const count = pages().length;
+    await page.goto(PAGES);
+    await page.locator('#pb-import-file').setInputFiles(file);
+    await expect(page.getByRole('heading', { name: 'Import pages' })).toBeVisible();
+    expect(pages().length, 'the review imports nothing').toBe(count);
+
+    const row = page.locator('[data-pb-import-page]');
+    await expect(row).toHaveCount(1);
+    await expect(row).toContainText('E2E Port');
+    await expect(row).toContainText('/hb-e2e-port');
+    await expect(row).toContainText('2 sections, 1 image');
+    const hint = row.locator('[data-pb-hint]');
+    await expect(hint, 'the address is taken, so the new page gets another').toContainText('Becomes "E2E Port (imported)" at /hb-e2e-port-2, as a draft.');
+    await expect(row.locator('select option')).toHaveText(['Add as a new page', 'Put its sections in "E2E Port" (/hb-e2e-port)', 'Leave it out']);
+
+    const go = page.locator('#pb-import-go');
+    await row.locator('select').selectOption('skip');
+    await expect(go, 'with every page left out there is nothing to do').toBeDisabled();
+    await row.locator('select').selectOption('new');
+    await expect(go).toHaveText('Import 1 page');
+    await go.click();
+
+    await expect(page.getByRole('heading', { name: 'Import finished' })).toBeVisible();
+    await expect(page.locator('[data-pb-import-result]')).toContainText('E2E Port (imported)');
+    await expect(page.locator('[data-pb-import-notes]'), 'everything came across').toHaveCount(0);
+
+    const imported = pages().find(p => p.name === 'E2E Port (imported)');
+    expect(imported, 'a new page, as a draft, at a free address').toMatchObject({ slug: 'hb-e2e-port-2', status: 'draft' });
+    const copy = builder('doc', imported.id);
+    expect(copy.draft.sections.map(s => s.type), 'the same sections').toEqual(seededTypes);
+    expect(valueOf(copy.draft, productType, productKey), 'the product was found by its name').toBe(seeded.product);
+    const imageUrl = valueOf(copy.draft, imageType, imageKey);
+    expect(imageUrl, 'the image is in the library again, under a name of its own').toMatch(/\/templates\/hadrian\/assets\/img\/media\/[a-f0-9]{32}\.png$/);
+    expect(imageUrl).not.toContain(seeded.image);
+    const image = await page.request.get(imageUrl);
+    expect(image.status(), 'and is served').toBe(200);
+    expect(image.headers()['content-type']).toContain('image/png');
+
+    // --- Import again, into the page that is already here. Publish that
+    // page empty first: what visitors get must not change.
+    await page.goto(`${MODULE}&action=edit&id=${seeded.id}`);
+    const token = JSON.parse(await page.locator('#hbx-boot').textContent()).token;
+    const post = (action, data) => page.request.post(`${MODULE}&action=${action}`, { data: { token, id: seeded.id, ...data } });
+    expect((await (await post('api-content', { doc: { sections: [] } })).json()).ok).toBe(true);
+    expect((await (await post('api-publish', {})).json()).ok).toBe(true);
+
+    await page.goto(PAGES);
+    await page.locator('#pb-import-file').setInputFiles(file);
+    await page.locator('[data-pb-import-page] select').selectOption(`replace:${seeded.id}`);
+    await expect(page.locator('[data-pb-hint]')).toContainText("Its sections replace that page's draft");
+    await page.locator('#pb-import-go').click();
+    await expect(page.locator('[data-pb-import-result]')).toContainText('Draft changed');
+
+    const target = builder('doc', seeded.id);
+    expect(target, 'its name, address and status are as they were').toMatchObject({ name: 'E2E Port', slug: 'hb-e2e-port', status: 'published' });
+    expect(target.draft.sections.map(s => s.type), 'the draft has the sections of the file').toEqual(seededTypes);
+    expect(target.published.sections, 'what visitors get is untouched').toEqual([]);
+    expect(valueOf(target.draft, imageType, imageKey), 'the image was not stored a second time').toBe(imageUrl);
+
+    // --- Duplicate, from the page's settings.
+    await page.goto(settingsOf(seeded.id));
+    await page.locator('[data-page-extension-panel] [data-pb-duplicate]').click();
+    await expect(page.locator('[data-ext-flash]')).toContainText('was duplicated');
+    const twin = pages().find(p => p.name === 'E2E Port (copy)');
+    expect(twin, 'a draft with an address of its own').toMatchObject({ slug: 'hb-e2e-port-3', status: 'draft' });
+    expect(page.url(), 'and its settings are where the admin lands').toContain(`page=built-${twin.id}`);
+    expect(builder('doc', twin.id).draft.sections.map(s => s.type)).toEqual(seededTypes);
+
+    // --- A file that is not a pages file is refused, with a reason.
+    const before = JSON.stringify(pages());
+    await page.goto(PAGES);
+    await page.locator('#pb-import-file').setInputFiles({ name: 'notes.json', mimeType: 'application/json', buffer: Buffer.from('{"hello":"world"}') });
+    await expect(page.locator('[data-ext-flash]')).toContainText('This is not a Hadrian pages file');
+
+    // --- Without the admin token nothing is copied, exported or imported.
+    await page.request.post(`${MODULE}&action=duplicate`, { form: { token: 'not-the-token', id: String(seeded.id) } });
+    const forged = await page.request.post(`${MODULE}&action=export`, { form: { token: 'not-the-token', all: '1' } });
+    expect(forged.headers()['content-disposition'], 'a forged export downloads nothing').toBeUndefined();
+    await page.request.post(`${MODULE}&action=import-apply`, { form: { token: 'not-the-token', t: 'a'.repeat(32) } });
+    expect(JSON.stringify(pages()), 'and nothing changed').toBe(before);
+  } finally {
+    fs.rmSync(file, { force: true });
+  }
+});
+
 test('nothing answers a visitor who is not signed in', async ({ page, playwright }) => {
   const id = await createPage(page, 'E2E Guarded');
   const before = JSON.stringify(pages());
@@ -681,8 +802,8 @@ test('nothing answers a visitor who is not signed in', async ({ page, playwright
       expect(res.status(), `${action} for an anonymous visitor`).toBe(302);
       expect(res.headers()['location'], `${action} goes to the login page`).toContain('login.php');
     }
-    for (const action of ['create', 'delete']) {
-      const res = await anon.post(`${MODULE}&action=${action}`, { form: { token, id: String(id), name: 'E2E Hijacked' }, maxRedirects: 0 });
+    for (const action of ['create', 'delete', 'duplicate', 'export', 'import', 'import-apply', 'import-cancel']) {
+      const res = await anon.post(`${MODULE}&action=${action}`, { form: { token, id: String(id), name: 'E2E Hijacked', all: '1', t: 'a'.repeat(32) }, maxRedirects: 0 });
       expect(res.status(), `${action} for an anonymous visitor`).toBe(302);
       expect(res.headers()['location']).toContain('login.php');
     }

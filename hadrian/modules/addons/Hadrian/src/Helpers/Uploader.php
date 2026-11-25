@@ -136,7 +136,35 @@ final class Uploader
             return ['ok' => false, 'error' => 'Upload was not received through PHP; rejected.'];
         }
 
-        $size = (int)($file['size'] ?? @filesize($tmp));
+        return $this->accept($tmp, (int)($file['size'] ?? @filesize($tmp)), $config, true);
+    }
+
+    /**
+     * Store a file that is already on this server: one taken out of an
+     * imported archive, say. Every check an upload gets applies (size, sniffed
+     * type, real image, pixel cap, our own random name); the only difference
+     * is that the source is copied, not moved, and stays where it was. The
+     * caller owns the source and removes it.
+     *
+     * @param array{allowedMimes: list<string>, maxBytes: int, maxPixels?: int} $config
+     * @return array{ok: bool, filename?: string, error?: string}
+     */
+    public function ingest(string $path, array $config): array
+    {
+        if ($path === '' || is_link($path) || !is_file($path) || !is_readable($path)) {
+            return ['ok' => false, 'error' => 'The file could not be read.'];
+        }
+        return $this->accept($path, (int)@filesize($path), $config, false);
+    }
+
+    /**
+     * Validate a file and put it in the upload directory under a new name.
+     *
+     * @param array<string,mixed> $config
+     * @return array{ok: bool, filename?: string, error?: string}
+     */
+    private function accept(string $tmp, int $size, array $config, bool $uploaded): array
+    {
         $cap  = min((int)$config['maxBytes'], self::HARD_CEILING_BYTES);
         if ($size <= 0) {
             return ['ok' => false, 'error' => 'Uploaded file is empty.'];
@@ -218,7 +246,7 @@ final class Uploader
             return ['ok' => false, 'error' => 'Refusing to write outside the upload directory.'];
         }
 
-        if (!@move_uploaded_file($tmp, $dest)) {
+        if (!($uploaded ? @move_uploaded_file($tmp, $dest) : @copy($tmp, $dest))) {
             return ['ok' => false, 'error' => 'Could not save the uploaded file.'];
         }
         @chmod($dest, 0644);

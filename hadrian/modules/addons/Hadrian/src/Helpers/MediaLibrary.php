@@ -37,6 +37,9 @@ final class MediaLibrary
 
     private const MANIFEST = '.hadrian-media.json';
 
+    /** How many images a collection holds before uploads and imports are refused. */
+    public const MAX_FILES = 500;
+
     /** Label length cap — long enough to be useful, short enough not to wrap a tile. */
     private const LABEL_MAX = 80;
 
@@ -184,6 +187,108 @@ final class MediaLibrary
             $map[$storedName] = $fields + $entry;
             return $map;
         });
+    }
+
+    // ------------------------------------------- files that come with a module
+
+    /**
+     * One library image as a module that exports it needs it: where it is on
+     * disk and what the admin calls it. Null when there is no such image.
+     *
+     * @return array{path:string,label:string,w:int,h:int}|null
+     */
+    public static function file(string $storedName, string $key = self::DEFAULT_COLLECTION): ?array
+    {
+        $uploader = self::uploaderFor($key);
+        if (!$uploader->isLibraryName($storedName)) {
+            return null;
+        }
+        $path = $uploader->diskPathFor($storedName);
+        if ($path === '' || !is_file($path)) {
+            return null;
+        }
+        $entry = self::manifest($key)[$storedName] ?? [];
+        $entry = is_array($entry) ? $entry : [];
+        return [
+            'path'  => $path,
+            'label' => trim((string)($entry['label'] ?? '')),
+            'w'     => (int)($entry['w'] ?? 0),
+            'h'     => (int)($entry['h'] ?? 0),
+        ];
+    }
+
+    /**
+     * Put a file that is already on this server into the library: an image
+     * that arrived inside an imported page, say. It gets every check an
+     * upload gets (Uploader::ingest) and the same treatment afterwards: a
+     * label, its size recorded, optimised when new uploads are.
+     *
+     * The same image is stored once. The file's hash as it arrived is kept in
+     * the manifest (`src`), so importing the same page twice, or two pages
+     * that share a picture, does not fill the library with copies even when
+     * optimising has changed the stored bytes.
+     *
+     * The source file is left where it is; the caller removes it.
+     *
+     * @return array{ok:bool, name?:string, url?:string, reused?:bool, error?:string}
+     */
+    public static function add(string $path, string $label, string $key = self::DEFAULT_COLLECTION): array
+    {
+        if (!self::has($key)) {
+            return ['ok' => false, 'error' => 'Unknown media collection.'];
+        }
+        $hash = is_file($path) ? @hash_file('sha256', $path) : false;
+        if (!is_string($hash)) {
+            return ['ok' => false, 'error' => 'The file could not be read.'];
+        }
+        $cfg      = self::config($key);
+        $uploader = self::uploaderFor($key);
+        $uploader->prepareStorage();
+
+        $stored = $uploader->listStored(self::MAX_FILES + 1);
+        $bytes  = (int)@filesize($path);
+        $known  = self::manifest($key);
+        foreach ($stored as $row) {
+            $name  = $row['name'];
+            $entry = is_array($known[$name] ?? null) ? $known[$name] : [];
+            $same  = ($entry['src'] ?? '') === $hash
+                || ($row['bytes'] === $bytes && @hash_file('sha256', $uploader->diskPathFor($name)) === $hash);
+            if ($same) {
+                return ['ok' => true, 'name' => $name, 'url' => $uploader->webUrlFor($name), 'reused' => true];
+            }
+        }
+        if (count($stored) >= self::MAX_FILES) {
+            return ['ok' => false, 'error' => 'The media library is full (' . self::MAX_FILES . ' files).'];
+        }
+
+        $result = $uploader->ingest($path, [
+            'allowedMimes' => $cfg['mimes'],
+            'maxBytes'     => (int)$cfg['maxBytes'],
+            'maxPixels'    => (int)$cfg['maxPixels'],
+        ]);
+        if (empty($result['ok'])) {
+            return ['ok' => false, 'error' => (string)($result['error'] ?? 'The image could not be stored.')];
+        }
+        $name  = (string)$result['filename'];
+        $disk  = $uploader->diskPathFor($name);
+        $size  = @getimagesize($disk);
+        $label = self::cleanLabel($label);
+        self::remember($key, $name, $label !== '' ? $label : $name, (int)($size[0] ?? 0), (int)($size[1] ?? 0));
+        self::patch($key, $name, ['src' => $hash]);
+
+        // Never fails the import: an image that cannot be made smaller is
+        // stored as it came.
+        if (self::optimizesUploads() && class_exists(MediaOptimizer::class) && MediaOptimizer::available()) {
+            try {
+                $r = MediaOptimizer::optimize($disk, self::quality(), self::maxEdge());
+                if (($r['status'] ?? '') === 'optimized') {
+                    self::patch($key, $name, ['w' => (int)$r['width'], 'h' => (int)$r['height'], 'skipOptimize' => 0]);
+                }
+            } catch (\Throwable $e) {
+                // Stored as it came.
+            }
+        }
+        return ['ok' => true, 'name' => $name, 'url' => $uploader->webUrlFor($name), 'reused' => false];
     }
 
     /**

@@ -14,7 +14,7 @@ namespace HadrianBuilder;
  *
  *   - rows()        one entry per built page, for the list
  *   - headerPanel() the "Website served by" switch, in the screen's header
- *   - groupPanel()  above the list of built pages; nothing there for now
+ *   - groupPanel()  export and import, shown above the list of built pages
  *   - pagePanel()   what a built page replaces, and its delete button, shown
  *                   on that page's editor
  *
@@ -180,12 +180,12 @@ final class SitePages
     }
 
     /**
-     * Above the list while it shows only built pages. The site switch moved
-     * to the header (headerPanel()), so nothing is shown here for now.
+     * Above the list while it shows only built pages: moving pages between
+     * sites.
      */
     public static function groupPanel(): string
     {
-        return '';
+        return self::STYLE . self::movePanel(count(Page::all()));
     }
 
     /**
@@ -209,6 +209,35 @@ final class SitePages
         . 'go.addEventListener("click",function(){var i=document.createElement("input");i.type="hidden";i.name="mode";i.value=d.dataset.pending;'
         . 'f.appendChild(i);go.disabled=true;f.submit();});'
         . '})();</script>';
+
+    /**
+     * Under the site switch: take every built page out as one file, or bring
+     * the pages of a file in. Choosing a file sends it at once; what it holds
+     * is shown for review before anything is imported (AdminController).
+     */
+    private static function movePanel(int $pages): string
+    {
+        return '<div class="mt-pb-site" id="pb-move">'
+            . '<div class="mt-pb-site-text">'
+            . '<div class="mt-pb-site-title">Move pages between sites</div>'
+            . '<div class="mt-pb-site-sub">Export saves your built pages and the images they use as one file. '
+            . 'Import reads such a file and shows you what is in it before it adds anything; imported pages arrive as drafts.</div>'
+            . '</div>'
+            . '<div class="mt-pb-move">'
+            . '<form method="post" action="' . self::e(AdminController::BASE . '&action=export') . '">'
+            . self::token() . '<input type="hidden" name="all" value="1">'
+            . '<button type="submit" class="mt-btn mt-btn-secondary mt-btn-sm" data-pb-export-all' . ($pages < 1 ? ' disabled' : '') . '>Export all</button>'
+            . '</form>'
+            . '<form method="post" enctype="multipart/form-data" action="' . self::e(AdminController::BASE . '&action=import') . '">'
+            . self::token()
+            . '<input type="file" name="file" id="pb-import-file" class="mt-pb-file" accept=".zip,.json,application/zip,application/json"'
+            . ' aria-label="Pages file to import" onchange="if(this.files.length){this.form.submit()}">'
+            . '<button type="button" class="mt-btn mt-btn-secondary mt-btn-sm" data-pb-import'
+            . ' onclick="document.getElementById(\'pb-import-file\').click()">Import</button>'
+            . '</form>'
+            . '</div>'
+            . '</div>';
+    }
 
     /**
      * On a built page's editor in Pages: the theme page it stands in for,
@@ -255,6 +284,21 @@ final class SitePages
             . '</form>'
             . '</div>'
             . '<div class="mt-row">'
+            . '<div><div class="mt-row-label">Copy or export</div>'
+            . '<div class="mt-row-help"><strong>Duplicate</strong> makes a second page with the same sections, as a draft. '
+            . '<strong>Export</strong> saves this page and its images as a file you can import on another site.</div></div>'
+            . '<div class="mt-pb-move">'
+            . '<form method="post" action="' . self::e(AdminController::BASE . '&action=duplicate') . '">'
+            . self::token() . '<input type="hidden" name="id" value="' . $id . '">'
+            . '<button type="submit" class="mt-btn mt-btn-secondary mt-btn-sm" data-pb-duplicate>Duplicate</button>'
+            . '</form>'
+            . '<form method="post" action="' . self::e(AdminController::BASE . '&action=export') . '">'
+            . self::token() . '<input type="hidden" name="id" value="' . $id . '">'
+            . '<button type="submit" class="mt-btn mt-btn-secondary mt-btn-sm" data-pb-export>Export</button>'
+            . '</form>'
+            . '</div>'
+            . '</div>'
+            . '<div class="mt-row">'
             . '<div><div class="mt-row-label">Delete this page</div>'
             . '<div class="mt-row-help">Removes the page, its sections and its settings. This cannot be undone.</div></div>'
             . '<form method="post" action="' . self::e(AdminController::BASE . '&action=delete') . '" onsubmit="return confirm(\'Delete this page? This cannot be undone.\');">'
@@ -277,6 +321,7 @@ final class SitePages
         . '.mt-pb-seg{display:inline-flex;gap:2px;padding:3px;margin:0;background:var(--mt-surface-2);border:1px solid var(--mt-border);border-radius:999px}'
         . '.mt-pb-seg button{border:0;background:none;padding:6px 16px;border-radius:999px;font:inherit;font-size:13px;font-weight:600;color:var(--mt-text-2);cursor:pointer}'
         . '.mt-pb-seg button.is-on{background:var(--mt-surface);color:var(--mt-text);box-shadow:0 1px 2px rgba(0,0,0,.08),0 0 0 1px var(--mt-border)}'
+        . '.mt-pb-site + .mt-pb-site{padding-top:18px}'
         . '.mt-pb-served{display:flex;align-items:center;gap:12px;padding:6px 6px 6px 16px;background:var(--mt-surface);border:1px solid var(--mt-border);border-radius:999px}'
         . '.mt-pb-served-text{display:flex;flex-direction:column;line-height:1.25;min-width:0}'
         . '.mt-pb-served-title{font-size:13px;font-weight:600;color:var(--mt-text)}'
@@ -294,6 +339,9 @@ final class SitePages
         . '.mt-pb-effect li:last-child{border-bottom:0}'
         . '.mt-pb-effect li span:last-child{color:var(--mt-text-3);text-align:right}'
         . '.mt-pb-dialog-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}'
+        . '.mt-pb-move{display:flex;gap:8px;flex:none}'
+        . '.mt-pb-move form{margin:0}'
+        . '.mt-pb-file{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}'
         . '.mt-pb-replace{display:flex;gap:6px;margin:0;flex:none}'
         . '.mt-pb-replace .mt-select{width:auto;min-width:150px;padding-top:8px;padding-bottom:8px;font-size:13px}'
         . '</style>';

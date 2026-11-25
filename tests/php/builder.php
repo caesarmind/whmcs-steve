@@ -16,8 +16,19 @@
  *   php tests/php/builder.php products
  *       JSON: the first three products an admin can pick, with the price a
  *       price card should show for each.
+ *   php tests/php/builder.php seed <name> [slug]
+ *       Make a draft page holding one library image and one product. JSON:
+ *       its id, the image's file name and address, the product id.
+ *   php tests/php/builder.php doc <id>
+ *       JSON: one page as stored (status, draft, published).
+ *   php tests/php/builder.php file <path>
+ *       JSON: what a pages file holds, as the importer reads it.
+ *   php tests/php/builder.php media <name> [drop]
+ *       JSON: whether that library image is on disk. With "drop", remove it
+ *       first (only an image labelled "E2E ...").
  *
- * Refuses unless SystemURL is localhost: `clean` deletes rows.
+ * Refuses unless SystemURL is localhost: `clean` deletes rows and the library
+ * images labelled "E2E ...".
  */
 
 declare(strict_types=1);
@@ -61,7 +72,19 @@ switch ($command) {
         if ($ids !== [] && DB::schema()->hasTable('hadrian_pages')) {
             DB::table('hadrian_pages')->whereIn('page', array_map(static fn($id) => 'built-' . (int) $id, $ids))->delete();
         }
-        echo json_encode(['removed' => $n]);
+        // And the library images the tests brought with them.
+        $images = 0;
+        foreach (Hadrian\Helpers\MediaLibrary::manifest('library') as $stored => $entry) {
+            if (is_array($entry) && str_starts_with((string) ($entry['label'] ?? ''), 'E2E ')) {
+                $file = Hadrian\Helpers\MediaLibrary::file((string) $stored);
+                if ($file !== null) {
+                    unlink($file['path']);
+                }
+                Hadrian\Helpers\MediaLibrary::forget('library', (string) $stored);
+                $images++;
+            }
+        }
+        echo json_encode(['removed' => $n, 'images' => $images]);
         break;
 
     case 'registry':
@@ -100,6 +123,83 @@ switch ($command) {
             $out[] = ['id' => $option['id'], 'name' => $option['name'], 'price' => $data['price'] ?? '', 'free' => $data['free'] ?? false];
         }
         echo json_encode($out);
+        break;
+
+    case 'seed':
+        // A draft page with one library image and one product on it, made
+        // without the editor: the starting point for export and import.
+        $name = (string) ($argv[2] ?? 'E2E Seeded');
+        $slug = (string) ($argv[3] ?? '');
+        $png  = tempnam(sys_get_temp_dir(), 'hbt');
+        $im   = imagecreatetruecolor(64, 48);
+        // Different pixels every run, so the library never already has it.
+        imagefilledrectangle($im, 0, 0, 64, 48, (int) imagecolorallocate($im, random_int(0, 255), random_int(0, 255), random_int(0, 255)));
+        imagesetpixel($im, random_int(0, 63), random_int(0, 47), (int) imagecolorallocate($im, random_int(0, 255), random_int(0, 255), random_int(0, 255)));
+        imagepng($im, $png);
+        $image = Hadrian\Helpers\MediaLibrary::add($png, 'E2E seeded image');
+        unlink($png);
+        if (empty($image['ok'])) {
+            fwrite(STDERR, 'Could not store the image: ' . ($image['error'] ?? '?') . "\n");
+            exit(4);
+        }
+        $product  = HadrianBuilder\Catalog::options()[0]['id'] ?? 0;
+        $sections = [];
+        $used     = ['image' => '', 'product' => ''];
+        foreach (HadrianBuilder\Sections::types() as $type => $def) {
+            foreach ($def['fields'] as $f) {
+                if (isset($used[$f['type']]) && $used[$f['type']] === '') {
+                    $used[$f['type']] = $type . '.' . $f['key'];
+                    $section = HadrianBuilder\Document::make($type);
+                    $section['props'][$f['key']] = $f['type'] === 'image' ? $image['url'] : $product;
+                    $sections[] = $section;
+                    break;
+                }
+            }
+        }
+        $id = HadrianBuilder\Page::create([
+            'name'  => $name,
+            'slug'  => $slug,
+            'meta'  => HadrianBuilder\Document::normalizeMeta(['title' => $name]),
+            'draft' => HadrianBuilder\Document::normalize(['sections' => $sections]),
+        ]);
+        HadrianBuilder\Bridge::pagesChanged();
+        echo json_encode(['id' => $id, 'image' => $image['name'], 'imageUrl' => $image['url'], 'product' => $product, 'fields' => $used]);
+        break;
+
+    case 'doc':
+        // JSON: one page as stored (status, draft, published).
+        $page = HadrianBuilder\Page::find((int) ($argv[2] ?? 0));
+        echo json_encode($page === null ? null : [
+            'name' => $page['name'], 'slug' => $page['slug'], 'status' => $page['status'],
+            'replaces' => $page['replaces'] ?? '', 'draft' => $page['draft'], 'published' => $page['published'],
+        ]);
+        break;
+
+    case 'file':
+        // JSON: what a pages file holds, as the importer reads it.
+        $read = HadrianBuilder\PageFile::read((string) ($argv[2] ?? ''));
+        echo json_encode($read['ok'] ? [
+            'ok'    => true,
+            'kind'  => $read['kind'],
+            'pages' => array_map(static fn($p) => ['name' => $p['name'], 'slug' => $p['slug'], 'sections' => count($p['doc']['sections'] ?? [])], $read['manifest']['pages']),
+            'media' => array_keys($read['manifest']['media']),
+            'inZip' => array_keys(HadrianBuilder\PageFile::mediaIn((string) $argv[2], array_keys($read['manifest']['media']))),
+            'products' => $read['manifest']['products'],
+            'text'  => json_encode($read['manifest']['pages']),
+        ] : ['ok' => false, 'error' => $read['error']]);
+        break;
+
+    case 'media':
+        // media <name>          JSON: is this library image on disk?
+        // media <name> drop     remove it first (only an image these tests made)
+        $name = (string) ($argv[2] ?? '');
+        $file = Hadrian\Helpers\MediaLibrary::file($name);
+        if (($argv[3] ?? '') === 'drop' && $file !== null && str_starts_with($file['label'], 'E2E ')) {
+            unlink($file['path']);
+            Hadrian\Helpers\MediaLibrary::forget('library', $name);
+            $file = null;
+        }
+        echo json_encode(['exists' => $file !== null, 'label' => $file['label'] ?? '']);
         break;
 
     default:

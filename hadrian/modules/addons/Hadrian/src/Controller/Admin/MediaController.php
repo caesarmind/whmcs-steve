@@ -46,7 +46,7 @@ final class MediaController
     private const REQUIRED_HEADER = 'XMLHttpRequest';
 
     /** Directory-level cap; keeps the modal payload and the disk bounded. */
-    public const MAX_FILES = 500;
+    public const MAX_FILES = MediaLibrary::MAX_FILES;
 
     /** Seconds one optimize request may spend; the screen sends the rest again. */
     private const OPTIMIZE_BUDGET = 8;
