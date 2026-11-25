@@ -355,7 +355,22 @@ test("a page's sections can be edited as a list on its settings in Pages", async
     await page.locator('#hbc-modal .hbx-pal[data-type="' + type + '"]').click();
     await expect(page.locator('#hbc-modal')).toBeHidden();
   };
-  await addFromList('Hero', 'hero-split');
+  // Pointing at a section shows it, drawn by the theme, before it is added;
+  // the preview's own button adds it.
+  await card.locator('#hbc-add').click();
+  await expect(page.locator('#hbc-peek'), 'nothing previewed until a section is pointed at').toHaveClass(/is-empty/);
+  await page.locator('#hbc-modal .hbx-cat-card[data-cat="Hero"]').click();
+  await page.locator('#hbc-modal .hbx-pal[data-type="hero-split"]').hover();
+  await expect(page.locator('#hbc-peek-head')).toContainText('Hero, split');
+  await expect(page.frameLocator('#hbc-peek-frame').locator('[data-hb-id] .hp-hero-split'), 'the theme draws the section on its own').toHaveCount(1);
+  await expect(page.frameLocator('#hbc-peek-frame').locator('header, footer'), 'without the site header or footer').toHaveCount(0);
+  await expect(rows, 'pointing adds nothing').toHaveCount(0);
+  await page.locator('#hbc-modal .hbc-card[data-card="hero-centered"] .hbc-eye').click();
+  await expect(page.locator('#hbc-peek-head'), 'the eye button previews too, for touch screens').toContainText('Hero, centered');
+  await page.locator('#hbc-modal .hbx-pal[data-type="hero-split"]').hover();
+  await expect(page.locator('#hbc-peek-add')).toHaveText('Add Hero, split');
+  await page.locator('#hbc-peek-add').click();
+  await expect(page.locator('#hbc-modal')).toBeHidden();
   await addFromList('Call to action', 'final-cta');
   await expect(rows).toHaveCount(2);
   await expect(card.locator('#hbc-status')).toHaveText('Unsaved changes');

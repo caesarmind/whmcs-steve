@@ -263,6 +263,7 @@
         state.cat = null; state.query = '';
         byId('hbc-q').value = '';
         byId('hbc-modal').hidden = false;
+        resetPeek();
         renderAdd();
         byId('hbc-q').focus();
     }
@@ -271,12 +272,23 @@
         var body = byId('hbc-modal-body'), q = state.query.replace(/^\s+|\s+$/g, '').toLowerCase(), total = Object.keys(boot.types).length;
         body.textContent = '';
         byId('hbc-modal-sub').textContent = total + ' sections in ' + kit.GROUPS.length + ' categories. A new section goes at the end; drag it where you want it.';
+        // A section: click adds it; pointing at it (or tabbing to it) shows it
+        // in the preview beside the list. The eye button does the same for a
+        // touch screen, where there is no pointing.
         var card = function (type) {
             var d = boot.types[type];
-            return el('button', { type: 'button', 'class': 'hbx-pal', 'data-type': type, 'aria-label': 'Add ' + d.label, onclick: function () { add(type); } }, [
-                el('span', { html: catTile(d.group, 'sm') }),
-                el('span', { 'class': 'hbx-txt' }, [el('strong', { text: d.label }), el('span', { text: d.hint })]),
-                el('span', { 'class': 'hbx-pal-add', html: svg('plus', 2) })
+            return el('div', { 'class': 'hbc-card' + (peekType === type ? ' is-peek' : ''), 'data-card': type }, [
+                el('button', { type: 'button', 'class': 'hbx-pal', 'data-type': type, 'aria-label': 'Add ' + d.label,
+                    onclick: function () { add(type); },
+                    onmouseenter: function () { queuePeek(type); },
+                    onmouseleave: function () { queuePeek(null); },
+                    onfocus: function () { showPeek(type); } }, [
+                    el('span', { html: catTile(d.group, 'sm') }),
+                    el('span', { 'class': 'hbx-txt' }, [el('strong', { text: d.label }), el('span', { text: d.hint })]),
+                    el('span', { 'class': 'hbx-pal-add', html: svg('plus', 2) })
+                ]),
+                el('button', { type: 'button', 'class': 'hbc-eye', title: 'Preview', 'aria-label': 'Preview ' + d.label, html: svg('eye'),
+                    onclick: function () { showPeek(type); } })
             ]);
         };
         if (q) {
@@ -305,6 +317,72 @@
             body.appendChild(el('div', { 'class': 'hbc-lib', style: 'margin-top:14px' }, group.types.map(card)));
         }
     }
+
+    // Preview: the theme draws one section on its own, with its default
+    // content and real products (/hb-preview/<id>?hb_sample=<type>), scaled
+    // down from a desktop width. The last one pointed at stays in view.
+    var peekType = null, peekKey = '', peekTimer = null, PEEK_WIDTH = 1280, peekIntro = byId('hbc-peek-head').innerHTML;
+    function resetPeek() {
+        window.clearTimeout(peekTimer);
+        peekType = null;
+        byId('hbc-peek-head').innerHTML = peekIntro;
+        byId('hbc-peek-add').hidden = true;
+        byId('hbc-peek').classList.add('is-empty');
+    }
+    function queuePeek(type) {
+        window.clearTimeout(peekTimer);
+        if (type) { peekTimer = window.setTimeout(function () { showPeek(type); }, 150); }
+    }
+    function showPeek(type) {
+        var d = boot.types[type], pane = byId('hbc-peek'), key = type + '|' + state.lang, frame = byId('hbc-peek-frame'), cards, i;
+        if (!d) { return; }
+        window.clearTimeout(peekTimer);
+        peekType = type;
+        byId('hbc-peek-head').innerHTML = catTile(d.group, 'sm') + '<span><b>' + esc(d.label) + '</b><small>' + esc(d.hint) + '</small></span>';
+        var addBtn = byId('hbc-peek-add');
+        addBtn.hidden = false;
+        addBtn.textContent = 'Add ' + d.label;
+        pane.classList.remove('is-empty');
+        cards = byId('hbc-modal-body').querySelectorAll('.hbc-card');
+        for (i = 0; i < cards.length; i++) { cards[i].classList.toggle('is-peek', cards[i].getAttribute('data-card') === type); }
+        if (peekKey !== key) {
+            peekKey = key;
+            pane.classList.add('is-loading');
+            fitPeek();
+            frame.src = boot.previewPath + '?hb_sample=' + encodeURIComponent(type) + '&hb_lang=' + encodeURIComponent(state.lang);
+        }
+    }
+    /* Draw the page at desktop width (phone width on a phone) and scale it to
+       the box; the box takes the section's height, up to a limit. */
+    function fitPeek() {
+        var box = byId('hbc-peek-box'), frame = byId('hbc-peek-frame'), width = window.innerWidth <= 860 ? 430 : PEEK_WIDTH,
+            scale = box.clientWidth / width, s = null, height = 0;
+        if (!scale) { return; }
+        frame.style.width = width + 'px';
+        try { s = frame.contentDocument && frame.contentDocument.querySelector('[data-hb-id]'); } catch (e) { s = null; }
+        if (s && !byId('hbc-peek').classList.contains('is-loading')) { height = s.getBoundingClientRect().height; }
+        if (height) { box.style.height = Math.max(90, Math.min(Math.round(height * scale), 440)) + 'px'; }
+        frame.style.transform = 'scale(' + scale + ')';
+        frame.style.height = Math.max(height, Math.ceil(box.clientHeight / scale)) + 'px';
+    }
+    window.addEventListener('resize', function () { if (peekType && !byId('hbc-modal').hidden) { fitPeek(); } });
+    byId('hbc-peek-frame').addEventListener('load', function () {
+        var frame = byId('hbc-peek-frame'), d, s, kids, i;
+        try { d = frame.contentDocument; } catch (e) { d = null; }
+        if (d && d.body) {
+            // Only the section: the header, menu and footer are the same for every one.
+            s = d.querySelector('[data-hb-id]');
+            if (s) {
+                kids = d.body.children;
+                for (i = kids.length - 1; i >= 0; i--) { if (kids[i].tagName !== 'SCRIPT') { kids[i].remove(); } }
+                d.body.appendChild(s);
+                d.body.style.margin = '0';
+            }
+        }
+        byId('hbc-peek').classList.remove('is-loading');
+        fitPeek();
+    });
+    byId('hbc-peek-add').addEventListener('click', function () { if (peekType) { add(peekType); } });
 
     // ----------------------------------------------------------------- wire
 

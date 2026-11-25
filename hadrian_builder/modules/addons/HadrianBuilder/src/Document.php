@@ -28,7 +28,8 @@ final class Document
 {
     public const VERSION = 1;
 
-    private const MAX_SECTIONS = 60;
+    // Room for every section in the library at once, with space to spare.
+    private const MAX_SECTIONS = 100;
 
     public const SPACING = ['regular' => 'Regular', 'compact' => 'Compact', 'roomy' => 'Roomy'];
 

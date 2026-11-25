@@ -79,7 +79,16 @@ final class ContentPanel
             .         '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>'
             .         '<input type="search" class="mt-input" id="hbc-q" placeholder="Search sections" aria-label="Search sections" autocomplete="off">'
             .       '</label></div>'
-            .       '<div class="mt-modal-body" id="hbc-modal-body"></div>'
+            .       '<div class="hbc-pick">'
+            .         '<div class="mt-modal-body" id="hbc-modal-body"></div>'
+            // What the pointed-at section looks like, drawn by the theme with
+            // its default content (Router::sample), before it is added.
+            .         '<aside class="hbc-peek is-empty" id="hbc-peek" aria-label="Section preview">'
+            .           '<div class="hbc-peek-head" id="hbc-peek-head"><b>Preview</b><small>Point at a section, or press its eye button, to see it as your theme draws it.</small></div>'
+            .           '<div class="hbc-peek-box" id="hbc-peek-box"><iframe id="hbc-peek-frame" title="Section preview" tabindex="-1"></iframe></div>'
+            .           '<button type="button" class="mt-btn mt-btn-primary mt-btn-sm" id="hbc-peek-add" hidden>Add section</button>'
+            .         '</aside>'
+            .       '</div>'
             .     '</div>'
             .   '</div>'
             . '</div>'

@@ -66,10 +66,42 @@
 #hbc-add { margin-top: 12px; }
 
 /* the Add dialog: Hadrian's own .mt-modal, narrower */
-.hbc-modal .mt-modal-card { width: min(760px, 96vw); }
+.hbc-modal .mt-modal-card { width: min(1080px, 96vw); height: min(720px, 90vh); }
 .hbc-modal .mt-modal-body { padding: 16px 20px 20px; }
 .hbc-cats { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
-.hbc-lib { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 8px; }
+.hbc-lib { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 8px; }
+
+/* the list on the left, the preview of the pointed-at section on the right */
+.hbc-pick { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 400px; border-top: 1px solid var(--mt-border-2); }
+.hbc-pick > .mt-modal-body { min-height: 0; }
+.hbc-peek { display: flex; flex-direction: column; gap: 12px; min-height: 0; overflow: auto; padding: 16px 20px 20px; border-left: 1px solid var(--mt-border-2); background: var(--mt-surface-2); }
+.hbc-peek-head { display: flex; align-items: flex-start; gap: 10px; }
+.hbc-peek-head b { display: block; font-size: 14px; font-weight: 600; }
+.hbc-peek-head small { display: block; margin-top: 2px; font-size: 12px; line-height: 1.45; color: var(--mt-text-3); }
+.hbc-peek-box { position: relative; height: 200px; overflow: hidden; border: 1px solid var(--mt-border); border-radius: var(--mt-radius); background: #fff; transition: height 0.25s ease; }
+.hbc-peek-box iframe { position: absolute; top: 0; left: 0; width: 1280px; height: 760px; border: 0; transform-origin: 0 0; pointer-events: none; }
+.hbc-peek.is-empty .hbc-peek-box { border-style: dashed; background: transparent; }
+.hbc-peek.is-empty .hbc-peek-box iframe, .hbc-peek.is-loading .hbc-peek-box iframe { visibility: hidden; }
+.hbc-peek.is-loading .hbc-peek-box::after { content: "Drawing the section..."; position: absolute; inset: 0; display: grid; place-items: center; font-size: 12px; color: var(--mt-text-3); }
+#hbc-peek-add { align-self: flex-start; }
+#hbc-peek-add[hidden] { display: none; }
+
+/* a section card: the card adds it, the eye beside its + shows it */
+.hbc-card { position: relative; }
+.hbc-card .hbx-pal { cursor: pointer; }
+.hbc-card .hbx-txt { margin-right: 32px; }
+.hbc-card.is-peek .hbx-pal { border-color: var(--mt-primary); }
+.hbc-eye { position: absolute; top: 50%; right: 46px; width: 28px; height: 28px; margin-top: -14px; display: grid; place-items: center; padding: 0; border: 0; border-radius: 50%; background: none; color: var(--mt-text-4); cursor: pointer; transition: background 0.15s ease, color 0.15s ease; }
+.hbc-eye svg { width: 16px; height: 16px; }
+.hbc-eye:hover, .hbc-card.is-peek .hbc-eye { background: var(--mt-primary-tint); color: var(--mt-primary); }
+.hbc-eye:focus-visible { outline: none; box-shadow: 0 0 0 3px var(--mt-primary-ring); }
+
+/* narrow screens: the preview goes above the list, once there is one */
+@media (max-width: 860px) {
+    .hbc-pick { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+    .hbc-peek { order: -1; border-left: 0; border-bottom: 1px solid var(--mt-border-2); max-height: 45vh; }
+    .hbc-peek.is-empty { display: none; }
+}
 .hbc-modal .hbx-pal { cursor: pointer; }
 .hbc-modal .hbx-search .mt-input { width: 100%; }
 .hbc-back { display: inline-flex; align-items: center; gap: 2px; margin: 0 0 12px -6px; padding: 4px 8px 4px 4px; border: 0; background: none; border-radius: var(--mt-radius-sm); color: var(--mt-link); font-size: 13px; font-weight: 500; cursor: pointer; }
