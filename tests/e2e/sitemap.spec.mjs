@@ -61,7 +61,10 @@ test('saving a page in Pages rewrites sitemap.xml and robots.txt', async ({ page
   try {
     // The site has set its sitemap up: Save on the Sitemap tab.
     const listed = sitemap('begin');
-    const target = listed.find(p => p.url && !/^built-/.test(p.page));
+    // A page served at the address it is registered with. Announcements and
+    // the knowledgebase are listed at a routed address; the check command
+    // covers those.
+    const target = listed.find(p => p.url && !/^built-/.test(p.page) && !['announcements', 'knowledgebase'].includes(p.page));
     expect(target, 'a theme page with an address is in the sitemap').toBeTruthy();
     const address = `${BASE_URL.replace(/\/$/, '')}/${target.url.replace(/^\//, '')}`;
     expect(sitemap('files').urls, 'it is listed to begin with').toContain(address);

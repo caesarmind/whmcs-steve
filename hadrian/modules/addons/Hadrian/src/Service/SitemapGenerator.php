@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Hadrian\Service;
 
 use Hadrian\Helpers\ExtensionPages;
+use Hadrian\Helpers\FrontDoor;
 use Hadrian\Models\Configuration;
 use Hadrian\Models\Page;
 use Hadrian\Models\Settings;
@@ -177,8 +178,8 @@ final class SitemapGenerator
                 $standIn[$replaced] = (string)$key;
             }
         }
-        $add = function (string $url) use ($xml, $urlset, $base, $freq): void {
-            $urlset->appendChild($this->urlNode($xml, $base . '/' . ltrim($url, '/'), $freq, '0.8'));
+        $add = function (string $page, string $url) use ($xml, $urlset, $base, $freq): void {
+            $urlset->appendChild($this->urlNode($xml, self::pageAddress($base, $page, $url), $freq, '0.8'));
         };
         foreach ($rows as $row) {
             $page = (string)$row['page'];
@@ -188,7 +189,7 @@ final class SitemapGenerator
             if (isset($standIn[$page]) && !isset($listed[$standIn[$page]])) {
                 continue;                   // what answers here is not for search engines
             }
-            $add((string)$row['url']);
+            $add($page, (string)$row['url']);
         }
         // A theme page that would not be listed itself, with an indexable
         // module page serving at its address.
@@ -196,7 +197,7 @@ final class SitemapGenerator
             if (isset($listed[$key]) && !isset($listed[$replaced])) {
                 $url = Page::get($template, $replaced)['url'] ?? null;
                 if (is_string($url) && $url !== '') {
-                    $add($url);
+                    $add((string)$replaced, $url);
                 }
             }
         }
@@ -210,7 +211,7 @@ final class SitemapGenerator
         if (!empty($cfg['productGroups']) && class_exists('\\WHMCS\\Product\\Group')) {
             try {
                 foreach (\WHMCS\Product\Group::where('hidden', 0)->get() as $group) {
-                    $urlset->appendChild($this->urlNode($xml, $base . '/' . ltrim((string)$group->getRoutePath(), '/'), $freq, '0.6'));
+                    $urlset->appendChild($this->urlNode($xml, self::fromRoute($base, (string)$group->getRoutePath()), $freq, '0.6'));
                 }
             } catch (\Throwable $e) {
                 error_log('Hadrian sitemap: product groups skipped — ' . $e->getMessage());
@@ -222,7 +223,7 @@ final class SitemapGenerator
             try {
                 foreach (\WHMCS\Announcement\Announcement::published()->get() as $a) {
                     $path = routePath('announcement-view', $a->id, self::friendly((string)$a->title));
-                    $urlset->appendChild($this->urlNode($xml, $base . '/' . ltrim((string)$path, '/'), $freq, '0.5'));
+                    $urlset->appendChild($this->urlNode($xml, self::fromRoute($base, (string)$path), $freq, '0.5'));
                 }
             } catch (\Throwable $e) {
                 error_log('Hadrian sitemap: announcements skipped — ' . $e->getMessage());
@@ -242,7 +243,7 @@ final class SitemapGenerator
                     ->get();
                 foreach ($cats as $cat) {
                     $path = routePath('knowledgebase-category-view', $cat->id, self::friendly((string)$cat->name));
-                    $urlset->appendChild($this->urlNode($xml, $base . '/' . ltrim((string)$path, '/'), $freq, '0.5'));
+                    $urlset->appendChild($this->urlNode($xml, self::fromRoute($base, (string)$path), $freq, '0.5'));
                 }
                 $articles = \WHMCS\Database\Capsule::table('tblknowledgebase')
                     ->where(self::flagOff('private'))
@@ -250,7 +251,7 @@ final class SitemapGenerator
                     ->get();
                 foreach ($articles as $art) {
                     $path = routePath('knowledgebase-article-view', $art->id, self::friendly((string)$art->title));
-                    $urlset->appendChild($this->urlNode($xml, $base . '/' . ltrim((string)$path, '/'), $freq, '0.5'));
+                    $urlset->appendChild($this->urlNode($xml, self::fromRoute($base, (string)$path), $freq, '0.5'));
                 }
             } catch (\Throwable $e) {
                 error_log('Hadrian sitemap: knowledge base skipped — ' . $e->getMessage());
@@ -262,7 +263,7 @@ final class SitemapGenerator
             try {
                 foreach (\WHMCS\Database\Capsule::table('tbldownloadcats')->where(self::flagOff('hidden'))->get() as $dc) {
                     $path = routePath('download-by-cat', $dc->id, self::friendly((string)$dc->name));
-                    $urlset->appendChild($this->urlNode($xml, $base . '/' . ltrim((string)$path, '/'), $freq, '0.4'));
+                    $urlset->appendChild($this->urlNode($xml, self::fromRoute($base, (string)$path), $freq, '0.4'));
                 }
             } catch (\Throwable $e) {
                 error_log('Hadrian sitemap: downloads skipped — ' . $e->getMessage());
@@ -294,6 +295,17 @@ final class SitemapGenerator
         foreach (Page::all($template) as $row) {
             if (($row['indexing'] ?? '') === 'disallow' && (string)($row['url'] ?? '') !== '') {
                 $block .= 'Disallow: /' . ltrim((string)$row['url'], '/') . "\n";
+                // Announcements and the knowledgebase are served at a routed
+                // address; the script named above only redirects to it. The
+                // rule for the routed address ends in "$" (RFC 9309: match
+                // the end of the address), because a Disallow is a prefix:
+                // without it, "Disallow: /announcements" would also shut out
+                // every single announcement, which is a different page with
+                // its own setting.
+                $routed = FrontDoor::isScript((string)$row['page'], (string)$row['url']) ? FrontDoor::path((string)$row['page']) : null;
+                if ($routed !== null) {
+                    $block .= 'Disallow: /' . ltrim($routed, '/') . "$\n";
+                }
             }
         }
         $block .= '# ' . self::MARK_END . "\n";
@@ -385,6 +397,43 @@ final class SitemapGenerator
         $scheme = (string)($_SERVER['REQUEST_SCHEME'] ?? ($https ? 'https' : 'http'));
         $host   = (string)($_SERVER['HTTP_HOST'] ?? '');
         return $host !== '' ? $scheme . '://' . $host : '';
+    }
+
+    /**
+     * The address a registry page is served at. The registry stores a path
+     * from the WHMCS root. For Announcements and the knowledgebase that is a
+     * script which only redirects (Helpers\FrontDoor), so the routed address
+     * is listed in its place.
+     */
+    public static function pageAddress(string $base, string $page, string $url): string
+    {
+        if (FrontDoor::isScript($page, $url)) {
+            $routed = FrontDoor::path($page);
+            if ($routed !== null) {
+                return self::fromRoute($base, $routed);
+            }
+        }
+        return rtrim($base, '/') . '/' . ltrim($url, '/');
+    }
+
+    /**
+     * A WHMCS route path as a full address. routePath() answers from the
+     * domain root, so on an install in a folder it already starts with that
+     * folder, and so does the System URL: joining the two as they are would
+     * name the folder twice (https://example.com/billing/billing/store/...).
+     */
+    public static function fromRoute(string $base, string $path): string
+    {
+        if (preg_match('~^https?://~i', $path)) {
+            return $path;
+        }
+        $base   = rtrim($base, '/');
+        $folder = rtrim((string)(parse_url($base, PHP_URL_PATH) ?? ''), '/');
+        $path   = '/' . ltrim($path, '/');
+        if ($folder !== '' && ($path === $folder || str_starts_with($path, $folder . '/') || str_starts_with($path, $folder . '?'))) {
+            $path = substr($path, strlen($folder));
+        }
+        return $base . '/' . ltrim($path, '/');
     }
 
     /**

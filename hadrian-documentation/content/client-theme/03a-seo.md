@@ -222,6 +222,13 @@ The site root is always the first entry, at priority 1.0. After that:
 Dynamic URLs are built through WHMCS' own routing, so they come out in whatever
 form your Friendly URLs setting produces.
 
+Announcements and Knowledgebase are a special case among the static pages.
+Their Public URL is `announcements.php` and `knowledgebase.php`, but WHMCS only
+redirects those to the routed address (`/announcements`, or
+`/index.php?rp=/announcements` without Friendly URLs). The sitemap lists the
+address the page is actually served at, never the one that redirects. If you
+typed a Public URL of your own for either page, yours is used as it is.
+
 :::warn A fresh install lists six pages, not a hundred
 A page only reaches the sitemap once it has a Public URL, and Hadrian seeds one
 for exactly six routes - the store, announcements, knowledge base, server
@@ -247,6 +254,18 @@ only what is between its own markers, so rules you added by hand survive every
 regeneration. The `Disallow` lines are the pages set to **Disallow indexing**
 that also have a Public URL; a disallowed page with no URL still gets its
 `noindex` meta tag, but there is no path to write into `robots.txt`.
+
+For Announcements and Knowledgebase you get two lines: the script, and the
+routed address it redirects to, ending in `$`:
+
+```
+Disallow: /announcements.php
+Disallow: /announcements$
+```
+
+A `Disallow` matches everything that starts with it, so without the `$` the
+second line would also shut out every single announcement. With it, only the
+list page is blocked; each announcement is a page of its own.
 
 The `Sitemap:` line is only written while **Enable sitemap** is on, so turning
 the sitemap off never leaves crawlers pointed at a file you have stopped

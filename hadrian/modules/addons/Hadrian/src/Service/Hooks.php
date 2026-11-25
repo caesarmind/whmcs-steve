@@ -3204,16 +3204,6 @@ final class Hooks
     }
 
     /**
-     * WHMCS routes for theme pages whose own script only redirects there
-     * (announcements.php answers 301). The route gives the address visitors
-     * end up at, in whichever URL form the install uses.
-     */
-    private const FRONT_DOOR_ROUTES = [
-        'announcements' => 'announcement-index',
-        'knowledgebase' => 'knowledgebase-index',
-    ];
-
-    /**
      * When the page being drawn is a module's page that currently replaces a
      * theme page (Helpers\ExtensionPages reports `replaces`), the theme
      * page's own address: a path from the domain root, with a query string
@@ -3236,15 +3226,11 @@ final class Hooks
         if ($replaced === 'homepage') {
             return rtrim((string)($vars['WEB_ROOT'] ?? ''), '/') . '/';
         }
-        if (isset(self::FRONT_DOOR_ROUTES[$replaced]) && function_exists('routePath')) {
-            try {
-                $path = (string)routePath(self::FRONT_DOOR_ROUTES[$replaced]);
-                if ($path !== '' && !str_contains($path, 'route-not-defined')) {
-                    return $path;
-                }
-            } catch (\Throwable $e) {
-                // Fall through to the page's registered address.
-            }
+        // Announcements and the knowledgebase are served at a WHMCS route;
+        // their own scripts only redirect there.
+        $routed = \Hadrian\Helpers\FrontDoor::path($replaced);
+        if ($routed !== null) {
+            return $routed;
         }
         $template = AddonHelper::getTemplate();
         $stored   = $template !== null ? (string)(Page::get($template->getName(), $replaced)['url'] ?? '') : '';

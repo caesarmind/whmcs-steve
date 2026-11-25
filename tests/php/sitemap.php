@@ -35,6 +35,7 @@ require_once $whmcsRoot . '/init.php';
 
 use Hadrian\Helpers\AddonHelper;
 use Hadrian\Helpers\ExtensionPages;
+use Hadrian\Helpers\FrontDoor;
 use Hadrian\Models\Page;
 use Hadrian\Service\PageRegistry;
 use Hadrian\Service\SitemapGenerator;
@@ -209,15 +210,61 @@ switch ($command) {
                 $check('a theme page with an address exists to test with', false);
             } else {
                 $pageBefore = (string) $page['indexing'];
-                $path = ltrim((string) $page['url'], '/');
+                $path    = ltrim((string) $page['url'], '/');
+                $address = SitemapGenerator::pageAddress($systemUrl, (string) $page['page'], (string) $page['url']);
+                $check('it is listed to begin with', in_array($address, $urls($read($sitemap)), true), $address);
                 Page::upsert($tpl, (string) $page['page'], ['indexing' => 'disallow']);
                 $check('a page set to "do not index" triggers a rewrite', SitemapGenerator::refresh($tpl) === true, $path);
-                $check('it leaves the sitemap', !in_array(rtrim($systemUrl, '/') . '/' . $path, $urls($read($sitemap)), true), $path);
+                $check('it leaves the sitemap', !in_array($address, $urls($read($sitemap)), true), $address);
                 $check('and robots.txt disallows it', (bool) preg_match('#^Disallow: /' . preg_quote($path, '#') . '$#m', (string) $read($robots)), $path);
                 Page::upsert($tpl, (string) $page['page'], ['indexing' => $pageBefore]);
                 SitemapGenerator::refresh($tpl);
-                $check('allowed again, it is back', in_array(rtrim($systemUrl, '/') . '/' . $path, $urls($read($sitemap)), true), $path);
+                $check('allowed again, it is back', in_array($address, $urls($read($sitemap)), true), $address);
             }
+
+            // Announcements and the knowledgebase: their own scripts only
+            // redirect, so the files name the address the pages are served at.
+            $routed = FrontDoor::path('announcements');
+            $annRow = Page::get($tpl, 'announcements');
+            if ($routed === null || $annRow === null || !FrontDoor::isScript('announcements', (string) ($annRow['url'] ?? ''))) {
+                $check('Announcements is registered at its script, with a route to go to', false, json_encode([$routed, $annRow['url'] ?? null]));
+            } else {
+                $annBefore   = (string) $annRow['indexing'];
+                $themeBefore = $annBefore;
+                $served      = SitemapGenerator::fromRoute($systemUrl, $routed);
+                $script      = rtrim($systemUrl, '/') . '/announcements.php';
+                $entries     = $urls($read($sitemap));
+                $check('Announcements is listed at the address it is served at', in_array($served, $entries, true), $served);
+                $check('not at announcements.php, which only redirects', !in_array($script, $entries, true));
+
+                Page::upsert($tpl, 'announcements', ['indexing' => 'disallow']);
+                SitemapGenerator::refresh($tpl);
+                $txt  = (string) $read($robots);
+                $rule = 'Disallow: /' . ltrim($routed, '/') . '$';
+                $check('set to "do not index", robots.txt blocks exactly that address', in_array($rule, array_map('trim', explode("\n", $txt)), true), $rule);
+                $check('the rule ends in "$", so single announcements stay open', !in_array('Disallow: /' . ltrim($routed, '/'), array_map('trim', explode("\n", $txt)), true));
+                $check('and the redirecting script is still blocked too', str_contains($txt, "Disallow: /announcements.php\n"));
+                Page::upsert($tpl, 'announcements', ['indexing' => $annBefore]);
+                SitemapGenerator::refresh($tpl);
+            }
+
+            // Joining a route to the site address, on an install in a folder.
+            $join = [
+                [['https://example.test', '/index.php?rp=/announcements'], 'https://example.test/index.php?rp=/announcements'],
+                [['https://example.test/billing', '/billing/index.php?rp=/announcements'], 'https://example.test/billing/index.php?rp=/announcements'],
+                [['https://example.test/billing/', '/billing/store/hosting'], 'https://example.test/billing/store/hosting'],
+                [['https://example.test/billing', '/store/hosting'], 'https://example.test/billing/store/hosting'],
+                [['https://example.test/bill', '/billing/store'], 'https://example.test/bill/billing/store'],
+                [['https://example.test/billing', 'https://cdn.example.test/x'], 'https://cdn.example.test/x'],
+            ];
+            $bad = [];
+            foreach ($join as [$in, $want]) {
+                $got = SitemapGenerator::fromRoute($in[0], $in[1]);
+                if ($got !== $want) {
+                    $bad[] = $in[1] . ' on ' . $in[0] . ' gave ' . $got;
+                }
+            }
+            $check('a route joins to the site address without naming the folder twice', $bad === [], implode('; ', $bad));
 
             // A module's page, as Hadrian Page Builder reports its pages.
             $live     = true;
@@ -251,7 +298,7 @@ switch ($command) {
             if ($theme === null || (string) ($theme['url'] ?? '') === '') {
                 $check('the Announcements page has an address to stand in at', false);
             } else {
-                $themeUrl    = rtrim($systemUrl, '/') . '/' . ltrim((string) $theme['url'], '/');
+                $themeUrl    = SitemapGenerator::pageAddress($systemUrl, 'announcements', (string) $theme['url']);
                 $themeIndex  = (string) $theme['indexing'];
                 $themeBefore = $themeIndex;         // for the finally block, should a check throw
                 $moduleIndex = (string) (Page::get($tpl, 'smtest-987001')['indexing'] ?? 'inherit');
