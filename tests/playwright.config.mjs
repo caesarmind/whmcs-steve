@@ -56,7 +56,8 @@ export default defineConfig({
       // admin-uploads.spec.mjs too: a logo upload changes every client page.
       // admin-csrf.spec.mjs saves real settings through the admin screens.
       // builder.spec.mjs creates and publishes pages on the install the other tiers crawl.
-      name: 'settings', testMatch: /(settings|email|builder|admin-uploads|admin-csrf)\.spec\.mjs/, dependencies: ['setup'],
+      // sitemap.spec.mjs rewrites sitemap.xml and robots.txt in the web root, and puts them back.
+      name: 'settings', testMatch: /(settings|email|builder|admin-uploads|admin-csrf|sitemap)\.spec\.mjs/, dependencies: ['setup'],
       use: { ...devices['Desktop Chrome'], userAgent: USER_AGENT, viewport: { width: 1280, height: 860 } },
     },
     {

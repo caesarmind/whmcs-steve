@@ -53,19 +53,28 @@ final class PageRegistry
      */
     public static function syncExtensionPages(Template $template): void
     {
-        $tpl   = $template->getName();
-        $pages = ExtensionPages::all();
-        $sort  = 100000;
+        $tpl     = $template->getName();
+        $pages   = ExtensionPages::all();
+        $sort    = 100000;
+        // Did anything the sitemap lists change: a page added or removed, its
+        // address, or whether it is live?
+        $changed = false;
         foreach ($pages as $page => $meta) {
             $sort += 10;
-            if (!Page::exists($tpl, $page)) {
+            $before = Page::get($tpl, $page);
+            if ($before === null) {
                 Page::upsert($tpl, $page, self::seedRow($template, $page, $sort));
             }
+            $url  = isset($meta['url']) ? (string)$meta['url'] : null;
+            $live = !empty($meta['extension']['live']);
             Page::upsert($tpl, $page, [
-                'url'        => isset($meta['url']) ? (string)$meta['url'] : null,
-                'published'  => !empty($meta['extension']['live']),
+                'url'        => $url,
+                'published'  => $live,
                 'page_group' => (string)($meta['group'] ?? 'Other'),
             ]);
+            $changed = $changed || $before === null
+                || ($before['url'] ?? null) !== $url
+                || !empty($before['published']) !== $live;
         }
         // Rows left behind by pages that are gone. Only keys of modules that
         // registered on this request are considered, so a module that is
@@ -75,7 +84,12 @@ final class PageRegistry
             $page = (string)($row['page'] ?? '');
             if (ExtensionPages::owns($page) && !isset($pages[$page])) {
                 Page::delete($tpl, $page);
+                $changed = true;
             }
+        }
+        // Only on a real change, so opening the Pages screen writes nothing.
+        if ($changed) {
+            SitemapGenerator::refresh($tpl);
         }
     }
 

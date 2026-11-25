@@ -560,6 +560,27 @@ if (AddonHelper::isActive()) {
         }
     });
 
+    // ── sitemap.xml + robots.txt: keep them in step with WHMCS content ─────
+    // The files list announcements, knowledgebase articles, download
+    // categories and product groups, which are made in WHMCS's own admin
+    // screens, not in Hadrian's. An announcement refreshes the files when it
+    // is saved; WHMCS has no hook for the others, so the daily cron picks
+    // them up. SitemapGenerator::refresh() only maintains files the site
+    // already keeps and writes only when the content differs.
+    $hadrianSitemapRefresh = static function () {
+        try {
+            $template = AddonHelper::getTemplate();
+            if ($template !== null) {
+                \Hadrian\Service\SitemapGenerator::refresh($template->getName());
+            }
+        } catch (\Throwable $e) {
+            error_log('Hadrian sitemap: refresh skipped: ' . $e->getMessage());
+        }
+    };
+    add_hook('AnnouncementAdd', 1, $hadrianSitemapRefresh);
+    add_hook('AnnouncementEdit', 1, $hadrianSitemapRefresh);
+    add_hook('DailyCronJob', 1, $hadrianSitemapRefresh);
+
     // AJAX dispatch (front-side)
     if (isset($_POST['mtAction'])) {
         \Hadrian\Service\AjaxService::handle($_POST['mtAction'], $_POST);

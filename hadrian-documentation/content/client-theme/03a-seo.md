@@ -203,10 +203,10 @@ The site root is always the first entry, at priority 1.0. After that:
 | Source | Priority | What qualifies |
 | --- | --- | --- |
 | Static pages | 0.8 | Every page on the Pages tab that is Public, is not set to Disallow indexing, and has a Public URL. Always included - there is no toggle, only the count. |
-| Product groups | 0.6 | One entry per store product group. |
+| Product groups | 0.6 | One entry per product group the store lists. A hidden group is left out. |
 | Announcements | 0.5 | One entry per published announcement. |
-| Knowledge base | 0.5 | Public categories and public articles. |
-| Downloads | 0.4 | Visible download categories. Off by default, because downloads are usually gated. |
+| Knowledge base | 0.5 | Categories that are not hidden and articles that are not private. A translation of a category or an article is the same page in another language, so it gets no entry of its own. |
+| Downloads | 0.4 | Download categories that are not hidden. Off by default, because downloads are usually gated. |
 
 Dynamic URLs are built through WHMCS' own routing, so they come out in whatever
 form your Friendly URLs setting produces.
@@ -254,10 +254,20 @@ maintaining.
 **Last written** carries the timestamp of the current `sitemap.xml`, or says
 the file has not been generated yet.
 
-:::warn Regeneration is manual
-Publishing an announcement, adding a knowledge base article or giving a page a
-Public URL does not rewrite `sitemap.xml`. Come back to this tab and press
-**Generate now** - or make it part of your publishing routine.
+:::info The files keep themselves up to date
+Once you have saved or generated here, Hadrian rewrites `sitemap.xml` and
+`robots.txt` whenever something they list changes:
+
+- a page is saved on the Pages tab (its Public URL, indexing or visibility)
+- a page made by an add-on, such as Page Builder, is published, unpublished or deleted
+- an announcement is added or edited
+- once a day, with the WHMCS cron. This is what picks up a new knowledge base
+  article, download category or product group, which WHMCS does not report
+  when they are saved.
+
+A file is only rewritten when its content would change, and nothing is written
+on a site that has never saved or generated here. Press **Generate now** if you
+do not want to wait for the cron.
 :::
 
 :::info The web root has to be writable
