@@ -119,6 +119,10 @@ export const CHECKS = [
   // Add-on products are written from scratch. Lagom is a behaviour reference
   // that stays outside the repo; this catches a paste from it.
   { id: 'no-lagom', title: 'Product modules carry no Lagom code', cmd: [node, STATIC('check-no-lagom.mjs')], cwd: REPO_ROOT, blocking: true,
+  { id: 'builder-fields-js', title: 'Builder module: shared field script parses', cmd: [node, '--check', 'hadrian_builder/modules/addons/HadrianBuilder/views/assets/js/fields.js'], cwd: REPO_ROOT, blocking: true,
+    why: 'The field controls both content screens build on; inlined by PHP like the editor script.' },
+  { id: 'builder-content-js', title: 'Builder module: section list script parses', cmd: [node, '--check', 'hadrian_builder/modules/addons/HadrianBuilder/views/assets/js/content-list.js'], cwd: REPO_ROOT, blocking: true,
+    why: 'The section list on a built page\'s settings in Pages; printed into Hadrian\'s screen by PHP.' },
     why: 'Lagom\'s namespace, table names and data keys in a product folder mean code was copied instead of written.' },
 ];
 

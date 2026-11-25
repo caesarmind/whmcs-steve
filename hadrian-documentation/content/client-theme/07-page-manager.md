@@ -74,6 +74,21 @@ With the Page Builder module installed, the pages you build live here too, on a 
 
 A built page takes the same settings as any page: SEO, indexing, visibility, area and a layout of its own. The sitemap lists it while it is published and public. The Variant column shows whether it is a draft, published, or serving in place of a theme page.
 
+At the top of a built page's settings is a **Content** list: the page's sections, top to bottom, for when you would rather fill in fields than work on the page itself. It edits the same draft as the builder's visual editor, so a change made in one shows in the other.
+
+| In the Content list | What it does |
+| --- | --- |
+| A row | Opens that section to edit its text, buttons, images and lists. One section is open at a time. |
+| The arrows, or dragging a row | Moves the section up or down the page. |
+| The eye, copy and bin buttons | Hide the section from visitors, duplicate it, or remove it. |
+| **Add section** | Picks a new section by category, the same ones the visual editor offers. It goes at the end. |
+| **Save draft** | Saves the list. Visitors still see the published page. |
+| **Publish** | Saves and puts the draft live. |
+| **Preview** | Opens the page as it is now, unsaved changes included, in a new tab. Only you see it. |
+| **Open visual editor** | Opens the same page in the builder, to change it on the page itself. |
+
+The list saves on its own: **Save changes** at the foot of the screen saves the page's settings, not its sections.
+
 At the foot of a built page's settings is a **Page Builder** panel with the two things only the builder knows:
 
 - **Replaces** lets the page stand in for one of the theme's website pages: Homepage, Announcements, Knowledgebase or Contact Us. *Follow site* uses it while the website is served by Page Builder, *Always* uses it whatever the site says, and *Never* keeps it on standby.

@@ -150,6 +150,28 @@ namespace {
     same('the frame script marks the page and carries the token', [str_contains($script, 'data-hadrian-preview'), str_contains($script, json_encode($token)), str_contains($script, json_encode(P::PARAM))], [true, true, true]);
     same('and it is one script element', [substr_count($script, '<script'), substr_count($script, '</script>')], [1, 1]);
 
+    // ------------------------------------------------------------------
+    // The second slot: an add-on drawing one of its pages under another look
+    // (Helpers\SiteLook::preview(); Hadrian Page Builder's "Preview with").
+    $section = 'the look slot';
+    $_SESSION = $session;
+    $_GET = [];
+    P::reset();
+    $look = $byVisitor;
+    $look['style'] = 'violet';
+    $look['theme'] = 'light';
+    $lookToken = P::putLook($look);
+    $both = $_SESSION;
+    same('it has a token of its own', [strlen($lookToken), $lookToken !== $token, P::putLook($look)], [32, true, $lookToken]);
+    same('and leaves what the customizer is trying alone', $both['hadrianCustomize'], $session['hadrianCustomize']);
+    same('its token draws its look', array_slice($ask($both, [P::LOOK_PARAM => $lookToken]), 0, 3), [true, 'violet', 'light']);
+    same('the customizer token still draws the customizer', array_slice($ask($both, [P::PARAM => $token]), 0, 3), [true, 'emerald', 'dark']);
+    same('one slot\'s token under the other\'s name is no preview', [$ask($both, [P::PARAM => $lookToken])[0], $ask($both, [P::LOOK_PARAM => $token])[0]], [false, false]);
+    same('the same gate: no admin, no preview', $ask(['hadrianLook' => $both['hadrianLook']], [P::LOOK_PARAM => $lookToken]), $off);
+    $ask($both, [P::LOOK_PARAM => $lookToken]);
+    $script = P::footerScript();
+    same('the frame script carries the look token', [str_contains($script, json_encode($lookToken)), str_contains($script, json_encode(P::LOOK_PARAM))], [true, true]);
+
     echo "\n" . ($ok + $fails) . " checks, {$fails} failing\n";
     exit($fails ? 1 : 0);
 }

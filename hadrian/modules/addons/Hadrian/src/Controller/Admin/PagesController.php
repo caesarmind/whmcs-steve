@@ -370,6 +370,7 @@ final class PagesController extends AbstractController
             // The owning module's own controls for this page, as HTML it
             // renders itself (see Helpers\ExtensionPages).
             'extensionPanel'   => ExtensionPages::pagePanel($page),
+            'extensionContent' => ExtensionPages::contentPanel($page),
             ...self::extensionFlash(),
             'variants'         => $variants,
             'activeVariant'    => $activeVariant,

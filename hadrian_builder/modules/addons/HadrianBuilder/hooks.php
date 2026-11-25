@@ -17,6 +17,7 @@ require_once __DIR__ . DIRECTORY_SEPARATOR . 'autoload.php';
 
 use HadrianBuilder\AdminController;
 use HadrianBuilder\Bridge;
+use HadrianBuilder\ContentPanel;
 use HadrianBuilder\Router;
 use HadrianBuilder\SitePages;
 
@@ -64,6 +65,9 @@ Bridge::registerPages([
     'createPlaceholder' => 'New page, for example: WordPress hosting',
     'panel'     => [SitePages::class, 'groupPanel'],
     'pagePanel' => [SitePages::class, 'pagePanel'],
+    // The page's sections as a list, at the top of its settings in Pages:
+    // add, reorder and edit them without opening the visual editor.
+    'contentPanel' => [ContentPanel::class, 'render'],
     'provider' => [SitePages::class, 'rows'],
 ]);
 

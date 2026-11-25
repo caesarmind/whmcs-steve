@@ -10,6 +10,7 @@ use Hadrian\Helpers\ColorTokens;
 use Hadrian\Helpers\CustomizePreview;
 use Hadrian\Helpers\LayoutPointers;
 use Hadrian\Helpers\PageArea;
+use Hadrian\Helpers\SiteLook;
 use Hadrian\Helpers\ThemeManifest;
 use Hadrian\Models\Settings;
 use Hadrian\Template\Template;
@@ -171,125 +172,48 @@ final class CustomizeController extends AbstractController
     }
 
     // ---------------------------------------------------------------- state
+    // What exists and what is saved are shared with add-on previews, so they
+    // live in Helpers\SiteLook. These keep the names the code above uses.
 
-    /**
-     * What exists: the schemes that can be activated, the layouts of each
-     * kind, and the colour schema.
-     *
-     * @return array{styles: list<string>, layouts: array<string, list<string>>, colors: array<string,mixed>}
-     */
+    /** @return array{styles: list<string>, layouts: array<string, list<string>>, colors: array<string,mixed>} */
     private function known(Template $template): array
     {
-        $styles = [];
-        foreach ($template->getStyles() as $name) {
-            // Dark is a mode on top of a scheme, not a scheme (see StylesController).
-            if ((($this->styleMeta($template, $name)['variables']['colorMode'] ?? 'light')) !== 'dark') {
-                $styles[] = (string)$name;
-            }
-        }
-        $layouts = [];
-        foreach (CustomizePreview::KINDS as $kind) {
-            $layouts[$kind] = array_values(array_map('strval', $template->getLayouts($kind)));
-        }
-        return [
-            'styles'  => $styles,
-            'layouts' => $layouts,
-            'colors'  => ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/config/colors.php'),
-        ];
+        return SiteLook::known($template);
     }
 
     /**
-     * The state the site is drawing now, in the shape normalise() returns.
-     *
      * @param array{styles: list<string>, layouts: array<string, list<string>>, colors: array<string,mixed>} $known
      * @return array<string,mixed>
      */
     private function savedState(Template $template, array $known): array
     {
-        $tpl   = $template->getName();
-        $style = $template->resolveStyleName((string)Settings::getValue($tpl . '_active_style', 'default'));
-        if (!in_array($style, $known['styles'], true)) {
-            $style = $known['styles'][0] ?? 'default';
-        }
-        $meta = $this->styleMeta($template, $style);
-
-        $colors = [];
-        foreach (['light', 'dark'] as $scope) {
-            $colors[$scope] = $this->storedColors($template, $style, $meta, $known['colors'], $scope);
-        }
-
-        $layouts = ['mode' => LayoutPointers::mode($tpl)];
-        foreach (CustomizePreview::KINDS as $kind) {
-            $valid = $known['layouts'][$kind];
-            foreach (LayoutPointers::AUDIENCES as $audience) {
-                $layouts['audience'][$kind][$audience] = LayoutPointers::forAudience($tpl, $kind, $audience, $valid);
-            }
-            foreach (array_keys(PageArea::LABELS) as $area) {
-                // An area never picked for shows what LayoutPointers::setMode()
-                // would start it from: the pick most of its visitors see today.
-                $layouts['area'][$kind][$area] =
-                    (string)Settings::getValue(LayoutPointers::areaKey($tpl, $kind, $area), '') !== ''
-                        ? LayoutPointers::forArea($tpl, $kind, $area, $valid)
-                        : LayoutPointers::forAudience($tpl, $kind, $area === PageArea::CLIENT ? 'client' : 'guest', $valid);
-            }
-        }
-
-        $darkOn = (bool)Settings::getValue('enable_dark_mode', true);
-        return [
-            'style'   => $style,
-            'theme'   => $darkOn && (string)Settings::getValue('dark_mode_default', 'light') === 'dark' ? 'dark' : 'light',
-            'colors'  => $colors,
-            'layouts' => $layouts,
-        ];
+        return SiteLook::savedState($template, $known);
     }
 
     /** @return array<string,mixed> a scheme's style.php */
     private function styleMeta(Template $template, string $style): array
     {
-        return ThemeManifest::loadVariantMeta($template->getFullPath() . '/core/styles/' . $style . '/style.php');
+        return SiteLook::styleMeta($template, $style);
     }
 
     /**
-     * The palette a scheme ships, as overrides of the schema.
-     *
      * @param array<string,mixed> $meta
      * @param array<string,mixed> $cfg
      * @return array<string,string>
      */
     private function shippedColors(array $meta, array $cfg, string $scope): array
     {
-        $declared = $meta['colors'][$scope] ?? null;
-        return is_array($declared) ? ColorTokens::diff($declared, $cfg, $scope) : [];
+        return SiteLook::shippedColors($meta, $cfg, $scope);
     }
 
     /**
-     * The colours the site draws for a scheme, or would draw once it is
-     * activated. Same read order as Service\Hooks::buildColorsHead (the
-     * per-scope row, then the pre-refactor keys); a scheme with no row yet
-     * gets the palette it ships, which is what activating it writes.
-     *
-     * @param array<string,mixed> $meta
+     * @param array<string,mixed> $meta unused: SiteLook reads it when it needs it
      * @param array<string,mixed> $cfg
      * @return array<string,string>
      */
     private function storedColors(Template $template, string $style, array $meta, array $cfg, string $scope): array
     {
-        $tpl  = $template->getName();
-        $keys = $scope === 'dark'
-            ? ['_colors_' . $style . '_dark', '_colors_dark']
-            : ['_colors_' . $style . '_light', '_colors_' . $style];
-        foreach ($keys as $key) {
-            $rows = Settings::getValue($tpl . $key, null);
-            if (is_array($rows) && $rows !== []) {
-                return ColorTokens::diff($rows, $cfg, $scope);
-            }
-        }
-        // A row that exists but is empty is the site's own choice (every
-        // colour reset), not a scheme that was never set up.
-        if (Settings::getValue($tpl . $keys[0], null) !== null) {
-            return [];
-        }
-        return $this->shippedColors($meta, $cfg, $scope);
+        return SiteLook::storedColors($template, $style, $cfg, $scope);
     }
 
     // -------------------------------------------------------------- helpers

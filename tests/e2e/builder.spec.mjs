@@ -52,14 +52,19 @@ const settled = page => page.waitForFunction(() => {
 }, null, { timeout: 30_000 });
 
 const frame = page => page.frameLocator('#hbx-frame');
-const field = (page, label) => page.locator('#hbx-inspector .hbx-field', { has: page.locator('.hbx-label', { hasText: new RegExp(`^${label}`) }) }).first();
-// The palette's groups are collapsed; the filter finds a section by its name.
+const field = (page, label) => page.locator('#hbx-panel .hbx-field', { has: page.locator('.hbx-label', { hasText: new RegExp(`^${label}`) }) }).first();
+const exact = label => new RegExp('^' + label.replace(/[.*+?^$()|[\]\\{}]/g, '\\$&') + '$');
+// Add opens the section categories; its search finds a section by its name.
+// A new section goes after the selected one, and its settings open.
 const addSection = async (page, label) => {
+  await page.locator('#hbx-addbtn').click();
   await page.locator('#hbx-palfilter').fill(label);
-  await page.locator('.hbx-pal', { has: page.locator('strong', { hasText: new RegExp('^' + label.replace(/[.*+?^$()|[\]\\{}]/g, '\\$&') + '$') }) }).click();
-  await page.locator('#hbx-palfilter').fill('');
+  await page.locator('.hbx-pal', { has: page.locator('strong', { hasText: exact(label) }) }).click();
+  await expect(page.locator('.hbx-id-name'), 'its settings open').toHaveText(label);
   await settled(page);
 };
+// The list of sections on the page.
+const layers = page => page.locator('#hbx-layersbtn').click();
 const sectionTypes = page => page.evaluate(() => window.hbBuilder.state.doc.sections.map(s => s.type));
 
 /** Make a page from the Built tab of Pages and land in its editor. Returns its id. */
@@ -144,7 +149,8 @@ test('build a page in the editor, publish it, and visit it', async ({ page, play
 
   // Clicking a section in the preview selects it; typing changes the preview.
   await frame(page).locator('.hp-hero-split h1').click();
-  await expect(page.locator('.hbx-insp-title')).toHaveText('Hero, split');
+  await expect(page.locator('.hbx-id-name')).toHaveText('Hero, split');
+  await expect(frame(page).locator('#hbp-sel .hbp-tag'), 'and the page names it').toContainText('Hero, split');
   await field(page, 'Headline').locator('input').fill('E2E headline one');
   await settled(page);
   await expect(frame(page).locator('.hp-hero-split h1')).toHaveText('E2E headline one');
@@ -188,6 +194,7 @@ test('build a page in the editor, publish it, and visit it', async ({ page, play
     expect((await anon.get('/hb-e2e-nothing-here')).status()).toBe(404);
 
     // A draft is never public. Change the headline and save: the live page keeps the old one.
+    await layers(page);
     await page.locator('.hbx-out', { hasText: 'Hero, split' }).click();
     await field(page, 'Headline').locator('input').fill('E2E headline two');
     await settled(page);
@@ -234,16 +241,20 @@ test('reorder, hide, duplicate, remove, and undo', async ({ page }) => {
   const order = await frame(page).locator('[data-hb-type]').evaluateAll(nodes => nodes.map(n => n.getAttribute('data-hb-type')));
   expect(order, 'the preview follows').toEqual(['hero-split', 'final-cta', 'feature-cards']);
 
-  // Drag the first section below the last in the outline.
+  // Drag the first section below the last in Layers.
+  await layers(page);
   await page.locator('.hbx-out').nth(0).dragTo(page.locator('.hbx-out').nth(2), { targetPosition: { x: 40, y: 34 } });
   await settled(page);
   expect(await sectionTypes(page)).toEqual(['final-cta', 'feature-cards', 'hero-split']);
 
+  await page.locator('.hbx-out').nth(2).click();
+  await expect(page.locator('.hbx-id-name')).toHaveText('Hero, split');
   await page.getByRole('button', { name: 'Duplicate section' }).click();
   await settled(page);
   expect((await sectionTypes(page)).length).toBe(4);
 
   // Hidden: still in the editor, marked, and gone from what a visitor would get.
+  await layers(page);
   await page.locator('.hbx-out').nth(0).hover();
   await page.locator('.hbx-out').nth(0).getByRole('button', { name: 'Hide from the page' }).click();
   await settled(page);
@@ -266,6 +277,125 @@ test('reorder, hide, duplicate, remove, and undo', async ({ page }) => {
   await expect(frame(page).locator('.hb-is-hidden')).toHaveCount(1);
 });
 
+test('sections by category, text found and typed on the page, and another look for this admin only', async ({ page, playwright }) => {
+  const id = await createPage(page, 'E2E Editing');
+
+  // Add: sections grouped by category, each with its colour chip; hovering one draws it.
+  await page.locator('#hbx-addbtn').click();
+  const categories = page.locator('.hbx-cat-card');
+  expect(await categories.count(), 'every category is offered').toBeGreaterThan(5);
+  await page.locator('.hbx-cat-card[data-cat="Call to action"]').click();
+  const card = page.locator('.hbx-pal[data-type="final-cta"]');
+  await card.hover();
+  await expect(page.locator('#hbx-peek.is-on'), 'hovering a section shows it').toBeVisible();
+  await expect(page.frameLocator('#hbx-peek-frame').locator('.hp-final-cta'), 'drawn by the theme, on its own').toHaveCount(1, { timeout: 15_000 });
+  await card.click();
+  await expect(page.locator('.hbx-id-name')).toHaveText('Closing call to action');
+  await settled(page);
+
+  // Clicking text on the selected section points at its setting.
+  const headline = await field(page, 'Headline').locator('input').inputValue();
+  await frame(page).locator('.hp-final-cta h2').click();
+  await expect(page.locator('.hbx-field.is-flash'), 'the headline field is pointed at').toHaveAttribute('data-path', 'title');
+  // Double-clicking it types on the page itself, and the field follows.
+  await frame(page).locator('.hp-final-cta h2').dblclick();
+  await page.keyboard.type('E2E typed on the page');
+  await page.keyboard.press('Enter');
+  await expect(field(page, 'Headline').locator('input')).toHaveValue('E2E typed on the page');
+  await settled(page);
+  await expect(frame(page).locator('.hp-final-cta h2'), 'and the redrawn page keeps it').toHaveText('E2E typed on the page');
+  expect(headline).not.toBe('E2E typed on the page');
+
+  // Preview with another style and navigation: drawn for this admin, saved nowhere.
+  const bar = page.locator('#hbx-look');
+  test.skip(await bar.isHidden(), 'this Hadrian cannot preview another look');
+  const site = await page.evaluate(() => JSON.parse(document.getElementById('hbx-boot').textContent).looks.site);
+  const style = await page.locator('select[data-look="style"] option').evaluateAll((o, s) => o.map(x => x.value).find(v => v !== s), site.style);
+  const nav = await page.locator('select[data-look="nav"] option').evaluateAll((o, s) => o.map(x => x.value).find(v => v !== s), site.nav);
+  await page.locator('select[data-look="style"]').selectOption(style);
+  await page.locator('select[data-look="nav"]').selectOption(nav);
+  await settled(page);
+  await expect(bar, 'the bar says it is a preview').toHaveClass(/is-diff/);
+  const src = await page.locator('#hbx-frame').getAttribute('src');
+  expect(src, 'the preview carries a look token').toMatch(/hadrian_look=[a-f0-9]{32}/);
+  await expect(frame(page).locator('body'), 'drawn with the other style').toHaveClass(new RegExp(`theme-${style}`));
+
+  // The same address without this admin's session is nothing.
+  const anon = await visitor(playwright);
+  try {
+    expect((await anon.get(src)).status(), 'no preview for a visitor, look or not').toBe(404);
+  } finally {
+    await anon.dispose();
+  }
+  // And this admin's own site still draws the saved look.
+  const own = await page.request.get(`/hb-preview/${id}`);
+  expect(await own.text(), 'without the token the saved style draws').toContain(`theme-${site.style}`);
+
+  await page.locator('[data-look-reset]').click();
+  await settled(page);
+  expect(await page.locator('#hbx-frame').getAttribute('src'), 'back to the site look drops the token').not.toContain('hadrian_look=');
+});
+
+test("a page's sections can be edited as a list on its settings in Pages", async ({ page, playwright }) => {
+  const id = await createPage(page, 'E2E List');
+  await setAddress(page, 'e2e-list');
+  await saveDraft(page);
+
+  await page.goto(settingsOf(id));
+  const card = page.locator('[data-page-extension-content] #hbc');
+  await expect(card, 'the list sits at the top of the page\'s settings').toBeVisible();
+  await expect(page.locator('#page-edit-form #hbc'), 'outside the settings form, so it never posts with Save changes').toHaveCount(0);
+  await expect(card.locator('.hbc-empty')).toBeVisible();
+  const rows = card.locator('.hbc-row');
+
+  // Add two sections from the same categories as the visual editor.
+  const addFromList = async (category, type) => {
+    await card.locator('#hbc-add').click();
+    await page.locator('#hbc-modal .hbx-cat-card[data-cat="' + category + '"]').click();
+    await page.locator('#hbc-modal .hbx-pal[data-type="' + type + '"]').click();
+    await expect(page.locator('#hbc-modal')).toBeHidden();
+  };
+  await addFromList('Hero', 'hero-split');
+  await addFromList('Call to action', 'final-cta');
+  await expect(rows).toHaveCount(2);
+  await expect(card.locator('#hbc-status')).toHaveText('Unsaved changes');
+  await expect(rows.nth(1), 'a new section opens to be edited').toHaveClass(/is-open/);
+
+  // Open the first, type its headline: the row's name follows.
+  await rows.nth(0).getByRole('button', { name: 'Edit Hero, split' }).click();
+  await expect(rows.nth(1), 'one section open at a time').not.toHaveClass(/is-open/);
+  await rows.nth(0).locator('.hbx-field[data-path="title"] input').fill('E2E edited as a list');
+  await expect(rows.nth(0).locator('.hbc-sum')).toHaveText('E2E edited as a list');
+
+  // Reorder, then save the draft and publish.
+  await rows.nth(1).getByRole('button', { name: 'Move section up' }).click();
+  expect(await page.evaluate(() => window.hbContent.state.doc.sections.map(s => s.type))).toEqual(['final-cta', 'hero-split']);
+  await card.locator('#hbc-save').click();
+  await expect(card.locator('#hbc-notice .mt-alert-success')).toContainText('Draft saved');
+  await expect(card.locator('#hbc-status')).toHaveText('Draft');
+  await page.reload();
+  expect(await page.evaluate(() => window.hbContent.state.doc.sections.map(s => s.type)), 'the saved draft holds the list as left').toEqual(['final-cta', 'hero-split']);
+  await expect(rows.nth(1).locator('.hbc-sum')).toHaveText('E2E edited as a list');
+
+  await card.locator('#hbc-publish').click();
+  await expect(card.locator('#hbc-notice .mt-alert-success')).toContainText('Published');
+  await expect(card.locator('#hbc-status')).toHaveText('Published');
+  const anon = await visitor(playwright);
+  try {
+    const html = await (await anon.get('/e2e-list')).text();
+    expect(html, 'visitors get what was published from the list').toContain('E2E edited as a list');
+    expect(html.indexOf('hp-final-cta'), 'in the order set there').toBeLessThan(html.indexOf('hp-hero-split'));
+  } finally {
+    await anon.dispose();
+  }
+
+  // The visual editor opens the same draft.
+  await card.locator('#hbc-visual').click();
+  await settled(page);
+  expect(await sectionTypes(page)).toEqual(['final-cta', 'hero-split']);
+  await expect(frame(page).locator('.hp-hero-split h1')).toHaveText('E2E edited as a list');
+});
+
 test('a price card shows the price WHMCS gives for the product', async ({ page }) => {
   const products = builder('products').filter(p => !p.free && p.price);
   test.skip(products.length === 0, 'the install has no priced product to show');
@@ -275,7 +405,7 @@ test('a price card shows the price WHMCS gives for the product', async ({ page }
   await addSection(page, 'Pricing cards');
   await expect(frame(page).locator('.hb-note'), 'with no plan chosen the editor says why nothing shows').toContainText('nothing to show yet');
 
-  await page.getByRole('button', { name: '+ Add plan' }).click();
+  await page.getByRole('button', { name: 'Add plan' }).click();
   await field(page, 'Product').locator('select').selectOption(String(product.id));
   await settled(page);
 
@@ -500,7 +630,7 @@ test('nothing answers a visitor who is not signed in', async ({ page, playwright
     const token = (login.match(/name="token" value="([^"]+)"/) || [])[1];
     expect(token, 'an anonymous session has a CSRF token of its own').toBeTruthy();
 
-    for (const action of ['api-preview', 'api-save', 'api-publish', 'api-unpublish']) {
+    for (const action of ['api-preview', 'api-save', 'api-content', 'api-publish', 'api-unpublish']) {
       const res = await anon.post(`${MODULE}&action=${action}`, { data: { token, id, name: 'E2E Hijacked', slug: 'hb-e2e-hijack', doc: { sections: [] } }, maxRedirects: 0 });
       expect(res.status(), `${action} for an anonymous visitor`).toBe(302);
       expect(res.headers()['location'], `${action} goes to the login page`).toContain('login.php');
@@ -522,7 +652,7 @@ test('every write is refused without the admin CSRF token', async ({ page }) => 
   expect(boot.token, 'the page was given a token').toMatch(/^[a-f0-9]{20,}$/);
   const before = JSON.stringify(pages());
 
-  for (const action of ['api-save', 'api-publish', 'api-unpublish', 'api-preview']) {
+  for (const action of ['api-save', 'api-content', 'api-publish', 'api-unpublish', 'api-preview']) {
     const res = await page.request.post(`${MODULE}&action=${action}`, { data: { token: 'not-the-token', id, name: 'E2E Forged', slug: 'hb-e2e-forged', doc: boot.doc } });
     expect(res.status(), `${action} with a wrong token`).toBe(403);
     expect((await res.json()).ok).toBe(false);

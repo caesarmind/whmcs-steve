@@ -48,6 +48,7 @@ namespace {
             'createUrl' => '?module=Demo&action=create', 'createLabel' => 'Create page', 'createPlaceholder' => 'New page',
             'panel' => static fn (): string => '<div id="demo-panel">site switch</div>',
             'pagePanel' => static fn (int $id): string => '<div id="demo-page">page ' . $id . '</div>',
+            'contentPanel' => static fn (int $id): string => '<div id="demo-content">sections of ' . $id . '</div>',
             'provider' => static function () use (&$rows, &$calls): array { $calls++; return $rows; },
         ];
     };
@@ -98,6 +99,8 @@ namespace {
     $section = 'the module\'s own controls';
     same('a page of the module gets its panel, with the module\'s id for it', X::pagePanel('built-12'), '<div id="demo-page">page 12</div>');
     same('a page the module does not report gets none', [X::pagePanel('built-99'), X::pagePanel('other-12'), X::pagePanel('homepage')], ['', '', '']);
+    same('and its content controls, for the top of the screen', X::contentPanel('built-12'), '<div id="demo-content">sections of 12</div>');
+    same('which an unreported page, a theme page or another key do not get', [X::contentPanel('built-99'), X::contentPanel('other-12'), X::contentPanel('homepage')], ['', '', '']);
 
     // ------------------------------------------------------------------
     $section = 'notes on theme pages';
@@ -146,6 +149,9 @@ namespace {
     $logTo = ini_set('error_log', PHP_OS_FAMILY === 'Windows' ? 'NUL' : '/dev/null');
     same('a panel that fails is no panel, and the screen still has its other groups', [X::groups()['Junk']['panelHtml'], X::groups()['Built']['panelHtml']], ['', '<div id="demo-panel">site switch</div>']);
     ini_set('error_log', (string)$logTo);
+    X::register($module(['id' => 'nocontent', 'prefix' => 'plain', 'label' => 'Plain', 'group' => 'Plain', 'contentPanel' => 'no such function',
+        'provider' => static fn (): array => [['id' => 7, 'name' => 'Plain page']]]));
+    same('a module with no content controls draws none', X::contentPanel('plain-7'), '');
 
     X::reset();
     same('reset forgets everything', [X::prefixes(), X::all(), X::owns('built-1')], [[], [], false]);

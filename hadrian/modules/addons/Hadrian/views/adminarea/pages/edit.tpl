@@ -159,6 +159,16 @@
 </style>
 {/literal}
 
+{* A page an extension module owns may bring controls for what is ON the page
+   (Page Builder: its sections, as a list). Above the form and outside it on
+   purpose: the module saves them itself, and its inputs must never post
+   with Save changes or wake this page's save bar. *}
+{if !empty($extensionContent)}
+    <div class="mt-panel pad" data-page-extension-content style="margin-bottom:20px">
+        {$extensionContent nofilter}
+    </div>
+{/if}
+
 <form id="page-edit-form" method="post" action="?module=Hadrian&action=pages&sub=save">
     <input type="hidden" name="page" value="{$page|escape}">
 
@@ -196,9 +206,13 @@
                    in that module; everything else on this screen applies to it
                    as to any page. *}
                 <div class="mt-pd-none" data-page-extension>
-                    This page is made in {$extension.label|escape}, which draws it inside the theme. Its address and content are set there.
+                    {if !empty($extensionContent)}
+                        This page is made in {$extension.label|escape}, which draws it inside the theme. Its content is listed above; open the visual editor to change it on the page itself.
+                    {else}
+                        This page is made in {$extension.label|escape}, which draws it inside the theme. Its address and content are set there.
+                    {/if}
                     {if $extension.editUrl}
-                        <a class="mt-btn mt-btn-secondary mt-btn-sm" style="margin-left:8px" href="{$extension.editUrl|escape}">Edit content</a>
+                        <a class="mt-btn mt-btn-secondary mt-btn-sm" style="margin-left:8px" href="{$extension.editUrl|escape}">{if !empty($extensionContent)}Open visual editor{else}Edit content{/if}</a>
                     {/if}
                 </div>
             {else}

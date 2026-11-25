@@ -283,6 +283,48 @@ final class Bridge
         }
     }
 
+    // ------------------------------------------------------------ site look
+
+    /**
+     * The styles and layouts the editor's "Preview with" bar offers, and the
+     * ones the site uses. Null with a Hadrian too old to preview another look;
+     * the editor then hides the bar.
+     *
+     * @return array<string,mixed>|null
+     */
+    public static function looks(): ?array
+    {
+        if (!self::boot() || !class_exists('\\Hadrian\\Helpers\\SiteLook')) {
+            return null;
+        }
+        try {
+            return \Hadrian\Helpers\SiteLook::options();
+        } catch (\Throwable $e) {
+            error_log('Hadrian Page Builder: could not read the site look: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * The query string that makes a preview draw another look, for this
+     * admin only, or '' to draw the site as it is. Nothing is saved.
+     *
+     * @param array<string,mixed> $pick style, nav, footer, theme
+     */
+    public static function lookQuery(array $pick): string
+    {
+        if (!self::boot() || !class_exists('\\Hadrian\\Helpers\\SiteLook')) {
+            return '';
+        }
+        try {
+            $token = \Hadrian\Helpers\SiteLook::preview($pick);
+        } catch (\Throwable $e) {
+            error_log('Hadrian Page Builder: could not preview the look: ' . $e->getMessage());
+            return '';
+        }
+        return $token === '' ? '' : '&' . \Hadrian\Helpers\CustomizePreview::LOOK_PARAM . '=' . rawurlencode($token);
+    }
+
     /** @return list<array<string,string>> */
     public static function extensionNav(): array
     {

@@ -68,6 +68,11 @@ final class ExtensionPages
      *                    pages on its tab.
      *        pagePanel   callable(int $id): string. HTML shown on the editor
      *                    of one of the module's pages.
+     *        contentPanel callable(int $id): string. HTML shown at the TOP of
+     *                    that editor, above the settings form: a module's own
+     *                    controls for what is on the page (Page Builder: the
+     *                    page's sections as a list). Outside the form, so its
+     *                    inputs never post with Save changes.
      *        provider  callable(): list<array>, one entry per page:
      *                    id           int, the module's own id for the page
      *                    name         string
@@ -97,6 +102,7 @@ final class ExtensionPages
             'createPlaceholder' => self::cut(trim((string)($module['createPlaceholder'] ?? '')), 80),
             'panel'     => is_callable($module['panel'] ?? null) ? $module['panel'] : null,
             'pagePanel' => is_callable($module['pagePanel'] ?? null) ? $module['pagePanel'] : null,
+            'contentPanel' => is_callable($module['contentPanel'] ?? null) ? $module['contentPanel'] : null,
             'provider' => $provider,
         ];
         self::$pages = null;
@@ -142,6 +148,19 @@ final class ExtensionPages
         }
         [$prefix, $id] = explode('-', $key, 2);
         return self::render(self::$modules[$prefix], 'pagePanel', (int)$id);
+    }
+
+    /**
+     * The owning module's content controls for one of its pages, for the top
+     * of that page's editor in Pages. '' when there are none.
+     */
+    public static function contentPanel(string $key): string
+    {
+        if (!self::owns($key) || !isset(self::all()[$key])) {
+            return '';
+        }
+        [$prefix, $id] = explode('-', $key, 2);
+        return self::render(self::$modules[$prefix], 'contentPanel', (int)$id);
     }
 
     /**

@@ -14,8 +14,10 @@ namespace HadrianBuilder;
  *   mode      POST set "Website served by" (Theme or Page Builder)
  *   replace   POST choose the theme page a built page stands in for, and when
  *
- * The editor talks JSON to four endpoints (api-preview, api-save, api-publish,
- * api-unpublish). They come through dispatch() like every other action, so
+ * The editor talks JSON to its endpoints (api-preview, api-save, api-publish,
+ * api-unpublish), and the section list on a built page's settings in Pages
+ * (ContentPanel) to api-content, api-preview and api-publish. They come
+ * through dispatch() like every other action, so
  * WHMCS has already enforced the admin login and this addon's role
  * permissions; they answer and exit before WHMCS prints any admin chrome.
  *
@@ -162,20 +164,12 @@ final class AdminController
             $this->fail('That page no longer exists.');
         }
         $installed = Bridge::languages();
-        $default   = Bridge::defaultLanguage();
-
-        $languages = [['code' => '_', 'label' => Bridge::languageName($default) . ' (default)']];
-        foreach (Bridge::offeredLanguages() as $code) {
-            if ($code !== $default) {
-                $languages[] = ['code' => $code, 'label' => Bridge::languageName($code)];
-            }
-        }
 
         // Opening the editor starts from what is saved, not from a preview an
         // earlier visit left behind.
         unset($_SESSION[Router::PREVIEW_SESSION][$id]);
 
-        $boot = [
+        $boot = self::sectionKit() + [
             'id'        => $id,
             'name'      => (string)$page['name'],
             'slug'      => (string)$page['slug'],
@@ -183,25 +177,26 @@ final class AdminController
             'doc'       => Document::normalize((array)$page['draft'], $installed),
             'status'    => (string)$page['status'],
             'changed'   => Page::hasUnpublishedChanges($page),
-            'types'     => Sections::forEditor(),
-            'spacing'   => Document::SPACING,
-            'icons'     => Icons::all(),
-            'iconNames' => Icons::options(),
-            'products'  => Catalog::options(),
-            'languages' => $languages,
+            // "Preview with": the site's styles and layouts, and its own pick.
+            'looks'     => Bridge::looks(),
+            // Where the site look is changed for real: Hadrian's customizer.
+            'customizeUrl' => 'addonmodules.php?module=Hadrian&action=customize',
+            // The preview address; ?hb_sample=<type> draws one section type
+            // on its own, for the "add a section" list (Router::sample()).
+            'previewPath'  => Router::previewUrlFor($id),
             'siteUrl'   => rtrim(Bridge::systemUrl(), '/') . '/',
             'pageUrl'   => $page['slug'] !== '' ? Router::urlFor((string)$page['slug']) : '',
             'api'       => self::BASE,
             'token'     => $this->token(),
         ];
 
-        $assets = dirname(__DIR__) . '/views/assets';
         return $this->view('editor', [
             'boot'      => json_encode($boot, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_UNESCAPED_SLASHES | JSON_INVALID_UTF8_SUBSTITUTE),
             // Inlined rather than linked: nothing here depends on the module's
-            // asset directory being reachable over HTTP.
-            'editorCss' => (string)@file_get_contents($assets . '/css/page-builder.css'),
-            'editorJs'  => (string)@file_get_contents($assets . '/js/page-builder.js'),
+            // asset directory being reachable over HTTP. fields.* are shared
+            // with the section list in Pages (ContentPanel).
+            'editorCss' => self::asset('css/fields.css') . "\n" . self::asset('css/page-builder.css'),
+            'editorJs'  => self::asset('js/fields.js') . "\n" . self::asset('js/page-builder.js'),
             'name'      => (string)$page['name'],
         ]);
     }
@@ -225,6 +220,7 @@ final class AdminController
         match ($action) {
             'api-preview'   => $this->apiPreview($page, $in),
             'api-save'      => $this->apiSave($page, $in),
+            'api-content'   => $this->apiContent($page, $in),
             'api-publish'   => $this->apiPublish($page),
             'api-unpublish' => $this->apiUnpublish($page),
             default         => $this->json(['ok' => false, 'error' => 'Unknown action.'], 404),
@@ -250,9 +246,12 @@ final class AdminController
 
         $lang = strtolower((string)($in['lang'] ?? '_'));
         $lang = preg_match('/^[a-z_][a-z0-9_-]{0,40}$/', $lang) ? $lang : '_';
+        // Another style or layout to draw the page with, for this admin only.
+        $look = is_array($in['look'] ?? null) ? $in['look'] : [];
         $this->json([
             'ok'  => true,
-            'url' => Router::previewUrlFor($id) . '?hb_lang=' . rawurlencode($lang) . '&hb_t=' . time(),
+            'url' => Router::previewUrlFor($id) . '?hb_lang=' . rawurlencode($lang) . '&hb_t=' . time()
+                . ($look !== [] ? Bridge::lookQuery($look) : ''),
         ]);
     }
 
@@ -304,6 +303,31 @@ final class AdminController
         ]);
     }
 
+    /**
+     * Save the sections only, as the draft. The section list in Pages uses
+     * this: the page's name and address are not on that screen, so they are
+     * left as they are.
+     *
+     * @param array<string,mixed> $page
+     * @param array<string,mixed> $in
+     */
+    private function apiContent(array $page, array $in): never
+    {
+        $id  = (int)$page['id'];
+        $doc = Document::normalize(is_array($in['doc'] ?? null) ? $in['doc'] : [], Bridge::languages());
+        Page::update($id, ['draft' => $doc]);
+        unset($_SESSION[Router::PREVIEW_SESSION][$id]);
+
+        $fresh = Page::find($id) ?? $page;
+        $this->json([
+            'ok'      => true,
+            'doc'     => $doc,
+            'status'  => (string)$fresh['status'],
+            'changed' => Page::hasUnpublishedChanges($fresh),
+            'pageUrl' => (string)$fresh['slug'] !== '' ? Router::urlFor((string)$fresh['slug']) : '',
+        ]);
+    }
+
     /** @param array<string,mixed> $page */
     private function apiPublish(array $page): never
     {
@@ -324,6 +348,37 @@ final class AdminController
     }
 
     // -------------------------------------------------------------- helpers
+
+    /** One of the module's own files under views/assets, as text. '' when missing. */
+    public static function asset(string $relative): string
+    {
+        return (string)@file_get_contents(dirname(__DIR__) . '/views/assets/' . $relative);
+    }
+
+    /**
+     * What both content screens need to draw a page's sections: the schemas,
+     * spacing names, icons, products and the languages to edit in.
+     *
+     * @return array<string,mixed>
+     */
+    public static function sectionKit(): array
+    {
+        $default   = Bridge::defaultLanguage();
+        $languages = [['code' => '_', 'label' => Bridge::languageName($default) . ' (default)']];
+        foreach (Bridge::offeredLanguages() as $code) {
+            if ($code !== $default) {
+                $languages[] = ['code' => $code, 'label' => Bridge::languageName($code)];
+            }
+        }
+        return [
+            'types'     => Sections::forEditor(),
+            'spacing'   => Document::SPACING,
+            'icons'     => Icons::all(),
+            'iconNames' => Icons::options(),
+            'products'  => Catalog::options(),
+            'languages' => $languages,
+        ];
+    }
 
     private function ensureSchema(): void
     {

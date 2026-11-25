@@ -36,9 +36,26 @@ final class CustomizePreview
 
     private const SESSION = 'hadrianCustomize';
 
+    /**
+     * A second slot, with its own token and state, for an add-on that draws
+     * one of its pages under another look (SiteLook::preview(); Hadrian Page
+     * Builder's "Preview with"). Separate so it never overwrites what the
+     * customizer is trying out in another tab. Same gate: a signed-in admin
+     * and the token stored in that admin's session.
+     */
+    public const LOOK_PARAM = 'hadrian_look';
+
+    private const LOOK_SESSION = 'hadrianLook';
+
+    /** URL parameter => session key, in the order they are checked. */
+    private const SLOTS = [self::PARAM => self::SESSION, self::LOOK_PARAM => self::LOOK_SESSION];
+
     public const KINDS = ['main-menu', 'footer'];
 
     private static ?bool $active = null;
+
+    /** The URL parameter whose token matched, when active() is true. */
+    private static string $param = self::PARAM;
 
     // ------------------------------------------------------------ the gate
 
@@ -48,19 +65,26 @@ final class CustomizePreview
         if (self::$active !== null) {
             return self::$active;
         }
-        $given  = $_GET[self::PARAM] ?? '';
-        $stored = $_SESSION[self::SESSION]['token'] ?? '';
-        return self::$active = is_string($given) && $given !== ''
-            && is_string($stored) && $stored !== ''
-            && (int)($_SESSION['adminid'] ?? 0) > 0
-            && hash_equals($stored, $given)
-            && is_array($_SESSION[self::SESSION]['state'] ?? null);
+        if ((int)($_SESSION['adminid'] ?? 0) <= 0) {
+            return self::$active = false;
+        }
+        foreach (self::SLOTS as $param => $key) {
+            $given  = $_GET[$param] ?? '';
+            $stored = $_SESSION[$key]['token'] ?? '';
+            if (is_string($given) && $given !== '' && is_string($stored) && $stored !== ''
+                && hash_equals($stored, $given) && is_array($_SESSION[$key]['state'] ?? null)) {
+                self::$param = $param;
+                return self::$active = true;
+            }
+        }
+        return self::$active = false;
     }
 
     /** Forget the memoised answer. For tests, which change the request. */
     public static function reset(): void
     {
         self::$active = null;
+        self::$param  = self::PARAM;
     }
 
     // ----------------------------------------------- what the theme reads
@@ -116,7 +140,7 @@ final class CustomizePreview
     /** @return array<string,mixed> the state when this is a preview, [] otherwise */
     private static function state(): array
     {
-        return self::active() ? (array)$_SESSION[self::SESSION]['state'] : [];
+        return self::active() ? (array)$_SESSION[self::SLOTS[self::$param]]['state'] : [];
     }
 
     // ------------------------------------------------ what the admin writes
@@ -137,6 +161,22 @@ final class CustomizePreview
     {
         $token = self::token();
         $_SESSION[self::SESSION] = ['token' => $token, 'state' => $state];
+    }
+
+    /**
+     * Hold a look for an add-on's preview (the second slot) and return the
+     * token its preview URL carries as LOOK_PARAM.
+     *
+     * @param array<string,mixed> $state the shape normalise() returns
+     */
+    public static function putLook(array $state): string
+    {
+        $token = $_SESSION[self::LOOK_SESSION]['token'] ?? '';
+        if (!is_string($token) || !preg_match('/^[a-f0-9]{32}$/', $token)) {
+            $token = bin2hex(random_bytes(16));
+        }
+        $_SESSION[self::LOOK_SESSION] = ['token' => $token, 'state' => $state];
+        return $token;
     }
 
     /**
@@ -201,8 +241,8 @@ final class CustomizePreview
         if (!self::active()) {
             return '';
         }
-        $param = json_encode(self::PARAM);
-        $token = json_encode((string)$_SESSION[self::SESSION]['token']);
+        $param = json_encode(self::$param);
+        $token = json_encode((string)$_SESSION[self::SLOTS[self::$param]]['token']);
         return <<<HTML
 <script id="hadrian-customize-frame">
 (function () {

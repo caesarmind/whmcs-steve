@@ -132,6 +132,12 @@ final class Router
             if ($page === null) {
                 return null;
             }
+            // One section type on its own, for the editor's "add a section"
+            // list to show what it looks like before it is added.
+            $sample = $_GET['hb_sample'] ?? null;
+            if (is_string($sample) && $sample !== '' && ($doc = self::sample($sample)) !== null) {
+                return ['page' => $page, 'doc' => $doc, 'preview' => true];
+            }
             // What the editor last sent, if anything; otherwise the saved draft.
             $unsaved = $_SESSION[self::PREVIEW_SESSION][$id] ?? null;
             return ['page' => $page, 'doc' => is_array($unsaved) ? $unsaved : (array)$page['draft'], 'preview' => true];
@@ -143,6 +149,47 @@ final class Router
         }
         $page = Page::bySlug($slug);
         return $page === null ? null : ['page' => $page, 'doc' => (array)$page['published'], 'preview' => false];
+    }
+
+    /**
+     * A page of one section of $type with its default content. Product
+     * fields get the first products in WHMCS, so a pricing section shows real
+     * prices instead of "nothing to show yet". Null for an unknown type.
+     *
+     * @return array<string,mixed>|null
+     */
+    public static function sample(string $type): ?array
+    {
+        $languages = Bridge::languages();
+        $section   = Document::make($type, $languages);
+        $def       = Sections::type($type);
+        if ($section === null || $def === null) {
+            return null;
+        }
+        $ids  = array_column(array_slice(Catalog::options(), 0, 6), 'id');
+        $next = 0;
+        $pid  = static function () use ($ids, &$next): int {
+            return $ids === [] ? 0 : (int)$ids[$next++ % count($ids)];
+        };
+        foreach ($def['fields'] as $f) {
+            if ($f['type'] === 'product') {
+                $section['props'][$f['key']] = $pid();
+            } elseif ($f['type'] === 'list') {
+                $productKeys = array_column(array_filter($f['fields'], static fn(array $s): bool => $s['type'] === 'product'), 'key');
+                if ($productKeys === []) {
+                    continue;
+                }
+                $items = $section['props'][$f['key']] ?: [[], [], []];
+                foreach ($items as &$item) {
+                    foreach ($productKeys as $k) {
+                        $item[$k] = $pid();
+                    }
+                }
+                unset($item);
+                $section['props'][$f['key']] = $items;
+            }
+        }
+        return Document::normalize(['sections' => [$section]], $languages);
     }
 
     /**
