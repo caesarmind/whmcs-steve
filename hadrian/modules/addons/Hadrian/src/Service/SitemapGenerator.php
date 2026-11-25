@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Hadrian\Service;
 
+use Hadrian\Helpers\ExtensionPages;
 use Hadrian\Models\Configuration;
 use Hadrian\Models\Page;
 use Hadrian\Models\Settings;
@@ -157,8 +158,47 @@ final class SitemapGenerator
         $urlset->appendChild($this->urlNode($xml, $base . '/', $freq, '1.0'));
 
         // Static registry pages (indexable, public, published, with a URL).
-        foreach (Page::forSitemap($template) as $row) {
-            $urlset->appendChild($this->urlNode($xml, $base . '/' . ltrim((string)$row['url'], '/'), $freq, '0.8'));
+        //
+        // A module's page that is standing in for a theme page (a built page
+        // serving as Announcements) answers at the theme page's address as
+        // well as its own, and names the theme page's address as canonical
+        // (Hooks::resolveSeoContext). So that address is listed once, the
+        // module page's own address is not, and whether it is listed at all
+        // follows the module page: its settings are the ones in force there.
+        $rows      = Page::forSitemap($template);
+        $listed    = [];
+        foreach ($rows as $row) {
+            $listed[(string)$row['page']] = true;
+        }
+        $standIn = [];                      // theme page => the module page serving there
+        foreach (ExtensionPages::all() as $key => $meta) {
+            $replaced = (string)($meta['extension']['replaces'] ?? '');
+            if ($replaced !== '') {
+                $standIn[$replaced] = (string)$key;
+            }
+        }
+        $add = function (string $url) use ($xml, $urlset, $base, $freq): void {
+            $urlset->appendChild($this->urlNode($xml, $base . '/' . ltrim($url, '/'), $freq, '0.8'));
+        };
+        foreach ($rows as $row) {
+            $page = (string)$row['page'];
+            if (in_array($page, $standIn, true)) {
+                continue;                   // its content is listed at the address it serves
+            }
+            if (isset($standIn[$page]) && !isset($listed[$standIn[$page]])) {
+                continue;                   // what answers here is not for search engines
+            }
+            $add((string)$row['url']);
+        }
+        // A theme page that would not be listed itself, with an indexable
+        // module page serving at its address.
+        foreach ($standIn as $replaced => $key) {
+            if (isset($listed[$key]) && !isset($listed[$replaced])) {
+                $url = Page::get($template, $replaced)['url'] ?? null;
+                if (is_string($url) && $url !== '') {
+                    $add($url);
+                }
+            }
         }
 
         // Dynamic content from WHMCS. Each source is isolated in its own

@@ -3147,7 +3147,21 @@ final class Hooks
         $path  = $split[0];
         parse_str($split[1] ?? '', $params);
         unset($params['currency'], $params['language']);
-        $clean = $path . ($params !== [] ? '?' . http_build_query($params) : '');
+
+        // A module's page that is standing in for a theme page (a built page
+        // serving as Announcements) answers at two addresses: its own, and
+        // the theme page's. Both name the theme page's address, which is the
+        // one visitors are sent to, so the two do not compete as duplicates.
+        $standsInFor = $this->frontDoorOfReplacedPage($vars);
+        if ($standsInFor !== null) {
+            $split = explode('?', $standsInFor, 2);
+            $path  = $split[0];
+            parse_str($split[1] ?? '', $params);
+        }
+        // The stand-in's address is used as WHMCS spells it ("rp=/announcements"),
+        // the way every link on the site does; rebuilding the query would
+        // percent-encode the slash and make a second spelling of one address.
+        $clean = $standsInFor ?? $path . ($params !== [] ? '?' . http_build_query($params) : '');
 
         // og:type. "article" is for time-stamped, authored content — it was
         // previously the default for everything except the homepage, which
@@ -3187,6 +3201,56 @@ final class Hooks
             'ogType'    => $ogType,
             'hreflang'  => $hreflang,
         ];
+    }
+
+    /**
+     * WHMCS routes for theme pages whose own script only redirects there
+     * (announcements.php answers 301). The route gives the address visitors
+     * end up at, in whichever URL form the install uses.
+     */
+    private const FRONT_DOOR_ROUTES = [
+        'announcements' => 'announcement-index',
+        'knowledgebase' => 'knowledgebase-index',
+    ];
+
+    /**
+     * When the page being drawn is a module's page that currently replaces a
+     * theme page (Helpers\ExtensionPages reports `replaces`), the theme
+     * page's own address: a path from the domain root, with a query string
+     * where the install's URL form needs one. Null for every other page, and
+     * when no single address can be named.
+     *
+     * @param array<string,mixed> $vars the ClientAreaPage hook's variables
+     */
+    private function frontDoorOfReplacedPage(array $vars): ?string
+    {
+        $templatefile = (string)($vars['templatefile'] ?? '');
+        if ($templatefile !== \Hadrian\Helpers\ExtensionPages::TEMPLATE) {
+            return null;
+        }
+        $key      = self::pageKey($templatefile, $vars);
+        $replaced = (string)(\Hadrian\Helpers\ExtensionPages::meta($key)['extension']['replaces'] ?? '');
+        if ($replaced === '') {
+            return null;
+        }
+        if ($replaced === 'homepage') {
+            return rtrim((string)($vars['WEB_ROOT'] ?? ''), '/') . '/';
+        }
+        if (isset(self::FRONT_DOOR_ROUTES[$replaced]) && function_exists('routePath')) {
+            try {
+                $path = (string)routePath(self::FRONT_DOOR_ROUTES[$replaced]);
+                if ($path !== '' && !str_contains($path, 'route-not-defined')) {
+                    return $path;
+                }
+            } catch (\Throwable $e) {
+                // Fall through to the page's registered address.
+            }
+        }
+        $template = AddonHelper::getTemplate();
+        $stored   = $template !== null ? (string)(Page::get($template->getName(), $replaced)['url'] ?? '') : '';
+        $url      = \Hadrian\Helpers\PageUrlResolver::resolve($replaced, $stored)['url'];
+        // An address on another host is not this page's other address.
+        return $url !== '' && !preg_match('~^https?://~i', $url) ? $url : null;
     }
 
     /**
