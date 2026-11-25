@@ -159,16 +159,6 @@
 </style>
 {/literal}
 
-{* A page an extension module owns may bring controls for what is ON the page
-   (Page Builder: its sections, as a list). Above the form and outside it on
-   purpose: the module saves them itself, and its inputs must never post
-   with Save changes or wake this page's save bar. *}
-{if !empty($extensionContent)}
-    <div class="mt-panel pad" data-page-extension-content style="margin-bottom:20px">
-        {$extensionContent nofilter}
-    </div>
-{/if}
-
 <form id="page-edit-form" method="post" action="?module=Hadrian&action=pages&sub=save">
     <input type="hidden" name="page" value="{$page|escape}">
 
@@ -176,6 +166,31 @@
 
     {* ── Main column ──────────────────────────────────────────────── *}
     <div class="mt-pd-main">
+
+        {* A page an extension module owns may bring controls for what is ON the
+           page (Page Builder: its sections, as a list). First in the main
+           column, so SEO stays beside it in the rail. It sits inside this form
+           only for the layout: the module saves it itself. Its controls carry
+           no name= (the ExtensionPages contract), so nothing in it posts with
+           Save changes, and the script below keeps Enter in one of its fields
+           from submitting this form. *}
+        {if !empty($extensionContent)}
+            <div class="mt-panel pad" data-page-extension-content>
+                {$extensionContent nofilter}
+            </div>
+            {literal}
+            <script>
+            (function () {
+                var box = document.querySelector('[data-page-extension-content]');
+                if (!box) { return; }
+                box.addEventListener('keydown', function (e) {
+                    var t = e.target;
+                    if (e.key === 'Enter' && t && t.tagName === 'INPUT') { e.preventDefault(); }
+                });
+            })();
+            </script>
+            {/literal}
+        {/if}
 
         {* Template variant + the options that belong to it, in ONE card: the
            options ARE the settings for the chosen template, so splitting them

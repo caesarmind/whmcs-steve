@@ -18,8 +18,9 @@ namespace HadrianBuilder;
  * (AdminController api-content); Publish makes it live, as in the editor.
  *
  * Everything here is drawn by content-list.js from the boot data printed
- * below. Hadrian prints this HTML above its settings form and outside it, so
- * these inputs never post with Save changes.
+ * below. Hadrian prints this HTML first in the main column of a page's
+ * settings, beside SEO, which puts it inside its settings form. No control
+ * here may have a name= attribute, or it would post with Save changes.
  */
 final class ContentPanel
 {

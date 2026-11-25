@@ -68,11 +68,14 @@ final class ExtensionPages
      *                    pages on its tab.
      *        pagePanel   callable(int $id): string. HTML shown on the editor
      *                    of one of the module's pages.
-     *        contentPanel callable(int $id): string. HTML shown at the TOP of
-     *                    that editor, above the settings form: a module's own
-     *                    controls for what is on the page (Page Builder: the
-     *                    page's sections as a list). Outside the form, so its
-     *                    inputs never post with Save changes.
+     *        contentPanel callable(int $id): string. HTML shown first in that
+     *                    editor's main column, beside the SEO rail: a module's
+     *                    own controls for what is on the page (Page Builder:
+     *                    the page's sections as a list). It sits inside the
+     *                    settings form for the layout, so its controls must
+     *                    carry NO name= attribute (they would post with Save
+     *                    changes) and save through the module's own requests.
+     *                    Hadrian stops Enter in its fields submitting the form.
      *        provider  callable(): list<array>, one entry per page:
      *                    id           int, the module's own id for the page
      *                    name         string

@@ -344,7 +344,7 @@ test("a page's sections can be edited as a list on its settings in Pages", async
   await page.goto(settingsOf(id));
   const card = page.locator('[data-page-extension-content] #hbc');
   await expect(card, 'the list sits at the top of the page\'s settings').toBeVisible();
-  await expect(page.locator('#page-edit-form #hbc'), 'outside the settings form, so it never posts with Save changes').toHaveCount(0);
+  await expect(page.locator('.mt-pd-main > [data-page-extension-content] #hbc'), 'first in the main column, with SEO beside it').toHaveCount(1);
   await expect(card.locator('.hbc-empty')).toBeVisible();
   const rows = card.locator('.hbc-row');
 
@@ -366,6 +366,16 @@ test("a page's sections can be edited as a list on its settings in Pages", async
   await expect(rows.nth(1), 'one section open at a time').not.toHaveClass(/is-open/);
   await rows.nth(0).locator('.hbx-field[data-path="title"] input').fill('E2E edited as a list');
   await expect(rows.nth(0).locator('.hbc-sum')).toHaveText('E2E edited as a list');
+
+  // The list sits inside Hadrian's settings form for the layout only: none of
+  // its fields posts with Save changes, and Enter in one does not submit it.
+  const posted = await page.evaluate(() => [...new FormData(document.getElementById('page-edit-form')).values()].map(String));
+  expect(posted.filter(v => v.includes('E2E edited as a list')), 'nothing typed in the list goes with Save changes').toEqual([]);
+  await expect(card.locator('[name]'), 'no control in the list has a name').toHaveCount(0);
+  const before = page.url();
+  await rows.nth(0).locator('.hbx-field[data-path="title"] input').press('Enter');
+  await expect(card.locator('#hbc-status'), 'Enter left the page alone').toHaveText('Unsaved changes');
+  expect(page.url()).toBe(before);
 
   // Reorder, then save the draft and publish.
   await rows.nth(1).getByRole('button', { name: 'Move section up' }).click();
