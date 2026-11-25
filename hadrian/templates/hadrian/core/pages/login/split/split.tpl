@@ -108,7 +108,8 @@
     </aside>
 
     {* ── Right: sign-in form ── *}
-    <main class="mt-ls-main">
+    {* A <div>: header.tpl wraps full-bleed pages in the <main> landmark. *}
+    <div class="mt-ls-main">
         <div class="mt-ls-card">
             <header class="page-header">
                 <p class="page-eyebrow">{$hadrianLang.auth.account}</p>
@@ -178,6 +179,6 @@
                 <a href="{$WEB_ROOT}/register.php" class="auth-link">{$LANG.userLogin.createAccount}</a>
             </div>
         </div>
-    </main>
+    </div>{* /.mt-ls-main *}
 
 </div>

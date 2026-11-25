@@ -397,7 +397,8 @@ test.describe('TH-D Navigation chrome', () => {
   test('TH-31 icon rail: 3 guest / 5 client flyouts open on hover, click and focus, close after the bridge delay', async ({ page, context }) => {
     const errors = watchErrors(page);
     await page.goto('/?preview=1&layout=rail');
-    const rail = page.locator('aside.ph-rail');
+    // A <nav> since the accessibility work (it is the main menu), not an <aside>.
+    const rail = page.locator('nav.ph-rail');
     await expect(rail).toBeVisible();
     await expect(rail.locator('.ph-rail-item[data-rail]:visible'), 'three flyouts for guests').toHaveCount(3);
 

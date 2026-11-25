@@ -1,6 +1,7 @@
 {* Hostnodes — 80px icon rail (rendered when body[data-layout="rail"]).
    Paired with rail-panels for hover flyouts. *}
-<aside class="ph-rail only-rail">
+{* <nav>, not <aside>: the rail is the site's main menu. *}
+<nav class="ph-rail only-rail" id="appRail" aria-label="{$hadrianLang.nav.mainMenu}">
     <a href="{$WEB_ROOT}/" class="ph-rail-logo" aria-label="{$hadrianLang.nav.portalHome}">
         {* The rail is a 44px column, so the square mark is the only logo that
            fits -- same slot the sidebar header uses. The full logo is
@@ -79,4 +80,4 @@
             <span>{$LANG.login}</span>
         </a>
     {/if}
-</aside>
+</nav>

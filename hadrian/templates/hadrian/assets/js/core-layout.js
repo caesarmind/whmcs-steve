@@ -582,30 +582,66 @@
             document.body.appendChild(backdrop);
         }
 
+        // The drawer is the rail on the rail layout, the sidebar otherwise.
+        var drawer = body.dataset.layout === 'rail'
+            ? document.getElementById('appRail')
+            : document.getElementById('appSidebar');
+        if (drawer && drawer.id === 'appRail') {
+            document.querySelectorAll('[data-nav-toggle]').forEach(function (b) {
+                b.setAttribute('aria-controls', 'appRail');
+            });
+        }
+        var lastToggle = null;
+
+        // While the drawer is closed and off screen (<=900px) it must not
+        // take focus: its links sat first in the tab order, invisible
+        // (WCAG 2.4.3, 2.4.7). Above 900px it is the visible sidebar or rail.
+        function syncInert() {
+            if (!drawer) return;
+            var hidden = MQ.matches && !body.classList.contains('nav-open');
+            if (hidden) drawer.setAttribute('inert', ''); else drawer.removeAttribute('inert');
+        }
+
         function open() {
             body.classList.add('nav-open');
             document.querySelectorAll('[data-nav-toggle]').forEach(function (b) {
                 b.setAttribute('aria-expanded', 'true');
             });
+            syncInert();
+            // Move focus into the drawer: it sits before the button in the
+            // page, so Tab from the button would skip past it.
+            if (drawer && MQ.matches) {
+                var first = drawer.querySelector('a[href], button:not([disabled]), input:not([type="hidden"]), [tabindex="0"]');
+                if (first) setTimeout(function () { first.focus(); }, 30);
+            }
         }
-        function close() {
+        function close(restoreFocus) {
+            var wasOpen = body.classList.contains('nav-open');
             body.classList.remove('nav-open');
             document.querySelectorAll('[data-nav-toggle]').forEach(function (b) {
                 b.setAttribute('aria-expanded', 'false');
             });
+            syncInert();
+            if (wasOpen && restoreFocus === true && lastToggle) lastToggle.focus();
         }
         function toggle() {
-            if (body.classList.contains('nav-open')) close(); else open();
+            if (body.classList.contains('nav-open')) close(true); else open();
         }
 
         document.querySelectorAll('[data-nav-toggle]').forEach(function (btn) {
-            btn.addEventListener('click', function (e) { e.stopPropagation(); toggle(); });
+            btn.addEventListener('click', function (e) {
+                e.stopPropagation();
+                // Remember the button that opened it, not the drawer's own
+                // Close button: focus goes back there, outside the drawer.
+                if (!drawer || !drawer.contains(btn)) lastToggle = btn;
+                toggle();
+            });
         });
 
         backdrop.addEventListener('click', close);
 
         document.addEventListener('keydown', function (e) {
-            if (e.key === 'Escape' && body.classList.contains('nav-open')) close();
+            if (e.key === 'Escape' && body.classList.contains('nav-open')) close(true);
         });
 
         // Close after navigating via a sidebar link (only on mobile)
@@ -616,9 +652,10 @@
         });
 
         // If we resize back into desktop, drop the drawer state
-        function syncMQ() { if (!MQ.matches) close(); }
+        function syncMQ() { if (!MQ.matches) close(); syncInert(); }
         if (MQ.addEventListener) MQ.addEventListener('change', syncMQ);
         else MQ.addListener(syncMQ);
+        syncInert();
     }
 
     // ── Sidebar collapsible groups ─────────────────────────

@@ -28,9 +28,15 @@
    IS active and dev_mode is on (in which case canRender is set to true). *}
 {assign var=mtLicenseGateEnabled value=false}
 
+{* Right-to-left languages (WHMCS language file names). The email module keeps
+   the same list for its own documents (HadrianEmail\Theme::isRtl). Sets the
+   attribute only; the theme has no RTL styles yet. *}
+{assign var=mt_langName value=$language|default:''|lower}
+{assign var=mt_rtl value=in_array($mt_langName, ['arabic', 'farsi', 'persian', 'hebrew', 'urdu', 'kurdish', 'pashto', 'sindhi', 'uyghur', 'yiddish', 'dhivehi'])}
+
 {if $mtLicenseGateEnabled && empty($hadrian.license.canRender)}
 <!DOCTYPE html>
-<html lang="{$activeLocale.languageCode|default:'en'}">
+<html lang="{$activeLocale.languageCode|default:'en'}"{if $mt_rtl} dir="rtl"{/if}>
 <head>
     <meta charset="{$charset|default:'utf-8'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -259,7 +265,7 @@
 {/if}
 <!DOCTYPE html>
 <!-- hadrian header v11 -->
-<html lang="{$activeLocale.languageCode|default:'en'}" data-theme="{$mtThemeMode|default:'light'}" data-dark-mode="{$mtDarkMode|default:'off'}" data-header-sentinel="v11"{if $mt_palette} data-palette="{$mt_palette|escape}"{/if}>
+<html lang="{$activeLocale.languageCode|default:'en'}"{if $mt_rtl} dir="rtl"{/if} data-theme="{$mtThemeMode|default:'light'}" data-dark-mode="{$mtDarkMode|default:'off'}" data-header-sentinel="v11"{if $mt_palette} data-palette="{$mt_palette|escape}"{/if}>
 <head>
     <meta charset="{$charset|default:'utf-8'}">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -408,6 +414,14 @@
       data-page-title="{$pagetitle|escape|default:'Page'}"
       data-tpl="{$templatefile|default:''|escape}"{if $hadrian.area|default:''} data-area="{$hadrian.area|escape}"{/if}{if ($templatefile|default:'') == 'module-page' || (($templatefile|default:''|strstr:'store') && !($templatefile|default:''|strstr:'order') && !($templatefile|default:''|strstr:'not-found'))} data-bleed="1"{/if}{if $mt_align} data-align="{$mt_align|escape}"{/if}{if $mt_sidebarSide} data-sidebar-side="{$mt_sidebarSide|escape}"{/if}{if $mt_navProfile} data-nav-profile="{$mt_navProfile|escape}"{/if}{if $mt_subnav} data-subnav="{$mt_subnav|escape}"{/if}{if $mt_subnavOrder} data-subnav-order="{$mt_subnavOrder|escape}"{/if}{if $mt_subnavWebsite} data-subnav-website="{$mt_subnavWebsite|escape}"{/if}{if $mt_subnavSide} data-subnav-side="{$mt_subnavSide|escape}"{/if}{if $mt_svcLayout} data-svc-layout="{$mt_svcLayout|escape}"{/if}{if $mt_data} data-data="{$mt_data|escape}"{/if}{if $mt_tiles} data-tiles="{$mt_tiles|escape}"{/if}{if $mt_form} data-form="{$mt_form|escape}"{/if}{if $mt_plan} data-plan="{$mt_plan|escape}"{/if}{if $mt_product} data-product="{$mt_product|escape}"{/if}{if $hadrian.addonSettings.hide_breadcrumb} data-hide-breadcrumb="1"{/if}{if $hadrian.addonSettings.content_width && $hadrian.addonSettings.content_width != 'boxed'} data-content-width="{$hadrian.addonSettings.content_width|escape}"{/if}{if $hadrian.addonSettings.affixed_navigation} data-affixed-nav="1"{/if}{if $hadrian.addonSettings.unpin_sidebar} data-unpin-sidebar="1"{/if}{if !($hadrian.addonSettings.capitalize_titles|default:true)} data-capitalize-titles="0"{/if}{if $hadrian.addonSettings.hide_cycle_discounts} data-hide-discounts="1"{/if}{if $hadrian.addonSettings.free_label} data-free-label="1" data-free-label-text="{$LANG.orderfree|default:'Free'|escape}"{/if}>
 
+{* Skip link: the first thing a keyboard user reaches (WCAG 2.4.1). The href
+   carries the current URL because of the <base> tag above: a bare
+   "#main-content" would resolve against the base and load the homepage.
+   Full-bleed pages have no navigation to skip. *}
+{if !$mt_fullPage}
+<a class="mt-skip-link" href="{$smarty.server.REQUEST_URI|escape}#main-content">{$hadrianLang.nav.skipToContent}</a>
+{/if}
+
 {$headeroutput}
 
 {if !$mt_fullPage}
@@ -461,7 +475,7 @@
        is cleaner than a full "Home / Page" trail. Skipped on the portal home
        page ($_tf == 'homepage'), where "back to Home" would point at itself. *}
     {if ($mt_preview || $mt_layout == 'top') && $_tf != 'homepage'}
-    <nav class="ph-breadcrumb ph-breadcrumb-back only-top" aria-label="breadcrumb">
+    <nav class="ph-breadcrumb ph-breadcrumb-back only-top" aria-label="{$hadrianLang.nav.breadcrumb}">
         <div class="ph-breadcrumb-inner">
             <a href="{$WEB_ROOT}/" class="ph-back-link">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
@@ -471,12 +485,19 @@
     </nav>
     {/if}
 
-    <div class="content-area">
+    {* The page's main landmark (WCAG 1.3.1) and the skip link's target.
+       tabindex="-1" lets the skip link move focus here in every browser;
+       footer.tpl closes it. *}
+    <main id="main-content" class="content-area" tabindex="-1">
     {* Email-verification banner (renders only when WHMCS flags the email unverified). *}
     {include file="`$template`/includes/verifyemail.tpl"}
     {* Network-issue and user-validation banners (stock Nexus shows both on every
        client-area page; each renders only when WHMCS sets its flag). *}
     {include file="`$template`/includes/network-issues-notifications.tpl"}
     {include file="`$template`/includes/validateuser.tpl"}
+    {else}
+    {* Full-bleed pages own their layout, so this <main> is display:contents
+       (core-theme.css): the landmark without a box. footer.tpl closes it. *}
+    <main id="main-content" class="mt-fullpage-main">
     {/if}{* end portal chrome (skipped when fullPage) *}
 {/if}

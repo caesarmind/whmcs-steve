@@ -9,7 +9,8 @@
 {/if}
 {assign var=user_initials value=$_first|truncate:1:''|upper}
 {assign var=user_fullname value=$_first|cat:' '|cat:$_last}
-<div class="ph-side-topbar only-inner">
+{* <header>: the page's banner landmark on the side and rail layouts. *}
+<header class="ph-side-topbar only-inner">
     <div class="ph-side-topbar-inner">
         <button type="button" class="ph-side-iconbtn ph-mobile-toggle" aria-label="{$hadrianLang.nav.openNavigation}" aria-controls="appSidebar" aria-expanded="false" data-nav-toggle>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
@@ -103,4 +104,4 @@
             {/if}
         </div>
     </div>
-</div>
+</header>

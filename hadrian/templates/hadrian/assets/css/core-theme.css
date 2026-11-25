@@ -4280,3 +4280,59 @@ body .iti__divider { border-bottom: 0.5px solid var(--color-border); margin: 4px
     .mt-verify-text { flex-basis: calc(100% - 42px); }
     .mt-verify-resend { margin-left: 30px; }
 }
+
+/* ===== Accessibility: focus, skip link, screen-reader text ================
+   docs/accessibility-hadrian-plan.md, phase 1.
+
+   Focus ring (WCAG 2.4.7). One rule for the whole client area and cart: a
+   2px ring in the accent colour, 2px outside the element, shown only for
+   keyboard focus (:focus-visible), so mouse users never see it. It is
+   !important on purpose: about 80 component rules set "outline: none" on
+   focus, many inside the cart's inline <style> blocks at specificities a
+   plain rule cannot beat, and leaving any of them would leave a control with
+   no visible focus. A component that wants its own ring keeps its
+   box-shadow; this outline is drawn as well. */
+:root {
+    --focus-ring-color: var(--color-accent);
+    --focus-ring-width: 2px;
+    --focus-ring-offset: 2px;
+}
+:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color) !important;
+    outline-offset: var(--focus-ring-offset) !important;
+}
+/* Elements that only ever receive focus from script (the skip link's target,
+   dialogs, headings moved to after an error) are not controls; ringing the
+   whole main column after "Skip to main content" reads as a bug. */
+[tabindex="-1"]:focus,
+[tabindex="-1"]:focus-visible { outline: none !important; }
+
+/* Skip link (WCAG 2.4.1): off screen until it has focus, then pinned to the
+   top-left corner above every bar and drawer. Inverted colours, so it reads
+   on any page background in both modes. */
+.mt-skip-link {
+    position: fixed; top: 12px; left: 12px; z-index: 10000;
+    padding: 10px 16px; border-radius: 10px;
+    background: var(--color-text-primary); color: var(--color-bg);
+    font-size: var(--text-md, 15px); font-weight: 600; text-decoration: none;
+    transform: translateY(-200%);
+}
+.mt-skip-link:focus,
+.mt-skip-link:focus-visible { transform: none; color: var(--color-bg); }
+
+/* Text for screen readers only. Global: five templates used the class with
+   no rule behind it, so their "hidden" text was on screen. */
+.sr-only {
+    position: absolute !important; width: 1px !important; height: 1px !important;
+    padding: 0 !important; margin: -1px !important; overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important;
+}
+
+/* Full-bleed pages (login split / beacon, banned) lay out from <body>;
+   header.tpl wraps them in <main> for the landmark, and this keeps that
+   wrapper out of their layout. */
+.mt-fullpage-main { display: contents; }
+
+/* Jumping to an anchor, or tabbing down the page, must not leave the target
+   under the sticky top bar (WCAG 2.4.11). */
+html { scroll-padding-top: 80px; }

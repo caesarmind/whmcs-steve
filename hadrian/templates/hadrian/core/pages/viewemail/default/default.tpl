@@ -12,7 +12,7 @@
 {assign var=vemMsg value=$message|default:''}
 {if !$vemMsg && $isPreview}{assign var=vemMsg value='<p>Hi Arshile,</p><p>This is a confirmation that your payment for invoice #1042 has been received. Thank you for your business.</p><p>Regards,<br>The Hostnodes Team</p>'}{/if}
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="{$activeLocale.languageCode|default:'en'}" data-theme="light">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/viewemail.css?v={$hadrian.version|default:'1.0'}">
 </head>
 <body class="vem-popup">
-    <div class="vem-card">
+    <main class="vem-card">
         <div class="vem-header">
             <p class="vem-eyebrow">{$LANG.clientareaemails}</p>
             <h1 class="vem-title">{$companyname|default:'Hostnodes'|escape}</h1>
@@ -42,6 +42,6 @@
         {else}
             <div class="vem-empty">{$LANG.clientareaemailsnone|default:'Messages we send to your account email will be listed here.'}</div>
         {/if}
-    </div>
+    </main>
 </body>
 </html>

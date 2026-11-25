@@ -98,7 +98,9 @@
     {/if}
 {/function}
 
-<aside class="sidebar only-side">
+{* id: the hamburger buttons' aria-controls target. On the top layout this is
+   the mobile drawer; core-layout.js makes it inert while it is closed. *}
+<aside class="sidebar only-side" id="appSidebar" aria-label="{$hadrianLang.nav.sidebar}">
     <div class="sidebar-header">
         <a href="{$WEB_ROOT}/" class="sidebar-home-link">
             {* FULL logo first here, square only as the fallback.
@@ -146,7 +148,7 @@
         </form>
     </div>
 
-    <nav class="sidebar-nav">
+    <nav class="sidebar-nav" aria-label="{$hadrianLang.nav.mainMenu}">
         {if isset($mtSidebarItems) && $mtSidebarItems}
             {* $mtSidebarItems is a flat ordered array of WHMCS Menu Items
                built by Hadrian's TreeRenderer in DB position order. We

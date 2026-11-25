@@ -15,7 +15,7 @@
      $logo, $issuedBy, $taxCode, $taxIdLabel, $itemTableTitle, $dateIssued, $notes
      $companyname, $pagetitle, $clientsdetails
 *}<!DOCTYPE html>
-<html lang="en">
+<html lang="{$activeLocale.languageCode|default:'en'}">
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -36,7 +36,7 @@
     {/literal}</style>
 </head>
 <body>
-<div class="vbn-doc">
+<main class="vbn-doc">
 
     <div class="vbn-brand">
         {if isset($logo) && $logo}
@@ -151,6 +151,6 @@
         <a href="{$WEB_ROOT}/clientarea.php?action=invoices" class="btn-secondary">{$LANG.invoicesbacktoclientarea}</a>
     </div>
 
-</div>
+</main>
 </body>
 </html>

@@ -462,7 +462,7 @@ Always blue button + blue text link with arrow. Never two prominent buttons side
 
 - **Label above input**, never beside (better for accessibility and mobile).
 - **12px border-radius** for inputs (matches default card radius).
-- **Focus ring**: 4px tinted glow + colored border. Never a thick outline.
+- **Focus ring**: a 2px accent outline, 2px outside the element, on `:focus-visible` only (one global rule in `core-theme.css`, `--focus-ring-*` tokens). The tinted glow and coloured border can stay as decoration, but they are not the focus indicator: at 8% alpha the glow was invisible to many people (WCAG 2.4.7). Never remove the outline.
 - **Validation**: red text + red border on error, with hint below explaining what to fix.
 
 ---

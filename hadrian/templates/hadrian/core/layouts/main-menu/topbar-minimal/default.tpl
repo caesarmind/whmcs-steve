@@ -16,7 +16,7 @@
         drawer takes over. Nothing to wire.
      5. Branding comes from the same $hadrian.branding slots every shipped
         layout uses, with the same company-name fallback. *}
-<nav class="tbm-bar only-topbar-minimal">
+<nav class="tbm-bar only-topbar-minimal" aria-label="{$hadrianLang.nav.mainMenu}">
     <a class="tbm-brand" href="{$WEB_ROOT}/index.php">
         {if !empty($hadrian.branding.logo.light)}
             <img src="{$hadrian.branding.logo.light}"

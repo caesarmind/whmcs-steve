@@ -128,9 +128,14 @@ return [
     ],
 
     // ---------------------------------------------------------------------
-    // NAV - chrome partials (B08). Landmark a11y names intentionally omitted.
+    // NAV - chrome partials (B08), plus the names screen readers announce for
+    // the page's landmarks and the skip link (docs/accessibility-hadrian-plan.md).
     // ---------------------------------------------------------------------
     'nav' => [
+        'skipToContent'  => 'Skip to main content',
+        'mainMenu'       => 'Main menu',
+        'sidebar'        => 'Sidebar',
+        'breadcrumb'     => 'Breadcrumb',
         'openNavigation' => 'Open navigation',
         'itemsInCart'    => '%s items in cart',
         'configureMenu'  => 'Configure menu...',

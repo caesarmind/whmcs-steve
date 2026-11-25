@@ -21,7 +21,7 @@
     {include file="`$template`/overwrites/footer.tpl"}
 {else}
     {if !$mt_fullPage}
-    </div>{* /.content-area *}
+    </main>{* /#main-content.content-area *}
 
     {* Footer layout dispatch — admin picks one of `core/layouts/footer/*`
        in Addons → Hadrian → Layouts → Footer:
@@ -48,6 +48,8 @@
    covers the full viewport. Opened by [data-locale-open] buttons in the
    footer; JS handler in core-layout.js. *}
 {include file="`$template`/includes/partials/locale-modal.tpl"}
+    {else}
+    </main>{* /#main-content.mt-fullpage-main, opened in header.tpl *}
     {/if}{* end portal chrome close (skipped when fullPage) *}
 
 {* Cookie consent bar — fixed overlay, rendered on every page (incl. cart +

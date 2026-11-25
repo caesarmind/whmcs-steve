@@ -1,7 +1,7 @@
 {
   "note": "Accessibility markup findings accepted for now: file -> rule -> count. Written by `node tests/static/check-a11y-markup.mjs --update`; it may only shrink.",
   "totals": {
-    "literal-name": 35,
+    "literal-name": 33,
     "svg-not-hidden": 965,
     "unlabelled-field": 70,
     "icon-only-control": 9,
@@ -391,11 +391,7 @@
       "unlabelled-field": 1
     },
     "hadrian/templates/hadrian/header.tpl": {
-      "literal-name": 1,
       "svg-not-hidden": 1
-    },
-    "hadrian/templates/hadrian/includes/breadcrumb.tpl": {
-      "literal-name": 1
     },
     "hadrian/templates/hadrian/includes/captcha.tpl": {
       "literal-name": 1

@@ -128,7 +128,7 @@
     {/if}
 {/function}
 
-<nav class="homepage-nav only-top">
+<nav class="homepage-nav only-top" aria-label="{$hadrianLang.nav.mainMenu}">
     <div class="homepage-nav-inner">
         {* Mobile drawer toggle — hidden on desktop; shown <=900px (core-layout.css).
            data-nav-toggle wires it to the shared body.nav-open drawer (core-layout.js);
