@@ -35,6 +35,9 @@ export const PAGES = {
   'banned':                         { status: 'todo', step: 4, needs: 'a banned IP or email that is NOT 127.0.0.1, set and cleared inside one test' },
   'account-paymentmethods-billing-contacts': { status: 'inner', in: 'account-paymentmethods-manage (AJAX fragment; see known-issues.mjs billing-contacts-fragment)' },
 
+  // --- public pages the site owner switches on ------------------------------
+  'accessibility':                  { status: 'todo', step: 4, needs: 'an accessibility.php entry file in the WHMCS root (the site owner creates it from custom-page.php; Hadrian ships none so an unfilled statement never goes live). A fixture could copy one into the local stack.' },
+
   // --- billing ---------------------------------------------------------------
   'usagebillingpricing':            { status: 'local', stub: 'a server module that reports usage metrics (WHMCS Usage Billing)' },
   '3dsecure':                       { status: 'local', stub: 'a card gateway that answers with a 3-D Secure challenge' },

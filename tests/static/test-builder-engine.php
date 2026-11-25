@@ -263,6 +263,15 @@ check('the editor sees a hidden section, marked', str_contains($edit, 'hp-final-
 check('an empty page explains itself to the editor only', str_contains(Renderer::page(Document::blank(), ['annotate' => true] + $ctx), 'class="hb-note"')
     && !str_contains(Renderer::page(Document::blank(), $ctx), 'class="hb-note"'));
 
+// One <h1> per page (WCAG 1.3.1): two heroes, the second announced as level 2.
+$heroes = Renderer::page(['sections' => [
+    ['type' => 'hero-centered', 'props' => ['title' => ['_' => 'First']]],
+    ['type' => 'hero-centered', 'props' => ['title' => ['_' => 'Second']]],
+]], $ctx);
+check('two heroes: one plain h1, the second at aria-level 2',
+    substr_count($heroes, '<h1') === 2 && substr_count($heroes, '<h1 aria-level="2"') === 1 && strpos($heroes, '<h1>First') < strpos($heroes, '<h1 aria-level="2">Second'),
+    substr($heroes, 0, 0));
+
 // Pricing: names and prices come from the catalogue, never from the document.
 $pricing = ['sections' => [['type' => 'pricing-cards', 'props' => ['plans' => [
     ['product' => 7, 'highlight' => true, 'badge' => 'Most popular'],

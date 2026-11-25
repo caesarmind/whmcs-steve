@@ -141,7 +141,16 @@ final class Palette
             $hasLink   = is_string($stored['--color-link'] ?? null) && trim((string)$stored['--color-link']) !== '';
             $hasAccent = is_string($stored['--color-accent'] ?? null) && trim((string)$stored['--color-accent']) !== '';
             if (!$hasLink && $hasAccent) {
-                $p['link'] = $mode === 'light' ? self::shiftLightness($p['accent'], -4.51) : $p['accent'];
+                // Mirrors the theme: darker than the accent in light mode,
+                // lighter in dark so it stays 4.5:1 on raised surfaces.
+                $p['link'] = $mode === 'light' ? self::shiftLightness($p['accent'], -4.51) : self::shiftLightness($p['accent'], 8);
+            }
+            // Ink on the accent: black or white, whichever reads, as the theme
+            // derives it (WCAG 1.4.3). Email clients cannot run the CSS
+            // derivation, so it is worked out here. A buyer's own choice wins.
+            $hasInk = is_string($stored['--color-on-accent'] ?? null) && trim((string)$stored['--color-on-accent']) !== '';
+            if (!$hasInk) {
+                $p['onAccent'] = self::contrast('#000000', $p['accent']) > self::contrast('#ffffff', $p['accent']) ? '#000000' : '#ffffff';
             }
 
             foreach (self::TINTS as $role => $var) {

@@ -208,6 +208,16 @@ Covers 1.3.1, 1.3.5, 3.3.1 to 3.3.4, 4.1.2, plus 3.3.7 and 3.3.8 from WCAG 2.2.
 - Confirm checkout does not ask for the same contact details twice without offering to reuse them.
 - Session timeout (2.2.1). WHMCS ends an idle session without warning, which can lose a half-filled checkout or ticket. Find out what the session lifetime is on a stock install and whether the theme can warn before it ends. If it cannot, this is a listed exception in the conformance report and a line in the operator guide. I have not investigated this yet.
 
+Phase 4 notes (done 2026-11-26):
+
+- Checkout: 33 fields that were labelled by an icon now have a visible text label above them (the string that was their placeholder; WHMCS's own strings for country and the card dates). The icon stays as decoration in a positioned wrapper, so it still sits in the input. Names, email, phone and address carry `autocomplete` tokens; the domain registrant's use a `section-registrant` prefix; the new passwords use `new-password`. Inputs draw a 1px 3:1 border.
+- WHMCS `StatesDropdown.js` swaps the state field for a select at runtime; a helper re-points any label whose field was swapped or hidden at the one visible field in its group.
+- 45 other unlabelled fields got names: 27 from their translated placeholder, the rest from WHMCS strings (DNS host and address, forwarder prefix and target, quantity, registration period, security question, captcha, IDN language). Labels that existed but were not associated (`<label class="form-label">` with no `for`) now are. Static check: unlabelled fields 70 -> 13, icon-only labels 34 -> 0. The 13 left are false positives (labels in an including template, a CSS comment, preview-only demo data, hidden selects WHMCS reads).
+- Errors: login notices, contact, add funds, mass pay, register and checkout error blocks carry `role="alert"` and `data-error-summary`; a helper moves focus to the summary once on load. Success notices are `role="status"`.
+- Choice cards whose input is invisible (cart billing cycle, option radios, apply credit, upgrade plans) draw the focus ring on the card.
+- Captcha image alt and code input use WHMCS's own "Spam Bot Verification" string. The CVV help button is named and its popover image has alt text.
+- Not done: `aria-invalid` and per-field `aria-describedby`. WHMCS returns errors as one list with no field keys, so the summary is the honest place for them. Session timeout (2.2.1): WHMCS ends idle sessions through PHP's own session lifetime and gives templates no hook or remaining-time value, so the theme cannot warn reliably. It goes in the conformance report as a WHMCS limitation, with a note in the operator guide to keep the session lifetime generous.
+
 ### Phase 5: Announcements and motion (M)
 
 Covers 4.1.3, 2.2.2, plus user motion preferences.
@@ -217,6 +227,8 @@ Covers 4.1.3, 2.2.2, plus user motion preferences.
 - Testimonial carousel (`core-theme.js:224-268`): a visible pause button, pause on focus, and no autoplay under `prefers-reduced-motion`.
 - Builder ticker and marquee sections: pause button, static under reduced motion.
 - A global `@media (prefers-reduced-motion: reduce)` block that removes non-essential animation and transitions, and gates `scroll-behavior: smooth`.
+
+Phase 5 notes (done 2026-11-26): one polite live region and `window.hadrianAnnounce(text)` for any script. It speaks the order summary's "total due today" when WHMCS rebuilds it, the domain lookup result, and the result count after a table search or status filter. The sorted column carries `aria-sort`. The testimonial carousel, hero ticker and feature marquee get a Pause/Play button, also stop while hovered or focused, and do not start under `prefers-reduced-motion`; a global reduced-motion rule stops every other animation and smooth scrolling. The ticker's faded words went from 30% to 55% opacity (3:1 for large text). Strings come from a new `a11y` group in the lang file, passed to the scripts by `footer.tpl`.
 
 ### Phase 6: Names, icons, language, structure (M)
 
@@ -231,6 +243,15 @@ Covers 1.1.1, 2.4.4, 2.4.6, 2.5.3, 3.1.2, 1.3.1.
 - Headings: real `<h2>` for checkout sections and dashboard block titles, an h1 on the beacon login, footer column titles demoted from h4 to a level that fits.
 - Remove the `!important` line-height and letter-spacing at `core-layout.css:1926-2037`, then run the text-spacing test.
 - Multiple ways to find a page (2.4.5). The client area has navigation and a knowledgebase search but no site search and no HTML sitemap, and the footer preset's "Sitemap" link points at `#`. The sitemap generator already knows every public page, so an HTML sitemap page is the cheap answer.
+
+Phase 6 notes (done 2026-11-26):
+
+- A codemod hid 1,046 decorative icons in 137 templates (`aria-hidden="true" focusable="false"` on inline SVGs, `aria-hidden` on Font Awesome `<i>`), skipping `<script>` blocks. Static check: unhidden SVGs 965 -> 23, all inside scripts.
+- Named the icon-only controls (store carousel arrows and dots, the cart summary's remove links). Moved translatable English names into the lang file (`a11y` group) and the crumb's page labels onto WHMCS's own strings. What is left in the static `literal-name` count (18) is brand names, preview-only chips and two dead templates.
+- Heading levels: footer and mega-menu column titles are announced at level 2, homepage feature items and the checkout's sub-headings at level 3; the beacon login and the missing-ticket state got an `<h1>`.
+- Language picker entries carry their own `lang`, from the BCP-47 map the hreflang code already had.
+- An unnamed `<form role="form">` and a `<footer>` nested inside `<main>` on the cart pages stopped being landmarks.
+- Not changed: the `!important` line-height and letter-spacing rules in `core-layout.css`. They do not block WCAG 1.4.12: a user style sheet's `!important` outranks an author's, and the test bookmarklets use inline `!important`, which also wins. Scroll containers: current Chrome and Firefox make scrollable regions keyboard-focusable themselves, and axe's scrollable-region rule found nothing. Row actions still read "Manage" without the row's name.
 
 ### Phase 7: WCAG 2.2 additions (S)
 
@@ -251,6 +272,16 @@ Covers 1.1.1, 2.4.4, 2.4.6, 2.5.3, 3.1.2, 1.3.1.
 - A small Accessibility group in Settings, added through `SettingsController::FLAGS` and `FLAG_GROUPS`. Candidates: underline all links, and a site-wide reduced-motion override. Each new flag needs documentation or `check-settings-doc-coverage.php` fails.
 - A documentation chapter in `hadrian-documentation/content/client-theme/` with what the theme covers, what stays the operator's job (logo and image alt text, colour choices, third-party modules, gateways, captcha choice, the statement) and a pre-launch checklist.
 - A published conformance report in VPAT 2.5 EU format, updated per release.
+
+Phase 8 and 9 notes (done 2026-11-26):
+
+- Page Builder: a page keeps one `<h1>`; any later hero heading is announced at level 2 (`aria-level`, so its styling stays). Covered by a new check in `test-builder-engine.php`. Every builder image field already had an alt text box; empty means decorative.
+- Email: the palette works out the ink on accent buttons (black or white) the way the theme does, since email clients cannot run the CSS derivation, and dark-mode links get the same lift. Layout tables already carried `role="presentation"` and images their alt text.
+- Documentation site: it already had a skip link, landmarks and focus rings; its copy of the theme tokens carried the old greys, so `docs.css` overrides them.
+- PDF invoices: WHMCS renders them with TCPDF, which writes no tags. The statement page and the docs say the HTML invoice is the accessible version.
+- Accessibility statement: a new `accessibility` page (Page Manager group Public) with the Annex V content written in the lang file and seven options for what only the site owner knows (status, limitations, method, contact email, enforcement body, dates). Hadrian does not ship the root `accessibility.php` entry file, so a statement still holding default answers never goes live by itself; the docs say how to create it.
+- Docs: a new chapter, `client-theme/10-accessibility.md`, covering what the theme does, what stays the owner's job, publishing the statement and a pre-launch checklist.
+- Not built: an Accessibility settings group. Links in running text are already underlined and reduced motion follows the visitor's own device setting, so neither toggle the plan proposed earns its place. The admin colour panel's contrast warning is still not built (its files carry other uncommitted work).
 
 ### Phase 10: Sign-off (M)
 

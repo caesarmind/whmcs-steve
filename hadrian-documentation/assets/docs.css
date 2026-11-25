@@ -671,3 +671,18 @@ body {
   .doc-topbar, .doc-rail, .doc-sidebar, .doc-toc, .doc-pager, .doc-scrim { display: none; }
   .doc-main { max-width: none; padding: 0; }
 }
+
+/* Text greys from the theme (WCAG 1.4.3). apple-theme.css is the design
+   prototype's copy and still carries the old values (tertiary #86868b was
+   3.6:1, quaternary 2.2:1). The docs are product documentation, which
+   EN 301 549 clause 12.1 holds to the same standard. */
+:root {
+  --color-text-secondary: #636368;
+  --color-text-tertiary: #6e6e73;
+  --color-text-quaternary: #737378;
+}
+[data-theme="dark"] {
+  --color-text-secondary: #b8b8bd;
+  --color-text-tertiary: #a6a6ab;
+  --color-text-quaternary: #9a9a9f;
+}

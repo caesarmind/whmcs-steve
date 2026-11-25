@@ -53,16 +53,34 @@ final class Renderer
         $ctx  = self::context($ctx);
         $doc  = Document::normalize($doc, $ctx['languages']);
         $html = '';
+        $seenH1 = false;
         foreach ($doc['sections'] as $section) {
             if ($section['hidden'] && !$ctx['annotate']) {
                 continue;
             }
-            $html .= self::section($section, $ctx);
+            $html .= self::oneH1(self::section($section, $ctx), $seenH1);
         }
         if ($html === '' && $ctx['annotate']) {
             $html = '<div class="hb-note">This page has no sections yet. Add one from the list on the left.</div>';
         }
         return '<style>' . self::CSS . '</style><div class="hb-page">' . $html . '</div>';
+    }
+
+    /**
+     * One <h1> per page (WCAG 1.3.1, 2.4.6). Every hero section opens with
+     * one, so a page with two heroes had two. The first stays; any later
+     * <h1> is announced as a level-2 heading. aria-level, not a different
+     * tag, so the section keeps the h1 styling its CSS is written for.
+     */
+    private static function oneH1(string $html, bool &$seenH1): string
+    {
+        return (string)preg_replace_callback('~<h1\b([^>]*)>~i', static function (array $m) use (&$seenH1): string {
+            if (!$seenH1) {
+                $seenH1 = true;
+                return $m[0];
+            }
+            return stripos($m[1], 'aria-level') !== false ? $m[0] : '<h1 aria-level="2"' . $m[1] . '>';
+        }, $html);
     }
 
     /**
