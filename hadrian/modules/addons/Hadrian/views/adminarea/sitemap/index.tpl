@@ -121,6 +121,7 @@
     <p class="mt-row-help">
         {if $lastGenerated}Last written: <strong>{$lastGenerated|escape}</strong>.{else}Not generated yet.{/if}
         Saving the settings above also regenerates the files.
+        After that they are kept up to date for you: when a page is saved in Pages, when an announcement is saved, and once a day with the WHMCS cron.
     </p>
     <div style="display:flex; gap:8px; flex-wrap:wrap;">
         <a class="mt-btn mt-btn-primary mt-btn-sm" href="?module=Hadrian&action=sitemap&sub=generate&amp;token={$csrfToken|escape:'url'}">Generate now</a>

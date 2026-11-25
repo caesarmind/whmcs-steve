@@ -82,6 +82,59 @@ final class SitemapGenerator
     }
 
     /**
+     * Bring the files up to date after something they list has changed: a
+     * page saved in Pages, a module's page published or removed, an
+     * announcement added, the daily cron.
+     *
+     * It only maintains files this site already keeps: nothing is written
+     * until an admin has saved the Sitemap settings or generated the files
+     * once. A file is rewritten only when its content would differ, so
+     * calling this often costs a few queries and no disk writes. Never
+     * throws: the change that triggered it is already saved.
+     *
+     * @return bool whether a file was rewritten
+     */
+    public static function refresh(string $template): bool
+    {
+        if (!defined('ROOTDIR') || $template === '') {
+            return false;
+        }
+        try {
+            $self      = new self();
+            $cfg       = self::config();
+            $sitemap   = ROOTDIR . '/sitemap.xml';
+            $robots    = ROOTDIR . '/robots.txt';
+            $oldXml    = is_file($sitemap) ? (string)@file_get_contents($sitemap) : '';
+            $oldRobots = is_file($robots) ? (string)@file_get_contents($robots) : '';
+
+            $configured = is_array(Settings::getValue(self::SETTING, null));
+            $ours       = strpos($oldXml, self::MARK_START) !== false || strpos($oldRobots, self::MARK_START) !== false;
+            if (!$configured && !$ours) {
+                return false;
+            }
+
+            $wrote = false;
+            // Switched off: only an old block of ours is left to take out.
+            if (!empty($cfg['enabled']) || strpos($oldXml, self::MARK_START) !== false) {
+                $xml = $self->buildSitemap($template, $cfg);
+                if ($xml !== $oldXml && @file_put_contents($sitemap, $xml) !== false) {
+                    $wrote = true;
+                }
+            }
+            if (!empty($cfg['robots'])) {
+                $txt = $self->buildRobots($template);
+                if ($txt !== $oldRobots && @file_put_contents($robots, $txt) !== false) {
+                    $wrote = true;
+                }
+            }
+            return $wrote;
+        } catch (\Throwable $e) {
+            error_log('Hadrian sitemap: refresh skipped: ' . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
      * Build the sitemap XML (no file writes — safe for the admin Preview). Any
      * existing sitemap.xml is reused with the previous hadrian block stripped,
      * so non-theme <url> entries survive.
@@ -112,10 +165,11 @@ final class SitemapGenerator
         // try/catch so an API/schema difference on some install can't abort the
         // whole sitemap (this theme ships to many WHMCS versions).
 
-        // Product groups.
+        // Product groups. A hidden group is one the store does not list: it
+        // is reached by direct link only, so it is not advertised here.
         if (!empty($cfg['productGroups']) && class_exists('\\WHMCS\\Product\\Group')) {
             try {
-                foreach (\WHMCS\Product\Group::get() as $group) {
+                foreach (\WHMCS\Product\Group::where('hidden', 0)->get() as $group) {
                     $urlset->appendChild($this->urlNode($xml, $base . '/' . ltrim((string)$group->getRoutePath(), '/'), $freq, '0.6'));
                 }
             } catch (\Throwable $e) {
@@ -138,11 +192,23 @@ final class SitemapGenerator
         // Knowledge base categories + public articles.
         if (!empty($cfg['knowledgebase']) && function_exists('routePath')) {
             try {
-                foreach (\WHMCS\Database\Capsule::table('tblknowledgebasecats')->where('hidden', '')->orWhere('hidden', 0)->get() as $cat) {
+                // WHMCS keeps a category's and an article's translations as
+                // rows of their own (catid / parentid = the original). They
+                // are the same page in another language, not pages with an
+                // address, so only the original is listed.
+                $cats = \WHMCS\Database\Capsule::table('tblknowledgebasecats')
+                    ->where(self::flagOff('hidden'))
+                    ->where(static function ($q) { $q->where('catid', 0)->orWhereNull('catid'); })
+                    ->get();
+                foreach ($cats as $cat) {
                     $path = routePath('knowledgebase-category-view', $cat->id, self::friendly((string)$cat->name));
                     $urlset->appendChild($this->urlNode($xml, $base . '/' . ltrim((string)$path, '/'), $freq, '0.5'));
                 }
-                foreach (\WHMCS\Database\Capsule::table('tblknowledgebase')->where('private', '')->orWhere('private', 0)->get() as $art) {
+                $articles = \WHMCS\Database\Capsule::table('tblknowledgebase')
+                    ->where(self::flagOff('private'))
+                    ->where(static function ($q) { $q->where('parentid', 0)->orWhereNull('parentid'); })
+                    ->get();
+                foreach ($articles as $art) {
                     $path = routePath('knowledgebase-article-view', $art->id, self::friendly((string)$art->title));
                     $urlset->appendChild($this->urlNode($xml, $base . '/' . ltrim((string)$path, '/'), $freq, '0.5'));
                 }
@@ -154,7 +220,7 @@ final class SitemapGenerator
         // Download categories.
         if (!empty($cfg['downloads']) && function_exists('routePath')) {
             try {
-                foreach (\WHMCS\Database\Capsule::table('tbldownloadcats')->where('hidden', '')->orWhere('hidden', 0)->get() as $dc) {
+                foreach (\WHMCS\Database\Capsule::table('tbldownloadcats')->where(self::flagOff('hidden'))->get() as $dc) {
                     $path = routePath('download-by-cat', $dc->id, self::friendly((string)$dc->name));
                     $urlset->appendChild($this->urlNode($xml, $base . '/' . ltrim((string)$path, '/'), $freq, '0.4'));
                 }
@@ -279,6 +345,20 @@ final class SitemapGenerator
         $scheme = (string)($_SERVER['REQUEST_SCHEME'] ?? ($https ? 'https' : 'http'));
         $host   = (string)($_SERVER['HTTP_HOST'] ?? '');
         return $host !== '' ? $scheme . '://' . $host : '';
+    }
+
+    /**
+     * A WHMCS on/off column that is off. Some of these are text columns
+     * holding 'on' or '' and some are tinyint, so both spellings of "off" are
+     * accepted, and both are compared as STRINGS: `private = 0` asks MySQL to
+     * read the text as a number, 'on' reads as 0, and every private article
+     * and hidden category would match.
+     */
+    private static function flagOff(string $column): \Closure
+    {
+        return static function ($q) use ($column): void {
+            $q->where($column, '')->orWhere($column, '0');
+        };
     }
 
     private static function friendly(string $s): string

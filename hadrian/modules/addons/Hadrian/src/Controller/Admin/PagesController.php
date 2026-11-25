@@ -531,6 +531,10 @@ final class PagesController extends AbstractController
             ],
         ]);
 
+        // The address, indexing and visibility decide whether the page is in
+        // sitemap.xml and robots.txt: keep those files in step with the save.
+        \Hadrian\Service\SitemapGenerator::refresh($template->getName());
+
         $this->redirect('?module=Hadrian&action=pages&sub=edit&page=' . urlencode($page) . '&flash=saved');
     }
 
