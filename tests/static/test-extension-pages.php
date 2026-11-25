@@ -41,12 +41,14 @@ namespace {
          'editUrl' => '?module=Demo&action=edit&id=12', 'seoTitle' => 'ignored by the builder', 'seoDescription' => 'Fast WordPress.', 'replaces' => 'homepage'],
         ['id' => 13, 'name' => 'Coming soon', 'url' => '', 'live' => false],
         ['id' => 14, 'name' => 'Standby', 'url' => 'standby', 'live' => false, 'replaces' => 'contact'],
+        ['id' => 15, 'name' => 'Pricing', 'url' => 'pricing', 'live' => true, 'status' => 'Standby for Announcements, waiting for the site to switch', 'tone' => 'neutral', 'standby' => 'announcements'],
     ];
     $module = static function (array $over = []) use (&$rows, &$calls): array {
         return $over + [
             'id' => 'demo', 'prefix' => 'built', 'label' => 'Demo Builder', 'group' => 'Built',
             'createUrl' => '?module=Demo&action=create', 'createLabel' => 'Create page', 'createPlaceholder' => 'New page',
             'panel' => static fn (): string => '<div id="demo-panel">site switch</div>',
+            'headerPanel' => static fn (): string => '<div id="demo-header">served by</div>',
             'pagePanel' => static fn (int $id): string => '<div id="demo-page">page ' . $id . '</div>',
             'contentPanel' => static fn (int $id): string => '<div id="demo-content">sections of ' . $id . '</div>',
             'provider' => static function () use (&$rows, &$calls): array { $calls++; return $rows; },
@@ -72,7 +74,7 @@ namespace {
     same('and no provider has been called yet', $calls, 0);
     same('its group says where a page is made, and carries the module\'s own panel', X::groups(), ['Built' => [
         'label' => 'Demo Builder', 'createUrl' => '?module=Demo&action=create', 'createLabel' => 'Create page', 'createPlaceholder' => 'New page',
-        'panelHtml' => '<div id="demo-panel">site switch</div>',
+        'panelHtml' => '<div id="demo-panel">site switch</div>', 'headerHtml' => '<div id="demo-header">served by</div>',
     ]]);
 
     // ------------------------------------------------------------------
@@ -83,16 +85,18 @@ namespace {
     // ------------------------------------------------------------------
     $section = 'pages';
     $all = X::all();
-    same('one entry per page, keyed', array_keys($all), ['built-12', 'built-13', 'built-14']);
+    same('one entry per page, keyed', array_keys($all), ['built-12', 'built-13', 'built-14', 'built-15']);
     same('asked once however often it is read', [X::all() === $all, X::meta('built-12') === $all['built-12'], $calls], [true, true, 1]);
 
     $p = $all['built-12'];
     same('it reads like a theme page', [$p['display_name'], $p['group'], $p['type'], $p['description'], $p['listDisplay'], $p['supportedOptions'], $p['area']], ['WordPress hosting', 'Built', 'extension', '/wordpress', true, [], 'website']);
     same('its address is a path from the site root', $p['url'], 'wordpress');
     same('its description is a fallback for SEO', $p['seoDefaults'], ['title' => 'ignored by the builder', 'description' => 'Fast WordPress.']);
-    same('the module is named, with where the content is edited', $p['extension'], ['id' => 'demo', 'label' => 'Demo Builder', 'live' => true, 'status' => 'Published', 'editUrl' => '?module=Demo&action=edit&id=12', 'replaces' => 'homepage']);
+    same('the module is named, with where the content is edited', $p['extension'], ['id' => 'demo', 'label' => 'Demo Builder', 'live' => true, 'status' => 'Published', 'tone' => 'success', 'editUrl' => '?module=Demo&action=edit&id=12', 'replaces' => 'homepage']);
 
     same('a page with no address has no url key', [array_key_exists('url', $all['built-13']), $all['built-13']['extension']['live'], $all['built-13']['extension']['status']], [false, false, 'Draft']);
+    same('with no tone given, live reads green and not live amber', [$all['built-12']['extension']['tone'], $all['built-13']['extension']['tone']], ['success', 'warning']);
+    same('a tone and a longer status are kept, cut at 40', [$all['built-15']['extension']['tone'], $all['built-15']['extension']['status']], ['neutral', 'Standby for Announcements, waiting for t']);
     same('an unknown page has no meta', [X::meta('built-99'), X::meta('other-12'), X::meta('homepage')], [[], [], []]);
 
     // ------------------------------------------------------------------
@@ -107,6 +111,9 @@ namespace {
     same('a live replacement is noted on the page it replaces', X::notesFor('homepage'), ['Replaced by WordPress hosting']);
     same('one on standby is not', [X::notesFor('contact'), array_key_exists('replaces', $all['built-14']['extension'])], [[], false]);
     same('other pages have none', X::notesFor('login'), []);
+    same('with the colour each is shown in', X::noteBadges('homepage'), [['text' => 'Replaced by WordPress hosting', 'tone' => 'primary']]);
+    same('a live page on standby is noted in grey', X::noteBadges('announcements'), [['text' => 'Pricing on standby', 'tone' => 'neutral']]);
+    same('and does not claim to replace it', array_key_exists('replaces', $all['built-15']['extension']), false);
 
     // ------------------------------------------------------------------
     $section = 'which page a request is drawing';
@@ -120,7 +127,7 @@ namespace {
     // ------------------------------------------------------------------
     $section = 'what a module cannot do';
     $rows = [
-        ['id' => 1, 'name' => 'A', 'url' => 'https://evil.example/x', 'editUrl' => 'https://evil.example/', 'live' => true, 'replaces' => '../../x'],
+        ['id' => 1, 'name' => 'A', 'url' => 'https://evil.example/x', 'editUrl' => 'https://evil.example/', 'live' => true, 'replaces' => '../../x', 'tone' => 'x" onclick="y', 'standby' => '../y'],
         ['id' => 2, 'name' => 'B', 'url' => '../admin/x', 'editUrl' => 'javascript:alert(1)'],
         ['id' => 3, 'name' => 'C', 'url' => 'ok/path-1', 'editUrl' => '?module=Demo&action=edit&id=3"><script>'],
         ['id' => 0, 'name' => 'no id'],
@@ -136,6 +143,8 @@ namespace {
     same('an edit link that leaves the admin is no link', [$all['built-1']['extension']['editUrl'], $all['built-2']['extension']['editUrl'], $all['built-3']['extension']['editUrl']], ['', '', '']);
     same('a replaced page that is not a page name is no note', [X::notesFor('../../x'), isset($all['built-1']['extension']['replaces'])], [[], false]);
     same('a long name is cut', strlen($all['built-5']['display_name']), 120);
+    same('a tone not on the list is the default', $all['built-1']['extension']['tone'], 'success');
+    same('a standby page that is not a page name is no note', X::noteBadges('../y'), []);
 
     X::register($module(['id' => 'broken', 'prefix' => 'boom', 'label' => 'Broken', 'group' => 'Broken', 'provider' => static function (): array { throw new \RuntimeException('down'); }]));
     $logTo = ini_set('error_log', PHP_OS_FAMILY === 'Windows' ? 'NUL' : '/dev/null');

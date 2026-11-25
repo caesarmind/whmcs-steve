@@ -64,6 +64,8 @@ Bridge::registerPages([
     'createLabel' => 'Create page',
     'createPlaceholder' => 'New page, for example: WordPress hosting',
     'panel'     => [SitePages::class, 'groupPanel'],
+    // "Website served by", in the header of Pages: it changes the whole site.
+    'headerPanel' => [SitePages::class, 'headerPanel'],
     'pagePanel' => [SitePages::class, 'pagePanel'],
     // The page's sections as a list, at the top of its settings in Pages:
     // add, reorder and edit them without opening the visual editor.

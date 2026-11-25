@@ -84,17 +84,30 @@ final class PagesController extends AbstractController
             }
             $group   = (string)($meta['group'] ?? 'Other');
             $allGroups[$group] = true;
+            $ext     = is_array($meta['extension'] ?? null) ? $meta['extension'] : null;
 
             $options = $this->readPageOptions($template, $page, $meta);
             $variant = $options['variant'];
 
-            // Public URL for the "Open" link. Resolved from data we already
-            // have in $options, so no extra query per row.
+            // Public URL for the address column. Resolved from data we
+            // already have in $options, so no extra query per row.
             $public = PageUrlResolver::resolve(
                 $page,
                 (string)($options['url'] ?? ''),
                 (string)($options['visibility'] ?? 'public')
             );
+
+            // The templates this page offers, and the one it uses.
+            $variants      = $ext === null ? $template->getPageVariants($page) : [];
+            $templateNames = array_values(array_map(static fn (array $v): string => (string)$v['label'], $variants));
+            $templateLabel = ucfirst(str_replace(['-', '_'], ' ', $variant));
+            foreach ($variants as $v) {
+                if ($v['name'] === $variant) {
+                    $templateLabel = (string)$v['label'];
+                }
+            }
+
+            $area = PageArea::forPage($page, $group === 'Order Process', $meta, $options['area']);
 
             $rows[] = [
                 'name'         => $page,
@@ -102,64 +115,104 @@ final class PagesController extends AbstractController
                 'group'        => $group,
                 'description'  => (string)($meta['description'] ?? ''),
                 'variant'      => $variant,
-                // An extension page has no theme template: the column names
-                // the module that draws it instead.
-                'variantLabel' => is_array($meta['extension'] ?? null)
-                    ? (string)$meta['extension']['label']
-                    : ucfirst(str_replace(['-', '_'], ' ', $variant)),
-                'hasSeo'       => $options['hasSeo'],
-                'indexing'     => $options['indexing'],
+                'area'         => $area,
+                'templateLabel' => $templateLabel,
+                'templateCount' => count($templateNames),
+                'templateNames' => implode(', ', $templateNames),
+                // What the admin set that differs from the theme's shipped
+                // page, as badges. Drives the "Changed by you" view.
+                'changes'      => self::changesFor($options, $meta, $templateLabel),
                 'visibility'   => $options['visibility'],
                 'publicUrl'    => $public['url'],
                 'publicReason' => $public['reason'],
+                // The address as a path, for reading: no scheme or host.
+                // A built page that is not live yet still has one to show.
+                'address'      => $public['url'] !== ''
+                    ? (string)preg_replace('~^https?://[^/]+~i', '', $public['url'])
+                    : ($ext !== null && (string)($meta['url'] ?? '') !== '' ? '/' . ltrim((string)$meta['url'], '/') : ''),
                 // Filtered behind a toggle in the list, never dropped.
                 'isSystem'     => in_array($page, self::SYSTEM_PAGES, true),
                 // A page an extension module owns: where its content is
                 // edited and whether it is live. Null for a theme page.
-                'extension'    => is_array($meta['extension'] ?? null) ? $meta['extension'] : null,
+                'extension'    => $ext,
                 // What extensions say about this theme page ("Replaced by ...").
-                'notes'        => ExtensionPages::notesFor($page),
+                'notes'        => ExtensionPages::noteBadges($page),
             ];
         }
 
-        // An extension module's tab is listed even with no pages in it:
-        // that is where its first page is made.
-        foreach (array_keys(ExtensionPages::groups()) as $extensionGroup) {
-            $allGroups[$extensionGroup] = true;
-        }
+        usort($rows, static fn (array $a, array $b): int => strcasecmp($a['label'], $b['label']));
 
+        // Group labels for the list, in the canonical order. A module's group
+        // reads as "Built pages", the theme's as they are named.
+        $extensionGroups = ExtensionPages::groups();
         $groups = array_keys($allGroups);
         usort($groups, function ($a, $b) {
             $oa = $this->groupOrder($a);
             $ob = $this->groupOrder($b);
             return $oa === $ob ? strcmp($a, $b) : $oa <=> $ob;
         });
+        $groupLabels = [];
+        foreach ($groups as $g) {
+            $groupLabels[$g] = isset($extensionGroups[$g]) ? $g . ' pages' : $g;
+        }
 
-        // Bucket rows by group and sort each bucket alphabetically by label.
-        // Tab switching is now client-side (no server-side filtering) so every
-        // bucket is rendered once and shown/hidden by the inline script.
-        $pagesByGroup = array_fill_keys($groups, []);
+        $areaCounts = array_fill_keys(array_keys(PageArea::LABELS), 0);
         foreach ($rows as $r) {
-            $g = (string)($r['group'] ?? 'Other');
-            if (!isset($pagesByGroup[$g])) $pagesByGroup[$g] = [];
-            $pagesByGroup[$g][] = $r;
+            $areaCounts[$r['area']]++;
         }
-        foreach ($pagesByGroup as &$bucket) {
-            usort($bucket, fn ($a, $b) => strcmp($a['label'], $b['label']));
-        }
-        unset($bucket);
 
         return $this->view('pages/index', [
-            'groups'       => $groups,
-            'pagesByGroup' => $pagesByGroup,
-            // Groups that belong to an extension module, with the link to
-            // where its pages are made (see Helpers\ExtensionPages).
-            'extensionGroups' => ExtensionPages::groups(),
+            'pages'        => $rows,
+            'groupLabels'  => $groupLabels,
+            'areas'        => PageArea::LABELS,
+            'areaHelp'     => PageArea::HELP,
+            'areaCounts'   => $areaCounts,
+            // Modules that add pages, with where their pages are made and
+            // their own controls (see Helpers\ExtensionPages).
+            'extensionGroups' => $extensionGroups,
             'totalCount'   => count($rows),
             'systemCount'  => count(array_filter($rows, static fn (array $r): bool => !empty($r['isSystem']))),
             'flashMsg'     => (string)($_GET['flash'] ?? ''),
             ...self::extensionFlash(),
         ]);
+    }
+
+    /**
+     * What an admin has changed on a page, against what the theme ships, as
+     * [kind, text] pairs for the list's badges. Only the admin's own choices
+     * count: SEO text the page ships with, or a page the theme already keeps
+     * out of search, is not a change.
+     *
+     * @param array<string,mixed> $options readPageOptions()
+     * @param array<string,mixed> $meta    the page's page.php
+     * @return list<array{0:string, 1:string}>
+     */
+    private static function changesFor(array $options, array $meta, string $templateLabel): array
+    {
+        $out = [];
+        $default = (string)($meta['defaultVariant'] ?? 'default');
+        if ($options['variantStored'] !== '' && $options['variantStored'] !== $default) {
+            $out[] = ['template', 'Template: ' . $templateLabel];
+        }
+        if ($options['seoSet']) {
+            $out[] = ['seo', 'SEO'];
+        }
+        if ($options['visibility'] === 'auth') {
+            $out[] = ['auth', 'Signed-in only'];
+        } elseif ($options['visibility'] === 'disabled') {
+            $out[] = ['off', 'Disabled'];
+        }
+        $shipped = (string)($meta['seoDefaults']['indexing'] ?? 'inherit');
+        if ($options['indexing'] === 'disallow' && $shipped !== 'disallow') {
+            $out[] = ['noindex', 'Hidden from search'];
+        }
+        if (!empty($options['layout_overrides']['main-menu']) || !empty($options['layout_overrides']['footer'])) {
+            $out[] = ['layout', 'Own layout'];
+        }
+        if ($options['area'] !== '') {
+            $out[] = ['area', 'Moved to ' . PageArea::LABELS[$options['area']]];
+        }
+        return $out;
     }
 
     /**
@@ -828,6 +881,10 @@ final class PagesController extends AbstractController
 
         $titleFields = self::seoFieldMap($row['seo_title'] ?? null, $langs);
         $descFields  = self::seoFieldMap($row['seo_description'] ?? null, $langs);
+        // Read before the shipped defaults are filled in below: did the
+        // admin set any SEO of their own?
+        $seoSet = trim(implode('', $titleFields)) !== '' || trim(implode('', $descFields)) !== ''
+            || trim((string)($row['seo_image'] ?? '')) !== '';
         // Pre-fill the default-language field with the page seoDefault when the
         // admin hasn't set anything in any language.
         if (trim(implode('', $titleFields)) === '' && (string)($seoDefaults['title'] ?? '') !== '') {
@@ -856,6 +913,9 @@ final class PagesController extends AbstractController
         return [
             'variant'    => $storedVariant !== ''
                 ? $storedVariant : (string)($meta['defaultVariant'] ?? 'default'),
+            // The variant the admin picked, '' when the page is on its default.
+            'variantStored' => $storedVariant,
+            'seoSet'     => $seoSet,
             'url'        => (string)($row['url'] ?? ''),
             'indexing'   => (string)($row['indexing'] ?? $seoDefaults['indexing'] ?? 'inherit'),
             'visibility' => (string)($row['visibility'] ?? 'public'),

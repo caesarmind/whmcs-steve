@@ -27,52 +27,55 @@ overwrites them.
 
 ## The page list
 
-The list opens on **All**. The tabs across the top are the page's own group,
-declared by the theme, with a count beside each one.
+The list opens on **All pages**: every page, one line each, grouped by the
+part of the site it belongs to. The rail on the left narrows it.
 
-:::shot img/pm-list-filters.png Search, the system-page toggle and the group tabs.
+:::shot img/pm-list-filters.png The rail, the search and the start of the list.
 
-| Control | What it does |
+| In the rail | Shows |
 | --- | --- |
-| Search pages | Filters on page name, description, slug and template as you type, within the tab you are on. Stay on **All** to search everything. |
-| Show N system pages | Reveals pages you never navigate to - wizard sub-steps, partials another page includes, and the error states WHMCS renders instead of what you asked for. |
-| Group tabs | Public, Authentication, Client Area, Account, Billing, Support, Shop, Order Process, and Built when the Page Builder is installed. Each count updates to match what is actually on screen. |
+| **Area** | All pages, or only the Website, the Client area or the Order process. Inside one area the list is grouped by the page's own group: Billing, Support, Built pages and so on. These are the same areas [Layout Manager](/client-theme/layout-manager/#by-visitor-or-by-area) and [Menu Manager](/client-theme/menu-manager/#menus-by-area) use. |
+| **Changed by you** | Only the pages where you set something of your own: a template, SEO, visibility, indexing, an area or a layout. A good place to see what you have done to the theme. |
+| **With templates** | Only the pages that offer more than one template. Each row names the template it uses and how many there are; hover that to see their names. |
+| **Built with Page Builder** | Only the pages you made with the Page Builder, when it is installed. |
+| **System pages** | Reveals pages you never navigate to: wizard sub-steps, parts another page includes, and the error states WHMCS shows instead of what you asked for. |
+
+The search above the list matches a page's name, description and address as you
+type, inside the view you are on. Go back to **All pages** to search everything.
 
 System pages are hidden rather than dropped. A 2FA challenge or an upgrade
 summary is a page a visitor really sees, so you can still give it a layout
-override or a `noindex` - tick the box and it appears in its group. Searching for
-one by name finds it whether the box is ticked or not.
+override or a `noindex`: switch them on and they join the list. Searching for one
+by name finds it whether the switch is on or not.
 
 ### What a row tells you
 
-:::shot img/pm-list-rows.png One group card. Every row is a page; click anywhere on it to open the editor.
+:::shot img/pm-list-rows.png Rows of the list. Click anywhere on a row to open that page's settings.
 
 | Column | Shows |
 | --- | --- |
-| Page | The page's display name and one line describing it. |
-| Variant | Which template is currently rendering it. |
-| SEO | A blue **SEO** badge when that page has a title or description; a dash when it has neither. A few pages ship with theme-written defaults, so they carry the badge before you touch them. |
-| Indexing | **Allow** (green), **Disallow** (amber) or **Inherit** (grey). |
-| Visibility | **Public** (green), **Auth only** (blue) or **Disabled** (amber). |
-| Open | Opens the live page in a new tab, when the page has a public URL set. |
+| Page | The page's name. Hover the small *i* for one line on what it is. Pages made with the Page Builder carry a **Built** tag. |
+| Address | Where the page lives on your site. Click it to open the live page in a new tab. *No direct address* means the page is only reached as a step, or needs a record such as an invoice. |
+| Changed | A badge for each thing you changed: **Template: ...**, **SEO**, **Signed-in only**, **Disabled**, **Hidden from search**, **Own layout** or **Moved to ...**. Empty means the page is as the theme ships it. |
+| **Manage** | Opens the page's settings, as clicking the row does. |
 
 Order Process pages - Products, Configure Product, View Cart, Checkout and the
-rest of the order form - get their own tab. They take SEO, visibility, sub-nav
-and layout overrides like any other page; they simply have no alternative
-templates to choose from, because the order form renders from its own template.
+rest of the order form - take SEO, visibility, sub-nav and layout overrides like
+any other page. They simply have no alternative templates to choose from,
+because the order form renders from its own template.
 
 ### Pages made with the Page Builder
 
-With the Page Builder module installed, the pages you build live here too, on a **Built** tab. The builder has no list of its own: this is where a built page is made, found, configured and deleted.
+With the Page Builder module installed, the pages you build live here too. The builder has no list of its own: this is where a built page is made, found, configured and deleted.
 
-| On the Built tab | What it does |
+| Control | What it does |
 | --- | --- |
-| The name field and **Create page** | Makes a new page and opens it in the builder's editor. It starts as a draft. |
-| **Website served by** | Theme or Page Builder. On Page Builder, a theme page that has a built replacement shows the replacement. |
+| **Add page** | In the header. Name the page and it opens in the builder's editor, as a draft. |
+| **Website served by** | In the header: Theme or Page Builder. On Page Builder, a theme page that has a built replacement shows the replacement. It changes the live site at once, so it asks first and lists the pages that will change. |
 | A row | Opens that page's settings, the same editor every page has. |
 | **Edit content** | Opens the page in the builder, to work on its sections and its address. |
 
-A built page takes the same settings as any page: SEO, indexing, visibility, area and a layout of its own. The sitemap lists it while it is published and public. The Variant column shows whether it is a draft, published, or serving in place of a theme page.
+A built page takes the same settings as any page: SEO, indexing, visibility, area and a layout of its own. The sitemap lists it while it is published and public. Its row says where it stands: **Draft**, **Published**, **Serving as Homepage** while it stands in for a theme page, or **Standby for Homepage** while it is set to and the site is on the theme.
 
 At the top of a built page's settings is a **Content** list: the page's sections, top to bottom, for when you would rather fill in fields than work on the page itself. It edits the same draft as the builder's visual editor, so a change made in one shows in the other.
 
@@ -95,7 +98,7 @@ At the foot of a built page's settings is a **Page Builder** panel with the two 
 - **Replaces** lets the page stand in for one of the theme's website pages: Homepage, Announcements, Knowledgebase or Contact Us. *Follow site* uses it while the website is served by Page Builder, *Always* uses it whatever the site says, and *Never* keeps it on standby.
 - **Delete page** removes the page, its sections and its settings.
 
-If a built page is standing in for a theme page, that theme page's row says so: *Replaced by ...* next to its name.
+The theme page says so too, in its Changed column: *Replaced by ...* while the built page is serving, *... on standby* while it waits.
 
 Clicking a row opens that page's editor. Everything from here down is one page's
 settings; **Back to Pages** returns to the list, **View page** opens the live

@@ -67,10 +67,11 @@ const addSection = async (page, label) => {
 const layers = page => page.locator('#hbx-layersbtn').click();
 const sectionTypes = page => page.evaluate(() => window.hbBuilder.state.doc.sections.map(s => s.type));
 
-/** Make a page from the Built tab of Pages and land in its editor. Returns its id. */
+/** Make a page with Add page in Pages and land in its editor. Returns its id. */
 async function createPage(page, name) {
   await page.goto(PAGES);
-  const form = page.locator('[data-group-panel="Built"] [data-group-create]');
+  await page.locator('[data-add-page]').click();
+  const form = page.locator('[data-group-create]');
   await form.locator('input[name="name"]').fill(name);
   await form.getByRole('button', { name: 'Create page' }).click();
   await expect(page.locator('#hbx')).toBeVisible();
@@ -110,13 +111,12 @@ test('it is its own module, and it plugs into the Hadrian admin', async ({ page 
   await page.goto(`${HADRIAN}&action=extensions`);
   await expect(page.locator('.mt-card-title', { hasText: 'Page Builder' })).toBeVisible();
 
-  // Its own address answers by opening the Built tab of Pages.
+  // Its own address answers by opening Pages on the built pages.
   await page.goto(MODULE);
   await expect(page).toHaveURL(/module=Hadrian&action=pages#tab=Built$/);
-  const built = page.locator('[data-group-panel="Built"]');
-  await expect(built, 'the Built tab is open').toBeVisible();
-  await expect(built.locator('[data-group-create]'), 'with the form that makes a page').toBeVisible();
-  await expect(built.locator('#pb-site'), 'and the switch for who serves the website').toBeVisible();
+  await expect(page.locator('[data-view^="ext-"]'), 'the list shows the built pages').toHaveAttribute('aria-pressed', 'true');
+  await expect(page.locator('[data-add-page]'), 'Add page makes a built page').toBeVisible();
+  await expect(page.locator('.mt-pl-head #pb-site'), 'and the switch for who serves the website is in the header').toBeVisible();
 
   // The editor is the one screen that is the module's own, drawn in Hadrian's shell.
   await createPage(page, 'E2E Shell');
@@ -517,10 +517,17 @@ test('a built page replaces a theme page when the site, or the page, says so', a
   // website is set at the top of the Built tab.
   const panel = page.locator('[data-page-extension-panel]');
   const state = panel.locator('[data-pb-state]');
-  const row = () => page.locator('[data-group-panel="Built"] [data-page-row]', { has: page.locator('.mt-pagerow-name', { hasText: 'E2E Replace' }) });
-  const siteServedBy = async mode => {
+  const row = () => page.locator('[data-page-row][data-ext-group="Built"]', { has: page.locator('[data-page-edit]', { hasText: 'E2E Replace' }) });
+  // The switch asks first, listing the theme pages it changes.
+  const siteServedBy = async (mode, lists) => {
     await page.goto(PAGES);
     await page.locator(`#pb-site button[value="${mode}"]`).click();
+    const confirm = page.locator('#pb-served-confirm');
+    await expect(confirm).toBeVisible();
+    if (lists) {
+      await expect(confirm.locator(`[data-list="${mode}"]`), 'the dialog says what changes').toContainText(lists);
+    }
+    await confirm.locator('[data-pb-served-go]').click();
     await expect(page.locator('[data-ext-flash]')).toContainText(mode === 'builder' ? 'served by Page Builder' : 'served by the theme');
   };
   try {
@@ -536,12 +543,15 @@ test('a built page replaces a theme page when the site, or the page, says so', a
     await expect(page, 'and stays on the page it was set on').toHaveURL(new RegExp(`page=built-${id}`));
     await expect(state).toHaveText('Standby');
     expect(await themePage(), 'site on Theme: the theme page shows').not.toContain(MARK);
+    const announcementsNote = page.locator('[data-page-row][data-key="announcements"] [data-page-note]');
+    await page.goto(PAGES);
+    await expect(row().locator('[data-page-status]')).toHaveText('Standby for Announcements');
+    await expect(announcementsNote, 'the theme page knows a replacement waits').toHaveText('E2E Replace on standby');
 
     // Flip the site. Now the built page is what visitors get there.
-    await siteServedBy('builder');
-    await expect(row().locator('[data-page-status]')).toHaveText('Serving');
-    await expect(page.locator('[data-group-panel="Support"] [data-page-row]', { has: page.locator('.mt-pagerow-name', { hasText: /^Announcements/ }) }).locator('[data-page-note]'),
-      'the theme page it replaces says so on its own row').toHaveText('Replaced by E2E Replace');
+    await siteServedBy('builder', 'now shows E2E Replace');
+    await expect(row().locator('[data-page-status]')).toHaveText('Serving as Announcements');
+    await expect(announcementsNote, 'the theme page it replaces says so on its own row').toHaveText('Replaced by E2E Replace');
     const html = await themePage();
     expect(html, 'site on Page Builder: the built page shows').toContain(MARK);
     expect(html, 'drawn through the theme').toContain('data-tpl="module-page"');
@@ -565,7 +575,7 @@ test('a built page replaces a theme page when the site, or the page, says so', a
     await panel.locator('select[name="replace_rule"]').selectOption('always');
     await expect(state).toHaveText('Serving');
     await siteServedBy('theme');
-    await expect(row().locator('[data-page-status]')).toHaveText('Serving');
+    await expect(row().locator('[data-page-status]')).toHaveText('Serving as Announcements');
     expect(await themePage(), 'rule Always, site on Theme: the built page shows').toContain(MARK);
 
     // Let go of it: the theme page is back with nothing lost.
@@ -588,7 +598,7 @@ test("a built page is a row in Hadrian's Pages, and what is set there applies to
   await saveDraft(page);
 
   const SETTINGS = settingsOf(id);
-  const row = () => page.locator('[data-group-panel="Built"] [data-page-row]', { has: page.locator('.mt-pagerow-name', { hasText: 'E2E Listed' }) });
+  const row = () => page.locator('[data-page-row][data-ext-group="Built"]', { has: page.locator('[data-page-edit]', { hasText: 'E2E Listed' }) });
   const anon = await visitor(playwright);
   const saveSettings = async fill => {
     await page.goto(SETTINGS);

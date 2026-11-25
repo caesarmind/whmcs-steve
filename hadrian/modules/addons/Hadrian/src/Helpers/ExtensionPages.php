@@ -44,13 +44,19 @@ final class ExtensionPages
     /** The template an extension's page is drawn through (theme: module-page.tpl). */
     public const TEMPLATE = 'module-page';
 
+    /** The colours a page's status badge may take (mt-badge-<tone>). */
+    private const TONES = ['success', 'warning', 'primary', 'neutral'];
+
+    /** A theme page's name, as a module may give it for replaces / standby. */
+    private const PAGE_NAME = '/^[a-z0-9][a-z0-9-]{0,60}$/';
+
     /** @var array<string, array<string,mixed>> by prefix: id, prefix, label, group, createUrl, createLabel, createPlaceholder, panel, pagePanel, provider */
     private static array $modules = [];
 
     /** @var array<string, array<string,mixed>>|null key => meta, once asked for */
     private static ?array $pages = null;
 
-    /** @var array<string, list<string>>|null theme page => notes */
+    /** @var array<string, list<array{text:string, tone:string}>>|null theme page => notes */
     private static ?array $notes = null;
 
     /**
@@ -65,7 +71,11 @@ final class ExtensionPages
      *        createLabel the form's button ("Create page")
      *        createPlaceholder  hint inside the name field
      *        panel       callable(): string. HTML shown above the module's
-     *                    pages on its tab.
+     *                    pages when the list is showing only them.
+     *        headerPanel callable(): string. HTML shown in the header of the
+     *                    Pages screen, beside Add page: a control that
+     *                    changes the whole site ("Website served by"). Keep
+     *                    it to one line.
      *        pagePanel   callable(int $id): string. HTML shown on the editor
      *                    of one of the module's pages.
      *        contentPanel callable(int $id): string. HTML shown first in that
@@ -82,10 +92,16 @@ final class ExtensionPages
      *                    description  string, one line for the row
      *                    url          path from the site root, '' when the page has no address yet
      *                    live         bool, visitors can reach it now
-     *                    status       short word for the row: "Published", "Draft"
+     *                    status       a few words for the row: "Published", "Draft",
+     *                                 "Serving as Homepage" (up to 40 characters)
+     *                    tone         the status badge's colour: success, warning,
+     *                                 primary or neutral. Defaults to success when
+     *                                 live, warning when not
      *                    editUrl      "?module=X&..." in the admin: where the content is edited
      *                    seoTitle, seoDescription  strings: what the page shows when Pages sets none
      *                    replaces     a theme page this page currently stands in for, '' otherwise
+     *                    standby      a theme page this page is set to stand in for
+     *                                 but does not right now, '' otherwise
      */
     public static function register(array $module): void
     {
@@ -104,6 +120,7 @@ final class ExtensionPages
             'createLabel' => self::cut(trim((string)($module['createLabel'] ?? '')), 30) ?: 'Create page',
             'createPlaceholder' => self::cut(trim((string)($module['createPlaceholder'] ?? '')), 80),
             'panel'     => is_callable($module['panel'] ?? null) ? $module['panel'] : null,
+            'headerPanel' => is_callable($module['headerPanel'] ?? null) ? $module['headerPanel'] : null,
             'pagePanel' => is_callable($module['pagePanel'] ?? null) ? $module['pagePanel'] : null,
             'contentPanel' => is_callable($module['contentPanel'] ?? null) ? $module['contentPanel'] : null,
             'provider' => $provider,
@@ -120,10 +137,10 @@ final class ExtensionPages
 
     /**
      * The groups extension pages are listed under, for the Pages screen:
-     * group => the module's name, where a new page is made, and the module's
-     * own panel for the top of the tab.
+     * group => the module's name, where a new page is made, the module's own
+     * panel for the top of its pages, and its control for the screen's header.
      *
-     * @return array<string, array{label:string, createUrl:string, createLabel:string, createPlaceholder:string, panelHtml:string}>
+     * @return array<string, array{label:string, createUrl:string, createLabel:string, createPlaceholder:string, panelHtml:string, headerHtml:string}>
      */
     public static function groups(): array
     {
@@ -135,6 +152,7 @@ final class ExtensionPages
                 'createLabel'       => $module['createLabel'],
                 'createPlaceholder' => $module['createPlaceholder'],
                 'panelHtml'         => self::render($module, 'panel'),
+                'headerHtml'        => self::render($module, 'headerPanel'),
             ];
         }
         return $out;
@@ -223,6 +241,10 @@ final class ExtensionPages
                 $url  = self::path((string)($row['url'] ?? ''));
                 $edit = (string)($row['editUrl'] ?? '');
                 $live = !empty($row['live']);
+                $tone = (string)($row['tone'] ?? '');
+                if (!in_array($tone, self::TONES, true)) {
+                    $tone = $live ? 'success' : 'warning';
+                }
 
                 $pages[$key] = [
                     'display_name'     => $name !== '' ? $name : ucfirst($prefix) . ' page ' . $id,
@@ -241,7 +263,8 @@ final class ExtensionPages
                         'id'      => $module['id'],
                         'label'   => $module['label'],
                         'live'    => $live,
-                        'status'  => self::cut(trim((string)($row['status'] ?? '')), 20) ?: ($live ? 'Published' : 'Draft'),
+                        'status'  => self::cut(trim((string)($row['status'] ?? '')), 40) ?: ($live ? 'Published' : 'Draft'),
+                        'tone'    => $tone,
                         'editUrl' => self::adminUrl($edit),
                     ],
                 ];
@@ -250,9 +273,12 @@ final class ExtensionPages
                 }
 
                 $replaces = (string)($row['replaces'] ?? '');
-                if ($live && preg_match('/^[a-z0-9][a-z0-9-]{0,60}$/', $replaces)) {
-                    $notes[$replaces][] = 'Replaced by ' . $pages[$key]['display_name'];
+                $standby  = (string)($row['standby'] ?? '');
+                if ($live && preg_match(self::PAGE_NAME, $replaces)) {
+                    $notes[$replaces][] = ['text' => 'Replaced by ' . $pages[$key]['display_name'], 'tone' => 'primary'];
                     $pages[$key]['extension']['replaces'] = $replaces;
+                } elseif ($live && preg_match(self::PAGE_NAME, $standby)) {
+                    $notes[$standby][] = ['text' => $pages[$key]['display_name'] . ' on standby', 'tone' => 'neutral'];
                 }
             }
         }
@@ -273,6 +299,17 @@ final class ExtensionPages
      * @return list<string>
      */
     public static function notesFor(string $themePage): array
+    {
+        return array_column(self::noteBadges($themePage), 'text');
+    }
+
+    /**
+     * The same notes with the colour each is shown in: "Replaced by ..." in
+     * the accent colour, a replacement on standby in grey.
+     *
+     * @return list<array{text:string, tone:string}>
+     */
+    public static function noteBadges(string $themePage): array
     {
         if (self::$notes === null) {
             self::all();

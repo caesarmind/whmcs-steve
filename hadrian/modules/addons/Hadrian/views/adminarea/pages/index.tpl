@@ -1,50 +1,41 @@
 {include file="includes/header.tpl"}
 
-<header class="mt-page-header">
-    <div class="mt-page-eyebrow">Theme</div>
-    <h1 class="mt-page-title">Pages {include file="includes/doclink.tpl" article="page-manager"}</h1>
-    <p class="mt-page-subtitle">Set the template variant, SEO, indexing, visibility and layout overrides for each WHMCS page.</p>
+{* Pages: every page of the site in one list.
+
+   Left, a rail that narrows the list: by area (Website, Client area, Order
+   process), or to the pages an admin changed, the pages that offer more than
+   one template, and the pages a module such as the Page Builder made. Right,
+   one table, one line per page: its name, its address, what was changed, and
+   the buttons that open it.
+
+   The server renders every row once, sorted by name. The script below only
+   shows, hides and regroups them, so the list works (flat, unfiltered)
+   without it. *}
+
+{assign var=createGroups value=[]}
+{foreach $extensionGroups as $g => $ext}{if $ext.createUrl}{$createGroups[$g] = $ext}{/if}{/foreach}
+
+<header class="mt-page-header mt-pl-head">
+    <div>
+        <div class="mt-page-eyebrow">Theme</div>
+        <h1 class="mt-page-title">Pages {include file="includes/doclink.tpl" article="page-manager"}</h1>
+        <p class="mt-page-subtitle">Every page on your site. Choose one to change its template, its SEO, who can see it, and its layout.</p>
+    </div>
+    <div class="mt-pl-head-right">
+        {* A module's control for the whole site ("Website served by"),
+           rendered by the module (Helpers\ExtensionPages, "headerPanel"). *}
+        {foreach $extensionGroups as $g => $ext}
+            {if $ext.headerHtml}<div class="mt-pl-head-ext" data-header-extension>{$ext.headerHtml nofilter}</div>{/if}
+        {/foreach}
+        {foreach $createGroups as $g => $ext}
+            <button type="button" class="mt-btn mt-btn-primary" data-add-page="{$ext@index}">
+                <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                Add page{if $createGroups|count > 1} in {$ext.label|escape}{/if}
+            </button>
+        {/foreach}
+    </div>
 </header>
 
-<div class="mt-search mt-pages-search">
-    <span class="mt-search-icon" aria-hidden="true">
-        <svg viewBox="0 0 16 16" fill="none">
-            <circle cx="7" cy="7" r="4.5" stroke="currentColor" stroke-width="1.6"/>
-            <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
-        </svg>
-    </span>
-    <input type="search" id="mt-pages-search" class="mt-input" placeholder="Search pages&hellip;"
-           autocomplete="off" spellcheck="false" aria-label="Search pages">
-    <button type="button" class="mt-search-clear" id="mt-pages-search-clear" aria-label="Clear search" hidden>&#10005;</button>
-</div>
-
-{* System pages -- wizard sub-steps, included partials and error states -- are
-   hidden by default because an admin never navigates to them. They are
-   FILTERED, not dropped: page.php's own listDisplay => false would make them
-   reachable only by typing a ?sub=edit&page= URL, and some of them (the 2FA
-   challenge, the upgrade summary) are pages a visitor really sees and an admin
-   may legitimately want to set a layout override or a noindex on. *}
-{if $systemCount > 0}
-    <label class="mt-sys-toggle">
-        <input type="checkbox" id="mt-pages-showsys">
-        <span>Show {$systemCount} system pages</span>
-        {include file="includes/tip.tpl" text="Wizard steps, partials included by another page, and error states WHMCS renders in place of whatever you asked for. They are hidden because you never navigate to them - not because they cannot be configured." article="page-manager" anchor="the-page-list"}
-    </label>
-{/if}
-
-<div class="mt-tabs" id="mt-pages-tabs" role="tablist">
-    <a class="mt-tab is-active" href="#tab=all" data-tab="all" role="tab">
-        All <span class="mt-tab-pill" data-tab-pill>{$totalCount}</span>
-    </a>
-    {foreach $groups as $g}
-        <a class="mt-tab" href="#tab={$g|escape:'url'}" data-tab="{$g|escape}" role="tab">
-            {$g|escape} <span class="mt-tab-pill" data-tab-pill>{$pagesByGroup[$g]|count}</span>
-        </a>
-    {/foreach}
-</div>
-
-{* Between the tab strip and the group cards, so the confirmation sits with the
-   content it describes rather than above the search box. *}
 {if $extOk|default:''}<div class="mt-alert mt-alert-success" data-ext-flash>{$extOk|escape}</div>{/if}
 {if $extErr|default:''}<div class="mt-alert mt-alert-danger" data-ext-flash>{$extErr|escape}</div>{/if}
 {if $flashMsg == 'saved'}
@@ -56,408 +47,431 @@
 
 {literal}
 <style>
-/* A bare count that inherits the tab's own colour (so it goes accent at 60% on
-   the active tab), not a filled pill with a background of its own. */
-.mt-tab-pill { margin-left:6px; font-size:11px; opacity:0.6; }
+/* Page-local: every name here starts .mt-pl- so nothing collides with the
+   shared admin stylesheet. */
+.mt-pl-head { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; }
+.mt-pl-head .mt-page-subtitle { max-width:480px; }
+.mt-pl-head-right { display:flex; align-items:center; gap:16px; flex-wrap:wrap; margin-left:auto; justify-content:flex-end; }
 
-/* Search ------------------------------------------------------------- */
-.mt-pages-search { margin: 0 0 10px; }
+.mt-pl-layout { display:grid; grid-template-columns:220px minmax(0,1fr); gap:24px; align-items:start; }
 
-/* System-pages toggle. Sits under the search, above the tabs. */
-.mt-sys-toggle { display:inline-flex; align-items:center; gap:8px; margin:0 0 14px;
-    font-size:12.5px; color:var(--mt-text-2); cursor:pointer; user-select:none; }
-.mt-sys-toggle input { accent-color:var(--mt-primary); width:14px; height:14px; margin:0; cursor:pointer; }
-/* While a search is running the toggle does nothing (search reveals system
-   pages regardless), so it reads as unavailable rather than broken. */
-.mt-sys-toggle.is-muted { opacity:0.45; cursor:default; }
-.mt-sys-toggle.is-muted input { cursor:default; }
-/* A revealed system row is dimmed so it stays visually secondary to the real
-   pages it sits among. */
-.mt-pagerow.is-system .mt-pagerow-name { color:var(--mt-text-2); }
-/* Radius scoped to this page so the global .mt-input (var(--mt-radius), 12px)
-   is left alone on every other admin screen. */
-.mt-pages-search .mt-input { padding-right: 34px; border-radius: 10px; }
-.mt-pages-search .mt-search-icon svg { width: 16px; height: 16px; }
-/* Suppress the native WebKit clear affordance -- we render our own so the
-   control looks identical across browsers. */
-.mt-pages-search input[type="search"]::-webkit-search-cancel-button,
-.mt-pages-search input[type="search"]::-webkit-search-decoration { -webkit-appearance: none; appearance: none; }
-.mt-search-clear { position:absolute; right:8px; top:50%; transform:translateY(-50%); display:flex; align-items:center; justify-content:center; width:22px; height:22px; padding:0; border:none; border-radius:50%; background:transparent; color:var(--mt-text-3); font-size:12px; line-height:1; cursor:pointer; transition:background 0.15s ease, color 0.15s ease; }
-.mt-search-clear:hover { background:var(--mt-neutral-tint); color:var(--mt-text); }
-.mt-search-clear:focus-visible { outline:2px solid var(--mt-primary); outline-offset:1px; }
-.mt-search-clear[hidden] { display:none; }
+/* Rail */
+.mt-pl-rail { position:sticky; top:16px; padding:10px; }
+.mt-pl-rail-label { font-size:11px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--mt-text-3); padding:12px 10px 6px; }
+.mt-pl-rail-btn { display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; border:0; background:none; padding:9px 10px; border-radius:8px; font:inherit; font-size:14px; color:var(--mt-text); cursor:pointer; text-align:left; }
+.mt-pl-rail-btn:hover { background:var(--mt-surface-2); }
+.mt-pl-rail-btn:focus-visible { outline:2px solid var(--mt-primary); outline-offset:-2px; }
+.mt-pl-rail-btn.is-on { background:var(--mt-primary-tint); color:var(--mt-primary); font-weight:600; }
+.mt-pl-rail-btn .n { font-size:12px; color:var(--mt-text-3); font-weight:500; }
+.mt-pl-rail-btn.is-on .n { color:var(--mt-primary); }
+.mt-pl-rail-help { font-size:11.5px; line-height:1.45; color:var(--mt-text-3); padding:2px 10px 8px; margin:0; }
+.mt-pl-rail-help[hidden] { display:none; }
+.mt-pl-rail hr { border:0; border-top:1px solid var(--mt-border); margin:8px 4px; }
+.mt-pl-sys { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px; font-size:13px; color:var(--mt-text-2); cursor:pointer; }
+.mt-pl-sys .n { color:var(--mt-text-4); }
 
-/* Section heading: 22px title with the count as a sub-line beneath it. */
-.mt-pages-section .mt-section-title { font-size:22px; letter-spacing:-0.02em; }
+/* Toolbar */
+.mt-pl-panel { padding:0; overflow:hidden; }
+.mt-pl-tools { display:flex; align-items:center; gap:12px; padding:14px 16px; border-bottom:1px solid var(--mt-border); }
+.mt-pl-tools .mt-search { flex:1; max-width:420px; }
+.mt-pl-tools .mt-input { padding-top:9px; padding-bottom:9px; padding-right:34px; font-size:14px; }
+.mt-pl-tools input[type="search"]::-webkit-search-cancel-button { -webkit-appearance:none; appearance:none; }
+.mt-pl-clear { position:absolute; right:8px; top:50%; transform:translateY(-50%); display:flex; align-items:center; justify-content:center; width:22px; height:22px; padding:0; border:0; border-radius:50%; background:transparent; color:var(--mt-text-3); font-size:12px; cursor:pointer; }
+.mt-pl-clear:hover { background:var(--mt-neutral-tint); color:var(--mt-text); }
+.mt-pl-clear[hidden] { display:none; }
+.mt-pl-count { margin-left:auto; font-size:13px; color:var(--mt-text-3); white-space:nowrap; }
 
-/* Page rows ----------------------------------------------------------- */
-.mt-pagerow-scroll { overflow-x:auto; }
-/* The wrapper is ours, not the reference's: a bare 1fr first track collapses
-   the name cell inside the WHMCS admin content column. At normal widths it
-   changes nothing. */
-/* 750, not 640: the Open column adds 84 + one 14px gap. Miss this and the
-   badges compress before .mt-pagerow-scroll engages. */
-.mt-pagerow-grid { min-width:750px; }
-.mt-pagerow-head,
-.mt-pagerow { display:grid; grid-template-columns:minmax(200px,1fr) 92px 56px 92px 104px 84px 18px; gap:14px; align-items:center; }
-.mt-pagerow-head { padding:0 14px 8px; }
-.mt-pagerow-head span { font-size:10px; font-weight:700; letter-spacing:0.1em; text-transform:uppercase; color:var(--mt-text-4); }
-.mt-pagerow-list { display:flex; flex-direction:column; gap:6px; }
-.mt-pagerow { padding:12px 14px; border:1px solid var(--mt-border); border-radius:10px; background:var(--mt-surface); text-decoration:none; color:inherit; transition:background 0.15s ease; }
-.mt-pagerow:hover { background:var(--mt-surface-2); text-decoration:none; }
-/* Row-scoped badge metrics. Deliberately NOT applied to the global .mt-badge:
-   .mt-lay-aud-cta on the Layouts cards is hand-tuned to .mt-badge's exact box
-   (3px padding + 1.5 line-height on 12px) so an "Activate" row is the same
-   height as an "Active" one -- changing the global would break that. */
-.mt-pagerow .mt-badge { padding:3px 9px; font-size:11px; letter-spacing:0.02em; }
-/* position:relative anchors the stretched overlay below. */
-.mt-pagerow { position:relative; }
-/* The name cell is the editor link; its ::after covers the whole row so
-   clicking anywhere still opens the editor, exactly as when the row itself
-   was an anchor.
-   position:static is LOAD-BEARING and looks like a no-op: without it the
-   inset:0 overlay would size to this cell instead of the row, and the
-   whole-row click target silently disappears. */
-.mt-pagerow-edit { position:static; text-decoration:none; color:inherit; }
-.mt-pagerow-edit:hover { text-decoration:none; color:inherit; }
-.mt-pagerow-edit::after { content:""; position:absolute; inset:0; border-radius:10px; }
-/* The row is a div now and cannot take focus, so the ring moves to the link
-   that can. Inset offset because .mt-pagerow-scroll is overflow-x:auto, which
-   clips in BOTH axes and would shave a positive-offset ring off the edge
-   rows. */
-.mt-pagerow-edit:focus-visible { outline:none; }
-.mt-pagerow-edit:focus-visible::after { outline:2px solid var(--mt-primary); outline-offset:-1px; }
-/* 0,2,0 so it beats the 0,1,0 display:grid above -- the search JS toggles this. */
-.mt-pagerow[hidden] { display:none; }
+/* A module's own controls, shown while the list shows its pages. */
+.mt-pl-extpanel { padding:16px 16px 0; border-bottom:1px solid var(--mt-border); background:var(--mt-surface-2); }
+.mt-pl-extpanel[hidden] { display:none; }
 
-/* Open cell: sits above the overlay so it wins the click. */
-.mt-pagerow-open { position:relative; z-index:1; justify-self:start; }
-.mt-pagerow-openlink { display:inline-flex; align-items:center; gap:5px; padding:3px 9px;
-    border:1px solid var(--mt-border); border-radius:999px; background:var(--mt-surface);
-    color:var(--mt-primary); font-size:11px; font-weight:600; letter-spacing:0.02em;
-    text-decoration:none; white-space:nowrap; transition:background .12s ease, border-color .12s ease; }
-.mt-pagerow-openlink:hover { background:var(--mt-primary-tint); border-color:var(--mt-primary);
-    color:var(--mt-primary); text-decoration:none; }
-.mt-pagerow-openlink:focus-visible { outline:2px solid var(--mt-primary); outline-offset:1px; }
-.mt-pagerow-openlink svg { width:11px; height:11px; display:block; flex-shrink:0; }
-/* cursor:help -- the dash's title carries the reason there is no link. */
-.mt-pagerow-open .mt-pagerow-dash { cursor:help; }
-.mt-pagerow-main { min-width:0; }
-.mt-pagerow-name { display:block; font-size:14px; font-weight:600; color:var(--mt-text); }
-.mt-pagerow-desc { display:block; font-size:12px; color:var(--mt-text-3); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.mt-pagerow-variant { font-size:12.5px; color:var(--mt-text-2); }
-.mt-pagerow-dash { color:var(--mt-text-4); }
-.mt-pagerow-chev { color:var(--mt-text-3); font-size:13px; text-align:right; }
+/* Table */
+.mt-pl-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+.mt-pl-table col.c-page { width:30%; }
+.mt-pl-table col.c-addr { width:22%; }
+.mt-pl-table col.c-act { width:220px; }
+.mt-pl-table th { text-align:left; font-size:11px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--mt-text-3); padding:9px 16px; background:var(--mt-surface-2); border-bottom:1px solid var(--mt-border); }
+.mt-pl-table td { padding:8px 16px; height:46px; border-bottom:1px solid var(--mt-border); font-size:14px; vertical-align:middle; }
+.mt-pl-table tbody tr:last-child td { border-bottom:0; }
+.mt-pl-row { cursor:pointer; }
+.mt-pl-row:hover td { background:var(--mt-surface-3); }
+.mt-pl-row[hidden], .mt-pl-grp[hidden] { display:none; }
+.mt-pl-grp td { height:auto; padding:18px 16px 6px; font-size:12px; font-weight:600; color:var(--mt-text-2); cursor:default; }
+.mt-pl-grp .n { color:var(--mt-text-4); font-weight:500; margin-left:6px; }
+.mt-pl-name { display:flex; align-items:center; gap:8px; min-width:0; }
+.mt-pl-name a { font-weight:500; color:var(--mt-text); text-decoration:none; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
+.mt-pl-name a:hover { color:var(--mt-text); text-decoration:none; }
+.mt-pl-name a:focus-visible { outline:2px solid var(--mt-primary); outline-offset:2px; border-radius:4px; }
+.mt-pl-row.is-system .mt-pl-name a { color:var(--mt-text-2); }
+.mt-pl-built { flex:none; font-size:10.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--mt-primary); background:var(--mt-primary-tint); border-radius:5px; padding:2px 6px; }
+.mt-pl-info { flex:none; display:inline-flex; color:var(--mt-text-4); cursor:help; }
+.mt-pl-info svg { width:15px; height:15px; display:block; }
+.mt-pl-addr { display:block; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:12.5px; color:var(--mt-text-3); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mt-pl-addr a { color:inherit; text-decoration:none; }
+.mt-pl-addr a:hover { color:var(--mt-link); text-decoration:underline; }
+.mt-pl-none { color:var(--mt-text-4); font-size:13px; cursor:help; }
+.mt-pl-badges { display:flex; gap:6px; flex-wrap:wrap; align-items:center; }
+.mt-pl-badges .mt-badge { font-size:11.5px; padding:2px 9px; }
+.mt-pl-badges [hidden] { display:none; }
+.mt-pl-act { text-align:right; white-space:nowrap; }
+.mt-pl-act .mt-btn { padding:6px 14px; font-size:13px; }
+.mt-pl-act .mt-btn + .mt-btn { margin-left:6px; }
 
-.mt-pages-noresults .mt-empty-title { font-size:17px; }
-.mt-pages-panel[hidden], .mt-pages-noresults[hidden] { display:none; }
+.mt-pl-sr { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; }
+.mt-pl-empty { padding:56px 24px; text-align:center; color:var(--mt-text-3); font-size:14px; }
+.mt-pl-empty strong { display:block; color:var(--mt-text); font-size:16px; font-weight:600; margin-bottom:6px; }
+.mt-pl-empty[hidden] { display:none; }
+
+/* Add page */
+.mt-pl-dialog { border:0; border-radius:18px; padding:0; width:min(440px,92vw); box-shadow:var(--mt-shadow-lg, 0 20px 60px rgba(0,0,0,.25)); background:var(--mt-surface); color:var(--mt-text); }
+.mt-pl-dialog::backdrop { background:rgba(0,0,0,.35); }
+.mt-pl-dialog form { padding:24px; margin:0; }
+.mt-pl-dialog h2 { margin:0 0 6px; font-size:20px; font-weight:600; }
+.mt-pl-dialog p { margin:0 0 16px; font-size:13.5px; color:var(--mt-text-2); line-height:1.5; }
+.mt-pl-dialog-foot { display:flex; justify-content:flex-end; gap:8px; margin-top:18px; }
+
+/* WHMCS's admin sets no mobile viewport, so a phone draws this screen about
+   980px wide: the narrow layout has to start above that, not at 900. */
+@media (max-width: 1100px) {
+    .mt-pl-layout { grid-template-columns:1fr; }
+    .mt-pl-rail { position:static; display:flex; flex-wrap:wrap; gap:4px; }
+    .mt-pl-rail-btn { width:auto; }
+    .mt-pl-rail-label, .mt-pl-rail-help, .mt-pl-rail hr { display:none; }
+    .mt-pl-sys { padding:9px 10px; }
+    .mt-pl-head-right { margin-left:0; justify-content:flex-start; }
+}
+@media (max-width: 760px) {
+    .mt-pl-col-addr { display:none; }
+    .mt-pl-table col.c-page { width:auto; }
+    .mt-pl-table col.c-act { width:104px; }
+    .mt-pl-act [data-page-content] { display:none; }
+}
 </style>
 {/literal}
 
-<div class="mt-panel pad mt-pages-noresults" id="mt-pages-noresults" hidden>
-    <div class="mt-empty">
-        <div class="mt-empty-icon mt-empty-icon-circle" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+<div class="mt-pl-layout">
+    <aside class="mt-panel mt-pl-rail" aria-label="Filter pages" id="mt-pl-rail">
+        <div class="mt-pl-rail-label">Area</div>
+        <button type="button" class="mt-pl-rail-btn is-on" data-view="all" aria-pressed="true">All pages <span class="n" data-count-for="all">{$totalCount}</span></button>
+        {foreach $areas as $areaKey => $areaLabel}
+            <button type="button" class="mt-pl-rail-btn" data-view="{$areaKey|escape}" aria-pressed="false">{$areaLabel|escape} <span class="n" data-count-for="{$areaKey|escape}">{$areaCounts[$areaKey]}</span></button>
+            <p class="mt-pl-rail-help" data-help-for="{$areaKey|escape}" hidden>{$areaHelp[$areaKey]|escape}.</p>
+        {/foreach}
+        <hr>
+        <div class="mt-pl-rail-label">Show</div>
+        <button type="button" class="mt-pl-rail-btn" data-view="changed" aria-pressed="false">Changed by you <span class="n" data-count-for="changed"></span></button>
+        <p class="mt-pl-rail-help" data-help-for="changed" hidden>Pages where you set a template, SEO, visibility, indexing, an area or a layout of their own.</p>
+        <button type="button" class="mt-pl-rail-btn" data-view="templates" aria-pressed="false">With templates <span class="n" data-count-for="templates"></span></button>
+        <p class="mt-pl-rail-help" data-help-for="templates" hidden>Pages that offer more than one template to choose from.</p>
+        {foreach $extensionGroups as $g => $ext}
+            <button type="button" class="mt-pl-rail-btn" data-view="ext-{$ext@index}" data-ext-group="{$g|escape}" aria-pressed="false">Built with {$ext.label|escape} <span class="n" data-count-for="ext-{$ext@index}"></span></button>
+        {/foreach}
+        {if $systemCount > 0}
+            <hr>
+            <label class="mt-pl-sys">
+                <span>System pages <span class="n">{$systemCount}</span></span>
+                <span class="mt-toggle"><input type="checkbox" id="mt-pages-showsys"><span class="mt-toggle-track"><span class="mt-toggle-thumb"></span></span></span>
+            </label>
+            {* Hidden by default because an admin never navigates to them.
+               FILTERED, not dropped: some (the 2FA challenge, the upgrade
+               summary) are pages a visitor really sees, and an admin may
+               want a layout override or a noindex on one. *}
+            <p class="mt-pl-rail-help">Error pages, wizard steps and parts of other pages. Visitors only reach them mid-flow.</p>
+        {/if}
+    </aside>
+
+    <section class="mt-panel mt-pl-panel">
+        <div class="mt-pl-tools">
+            <label class="mt-search">
+                <span class="mt-search-icon" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.6"/><path d="M11 11l3 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span>
+                <input type="search" class="mt-input" id="mt-pages-search" placeholder="Search by name or address"
+                       autocomplete="off" spellcheck="false" aria-label="Search pages">
+                <button type="button" class="mt-pl-clear" id="mt-pages-search-clear" aria-label="Clear search" hidden>&#10005;</button>
+            </label>
+            <span class="mt-pl-count" id="mt-pl-count" aria-live="polite">{$totalCount} pages</span>
         </div>
-        <h3 class="mt-empty-title">No pages match &ldquo;<span id="mt-pages-noresults-q"></span>&rdquo;</h3>
-        <p>Try a different search term, or switch to another group.</p>
-    </div>
+
+        {* The owning module's own controls for its pages, rendered by the
+           module (Helpers\ExtensionPages, "panel"). Shown while the list
+           shows only that module's pages. *}
+        {foreach $extensionGroups as $g => $ext}
+            {if $ext.panelHtml}
+                <div class="mt-pl-extpanel" data-view-panel="ext-{$ext@index}" data-group-extension hidden>{$ext.panelHtml nofilter}</div>
+            {/if}
+        {/foreach}
+
+        <table class="mt-pl-table">
+            <colgroup><col class="c-page"><col class="c-addr mt-pl-col-addr"><col><col class="c-act"></colgroup>
+            <thead><tr><th scope="col">Page</th><th scope="col" class="mt-pl-col-addr">Address</th><th scope="col">Changed</th><th scope="col"><span class="mt-pl-sr">Actions</span></th></tr></thead>
+            <tbody id="mt-pl-body">
+            {foreach $pages as $page}
+                {assign var=editUrl value="?module=Hadrian&action=pages&sub=edit&page={$page.name|escape:'url'}"}
+                <tr class="mt-pl-row{if $page.isSystem} is-system{/if}" data-page-row
+                    data-key="{$page.name|escape}" data-area="{$page.area|escape}" data-group="{$groupLabels[$page.group]|default:$page.group|escape}"
+                    {if $page.extension} data-ext-group="{$page.group|escape}"{/if}
+                    {if $page.isSystem} data-system{/if}
+                    {if $page.changes || $page.notes || !empty($page.extension.replaces)} data-changed{/if}
+                    data-templates="{$page.templateCount}"
+                    data-search="{$page.label|lower|escape} {$page.description|lower|escape} {$page.name|lower|escape} {$page.address|lower|escape}">
+                    <td>
+                        <span class="mt-pl-name">
+                            <a href="{$editUrl|escape}" data-page-edit title="{$page.label|escape}">{$page.label|escape}</a>
+                            {if $page.extension}<span class="mt-pl-built">Built</span>{/if}
+                            {if $page.description}
+                                <span class="mt-pl-info" title="{$page.description|escape}" aria-label="{$page.description|escape}" role="img"><svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="8" cy="8" r="6.2" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.2v3.6M8 5.2v.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></span>
+                            {/if}
+                        </span>
+                    </td>
+                    <td class="mt-pl-col-addr">
+                        {if $page.publicUrl}
+                            {* plain |escape, never |escape:'url': the value carries its own ?a=b query. *}
+                            <span class="mt-pl-addr"><a href="{$page.publicUrl|escape}" target="_blank" rel="noopener" data-page-open title="Open {$page.address|escape} in a new tab">{$page.address|escape}</a></span>
+                        {elseif $page.address}
+                            <span class="mt-pl-addr" title="Not live yet, so there is nothing to open">{$page.address|escape}</span>
+                        {else}
+                            <span class="mt-pl-none" title="{$page.publicReason|escape}">No direct address</span>
+                        {/if}
+                    </td>
+                    <td>
+                        <div class="mt-pl-badges">
+                            {if $page.extension}
+                                <span class="mt-badge mt-badge-{$page.extension.tone|default:'success'|escape}" data-page-status>{$page.extension.status|escape}</span>
+                            {/if}
+                            {foreach $page.notes as $note}
+                                <span class="mt-badge mt-badge-{$note.tone|escape}" data-page-note>{$note.text|escape}</span>
+                            {/foreach}
+                            {* Shown on the "With templates" view only, for a page
+                               still on its first template: which one it uses. *}
+                            {assign var=tplChanged value=false}
+                            {foreach $page.changes as $c}{if $c[0] == 'template'}{assign var=tplChanged value=true}{/if}{/foreach}
+                            {if $page.templateCount > 1 && !$tplChanged}
+                                <span class="mt-badge mt-badge-neutral" data-template-info title="{$page.templateNames|escape}" hidden>{$page.templateLabel|escape} &middot; {$page.templateCount} available</span>
+                            {/if}
+                            {foreach $page.changes as $c}
+                                <span class="mt-badge {if $c[0] == 'auth'}mt-badge-warning{elseif $c[0] == 'off'}mt-badge-danger{elseif $c[0] == 'noindex' || $c[0] == 'area'}mt-badge-neutral{else}mt-badge-primary{/if}" data-page-change="{$c[0]|escape}">{$c[1]|escape}</span>
+                            {/foreach}
+                        </div>
+                    </td>
+                    <td class="mt-pl-act">
+                        {if $page.extension && $page.extension.editUrl}
+                            <a class="mt-btn mt-btn-secondary" href="{$page.extension.editUrl|escape}" data-page-content title="Opens this page in {$page.extension.label|escape}">Edit content</a>
+                        {/if}
+                        <a class="mt-btn mt-btn-secondary" href="{$editUrl|escape}" data-page-manage>Manage</a>
+                    </td>
+                </tr>
+            {/foreach}
+            </tbody>
+        </table>
+        <div class="mt-pl-empty" id="mt-pl-empty" hidden><strong id="mt-pl-empty-title"></strong><span id="mt-pl-empty-text"></span></div>
+    </section>
 </div>
 
-{foreach $groups as $g}
-    {assign var=groupRows value=$pagesByGroup[$g]}
-    <div class="mt-panel pad mt-pages-panel" data-group-panel="{$g|escape}">
-    <section class="mt-section mt-pages-section" data-group-section="{$g|escape}">
-        <header class="mt-section-header">
-            {* One wrapper div, so .mt-section-header's space-between has a
-               single left child and the count reads as a sub-line of the title.
-               [data-group-count] and data-total move WITH it -- the search JS
-               selects by attribute and reads data-total off this element. *}
-            <div>
-                <h2 class="mt-section-title">{$g|escape} pages</h2>
-                <div class="mt-section-sub" data-group-count data-total="{$groupRows|count}">{$groupRows|count} pages</div>
+{foreach $createGroups as $g => $ext}
+    <dialog class="mt-pl-dialog" data-add-dialog="{$ext@index}" aria-labelledby="mt-pl-add-title-{$ext@index}">
+        {* Posts to the module, which answers by opening its editor on the new page. *}
+        <form method="post" action="{$ext.createUrl|escape}" data-group-create>
+            <h2 id="mt-pl-add-title-{$ext@index}">Add a page</h2>
+            <p>Name the page. It opens in {$ext.label|escape} as a draft, and nothing is public until you publish it.</p>
+            <input type="text" class="mt-input" name="name" maxlength="120" required
+                   placeholder="{$ext.createPlaceholder|escape}" aria-label="Name of the new page">
+            <div class="mt-pl-dialog-foot">
+                <button type="button" class="mt-btn mt-btn-secondary mt-btn-sm" data-dialog-cancel>Cancel</button>
+                <button type="submit" class="mt-btn mt-btn-primary mt-btn-sm">{$ext.createLabel|escape}</button>
             </div>
-            {* A group an extension module owns: a new page is made by that
-               module, from a name typed here. The form posts to the module,
-               which answers by opening its editor on the new page. *}
-            {if !empty($extensionGroups[$g]) && $extensionGroups[$g].createUrl}
-                <form method="post" action="{$extensionGroups[$g].createUrl|escape}" class="mt-section-tools" data-group-create style="gap:8px">
-                    <input type="text" class="mt-input" name="name" maxlength="120" required
-                           placeholder="{$extensionGroups[$g].createPlaceholder|escape}" aria-label="Name of the new page"
-                           style="width:260px;padding:8px 12px;font-size:13px">
-                    <button type="submit" class="mt-btn mt-btn-primary mt-btn-sm">{$extensionGroups[$g].createLabel|escape}</button>
-                </form>
-            {/if}
-        </header>
-
-        {* The owning module's own controls for this tab, rendered by the
-           module (Helpers\ExtensionPages, "panel"). *}
-        {if !empty($extensionGroups[$g]) && $extensionGroups[$g].panelHtml}
-            <div data-group-extension>{$extensionGroups[$g].panelHtml nofilter}</div>
-        {/if}
-
-        {if $groupRows|count}
-            <div class="mt-pagerow-scroll">
-                <div class="mt-pagerow-grid">
-                    <div class="mt-pagerow-head" aria-hidden="true">
-                        <span>Page</span>
-                        <span>Variant</span>
-                        <span>SEO</span>
-                        <span>Indexing</span>
-                        <span>Visibility</span>
-                        <span>Open</span>
-                        <span></span>
-                    </div>
-                    <div class="mt-pagerow-list">
-                        {foreach $groupRows as $page}
-                            {* The row is a DIV, not an anchor. It used to be an
-                               <a> wrapping every cell, but the Open link below
-                               is a second anchor and anchors cannot nest --
-                               the parser would close the outer one early and
-                               re-parent the remaining cells as siblings,
-                               shattering the grid. Instead the NAME cell is
-                               the anchor and a stretched ::after restores the
-                               whole-row click target. *}
-                            <div class="mt-pagerow{if $page.isSystem} is-system{/if}"
-                                 data-page-row{if $page.isSystem} data-system{/if}
-                                 data-search="{$page.label|lower|escape} {$page.description|lower|escape} {$page.name|lower|escape} {$page.variantLabel|lower|escape}">
-                                <a class="mt-pagerow-main mt-pagerow-edit"
-                                   href="?module=Hadrian&amp;action=pages&amp;sub=edit&amp;page={$page.name|escape:'url'}">
-                                    <span class="mt-pagerow-name">{$page.label|escape}{if !empty($page.notes)}{foreach $page.notes as $mtNote} <span class="mt-badge mt-badge-primary" data-page-note>{$mtNote|escape}</span>{/foreach}{/if}</span>
-                                    {if $page.description}
-                                        <span class="mt-pagerow-desc">{$page.description|escape}</span>
-                                    {/if}
-                                </a>
-                                <span class="mt-pagerow-variant">{$page.variantLabel|escape}{if !empty($page.extension)} <span class="mt-badge {if $page.extension.live}mt-badge-success{else}mt-badge-warning{/if}" data-page-status>{$page.extension.status|escape}</span>{/if}</span>
-                                <span>
-                                    {if $page.hasSeo}
-                                        <span class="mt-badge mt-badge-primary">SEO</span>
-                                    {else}
-                                        <span class="mt-pagerow-dash">&mdash;</span>
-                                    {/if}
-                                </span>
-                                <span>
-                                    {if $page.indexing == 'allow'}
-                                        <span class="mt-badge mt-badge-success">Allow</span>
-                                    {elseif $page.indexing == 'disallow'}
-                                        <span class="mt-badge mt-badge-warning">Disallow</span>
-                                    {else}
-                                        <span class="mt-badge mt-badge-neutral">Inherit</span>
-                                    {/if}
-                                </span>
-                                <span>
-                                    {if $page.visibility == 'disabled'}
-                                        <span class="mt-badge mt-badge-warning">Disabled</span>
-                                    {elseif $page.visibility == 'auth'}
-                                        <span class="mt-badge mt-badge-primary">Auth only</span>
-                                    {else}
-                                        <span class="mt-badge mt-badge-success">Public</span>
-                                    {/if}
-                                </span>
-                                {* Sits ABOVE the stretched overlay (z-index), so
-                                   clicking Open opens the client-area page while
-                                   clicking anywhere else in the row still opens
-                                   the editor. plain |escape, never |escape:'url'
-                                   -- the value carries its own ?a=b query. *}
-                                <span class="mt-pagerow-open">
-                                    {* A page an extension module owns: its
-                                       content is edited there. The row itself
-                                       still opens these settings. *}
-                                    {if !empty($page.extension) && $page.extension.editUrl}
-                                        <a class="mt-pagerow-openlink" data-page-content href="{$page.extension.editUrl|escape}"
-                                           title="Opens this page in {$page.extension.label|escape}.">Edit content</a>
-                                    {/if}
-                                    {if $page.publicUrl}
-                                        <a class="mt-pagerow-openlink" href="{$page.publicUrl|escape}"
-                                           target="_blank" rel="noopener"
-                                           title="Opens {$page.publicUrl|escape} in a new tab.">
-                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 4h6v6"/><path d="M20 4l-8 8"/><path d="M18 14v4a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4"/></svg>
-                                            Open
-                                        </a>
-                                    {else}
-                                        <span class="mt-pagerow-dash" title="{$page.publicReason|escape}">&mdash;</span>
-                                    {/if}
-                                </span>
-                                <span class="mt-pagerow-chev" aria-hidden="true">&rsaquo;</span>
-                            </div>
-                        {/foreach}
-                    </div>
-                </div>
-            </div>
-        {else}
-            <div class="mt-empty">
-                <h3 class="mt-empty-title">No pages in this group</h3>
-                <p>Add a <code>core/pages/&lt;page&gt;/page.php</code> with <code>'group' =&gt; '{$g|escape}'</code> and rebuild discovery from the Tools tab.</p>
-            </div>
-        {/if}
-    </section>
-    </div>
+        </form>
+    </dialog>
 {/foreach}
 
 {literal}
 <script>
-(function() {
-    var tabs     = document.querySelectorAll('#mt-pages-tabs .mt-tab');
-    var panels   = document.querySelectorAll('.mt-pages-panel');
-    var input    = document.getElementById('mt-pages-search');
-    var clearBtn = document.getElementById('mt-pages-search-clear');
-    var noRes    = document.getElementById('mt-pages-noresults');
-    var noResQ   = document.getElementById('mt-pages-noresults-q');
-    if (!tabs.length || !panels.length) return;
-
-    var validTabs = {};
-    Array.prototype.forEach.call(tabs, function(t) { validTabs[t.getAttribute('data-tab')] = true; });
-
-    var activeTab = 'all';
-    var query     = '';
-    // Not persisted on purpose: a returning admin must never land on a
-    // filtered list they did not choose. Off is the honest default.
-    var sysToggle  = document.getElementById('mt-pages-showsys');
-    var showSystem = false;
-
-    // Single source of truth: a row is visible when it belongs to the active
-    // tab AND matches the query. Group panels hide when they have no visible
-    // rows, so searching collapses irrelevant groups the way the tabs do.
-    function apply() {
-        var q = query.trim().toLowerCase();
-        var totalVisible = 0;
-        var panelCounts = {};
-
-        Array.prototype.forEach.call(panels, function(panel) {
-            var group   = panel.getAttribute('data-group-panel');
-            var inTab   = (activeTab === 'all') || (group === activeTab);
-            var rows    = panel.querySelectorAll('[data-page-row]');
-            var shown   = 0;
-
-            Array.prototype.forEach.call(rows, function(row) {
-                // A system page is suppressed unless the toggle is on -- EXCEPT
-                // when it matches an explicit search, because someone typing
-                // "two-factor" is looking for exactly that row and silently
-                // withholding it would read as the page not existing.
-                var isSys   = row.hasAttribute('data-system');
-                var sysOk   = !isSys || showSystem || !!q;
-                var hit = inTab && sysOk && (!q || row.getAttribute('data-search').indexOf(q) !== -1);
-                if (hit) { row.removeAttribute('hidden'); shown++; }
-                else     { row.setAttribute('hidden', ''); }
-            });
-
-            // Counts must describe what is ON SCREEN. The server-rendered
-            // total includes system pages, so with them suppressed an
-            // unadjusted "22 pages" over a list of 19 would simply be wrong.
-            var countable = 0;
-            Array.prototype.forEach.call(rows, function(r) {
-                if (!r.hasAttribute('data-system') || showSystem) { countable++; }
-            });
-            panelCounts[group] = countable;
-
-            var countEl = panel.querySelector('[data-group-count]');
-            if (countEl) {
-                countEl.textContent = q
-                    ? (shown + ' of ' + countable + ' pages')
-                    : (countable + (countable === 1 ? ' page' : ' pages'));
-            }
-
-            // A group with zero rows on the server still shows its own empty
-            // state, but only while it is in the active tab and unfiltered.
-            var serverEmpty = rows.length === 0;
-            var visible = inTab && (serverEmpty ? !q : shown > 0);
-            if (visible) { panel.removeAttribute('hidden'); }
-            else         { panel.setAttribute('hidden', ''); }
-
-            totalVisible += shown;
-        });
-
-        var noneAtAll = q && totalVisible === 0;
-        if (noneAtAll) {
-            noResQ.textContent = query.trim();
-            noRes.removeAttribute('hidden');
-        } else {
-            noRes.setAttribute('hidden', '');
+(function () {
+    var body = document.getElementById('mt-pl-body');
+    if (!body) { return; }
+    var rows    = Array.prototype.slice.call(body.querySelectorAll('[data-page-row]'));
+    var rail    = document.getElementById('mt-pl-rail');
+    var input   = document.getElementById('mt-pages-search');
+    var clear   = document.getElementById('mt-pages-search-clear');
+    var sys     = document.getElementById('mt-pages-showsys');
+    var countEl = document.getElementById('mt-pl-count');
+    var empty   = document.getElementById('mt-pl-empty');
+    var AREA_ORDER = ['website', 'client', 'order'];
+    var AREA_LABEL = {};
+    var views = {};
+    Array.prototype.forEach.call(rail.querySelectorAll('[data-view]'), function (b) {
+        views[b.getAttribute('data-view')] = b;
+        if (AREA_ORDER.indexOf(b.getAttribute('data-view')) >= 0) {
+            AREA_LABEL[b.getAttribute('data-view')] = b.firstChild.textContent.trim();
         }
-
-        if (clearBtn) {
-            if (query) { clearBtn.removeAttribute('hidden'); }
-            else       { clearBtn.setAttribute('hidden', ''); }
-        }
-
-        // Tab pills follow the same rule as the group counts: they name what
-        // the tab would show, not what the server rendered.
-        var grand = 0;
-        Array.prototype.forEach.call(tabs, function(t) {
-            var name = t.getAttribute('data-tab');
-            var pill = t.querySelector('[data-tab-pill]');
-            if (!pill || name === 'all') { return; }
-            var n = panelCounts[name] || 0;
-            grand += n;
-            pill.textContent = n;
-        });
-        var allPill = document.querySelector('[data-tab="all"] [data-tab-pill]');
-        if (allPill) { allPill.textContent = grand; }
-
-        // The toggle is a no-op while a query is running (search already
-        // reveals system pages), so say so instead of leaving it looking broken.
-        if (sysToggle) {
-            sysToggle.disabled = !!q;
-            var lbl = sysToggle.closest('.mt-sys-toggle');
-            if (lbl) { lbl.classList.toggle('is-muted', !!q); }
-        }
-    }
-
-    function activate(name, push) {
-        if (!validTabs[name]) name = 'all';
-        activeTab = name;
-        Array.prototype.forEach.call(tabs, function(t) {
-            t.classList.toggle('is-active', t.getAttribute('data-tab') === name);
-        });
-        apply();
-        if (push !== false) {
-            try { history.replaceState(null, '', '#tab=' + encodeURIComponent(name)); } catch (e) {}
-            try { localStorage.setItem('mt-pages-tab', name); } catch (e) {}
-        }
-    }
-
-    Array.prototype.forEach.call(tabs, function(t) {
-        t.addEventListener('click', function(e) {
-            e.preventDefault();
-            activate(t.getAttribute('data-tab'));
-        });
+    });
+    // Groups in the order the server listed them (the page's own group).
+    var groupOrder = [];
+    rows.forEach(function (r) {
+        var g = r.getAttribute('data-group');
+        if (groupOrder.indexOf(g) < 0) { groupOrder.push(g); }
     });
 
-    if (input) {
-        input.addEventListener('input', function() { query = input.value; apply(); });
-        input.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape' && input.value) {
-                e.preventDefault();
-                input.value = ''; query = ''; apply();
+    var state = { view: 'all', q: '', system: false };
+
+    function inView(r, view) {
+        if (!state.system && r.hasAttribute('data-system')) { return false; }
+        if (view === 'all') { return true; }
+        if (view === 'changed') { return r.hasAttribute('data-changed'); }
+        if (view === 'templates') { return +r.getAttribute('data-templates') > 1; }
+        if (view.indexOf('ext-') === 0) { return r.getAttribute('data-ext-group') === views[view].getAttribute('data-ext-group'); }
+        return r.getAttribute('data-area') === view;
+    }
+    function matches(r) {
+        if (!state.q) { return true; }
+        var hay = r.getAttribute('data-search');
+        return state.q.split(/\s+/).every(function (w) { return hay.indexOf(w) >= 0; });
+    }
+
+    function render() {
+        var q = state.q;
+        // A search reveals system pages: someone typing "two-factor" is
+        // looking for exactly that row, and withholding it would read as
+        // the page not existing.
+        var shown = rows.filter(function (r) {
+            var sysOk = state.system || !r.hasAttribute('data-system') || !!q;
+            var ok = sysOk && (q ? matches(r) && inViewIgnoringSystem(r) : inView(r, state.view));
+            r.hidden = !ok;
+            return ok;
+        });
+
+        // Group by area where the list spans areas; inside one area, by the
+        // page's own group (Billing, Support, Built pages).
+        var byArea = AREA_ORDER.indexOf(state.view) < 0;
+        var key = function (r) { return byArea ? r.getAttribute('data-area') : r.getAttribute('data-group'); };
+        var order = byArea ? AREA_ORDER : groupOrder;
+        Array.prototype.forEach.call(body.querySelectorAll('.mt-pl-grp'), function (g) { g.remove(); });
+        var frag = document.createDocumentFragment();
+        order.forEach(function (k) {
+            var inGroup = shown.filter(function (r) { return key(r) === k; });
+            if (!inGroup.length) { return; }
+            var tr = document.createElement('tr');
+            tr.className = 'mt-pl-grp';
+            var td = document.createElement('td');
+            td.colSpan = 4;
+            td.textContent = byArea ? (AREA_LABEL[k] || k) : k;
+            var n = document.createElement('span');
+            n.className = 'n';
+            n.textContent = inGroup.length;
+            td.appendChild(n);
+            tr.appendChild(td);
+            frag.appendChild(tr);
+            inGroup.forEach(function (r) { frag.appendChild(r); });
+        });
+        rows.forEach(function (r) { if (r.hidden) { frag.appendChild(r); } });
+        body.appendChild(frag);
+
+        // The template badge says which template a page uses, on the view
+        // that is about templates.
+        Array.prototype.forEach.call(body.querySelectorAll('[data-template-info]'), function (b) {
+            b.hidden = state.view !== 'templates';
+        });
+
+        Object.keys(views).forEach(function (v) {
+            var on = v === state.view;
+            views[v].classList.toggle('is-on', on);
+            views[v].setAttribute('aria-pressed', on ? 'true' : 'false');
+            var n = rail.querySelector('[data-count-for="' + v + '"]');
+            if (n) { n.textContent = rows.filter(function (r) { return inView(r, v); }).length; }
+        });
+        Array.prototype.forEach.call(rail.querySelectorAll('[data-help-for]'), function (p) {
+            p.hidden = p.getAttribute('data-help-for') !== state.view;
+        });
+        Array.prototype.forEach.call(document.querySelectorAll('[data-view-panel]'), function (p) {
+            p.hidden = p.getAttribute('data-view-panel') !== state.view;
+        });
+
+        countEl.textContent = shown.length + (shown.length === 1 ? ' page' : ' pages');
+        clear.hidden = !input.value;
+        empty.hidden = shown.length > 0;
+        if (!shown.length) {
+            var title, text;
+            if (q) {
+                title = 'No pages match “' + input.value.trim() + '”';
+                text = 'Try another word, or look in All pages.';
+            } else if (state.view === 'changed') {
+                title = 'Nothing changed yet';
+                text = 'Every page uses the theme’s defaults. Pages you change show up here.';
+            } else if (state.view.indexOf('ext-') === 0) {
+                title = 'No pages yet';
+                text = 'Use Add page to make the first one.';
+            } else {
+                title = 'No pages here';
+                text = 'Turn on System pages to see the ones that are hidden.';
             }
-        });
+            document.getElementById('mt-pl-empty-title').textContent = title;
+            document.getElementById('mt-pl-empty-text').textContent = text;
+        }
     }
-    if (clearBtn) {
-        clearBtn.addEventListener('click', function() {
-            input.value = ''; query = ''; apply();
-            input.focus();
-        });
-    }
-    if (sysToggle) {
-        sysToggle.addEventListener('change', function() {
-            showSystem = sysToggle.checked;
-            apply();
-        });
+    // While searching, the view still narrows the list, but system pages are
+    // not held back.
+    function inViewIgnoringSystem(r) {
+        var keep = state.system;
+        state.system = true;
+        var ok = inView(r, state.view);
+        state.system = keep;
+        return ok;
     }
 
-    // Resolve initial tab: URL hash > localStorage > default 'all'.
-    var initial = null;
-    var m = window.location.hash.match(/tab=([^&]+)/);
-    if (m) { try { initial = decodeURIComponent(m[1]); } catch (e) {} }
-    if (!initial) { try { initial = localStorage.getItem('mt-pages-tab'); } catch (e) {} }
-    if (!initial) initial = 'all';
-    activate(initial);
+    function setView(v, remember) {
+        state.view = views[v] ? v : 'all';
+        render();
+        if (remember !== false) {
+            try { history.replaceState(null, '', '#view=' + encodeURIComponent(state.view)); } catch (e) {}
+            try { localStorage.setItem('mt-pages-view', state.view); } catch (e) {}
+        }
+    }
+    // "#view=client", or the old "#tab=Built" a module may still link to.
+    function fromHash() {
+        var m = location.hash.match(/view=([^&]+)/);
+        if (m) { try { return decodeURIComponent(m[1]); } catch (e) {} }
+        var t = location.hash.match(/tab=([^&]+)/);
+        if (t) {
+            var group = '';
+            try { group = decodeURIComponent(t[1]); } catch (e) {}
+            var hit = rail.querySelector('[data-ext-group="' + (window.CSS && CSS.escape ? CSS.escape(group) : group) + '"]');
+            return hit ? hit.getAttribute('data-view') : 'all';
+        }
+        return null;
+    }
 
-    // React to back/forward navigation that changes the hash.
-    window.addEventListener('hashchange', function() {
-        var mm = window.location.hash.match(/tab=([^&]+)/);
-        if (mm) { try { activate(decodeURIComponent(mm[1]), false); } catch (e) {} }
+    rail.addEventListener('click', function (e) {
+        var b = e.target.closest('[data-view]');
+        if (b) { setView(b.getAttribute('data-view')); }
     });
+    if (sys) {
+        sys.addEventListener('change', function () { state.system = sys.checked; render(); });
+    }
+    input.addEventListener('input', function () { state.q = input.value.trim().toLowerCase(); render(); });
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && input.value) { e.preventDefault(); input.value = ''; state.q = ''; render(); }
+    });
+    clear.addEventListener('click', function () { input.value = ''; state.q = ''; render(); input.focus(); });
+
+    // Anywhere on a row opens its settings, except its own links and buttons.
+    body.addEventListener('click', function (e) {
+        if (e.target.closest('a, button, input, select, textarea, label')) { return; }
+        var r = e.target.closest('[data-page-row]');
+        if (!r) { return; }
+        var a = r.querySelector('[data-page-edit]');
+        if (a) { location.href = a.getAttribute('href'); }
+    });
+
+    // Add page
+    Array.prototype.forEach.call(document.querySelectorAll('[data-add-page]'), function (b) {
+        var d = document.querySelector('[data-add-dialog="' + b.getAttribute('data-add-page') + '"]');
+        if (!d || typeof d.showModal !== 'function') { return; }
+        b.addEventListener('click', function () { d.showModal(); var f = d.querySelector('input[name="name"]'); if (f) { f.focus(); } });
+        d.querySelector('[data-dialog-cancel]').addEventListener('click', function () { d.close(); });
+    });
+
+    var initial = fromHash();
+    if (!initial) { try { initial = localStorage.getItem('mt-pages-view'); } catch (e) {} }
+    setView(initial || 'all', false);
+    window.addEventListener('hashchange', function () { var v = fromHash(); if (v) { setView(v, false); } });
 })();
 </script>
 {/literal}

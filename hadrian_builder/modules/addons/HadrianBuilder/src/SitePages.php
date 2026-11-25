@@ -13,7 +13,8 @@ namespace HadrianBuilder;
  * pages, and it hands Hadrian the few controls only it understands:
  *
  *   - rows()        one entry per built page, for the list
- *   - groupPanel()  the "Website served by" switch, shown above the list
+ *   - headerPanel() the "Website served by" switch, in the screen's header
+ *   - groupPanel()  above the list of built pages; nothing there for now
  *   - pagePanel()   what a built page replaces, and its delete button, shown
  *                   on that page's editor
  *
@@ -70,6 +71,13 @@ final class SitePages
             $replaces  = Replace::isTarget((string)($page['replaces'] ?? '')) ? (string)$page['replaces'] : '';
             $serving   = $replaces !== '' && Replace::serves($mode, (string)($page['replace_rule'] ?? ''), (string)$page['status']);
             $meta      = Document::normalizeMeta((array)($page['meta'] ?? []));
+            $target    = $replaces !== '' ? Replace::TARGETS[$replaces] : '';
+            [$status, $tone] = match (true) {
+                !$published => ['Draft', 'warning'],
+                $serving    => ['Serving as ' . $target, 'primary'],
+                $replaces !== '' => ['Standby for ' . $target, 'neutral'],
+                default     => ['Published', 'success'],
+            };
 
             $rows[] = [
                 'id'          => (int)$page['id'],
@@ -79,7 +87,8 @@ final class SitePages
                 'url'         => $slug,
                 // Visitors can reach it: this is what puts it in the sitemap.
                 'live'        => $published && $slug !== '',
-                'status'      => !$published ? 'Draft' : ($serving ? 'Serving' : 'Published'),
+                'status'      => $status,
+                'tone'        => $tone,
                 'editUrl'     => AdminController::BASE . '&action=edit&id=' . (int)$page['id'],
                 // The description typed in the builder is the fallback; one
                 // set in Pages wins. No title is offered: Hadrian would print
@@ -87,47 +96,119 @@ final class SitePages
                 // reaches WHMCS, which adds the company name.
                 'seoDescription' => Text::pick($meta['description'], $lang),
                 'replaces'    => $serving ? $replaces : '',
+                // Set to stand in for a theme page, but not doing so now.
+                'standby'     => $serving ? '' : $replaces,
             ];
         }
         return $rows;
     }
 
     /**
-     * Above the list of built pages: which version of the site visitors get.
-     * Only theme pages that have a built replacement change with it.
+     * In the header of Pages: which version of the site visitors get. It
+     * changes the live site at once, so a click asks first and lists the
+     * theme pages that would change. Without script the buttons just post.
+     *
+     * Only built pages on the "Follow site" rule move with the switch: one on
+     * "Always" serves either way, one on "Never" never does.
      */
-    public static function groupPanel(): string
+    public static function headerPanel(): string
     {
-        $mode    = Replace::mode();
-        $serving = 0;
-        foreach (Page::forSite() as $page) {
-            $serving += Replace::isTarget((string)($page['replaces'] ?? ''))
-                && Replace::serves($mode, (string)($page['replace_rule'] ?? ''), (string)$page['status']) ? 1 : 0;
-        }
+        $mode      = Replace::mode();
         $onBuilder = $mode === Replace::MODE_BUILDER;
-        $sub = $onBuilder
-            ? 'Theme pages that have a built replacement show it. Every other page keeps the theme.'
-            : 'Every website page uses the theme. Built replacements are kept, so switching is instant either way.';
-        if ($serving > 0) {
-            $sub .= ' <strong>' . $serving . '</strong> built ' . ($serving === 1 ? 'page is' : 'pages are') . ' replacing a theme page now.';
+        $serving   = 0;
+        $follows   = [];
+        foreach (Page::forSite() as $page) {
+            $replaces = (string)($page['replaces'] ?? '');
+            if (!Replace::isTarget($replaces) || (string)$page['status'] !== 'published') {
+                continue;
+            }
+            $rule = Replace::rule((string)($page['replace_rule'] ?? ''));
+            $serving += Replace::serves($mode, $rule, 'published') ? 1 : 0;
+            if ($rule === 'follow') {
+                $follows[] = ['target' => Replace::TARGETS[$replaces], 'name' => (string)$page['name']];
+            }
         }
+        $n   = count($follows);
+        $sub = match (true) {
+            $onBuilder && $serving > 0 => $serving . ($serving === 1 ? ' theme page shows its' : ' theme pages show their') . ' built version',
+            $onBuilder                 => 'No built page replaces a theme page yet',
+            $n > 0                     => $n . ($n === 1 ? ' built page is' : ' built pages are') . ' ready to take over',
+            default                    => 'No built page replaces a theme page yet',
+        };
+
         $button = static fn (string $value, string $label, bool $on): string =>
             '<button type="submit" name="mode" value="' . $value . '"' . ($on ? ' class="is-on"' : '')
             . ' aria-pressed="' . ($on ? 'true' : 'false') . '">' . $label . '</button>';
 
+        // What each direction changes, for the dialog. Rendered here so the
+        // script only has to pick one list.
+        $list = static function (bool $toBuilder) use ($follows): string {
+            $out = '';
+            foreach ($follows as $f) {
+                $out .= '<li><span>' . self::e($f['target']) . '</span><span>'
+                    . ($toBuilder ? 'now shows ' . self::e($f['name']) : 'back to the theme\'s page') . '</span></li>';
+            }
+            return $out;
+        };
+        $none = 'No built page replaces a theme page yet, so visitors see no difference until you give one a page to replace.';
+
         return self::STYLE
-            . '<div class="mt-pb-site" id="pb-site">'
-            . '<div class="mt-pb-site-text">'
-            . '<div class="mt-pb-site-title">Website served by</div>'
-            . '<div class="mt-pb-site-sub">' . $sub . '</div>'
-            . '</div>'
-            . '<form method="post" action="' . self::e(AdminController::BASE . '&action=mode') . '" class="mt-pb-seg" role="group" aria-label="Website served by">'
+            . '<div class="mt-pb-served" id="pb-site">'
+            . '<div class="mt-pb-served-text"><span class="mt-pb-served-title">Website served by</span>'
+            . '<span class="mt-pb-served-sub" data-pb-served-sub>' . self::e($sub) . '</span></div>'
+            . '<form method="post" action="' . self::e(AdminController::BASE . '&action=mode') . '" class="mt-pb-seg" role="group" aria-label="Website served by" data-pb-served>'
             . self::token()
             . $button(Replace::MODE_THEME, 'Theme', !$onBuilder)
             . $button(Replace::MODE_BUILDER, 'Page Builder', $onBuilder)
             . '</form>'
-            . '</div>';
+            . '</div>'
+            . '<dialog class="mt-pb-dialog" id="pb-served-confirm" aria-labelledby="pb-served-title">'
+            . '<div class="mt-pb-dialog-body">'
+            . '<h2 id="pb-served-title" data-title-builder="Serve the website with Page Builder?" data-title-theme="Serve the website with the theme?"></h2>'
+            . '<p data-pb-served-text'
+            . ' data-text-builder="' . self::e($n ? 'Visitors get the built version of these pages right away. Every other page keeps the theme.' : $none) . '"'
+            . ' data-text-theme="' . self::e($n ? 'These pages go back to the theme\'s version right away.' : $none) . '"></p>'
+            . '<ul class="mt-pb-effect" data-list="builder" hidden>' . $list(true) . '</ul>'
+            . '<ul class="mt-pb-effect" data-list="theme" hidden>' . $list(false) . '</ul>'
+            . '<p class="mt-pb-dialog-note">Built pages keep their own addresses either way, and you can switch back at any time.</p>'
+            . '<div class="mt-pb-dialog-foot">'
+            . '<button type="button" class="mt-btn mt-btn-secondary mt-btn-sm" data-pb-served-cancel>Cancel</button>'
+            . '<button type="button" class="mt-btn mt-btn-primary mt-btn-sm" data-pb-served-go'
+            . ' data-label-builder="Switch to Page Builder" data-label-theme="Switch to the theme"></button>'
+            . '</div></div></dialog>'
+            . self::SERVED_SCRIPT;
     }
+
+    /**
+     * Above the list while it shows only built pages. The site switch moved
+     * to the header (headerPanel()), so nothing is shown here for now.
+     */
+    public static function groupPanel(): string
+    {
+        return '';
+    }
+
+    /**
+     * The confirm step for the switch. A click on the side that is not on
+     * opens the dialog; confirming posts the form with that side. The choice
+     * is applied from the button's own click, not from the dialog's close
+     * event, which arrives a task later.
+     */
+    private const SERVED_SCRIPT = '<script>(function(){'
+        . 'var f=document.querySelector("[data-pb-served]"),d=document.getElementById("pb-served-confirm");'
+        . 'if(!f||!d||typeof d.showModal!=="function")return;'
+        . 'var go=d.querySelector("[data-pb-served-go]");'
+        . 'f.addEventListener("click",function(e){var b=e.target.closest("button[name=mode]");'
+        . 'if(!b||b.classList.contains("is-on")){if(b)e.preventDefault();return;}'
+        . 'e.preventDefault();var m=b.value;d.dataset.pending=m;'
+        . 'd.querySelector("h2").textContent=d.querySelector("h2").getAttribute("data-title-"+m);'
+        . 'var t=d.querySelector("[data-pb-served-text]");t.textContent=t.getAttribute("data-text-"+m);'
+        . 'Array.prototype.forEach.call(d.querySelectorAll("[data-list]"),function(u){u.hidden=u.getAttribute("data-list")!==m||!u.children.length;});'
+        . 'go.textContent=go.getAttribute("data-label-"+m);d.showModal();});'
+        . 'd.querySelector("[data-pb-served-cancel]").addEventListener("click",function(){d.close();});'
+        . 'go.addEventListener("click",function(){var i=document.createElement("input");i.type="hidden";i.name="mode";i.value=d.dataset.pending;'
+        . 'f.appendChild(i);go.disabled=true;f.submit();});'
+        . '})();</script>';
 
     /**
      * On a built page's editor in Pages: the theme page it stands in for,
@@ -196,6 +277,23 @@ final class SitePages
         . '.mt-pb-seg{display:inline-flex;gap:2px;padding:3px;margin:0;background:var(--mt-surface-2);border:1px solid var(--mt-border);border-radius:999px}'
         . '.mt-pb-seg button{border:0;background:none;padding:6px 16px;border-radius:999px;font:inherit;font-size:13px;font-weight:600;color:var(--mt-text-2);cursor:pointer}'
         . '.mt-pb-seg button.is-on{background:var(--mt-surface);color:var(--mt-text);box-shadow:0 1px 2px rgba(0,0,0,.08),0 0 0 1px var(--mt-border)}'
+        . '.mt-pb-served{display:flex;align-items:center;gap:12px;padding:6px 6px 6px 16px;background:var(--mt-surface);border:1px solid var(--mt-border);border-radius:999px}'
+        . '.mt-pb-served-text{display:flex;flex-direction:column;line-height:1.25;min-width:0}'
+        . '.mt-pb-served-title{font-size:13px;font-weight:600;color:var(--mt-text)}'
+        . '.mt-pb-served-sub{font-size:11.5px;color:var(--mt-text-3)}'
+        . '.mt-pb-served .mt-pb-seg button.is-on{background:var(--mt-primary);color:#fff;box-shadow:none}'
+        . '.mt-pb-dialog{border:0;border-radius:18px;padding:0;width:min(460px,92vw);background:var(--mt-surface);color:var(--mt-text);box-shadow:var(--mt-shadow-lg,0 20px 60px rgba(0,0,0,.25))}'
+        . '.mt-pb-dialog::backdrop{background:rgba(0,0,0,.35)}'
+        . '.mt-pb-dialog-body{padding:24px}'
+        . '.mt-pb-dialog h2{margin:0 0 6px;font-size:20px;font-weight:600}'
+        . '.mt-pb-dialog p{margin:0 0 16px;font-size:13.5px;line-height:1.5;color:var(--mt-text-2)}'
+        . '.mt-pb-dialog .mt-pb-dialog-note{margin:12px 0 0;font-size:12.5px;color:var(--mt-text-3)}'
+        . '.mt-pb-effect{list-style:none;margin:0;padding:0;border:1px solid var(--mt-border);border-radius:12px}'
+        . '.mt-pb-effect[hidden]{display:none}'
+        . '.mt-pb-effect li{display:flex;justify-content:space-between;gap:12px;padding:10px 14px;font-size:13.5px;border-bottom:1px solid var(--mt-border)}'
+        . '.mt-pb-effect li:last-child{border-bottom:0}'
+        . '.mt-pb-effect li span:last-child{color:var(--mt-text-3);text-align:right}'
+        . '.mt-pb-dialog-foot{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}'
         . '.mt-pb-replace{display:flex;gap:6px;margin:0;flex:none}'
         . '.mt-pb-replace .mt-select{width:auto;min-width:150px;padding-top:8px;padding-bottom:8px;font-size:13px}'
         . '</style>';
