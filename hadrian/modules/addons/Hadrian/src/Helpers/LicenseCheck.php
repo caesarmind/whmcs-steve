@@ -7,15 +7,16 @@ namespace Hadrian\Helpers;
  * Admin-side license status check.
  *
  * The buyer-side license hook is the enforcement point. This is only for the
- * admin status display, so it calls the Licensing Manager's verify endpoint
- * directly over HTTPS and trusts the TLS response (it does not re-check the
- * HMAC - verifying it would mean shipping the product secret inside this
- * readable file). It POSTs to the FIXED vendor endpoint, never to a URL
- * derived from the request: $_SERVER['HTTP_HOST'] is the buyer's own domain
- * on every install but ours, where no verify.php exists. The request BODY
- * still mirrors the hook's (same domain + directory), because verify.php has
- * write side effects - a Reissued license locks to the calling environment
- * verbatim - so a mismatched identity here could consume the reissue or
+ * admin status display. Both ask the same licence server, whose replies are
+ * RSA-signed: this file carries the PUBLIC key, checks the signature, and
+ * checks that the reply answers this request (our token and our key). A
+ * public key cannot sign, so shipping it in this readable file is safe.
+ *
+ * It POSTs to the FIXED vendor endpoint, never to a URL derived from the
+ * request: $_SERVER['HTTP_HOST'] is the buyer's own domain. The request BODY
+ * mirrors the hook's (same domain + directory), because the licence server
+ * has write side effects - a reissued licence locks to the calling
+ * environment - so a mismatched identity here could consume the reissue or
  * create a false directory conflict.
  *
  * Results are cached briefly (tmp file, CACHE_TTL) so browsing the admin does
@@ -29,9 +30,25 @@ namespace Hadrian\Helpers;
  */
 final class LicenseCheck
 {
-    /** The Licensing Manager - the same endpoint the buyer-side hook posts to
+    /** The licence server - the same endpoint the buyer-side hook posts to
         (HOSTNODES_VERIFY_URL there). Keep the two in lockstep. */
-    private const VERIFY_URL = 'https://bill.hostnodes.com/modules/servers/licensing/verify.php';
+    private const VERIFY_URL = 'https://license.hostnodes.com/hostnodes-licensing/verify.php';
+
+    /** The public half of the licence server's key pair (HOSTNODES_PUBLIC_KEY
+        in the hook). It can check a signature, never make one. */
+    private const PUBLIC_KEY = <<<'PEM'
+-----BEGIN PUBLIC KEY-----
+MIIBojANBgkqhkiG9w0BAQEFAAOCAY8AMIIBigKCAYEA1Xc4TAYa4OugGLYuuQOi
+F++s9+LDiykDdDvjjAzBNn0rLFBE2JUCDSnF9c8vyUEJztjvIGri1+oeZCtrNi9g
+4w1NqPJAN/gAN/OHTwOvOUOZZoJP2e3D2w7ZBlB4hgIiQVhqBd3iaHy683fQuSO2
+Om/QbnTteDygbpVv/jicf7g0xUBPZYRFdv8M0ZDhzpcyxVhGLyOpJ4J8gxorzscx
+0lZmM8ce6oxXimFx0pWYD3c22FNkQ4USTvfsHdWU9dcvRxSNb1rcbs91Ol+nAbK7
+NskBE1iycpEBBPvI4RyFj6FmpdaL+yXtPCVVt2Q8apXCSz8mKoLL2ZlqWiAexDuK
+4xh/RnKcm+FEUp7rfE1pRrPDGV5M6z7x9a70gnkiRKaoYj4E0oGN36T3fOwE2NvG
+kiPX8eL5uJPeHOnnOBqQr95+AYIeqlpurEd8t+hGdFC9Sgq5JLf6wzenJY0do7UV
+c1DD57OWE8MdxBToE3FqjxmBvWJM9JRFmLxfLXv5NDAnAgMBAAE=
+-----END PUBLIC KEY-----
+PEM;
 
     /** How long a successful check may be reused before re-asking. */
     private const CACHE_TTL = 900; // 15 min
@@ -48,38 +65,77 @@ final class LicenseCheck
             return $cached;
         }
 
-        $host = (string) ($_SERVER['HTTP_HOST'] ?? '');
-        $resp = self::post(self::VERIFY_URL, [
+        $host  = (string) ($_SERVER['HTTP_HOST'] ?? '');
+        $nonce = bin2hex(random_bytes(16));
+        $resp  = self::post(self::VERIFY_URL, [
             'licensekey'  => $key,
             'domain'      => $host,
             'ip'          => (string) ($_SERVER['SERVER_ADDR'] ?? ''),
-            'dir'         => (defined('ROOTDIR') ? ROOTDIR : '') . '/includes/hooks',
-            'check_token' => bin2hex(random_bytes(8)),
+            'dir'         => self::installDir(),
+            'check_token' => $nonce,
+            'product'     => 'hadrian',
+            'version'     => self::installedRelease(),
         ]);
 
+        // No answer, or a server-side fault (an unsigned 503): the "could not
+        // verify right now" alert, never cached, so the next view retries.
         if ($resp === null) {
             return ['active' => false, 'status' => 'Unreachable', 'data' => []];
         }
 
-        $env  = json_decode($resp, true);
-        $data = is_array($env) ? json_decode((string) ($env['payload'] ?? ''), true) : null;
-        if (!is_array($data)) {
+        $data = self::open($resp, $nonce, $key);
+        if ($data === null) {
             return ['active' => false, 'status' => 'Unknown', 'data' => []];
         }
 
         $status = (string) ($data['status'] ?? 'Invalid');
-
-        // 'Error' is the Licensing Manager's catch-all for a server-side fault
-        // (its unknown-key answer is 'Invalid'). Treat it like an outage: the
-        // "could not verify right now" alert, and never cached, so the next
-        // page view retries instead of pinning a transient hiccup for 15 min.
-        if ($status === 'Error') {
-            return ['active' => false, 'status' => 'Unreachable', 'data' => []];
-        }
-
         $result = ['active' => $status === 'Active', 'status' => $status, 'data' => $data];
         self::writeCache($key, $result);
         return $result;
+    }
+
+    /**
+     * The folder this install is bound to: the real path of includes/hooks with
+     * forward slashes. The theme hook sends exactly the same string, so both
+     * checks match the one binding on Windows and behind symlinks too.
+     */
+    private static function installDir(): string
+    {
+        $dir  = (defined('ROOTDIR') ? ROOTDIR : '') . '/includes/hooks';
+        $real = realpath($dir);
+        return str_replace('\\', '/', $real !== false ? $real : $dir);
+    }
+
+    // --------------------------------------------------------------- the reply
+
+    /** The payload of a reply signed by the licence server for this request, or null. */
+    private static function open(string $resp, string $nonce, string $key): ?array
+    {
+        if (!function_exists('openssl_verify')) {
+            return null;
+        }
+        $env  = json_decode($resp, true);
+        $body = is_array($env) ? ($env['payload'] ?? null) : null;
+        $sig  = is_array($env) ? base64_decode((string) ($env['signature'] ?? ''), true) : false;
+        if (!is_string($body) || $sig === false || $sig === ''
+            || openssl_verify($body, $sig, self::PUBLIC_KEY, OPENSSL_ALGO_SHA256) !== 1) {
+            return null;
+        }
+        $data = json_decode($body, true);
+        if (!is_array($data)
+            || !hash_equals($nonce, (string) ($data['nonce'] ?? ''))
+            || !hash_equals($key, (string) ($data['key'] ?? ''))) {
+            return null;
+        }
+        return $data;
+    }
+
+    /** The theme release this site runs, from the release.json a build stamps in. */
+    private static function installedRelease(): string
+    {
+        $root = defined('ROOTDIR') ? ROOTDIR : '';
+        $mark = json_decode((string) @file_get_contents($root . '/templates/hadrian/release.json'), true);
+        return is_array($mark) ? (string) ($mark['release'] ?? '') : '';
     }
 
     // ------------------------------------------------------------------ cache

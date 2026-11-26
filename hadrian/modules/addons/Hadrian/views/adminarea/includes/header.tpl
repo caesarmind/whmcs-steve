@@ -26,13 +26,13 @@
             <div class="mt-brandbar-left">
                 <span class="mt-brandmark" role="img" aria-label="Hadrian"></span>
                 <div class="mt-brand-text">
-                    <div class="mt-brandname">Caesarthemes</div>
+                    <div class="mt-brandname">{$mtBrand.vendor|escape}</div>
                     <div class="mt-brandversion">Hadrian &middot; Client Theme</div>
                 </div>
                 {if $mtThemeVersion|default:''}<span class="mt-brand-ver">v{$mtThemeVersion|escape}</span>{/if}
             </div>
             <div class="mt-brandbar-right">
-                <a class="mt-brandbar-link" href="https://docs.hadrianthegreat.com/" target="_blank" rel="noopener">
+                <a class="mt-brandbar-link" href="{$mtBrand.docsUrl|escape}" target="_blank" rel="noopener">
                     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
                         <path d="M3 2.5h6.5L13 6v7.5a1 1 0 01-1 1H3a1 1 0 01-1-1v-10a1 1 0 011-1z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
                         <path d="M9.5 2.5V6H13" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
@@ -40,7 +40,7 @@
                     </svg>
                     Docs
                 </a>
-                <a class="mt-brandbar-link" href="https://github.com/hostnodes/issues" target="_blank" rel="noopener">
+                <a class="mt-brandbar-link" href="{$mtBrand.bugsUrl|escape}" target="_blank" rel="noopener">
                     <svg viewBox="0 0 16 16" fill="none" aria-hidden="true">
                         <path d="M5 7c0-1.5 1.5-3 3-3s3 1.5 3 3v3a3 3 0 11-6 0V7z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/>
                         <path d="M2.5 8.5h3M10.5 8.5h3M3 5l1.5 1.5M13 5l-1.5 1.5M3 12l1.5-1.5M13 12l-1.5-1.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>

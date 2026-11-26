@@ -139,6 +139,7 @@ PEM;
             'days'    => $days !== null ? (int)$days : null,
             'message' => $message,
             'key'     => $this->getLicenseKey(),
+            'renewUrl' => \Hadrian\Brand::ACCOUNT_URL,
         ]);
     }
 

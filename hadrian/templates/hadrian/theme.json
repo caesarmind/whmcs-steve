@@ -4,7 +4,7 @@
   "version": "1.7.1",
   "displayName": "Hadrian",
   "description": "A modern WHMCS client area theme.",
-  "author": "Your Studio",
+  "author": "Caesarthemes",
 
   "requires": {
     "whmcs": ">=9.0",

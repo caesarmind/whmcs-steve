@@ -28,7 +28,9 @@ function HadrianBuilder_config()
     return [
         'name'        => 'Hadrian Page Builder',
         'description' => 'Build marketing pages from sections and publish them at their own addresses. Requires the Hadrian addon and theme.',
-        'author'      => 'Caesarthemes',
+        // Vendor name lives in Hadrian's src/Brand.php; the literal only shows
+        // when Hadrian itself is missing (this module requires it).
+        'author'      => class_exists('\\Hadrian\\Brand') ? \Hadrian\Brand::authorHtml() : 'Caesarthemes',
         'language'    => 'english',
         'version'     => HadrianBuilder\AdminController::VERSION,
         'fields'      => [

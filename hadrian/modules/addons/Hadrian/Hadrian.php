@@ -42,8 +42,8 @@ function Hadrian_config()
 {
     return [
         'name'        => 'Hadrian',
-        'description' => 'Manages Hadrian client-area templates. <a href="https://your-domain.com/" target="_blank">Learn more</a>',
-        'author'      => '<a href="https://your-domain.com" target="_blank">Your Studio</a>',
+        'description' => 'Manages Hadrian client-area templates. <a href="' . htmlspecialchars(\Hadrian\Brand::PRODUCT_URL) . '" target="_blank" rel="noopener">Learn more</a>',
+        'author'      => \Hadrian\Brand::authorHtml(),
         'language'    => 'english',
         'version'     => '1.2.3',
         'fields'      => [

@@ -73,6 +73,8 @@ abstract class AbstractController
             // The theme version in the header pill: the same value the Info
             // page shows (core/hadrian.php). Empty when the theme can't load.
             'mtThemeVersion' => \Hadrian\Helpers\AddonHelper::getTemplate()?->getVersion() ?? '',
+            // Vendor name and links, one source: src/Brand.php.
+            'mtBrand'       => \Hadrian\Brand::toArray(),
             ...$vars,
         ]);
         return (string)$this->smarty->fetch($template . '.tpl');

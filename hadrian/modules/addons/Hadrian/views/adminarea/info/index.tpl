@@ -14,7 +14,7 @@
     </header>
     <dl class="mt-deflist">
         <dt>Theme Version</dt>
-        <dd>{$info.version|escape}{if $info.newVersion} <span class="mt-badge mt-badge-primary">New version available</span>{/if}</dd>
+        <dd>{$info.version|escape}{if $info.newVersion} <span class="mt-badge mt-badge-primary">Version {$info.newVersion|escape} available</span>{if !$info.newAllowed} <span class="mt-text-3">(renew support to install it)</span>{/if}{/if}</dd>
     </dl>
 </section>
 
@@ -38,7 +38,7 @@
         <dd>{if $license.key}<code>{$license.key|escape}</code>{else}<span class="mt-text-3">Not set</span>{/if}</dd>
 
         <dt>Support &amp; Updates</dt>
-        <dd>{if $license.active}<span class="mt-badge mt-badge-success">Entitled</span>{else}<span class="mt-badge mt-badge-warning">Paused &middot; renew to update</span>{/if}</dd>
+        <dd>{if $updates.entitled && $updates.ended}<span class="mt-badge mt-badge-warning">Ended {$updates.until|escape}</span> <span class="mt-text-3">releases up to that date are covered</span>{elseif $updates.entitled}<span class="mt-badge mt-badge-success">Entitled</span>{if $updates.kind == 'lifetime'} <span class="mt-text-3">for life</span>{elseif $updates.until} <span class="mt-text-3">until {$updates.until|escape}</span>{/if}{else}<span class="mt-badge mt-badge-warning">Paused &middot; renew to update</span>{if $updates.until} <span class="mt-text-3">support ended {$updates.until|escape}</span>{/if}{/if}</dd>
 
         {if $license.data.productname}<dt>Product</dt>
         <dd>{$license.data.productname|escape}</dd>{/if}

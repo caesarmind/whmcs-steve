@@ -28,7 +28,9 @@ function HadrianEmail_config()
     return [
         'name'        => 'Hadrian Email Templates',
         'description' => 'Branded email for WHMCS: a layout around every client email and a block builder for the ones you redesign. Requires the Hadrian addon.',
-        'author'      => 'Caesarthemes',
+        // Vendor name lives in Hadrian's src/Brand.php; the literal only shows
+        // when Hadrian itself is missing (this module requires it).
+        'author'      => class_exists('\\Hadrian\\Brand') ? \Hadrian\Brand::authorHtml() : 'Caesarthemes',
         'language'    => 'english',
         'version'     => '1.0.0',
         'fields'      => [

@@ -15,7 +15,7 @@
     </div>
     <div class="alert-actions">
         {if $state != 'DEV_MODE'}
-            <a href="https://your-domain.com/my-account/" target="_blank" class="btn btn-default">Renew</a>
+            <a href="{$renewUrl|escape}" target="_blank" class="btn btn-default">Renew</a>
         {/if}
         <a href="addonmodules.php?module=Hadrian&action=license" class="btn btn-default">Manage</a>
     </div>
