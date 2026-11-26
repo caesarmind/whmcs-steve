@@ -16,9 +16,14 @@ export const measure = () => {
   const rgb = s => (s.match(/[\d.]+/g) || []).map(Number);
   const lum = ([r, g, b]) => [r, g, b].map(v => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; })
     .reduce((a, v, i) => a + v * [0.2126, 0.7152, 0.0722][i], 0);
+  // null when the nearest painted layer is a gradient or an image: one colour
+  // cannot stand for it, and the fallback below would measure against the page
+  // colour behind it instead (the beacon sign-in field read 1.23:1 that way).
   const bgOf = el => {
     for (let e = el; e; e = e.parentElement) {
-      const c = rgb(getComputedStyle(e).backgroundColor);
+      const cs = getComputedStyle(e);
+      if (cs.backgroundImage && cs.backgroundImage !== 'none') return null;
+      const c = rgb(cs.backgroundColor);
       if (c.length >= 3 && (c[3] === undefined || c[3] > 0.5)) return c;
     }
     return document.documentElement.dataset.theme === 'dark' ? [0, 0, 0] : [255, 255, 255];
@@ -27,7 +32,9 @@ export const measure = () => {
   const contrastOf = (sel, min) => {
     const el = [...document.querySelectorAll(sel)].find(e => e.textContent.trim().length > 2 && e.getBoundingClientRect().width > 0);
     if (!el) return null;
-    const a = lum(rgb(getComputedStyle(el).color)), b = lum(bgOf(el));
+    const bg = bgOf(el);
+    if (!bg) return null;
+    const a = lum(rgb(getComputedStyle(el).color)), b = lum(bg);
     return { sel, min, text: el.textContent.trim().slice(0, 40), ratio: Math.round(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)) * 100) / 100 };
   };
   // Accessibility basics, no library: controls a screen reader cannot name.

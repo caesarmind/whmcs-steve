@@ -546,14 +546,15 @@ test.describe('TH-J Languages', () => {
     buyerFile(FILES.langFrench, "<?php\nreturn ['common' => ['localeChoose' => \n");   // a syntax error
     await opcacheSettle(page);
     try {
-      // The footer locale button (partials/locale-btn.tpl) carries the string;
-      // the sidebar's switcher items share data-locale-open but have no label.
+      // The footer locale button (partials/locale-btn.tpl) carries the string
+      // as hidden text after the visible "English / USD", so the spoken name
+      // starts with what is on screen (WCAG 2.5.3); an aria-label would hide it.
       await page.goto('/?language=english');
-      await expect(page.locator('button.locale-btn').first()).toHaveAttribute('aria-label', 'Choose a language (hadrian-test override)');
+      await expect(page.locator('button.locale-btn .sr-only').first()).toContainText('Choose a language (hadrian-test override)');
       const res = await page.goto('/?language=french');
       expect(res.status()).toBe(200);
       expect(inspect(await page.content()).problems, 'the broken file breaks nothing').toEqual([]);
-      const label = await page.locator('button.locale-btn').first().getAttribute('aria-label');
+      const label = await page.locator('button.locale-btn .sr-only').first().textContent();
       expect(label.trim().length).toBeGreaterThan(0);
       expect(label).not.toContain('hadrian-test');
     } finally {
