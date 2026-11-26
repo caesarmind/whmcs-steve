@@ -2,7 +2,7 @@
 /**
  * Regression harness for the light-scope colour leak.
  *
- * Builds four pages against the REAL apple-theme.css + apple-layout.css, each
+ * Builds four pages against the REAL core-theme.css + core-layout.css, each
  * carrying the block Hooks::buildColorsHead emits -- with the selector read out
  * of Hooks.php itself, so this cannot pass while the shipped selector says
  * something else.
@@ -34,8 +34,18 @@ $darkSel = $m2[1];
 echo "light selector from Hooks.php : {$lightSel}\n";
 echo "dark  selector from Hooks.php : {$darkSel}\n";
 
-$css = file_get_contents($tpl . '/assets/css/apple-theme.css')
-     . "\n" . file_get_contents($tpl . '/assets/css/apple-layout.css');
+// A sheet that is not there must stop the run: until 2026-11-25 this read
+// apple-theme.css and apple-layout.css, renamed to core-* on 2026-08-21, and
+// every preview since was built with no theme CSS at all.
+$sheet = static function (string $file) use ($tpl): string {
+    $css = is_file($tpl . '/assets/css/' . $file) ? file_get_contents($tpl . '/assets/css/' . $file) : false;
+    if ($css === false || trim($css) === '') {
+        fwrite(STDERR, "FAIL the theme stylesheet assets/css/{$file} is missing or empty - update this checker\n");
+        exit(1);
+    }
+    return $css;
+};
+$css = $sheet('core-theme.css') . "\n" . $sheet('core-layout.css');
 
 /* Light-scope overrides only -- no dark counterpart, exactly as saved. */
 $lightDecls = '--sidebar-text:#1d1d21;--sidebar-text-muted:#87868a;'

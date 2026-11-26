@@ -483,6 +483,14 @@ final class StylesController extends AbstractController
             $it['value'] = (int)($weightsStored[$it['var']] ?? $it['default']);
             $weights[] = $it;
         }
+        // Line heights are unitless ratios: a float, never an (int) cast.
+        $lhStored    = is_array($stored['lineHeights'] ?? null) ? $stored['lineHeights'] : [];
+        $lineHeights = [];
+        foreach (($cfg['lineHeights'] ?? []) as $it) {
+            $it['value'] = (float)($lhStored[$it['var']] ?? $it['default']);
+            $lineHeights[] = $it;
+        }
+        $hf = is_array($stored['headingFamily'] ?? null) ? $stored['headingFamily'] : [];
 
         // Effective "how it's written" stack per mode: the stored override for the
         // active mode, else a freshly-derived stack from that mode's pick. The
@@ -511,6 +519,14 @@ final class StylesController extends AbstractController
         return [
             'sizeGroups'     => $sizeGroups,
             'weights'        => $weights,
+            'lineHeights'    => $lineHeights,
+            'lineHeightMin'  => (float)($cfg['lineHeightMin'] ?? 0.8),
+            'lineHeightMax'  => (float)($cfg['lineHeightMax'] ?? 3.0),
+            // "Same as body text" unless a Google family is stored for headings.
+            'headingFamily'  => [
+                'mode'   => (($hf['mode'] ?? '') === 'google' && (string)($hf['google'] ?? '') !== '') ? 'google' : 'body',
+                'google' => (string)($hf['google'] ?? ''),
+            ],
             'weightOptions'  => $cfg['weightOptions'] ?? [300, 400, 500, 600, 700, 900],
             // Both pre-encoded here rather than in the view: Smarty has no
             // json_encode modifier registered, and the encoding of the blob the
@@ -591,6 +607,42 @@ final class StylesController extends AbstractController
         }
         if ($weights !== []) {
             $out['weights'] = $weights;
+        }
+
+        // Line heights: unitless ratios inside the schema's bounds, stored only
+        // where they differ from the default (compared with a tolerance -- the
+        // Normal default is 1.47059, which a number field may echo rounded).
+        $lhMin       = (float)($cfg['lineHeightMin'] ?? 0.8);
+        $lhMax       = (float)($cfg['lineHeightMax'] ?? 3.0);
+        $lineHeights = [];
+        foreach (($cfg['lineHeights'] ?? []) as $it) {
+            $key = 'lh_' . str_replace('--', '', $it['var']);
+            if (!isset($_POST[$key]) || !is_numeric($_POST[$key])) {
+                continue;
+            }
+            $val = round((float)$_POST[$key], 3);
+            if ($val < $lhMin || $val > $lhMax || abs($val - (float)$it['default']) < 0.0006) {
+                continue;
+            }
+            $lineHeights[$it['var']] = $val;
+        }
+        if ($lineHeights !== []) {
+            $out['lineHeights'] = $lineHeights;
+        }
+
+        // Heading font: "Same as body text" stores nothing; a Google family is
+        // allowlisted against the catalog exactly as the body font is below.
+        if ((string)($_POST['hf_mode'] ?? 'body') === 'google' && trim((string)($_POST['hf_google'] ?? '')) !== '') {
+            $name    = trim((string)$_POST['hf_google']);
+            $catalog = $this->loadGoogleFontCatalog($template, $cfg);
+            if ($catalog === [] || in_array($name, array_column($catalog, 0), true)) {
+                $heading = ['mode' => 'google', 'google' => $name];
+                $hw      = $this->googleWeightsFor($catalog, $cfg, $name);
+                if ($hw !== []) {
+                    $heading['googleWeights'] = $hw;
+                }
+                $out['headingFamily'] = $heading;
+            }
         }
 
         // Font family. The admin-editable "stack" string (the exact value written to
@@ -912,10 +964,14 @@ final class StylesController extends AbstractController
         // render at the head of it. Found by MEMBERSHIP, not by name: group
         // names are display strings this file says are free to change.
         $navGroup = '';
+        $footerGroup = '';
         foreach (($cfg['groups'] ?? []) as $groupName => $tokens) {
             foreach ($tokens as $t) {
                 if ((string)($t['var'] ?? '') === '--sidebar-bg') {
                     $navGroup = (string)$groupName;
+                }
+                if ((string)($t['var'] ?? '') === '--footer-bg') {
+                    $footerGroup = (string)$groupName;
                 }
             }
         }
@@ -960,16 +1016,36 @@ final class StylesController extends AbstractController
            functions as modifiers when the security policy allows it, and this
            renders inside WHMCS's admin. Encoding in the controller cannot be
            switched off underneath us. */
-        $sbStyles = [];
-        foreach ((array)($cfg['sidebarStyles'] ?? []) as $key => $sb) {
-            // Both scopes' token sets go to the browser: one click fills the
-            // visible rows AND the hidden other-scope fields, so a style lands
-            // in light and dark together.
-            $sb['json']     = json_encode((object)($sb['tokens'][$mode] ?? []), JSON_UNESCAPED_SLASHES);
-            $sb['jsonOther'] = json_encode((object)($sb['tokens'][$other] ?? []), JSON_UNESCAPED_SLASHES);
-            $sb['dot']      = (string)($sb['value'][$mode] ?? '');
-            $sb['dotOther'] = (string)($sb['value'][$other] ?? '');
-            $sbStyles[$key] = $sb;
+        $encodeStyles = function (array $list) use ($mode, $other): array {
+            $out = [];
+            foreach ($list as $key => $sb) {
+                // Both scopes' token sets go to the browser: one click fills the
+                // visible rows AND the hidden other-scope fields, so a style
+                // lands in light and dark together.
+                $sb['json']      = json_encode((object)($sb['tokens'][$mode] ?? []), JSON_UNESCAPED_SLASHES);
+                $sb['jsonOther'] = json_encode((object)($sb['tokens'][$other] ?? []), JSON_UNESCAPED_SLASHES);
+                $sb['dot']       = (string)($sb['value'][$mode] ?? '');
+                $sb['dotOther']  = (string)($sb['value'][$other] ?? '');
+                $sb['inkJson']   = isset($sb['inkRamp']) && is_array($sb['inkRamp'])
+                    ? json_encode((object)$sb['inkRamp'], JSON_UNESCAPED_SLASHES) : '';
+                $out[(string)$key] = $sb;
+            }
+            return $out;
+        };
+        $sbStyles = $encodeStyles((array)($cfg['sidebarStyles'] ?? []));
+
+        /* One chip row per AREA, each rendered at the head of the group that
+           holds its background row. The sidebar's "off" chip is Light and the
+           footer's is Default, because that is what each one resets to. */
+        $areaStyles = [];
+        if ($navGroup !== '' && $sbStyles !== []) {
+            $areaStyles[] = ['area' => 'sidebar', 'group' => $navGroup, 'bg' => '--sidebar-bg',
+                             'offLabel' => 'Light', 'styles' => $sbStyles];
+        }
+        $ftStyles = $encodeStyles((array)($cfg['footerStyles'] ?? []));
+        if ($footerGroup !== '' && $ftStyles !== []) {
+            $areaStyles[] = ['area' => 'footer', 'group' => $footerGroup, 'bg' => '--footer-bg',
+                             'offLabel' => 'Default', 'styles' => $ftStyles];
         }
 
         $accents = ['light' => '', 'dark' => ''];
@@ -993,6 +1069,7 @@ final class StylesController extends AbstractController
             // defaults, so picking it resets rather than writes.
             'sbStyles' => $sbStyles,
             'navGroup' => $navGroup,
+            'areaStyles' => $areaStyles,
         ];
     }
 
@@ -1397,6 +1474,9 @@ final class StylesController extends AbstractController
                         : (string)$f['default'];
                 } elseif ($type === 'em') {
                     $f['value'] = $raw !== null ? (float)$raw : (float)$f['default'];
+                } elseif ($type === 'hex') {
+                    $hex = $raw !== null ? strtolower(trim((string)$raw)) : '';
+                    $f['value'] = preg_match('/^#[0-9a-f]{6}$/', $hex) ? $hex : (string)$f['default'];
                 } else {
                     $f['value'] = $raw !== null ? (int)$raw : (int)$f['default'];
                 }
@@ -1458,13 +1538,30 @@ final class StylesController extends AbstractController
                     continue;
                 }
 
+                if ($type === 'hex') {
+                    $hex = strtolower(trim((string)$in[$var]));
+                    if (!preg_match('/^#[0-9a-f]{6}$/', $hex) || $hex === strtolower((string)$f['default'])) {
+                        continue;
+                    }
+                    $out[$var] = $hex;
+                    continue;
+                }
+
+                // A field may narrow the panel-wide bounds (the Custom shadow
+                // sliders do), and pct is capped at 100 whatever it declares.
+                $lo  = isset($f['min']) ? max($min, (int)$f['min']) : $min;
+                $hi  = isset($f['max']) ? min($max, (int)$f['max']) : $max;
+                if ($type === 'pct') {
+                    $hi = min($hi, 100);
+                }
                 $val = (int)$in[$var];
-                if ($val < $min || $val > $max || $val === (int)$f['default']) {
+                if ($val < $lo || $val > $hi || $val === (int)$f['default']) {
                     continue;
                 }
                 // Motion is stored WITH the curve re-attached, so the emitter
                 // stays a dumb passthrough like every other head builder.
-                $out[$var] = $type === 'ms' ? ($val . 'ms ' . $easing) : ($val . 'px');
+                $out[$var] = $type === 'ms' ? ($val . 'ms ' . $easing)
+                    : ($type === 'pct' ? ($val . '%') : ($val . 'px'));
             }
         }
 

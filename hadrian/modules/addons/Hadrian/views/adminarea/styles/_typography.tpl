@@ -102,6 +102,52 @@
         </div>
     </section>
 
+    {* Headings h1 to h6. A second picker over the same Google catalog: it has
+       no catalog <script> of its own, the picker JS in includes/footer.tpl
+       reads the one above. hf_google round-trips even in "Same as body" mode;
+       the save path only reads it when hf_mode is 'google'. *}
+    <section class="mt-section">
+        <header class="mt-section-header"><h2 class="mt-section-title">Heading Font</h2>{include file="includes/doclink.tpl" article="styles" anchor="heading-font"}</header>
+        <div class="mt-typo-fonts mt-typo-heading">
+            <label class="mt-typo-radio">
+                <input type="radio" name="hf_mode" value="body"{if $typography.headingFamily.mode == 'body'} checked{/if}>
+                <span>Same as body text</span>
+            </label>
+            <label class="mt-typo-radio">
+                <input type="radio" name="hf_mode" value="google"{if $typography.headingFamily.mode == 'google'} checked{/if}>
+                <span>Google Font <em>(headings h1 to h6; the body font stays behind it for any missing letters)</em></span>
+            </label>
+            <div class="mt-typo-dep">
+                <div class="mt-fontpick-wrap" data-fontpick data-count="{$typography.googleCount}">
+                    <input type="hidden" name="hf_google" value="{$typography.headingFamily.google|escape}" data-fontpick-value>
+                    <button type="button" class="mt-fontpick" data-fontpick-field aria-haspopup="listbox" aria-expanded="false">
+                        <span class="mt-fontpick-name" data-fontpick-label>&mdash; select a Google font &mdash;</span>
+                        <span class="mt-fontpick-meta" data-fontpick-meta></span>
+                        <span class="mt-fontpick-caret" aria-hidden="true">
+                            <svg viewBox="0 0 16 16" fill="none"><path d="M4 6l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                        </span>
+                    </button>
+                    <div class="mt-fontpick-panel" hidden data-fontpick-panel role="listbox">
+                        <div class="mt-fontpick-head">
+                            <input type="search" placeholder="Search {$typography.googleCount} Google fonts&hellip;" autocomplete="off"
+                                   aria-label="Search Google fonts for headings" data-fontpick-search>
+                            <div class="mt-fontpick-cats" role="group" aria-label="Filter by category">
+                                <button type="button" class="mt-fontpick-cat is-active" data-cat="">All</button>
+                                <button type="button" class="mt-fontpick-cat" data-cat="sans">Sans</button>
+                                <button type="button" class="mt-fontpick-cat" data-cat="serif">Serif</button>
+                                <button type="button" class="mt-fontpick-cat" data-cat="display">Display</button>
+                                <button type="button" class="mt-fontpick-cat" data-cat="hand">Handwriting</button>
+                                <button type="button" class="mt-fontpick-cat" data-cat="mono">Mono</button>
+                            </div>
+                        </div>
+                        <div class="mt-fontpick-options" data-fontpick-options></div>
+                        <div class="mt-fontpick-empty" hidden data-fontpick-empty>No fonts match.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="mt-section">
         <header class="mt-section-header"><h2 class="mt-section-title">Font Size</h2>{include file="includes/doclink.tpl" article="styles" anchor="font-size-and-font-weight"}</header>
         {foreach $typography.sizeGroups as $groupName => $items}
@@ -118,6 +164,18 @@
                 {/foreach}
             </div>
         {/foreach}
+    </section>
+
+    <section class="mt-section">
+        <header class="mt-section-header"><h2 class="mt-section-title">Line Height</h2>{include file="includes/doclink.tpl" article="styles" anchor="line-height"}</header>
+        <div class="mt-typo-grid">
+            {foreach $typography.lineHeights as $it}
+                <div class="mt-typo-field">
+                    <label class="mt-typo-field-label" for="lh_{$it.var|replace:'--':''}">{$it.label|escape}</label>
+                    <input type="number" id="lh_{$it.var|replace:'--':''}" name="lh_{$it.var|replace:'--':''}" value="{$it.value}" min="{$typography.lineHeightMin}" max="{$typography.lineHeightMax}" step="any" class="mt-input mt-input-compact">
+                </div>
+            {/foreach}
+        </div>
     </section>
 
     <section class="mt-section">

@@ -158,8 +158,13 @@
            resets those rows rather than writing to them. *}
 
         <div class="mt-color-rows mt-cs-card">
-        {if $groupName == $colors.navGroup && $colors.sbStyles}
-        <div class="mt-schemes mt-sbt" data-sbt>
+        {* One Style row per AREA (sidebar, footer), each at the head of the
+           group that holds its background row. data-sbt-area tells them apart;
+           data-sbt-bg names the background row for autoInk and for the off
+           chip's dot. *}
+        {foreach $colors.areaStyles|default:[] as $area}
+        {if $groupName == $area.group}
+        <div class="mt-schemes mt-sbt" data-sbt data-sbt-area="{$area.area|escape}" data-sbt-bg="{$area.bg|escape}">
             <span class="mt-sbt-lab">Style</span>
             {* No is-active here. Which style is in force is a property of the
                SAVED VALUES, not of the markup, and hardcoding it on Light meant
@@ -167,8 +172,8 @@
                applied correctly on the site while the panel said otherwise.
                sbDetectActive() in footer.tpl marks the right one on load. *}
             <button type="button" class="mt-scheme mt-sbt-mode" data-sbt-mode="off">
-                <span class="mt-scheme-dot mt-sbt-dot"></span>Light</button>
-            {foreach $colors.sbStyles as $sbKey => $sb}
+                <span class="mt-scheme-dot mt-sbt-dot"></span>{$area.offLabel|escape}</button>
+            {foreach $area.styles as $sbKey => $sb}
             {* data-sbt-tokens carries the style's whole token set as JSON, and
                data-sbt-css just its background for the chip dot. Both come
                straight from colors.php, so the admin holds no second copy of
@@ -176,11 +181,13 @@
             <button type="button" class="mt-scheme mt-sbt-mode" data-sbt-mode="{$sbKey|escape}"
                     data-sbt-css="{$sb.dot|escape}" data-sbt-css-other="{$sb.dotOther|escape}"
                     data-sbt-tokens="{$sb.json|escape}" data-sbt-tokens-other="{$sb.jsonOther|escape}"
-                    {if $sb.autoInk|default:false}data-sbt-autoink="1"{/if}>
+                    {if $sb.autoInk|default:false}data-sbt-autoink="1"{/if}
+                    {if $sb.inkJson|default:''}data-sbt-ink="{$sb.inkJson|escape}"{/if}>
                 <span class="mt-scheme-dot mt-sbt-dot"></span>{$sb.label|escape}</button>
             {/foreach}
         </div>
         {/if}
+        {/foreach}
             {foreach $tokens as $t}
             {* data-follows names a row this one already tracks IN CSS -- the
                seven sidebar rows are `var(--_sb-*, var(--color-*))`, so they

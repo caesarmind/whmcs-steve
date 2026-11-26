@@ -844,6 +844,52 @@ final class Hooks
             }
         }
 
+        // Heading font (Styles > Typography > Heading font): a Google family,
+        // with the body font behind it so missing glyphs fall back to the body
+        // face. Same name filter and save-time weights as the body font above.
+        $hf = is_array($stored['headingFamily'] ?? null) ? $stored['headingFamily'] : [];
+        if (($hf['mode'] ?? '') === 'google' && !empty($hf['google'])) {
+            $hname = trim((string)preg_replace('/[^A-Za-z0-9 ]/', '', (string)$hf['google']));
+            if ($hname !== '') {
+                $hw = [];
+                foreach ((array)($hf['googleWeights'] ?? []) as $w) {
+                    $w = (int)$w;
+                    if ($w >= 100 && $w <= 900) {
+                        $hw[] = $w;
+                    }
+                }
+                if ($hw === []) {
+                    $hw = array_map('intval', (array)($cfg['googleWeights'] ?? [300, 400, 500, 600, 700]));
+                }
+                sort($hw);
+                $hhref = 'https://fonts.googleapis.com/css2?family=' . rawurlencode($hname)
+                       . ':wght@' . implode(';', array_unique($hw)) . '&display=swap';
+                if (strpos($links, 'fonts.gstatic.com') === false) {
+                    $links .= '<link rel="preconnect" href="https://fonts.googleapis.com">'
+                            . '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>';
+                }
+                $links .= '<link rel="stylesheet" href="' . htmlspecialchars($hhref, ENT_QUOTES) . '">';
+                $decls['--font-family-heading'] = "'{$hname}', var(--font-family)";
+            }
+        }
+
+        // Line heights: unitless ratios, emitted as floats inside the schema's
+        // bounds. Never through the (int) loop below -- 1.5 would become 1.
+        if (is_array($stored['lineHeights'] ?? null)) {
+            $lhMin = (float)($cfg['lineHeightMin'] ?? 0.8);
+            $lhMax = (float)($cfg['lineHeightMax'] ?? 3.0);
+            foreach ($stored['lineHeights'] as $var => $val) {
+                if (!preg_match('/^--lh-[a-z0-9-]+$/', (string)$var) || !is_numeric($val)) {
+                    continue;
+                }
+                $f = (float)$val;
+                if ($f < $lhMin || $f > $lhMax) {
+                    continue;
+                }
+                $decls[(string)$var] = rtrim(rtrim(number_format($f, 3, '.', ''), '0'), '.');
+            }
+        }
+
         // Sizes (px) + weights (numeric). Each stored bucket holds only overrides.
         foreach (['sizes' => 'px', 'weights' => ''] as $bucket => $unit) {
             if (!is_array($stored[$bucket] ?? null)) {
@@ -1232,6 +1278,18 @@ final class Hooks
                     break;
                 case 'ms':
                     if (!preg_match('/^\d{1,5}ms cubic-bezier\([\d.,\s]+\)$/', $val)) {
+                        continue 2;
+                    }
+                    break;
+                // Custom shadow strength and tint: a bounded percentage and a
+                // six-digit hex, nothing else reaches the <style> block.
+                case 'pct':
+                    if (!preg_match('/^\d{1,3}%$/', $val) || (int)$val > 100) {
+                        continue 2;
+                    }
+                    break;
+                case 'hex':
+                    if (!preg_match('/^#[0-9a-f]{6}$/i', $val)) {
                         continue 2;
                     }
                     break;

@@ -31,6 +31,17 @@ return [
         'systemPrefix' => "-apple-system, BlinkMacSystemFont",
     ],
 
+    // The font headings (h1 to h6) are drawn in. Default: the body font
+    // (core-theme.css sets --font-family-heading: var(--font-family)), so
+    // nothing changes until a buyer picks one. Offered as "Same as body text"
+    // or a Google family; stored as typography.headingFamily
+    // {mode: 'google', google: name, googleWeights: [...]} and emitted by
+    // Hooks::buildTypographyHead with the body font as its fallback.
+    'headingFamily' => [
+        'var'     => '--font-family-heading',
+        'default' => 'var(--font-family)',
+    ],
+
     // Font-size tokens (px), grouped for the admin form. var === the CSS custom property.
     'sizeGroups' => [
         'Body' => [
@@ -72,20 +83,10 @@ return [
     // Field shape mirrors 'weights' (flat list, var/label/default) because this
     // is one ungrouped ramp, not a grouped size table.
     //
-    // WIRING STATUS: schema only. The admin panel and the emitter both iterate
-    // fixed buckets, so three additions in the addon are needed before the
-    // fields render and emit -- each is the line-height twin of an existing
-    // 'weights' branch:
-    //   1. StylesController::buildTypographyViewModel  -- read a 'lineHeights'
-    //      stored bucket and pass it to the view (guard the cast as float).
-    //   2. StylesController::saveTypographyAction      -- validate against
-    //      lineHeightMin/Max and persist only values differing from default.
-    //   3. Hooks::buildTypographyHead                  -- add 'lineHeights' to
-    //      the ['sizes' => 'px', 'weights' => ''] bucket loop with a '' unit
-    //      AND a float cast; the (int) cast that loop uses today would turn
-    //      1.5 into 1 and collapse every line of text.
-    // Until then the ramp is still useful: the tokens exist in the CSS, so a
-    // buyer can override them from Custom CSS.
+    // Wired end to end: the Typography panel edits them (Line Height),
+    // StylesController stores the ones that differ as typography.lineHeights,
+    // and Hooks::buildTypographyHead emits them as unitless FLOATS -- an (int)
+    // cast there would turn 1.5 into 1 and collapse every line of text.
     'lineHeights' => [
         ['var' => '--lh-tight',   'label' => 'Tight',   'default' => 1.05],
         ['var' => '--lh-snug',    'label' => 'Snug',    'default' => 1.2],

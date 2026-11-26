@@ -25,11 +25,18 @@
  *   ms      an integer; the emitter re-attaches the easing curve, because the
  *           stored token is a composite (`150ms cubic-bezier(...)`) and the
  *           curve is ours to keep consistent, not a buyer's to mistype.
+ *   pct     an integer percentage, 0 to 100, emitted with a % sign.
+ *   hex     a six-digit #rrggbb colour, the only colour form accepted.
  *   preset  a fixed dropdown over authored `options`. Shadows are composite
  *           multi-layer strings — there is no validator for them short of a
  *           CSS parser, and a malformed one dropped raw into the <style> block
  *           would break the rule it lands in. Offering the three we author is
  *           the honest control.
+ *
+ * The Custom shadow group is how a free-form shadow gets in WITHOUT a free-form
+ * string: four validated numbers (offset, blur, strength, tint) that
+ * core-theme.css composes into --shadow-custom. Picking "Custom" in any shadow
+ * dropdown then points at that one composed token.
  */
 return [
     'sizeMin' => 0,
@@ -53,6 +60,18 @@ return [
             ['var' => '--shadow-dropdown',   'label' => 'Dropdown',   'type' => 'preset', 'default' => 'strong'],
         ],
 
+        // Composed in core-theme.css as
+        //   0 <offset> <blur> color-mix(<tint> <strength>, transparent)
+        // and offered as "Custom" in every shadow dropdown here and on the
+        // Elements panel. Changing these does nothing until something picks
+        // Custom, so the default render is untouched.
+        'Custom shadow' => [
+            ['var' => '--shadow-custom-y',        'label' => 'Offset',   'type' => 'px',  'default' => 4,  'min' => 0, 'max' => 40],
+            ['var' => '--shadow-custom-blur',     'label' => 'Blur',     'type' => 'px',  'default' => 24, 'min' => 0, 'max' => 80],
+            ['var' => '--shadow-custom-strength', 'label' => 'Strength', 'type' => 'pct', 'default' => 8,  'min' => 0, 'max' => 60],
+            ['var' => '--shadow-custom-color',    'label' => 'Tint',     'type' => 'hex', 'default' => '#000000'],
+        ],
+
         'Controls' => [
             ['var' => '--input-height', 'label' => 'Input height',   'type' => 'px', 'default' => 40],
             ['var' => '--input-pad-x',  'label' => 'Input padding',  'type' => 'px', 'default' => 14],
@@ -74,6 +93,8 @@ return [
         ['key' => 'soft',   'label' => 'Soft',   'css' => '0 0 0 0.5px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03)'],
         ['key' => 'medium', 'label' => 'Medium', 'css' => '0 0 0 0.5px rgba(0,0,0,0.04), 0 2px 12px rgba(0,0,0,0.06)'],
         ['key' => 'strong', 'label' => 'Strong', 'css' => '0 4px 32px rgba(0,0,0,0.12), 0 0 1px rgba(0,0,0,0.08)'],
+        // Built from the Custom shadow group above, not authored here.
+        ['key' => 'custom', 'label' => 'Custom', 'css' => 'var(--shadow-custom)'],
     ],
 
     // Re-attached to every motion value at emit time. Keeping the curve out of

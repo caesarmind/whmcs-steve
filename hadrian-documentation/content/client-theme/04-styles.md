@@ -102,6 +102,8 @@ It rebuilds the scope named in the toggle above it. To rebuild dark as well, swi
 
 The accent and everything derived from it. `Accent` is the single colour that marks the one primary action per view; `Accent tint` is its translucent wash, used behind active rows and info callouts. `On accent` is the text colour that sits *on* a filled accent button - change the accent to a pale colour and this needs to go dark.
 
+`Secondary` is a second brand colour, slate grey out of the box. The theme works out a darker shade and a light tint from it, and all three appear under **Secondary** in the colour lists on the Buttons and Forms tabs. Use it for a second button style or a field highlight that should not compete with the accent. It has one value for both modes.
+
 ### Surfaces
 
 :::shot img/group-surfaces.png
@@ -142,6 +144,23 @@ The whole navigation shell - sidebar, topbar, flyout panel, item hover and activ
 
 The **STYLE** row at the top is a shortcut: **Light**, **Tinted**, **Brand**, **Dark** and **Gradient** each set a coordinated group of sidebar variables in one click. The individual rows below stay editable afterwards, so a named style is a starting point too.
 
+### Footer
+
+The site footer, in every footer layout: its background, the headings and brand name, the text and links, a muted line for the rating, the borders between its sections and the short separators between the bottom links. Out of the box the footer uses the page's own colours, so it changes with the rest of the palette until you set a row here.
+
+The **STYLE** row works like the sidebar's:
+
+- **Default** puts every footer row back to the page colours.
+- **Tinted** washes the footer in a light tint of your accent.
+- **Brand** fills it with the accent itself and picks black or white text, whichever reads better on your colour.
+- **Dark** gives a near-black footer under a light page, and a black one in dark mode.
+
+Each style fills both the light and dark scopes in one click. Nothing is saved until **Save colors**.
+
+:::info Brand follows the accent you have now
+A style turns your current accent into fixed colours when you click it. If you change the accent later, click **Brand** or **Tinted** again to bring the footer along.
+:::
+
 ### Icons & avatars
 
 :::shot img/group-icons.png
@@ -168,7 +187,7 @@ It clears the stored colour variables for that style. Note your hex values somew
 
 :::shot img/type-family.png The four font modes.
 
-One typeface is applied across the whole client area - there is no separate heading face. Pick one of four modes. They differ in what gets **loaded** (a network request, or none) and what gets **written** into the `--font-family` variable.
+This is the typeface for the whole client area; headings use it too unless you give them their own under [Heading Font](#heading-font). Pick one of four modes. They differ in what gets **loaded** (a network request, or none) and what gets **written** into the `--font-family` variable.
 
 :::props
 | Mode | Loads | Where from |
@@ -285,6 +304,26 @@ The two halves are independent. The radio button decides what gets **loaded** - 
 
 Edit it if you need a fallback the defaults do not give you - a specific CJK face, say, or a monospace stack. Only letters, digits, spaces, commas, quotes and hyphens ever reach the live page; anything else is silently dropped whenever the front-end page head is built, not when you save the form.
 
+### Heading Font
+
+Headings, `h1` to `h6`, can have a face of their own: a serif for titles over a sans body, say. Pick **Same as body text** to keep one face everywhere, or **Google Font** to open the same searchable picker as above.
+
+A heading face writes `--font-family-heading` and loads its own stylesheet next to the body font's:
+
+```css
+--font-family-heading: 'Playfair Display', var(--font-family);
+```
+
+The body font stays behind it, so any letter the heading face lacks is drawn in the body face instead of a generic one. Only the weights the family ships are requested, as for the body font.
+
+:::info Only real headings change
+The face applies to `h1` to `h6`. Large text that is not a heading, such as a price or a number on the dashboard, keeps the body font.
+:::
+
+### Line Height
+
+Four line-height variables, unitless ratios: **Tight** (`--lh-tight`, 1.05) for display headings, **Snug** (`--lh-snug`, 1.2) for headings, **Normal** (`--lh-normal`, 1.47059) for body copy and **Relaxed** (`--lh-relaxed`, 1.6) for long reading text. A new font often needs these adjusted: a face with a taller x-height reads cramped at the leading that suited the shipped one. Values run from 0.8 to 3.
+
 ### Font Size and Font Weight
 
 Below Font Family, Font Size exposes the full type scale, grouped under three headings you will see in the panel: **Body** (`--text-xs` through `--text-3xl`), **Headings** (`--text-h6` through `--text-h1`) and **Display** (`--text-display-sm` through `--text-display-xl`). Each step is its own variable, so you can change one size without shifting the rest.
@@ -324,11 +363,11 @@ They used to sit in the Layout Manager's **Containers** section. Any values you 
 
 ## General, Buttons, Forms and Elements
 
-The remaining sub-sections cover component variables. They share one habit: only the values you change are saved. Buttons and Forms also let you recolour from the palette you already set, so those colours track your accent and dark mode; General and Elements are shape and timing only - General has no colour fields at all, and Elements keeps its colours in the Colors panel.
+The remaining sub-sections cover component variables. They share one habit: only the values you change are saved. Buttons and Forms also let you recolour from the palette you already set, so those colours track your accent and dark mode; General and Elements are shape and timing only - General's one colour is the tint of the custom shadow, and Elements keeps its colours in the Colors panel.
 
 | Section | What it controls |
 | --- | --- |
-| General | Shared UI variables - corner radius, shadow depth, control padding, and animation (transition) speed, used across components |
+| General | Shared UI variables - corner radius, shadow depth, a custom shadow, control padding, and animation (transition) speed, used across components |
 | Buttons | A size tier per button scale (font size, weight, line height, radius) plus per-variant colours. Height follows the font size automatically |
 | Forms | Field, label and checkbox/radio sizing (font size, weight, radius, border width), plus their colours - field background, border, text, placeholder and focus, label text colour, and the checkbox/radio accent colour |
 | Elements | Card shape (radius, shadow, padding) and the pagination button radius - no colours here, those stay in the Colors panel |
@@ -336,6 +375,25 @@ The remaining sub-sections cover component variables. They share one habit: only
 :::info These are shared across styles
 Unlike Colors, the component sections - and Typography - are not stored per preset. Changing a button radius, or the site's font, changes it whichever style is active.
 :::
+
+### Custom shadow
+
+The three shadow steps (**Soft**, **Medium**, **Strong**) are fixed. To get a shadow of your own, use the **Custom shadow** group on the General tab:
+
+| Control | What it sets |
+| --- | --- |
+| Offset | How far the shadow drops below the element, 0 to 40 px |
+| Blur | How soft its edge is, 0 to 80 px |
+| Strength | How dark it is, 0 to 60% |
+| Tint | Its colour. Black is the usual choice; a dark shade of your accent gives a coloured glow |
+
+The tile under the sliders shows the result as you drag. Then pick **Custom** wherever a shadow is chosen: the **Card**, **Card hover** and **Dropdown** menus on the General tab, or the card **Shadow** menu on the Elements tab.
+
+:::info Nothing changes until you pick Custom
+The sliders only define the shadow. A site where no menu is set to **Custom** looks exactly the same, whatever the sliders say.
+:::
+
+In your own CSS the shadow is `var(--shadow-custom)`.
 
 ## Custom CSS
 

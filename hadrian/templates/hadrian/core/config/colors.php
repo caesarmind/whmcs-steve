@@ -257,6 +257,108 @@ return [
         ],
     ],
 
+    /* Named footer styles. The same contract as sidebarStyles above -- a style
+       is a PRESET of the Footer rows, written into the form on click, every
+       row still editable afterwards, nothing stored until Save colors -- and
+       the same admin code applies them (the .mt-sbt chip rows in footer.tpl).
+
+       Default is not a row here: it is the DEFAULTS, so picking it resets the
+       footer tokens rather than writing anything.
+
+       `bgVar` names the row autoInk reads the background from, and `inkRamp`
+       is the alpha for each ink row as [on a light background, on a dark one].
+       A value of 1 writes solid black or white. The sidebar styles carry
+       neither and keep their own ramp in footer.tpl. */
+    'footerStyles' => [
+        'tinted' => [
+            'label'  => 'Tinted',
+            'value'  => [
+                'light' => 'color-mix(in srgb, var(--color-accent) 8%, #ffffff)',
+                'dark'  => 'color-mix(in srgb, var(--color-accent) 14%, #1c1c1e)',
+            ],
+            'tokens' => [
+                'light' => [
+                    '--footer-bg'         => 'color-mix(in srgb, var(--color-accent) 8%, #ffffff)',
+                    '--footer-heading'    => '#1d1d1f',
+                    '--footer-text'       => '#5e5e63',
+                    '--footer-text-muted' => '#6e6e73',
+                    '--footer-border'     => 'color-mix(in srgb, var(--color-accent) 18%, #ffffff)',
+                    '--footer-divider'    => 'color-mix(in srgb, var(--color-accent) 28%, #ffffff)',
+                ],
+                'dark' => [
+                    '--footer-bg'         => 'color-mix(in srgb, var(--color-accent) 14%, #1c1c1e)',
+                    '--footer-heading'    => '#f5f5f7',
+                    '--footer-text'       => '#b0b0b5',
+                    '--footer-text-muted' => '#98989d',
+                    '--footer-border'     => 'color-mix(in srgb, var(--color-accent) 26%, #1c1c1e)',
+                    '--footer-divider'    => 'color-mix(in srgb, var(--color-accent) 36%, #1c1c1e)',
+                ],
+            ],
+        ],
+        'brand' => [
+            'label'   => 'Brand',
+            'autoInk' => true,
+            'bgVar'   => '--footer-bg',
+            'inkRamp' => [
+                '--footer-heading'    => [1, 1],
+                '--footer-text'       => [0.78, 0.82],
+                '--footer-text-muted' => [0.62, 0.70],
+                '--footer-border'     => [0.16, 0.20],
+                '--footer-divider'    => [0.24, 0.30],
+            ],
+            'value'  => [
+                'light' => 'color-mix(in srgb, var(--color-accent) 94%, #000000)',
+                'dark'  => 'color-mix(in srgb, var(--color-accent) 74%, #000000)',
+            ],
+            'tokens' => [
+                'light' => [
+                    '--footer-bg'         => 'color-mix(in srgb, var(--color-accent) 94%, #000000)',
+                    '--footer-heading'    => '#ffffff',
+                    '--footer-text'       => 'rgba(255,255,255,0.82)',
+                    '--footer-text-muted' => 'rgba(255,255,255,0.70)',
+                    '--footer-border'     => 'rgba(255,255,255,0.20)',
+                    '--footer-divider'    => 'rgba(255,255,255,0.30)',
+                ],
+                'dark' => [
+                    '--footer-bg'         => 'color-mix(in srgb, var(--color-accent) 74%, #000000)',
+                    '--footer-heading'    => '#ffffff',
+                    '--footer-text'       => 'rgba(255,255,255,0.82)',
+                    '--footer-text-muted' => 'rgba(255,255,255,0.70)',
+                    '--footer-border'     => 'rgba(255,255,255,0.20)',
+                    '--footer-divider'    => 'rgba(255,255,255,0.30)',
+                ],
+            ],
+        ],
+        /* Dark -- a near-black band under a light page, the commonest footer
+           tone there is. In dark mode it goes one step deeper than the shipped
+           #1c1c1e so picking it still visibly does something. */
+        'dark' => [
+            'label'  => 'Dark',
+            'value'  => [
+                'light' => '#1c1c1e',
+                'dark'  => '#000000',
+            ],
+            'tokens' => [
+                'light' => [
+                    '--footer-bg'         => '#1c1c1e',
+                    '--footer-heading'    => '#f5f5f7',
+                    '--footer-text'       => '#a1a1a6',
+                    '--footer-text-muted' => '#8e8e93',
+                    '--footer-border'     => 'rgba(255,255,255,0.10)',
+                    '--footer-divider'    => 'rgba(255,255,255,0.18)',
+                ],
+                'dark' => [
+                    '--footer-bg'         => '#000000',
+                    '--footer-heading'    => '#f5f5f7',
+                    '--footer-text'       => '#a1a1a6',
+                    '--footer-text-muted' => '#8e8e93',
+                    '--footer-border'     => 'rgba(255,255,255,0.10)',
+                    '--footer-divider'    => 'rgba(255,255,255,0.18)',
+                ],
+            ],
+        ],
+    ],
+
     // Editable tokens, grouped for the form. Each: var, label, light, dark,
     // and an optional `hint` shown under the label.
     //
@@ -279,6 +381,11 @@ return [
             ['var' => '--color-on-accent',    'label' => 'On accent',    'light' => '#ffffff',              'dark' => '#ffffff',              'hint' => 'Text and icons sitting ON a filled accent surface. Left at its default it is worked out from the Accent (black or white, whichever reads); set it only to force one.'],
             ['var' => '--color-link',         'label' => 'Link',         'light' => '#0066cc',              'dark' => '#52abff',              'hint' => 'Follows the Accent: darker than it in light mode, lighter in dark so links stay readable on raised surfaces.'],
             ['var' => '--color-link-hover',   'label' => 'Link hover',   'light' => '#0071e3',              'dark' => '#7cc0ff',              'hint' => 'Follows the Accent automatically.'],
+            /* The second brand colour. The token and its tint ramp were already
+               in core-theme.css (the Slate button colours read them); this row
+               only makes it editable. One value for both modes because the
+               dark block never redeclared it. */
+            ['var' => '--brand-secondary',    'label' => 'Secondary',    'light' => '#64748b',              'dark' => '#64748b',              'hint' => 'A second brand colour. Buttons and Forms offer it, with its darker shade and tint, under Secondary in every colour list.'],
         ],
 
         // Renamed from "Backgrounds" to match the word every other panel's
@@ -391,6 +498,20 @@ return [
             ['var' => '--sidebar-grad-angle',     'label' => 'Gradient direction', 'light' => '180deg',                 'dark' => '180deg',              'type' => 'select', 'options' => ['180deg' => 'Top to bottom', '0deg' => 'Bottom to top', '135deg' => 'Diagonal', '90deg' => 'Left to right', '270deg' => 'Right to left'], 'hint' => 'Which way the Gradient nav style runs. Only has an effect while that style is picked -- with no gradient there is nothing to point.'],
             ['var' => '--sidebar-grad-to',        'label' => 'Gradient bottom',    'light' => 'rgba(0,0,0,0)',          'dark' => 'rgba(0,0,0,0)',       'hint' => 'Bottom stop. Set both to see a gradient; the Gradient style sets them for you from the accent.'],
             ['var' => '--topbar-bg',              'label' => 'Topbar background',  'light' => 'rgba(251,251,253,0.72)', 'dark' => 'rgba(44,44,46,0.72)', 'hint' => 'Also translucent -- keep some alpha or the frost effect is lost.'],
+        ],
+
+        // The site footer, every layout (Default, Extended, Extended with
+        // info). Its own group because it is its own area: a buyer who wants a
+        // dark footer under a light page should not have to darken the page
+        // text to get it. The three ink rows follow the page text in CSS, so
+        // they stay in step with a rebrand until someone sets them.
+        'Footer' => [
+            ['var' => '--footer-bg',         'label' => 'Background',     'light' => '#f5f5f7',          'dark' => '#1c1c1e',                'hint' => 'The footer band. Pick a Style above for a set of colours that read well together.'],
+            ['var' => '--footer-heading',    'label' => 'Headings',       'light' => '#1d1d1f',          'dark' => '#f5f5f7', 'follows' => '--color-text-primary',   'hint' => 'Column titles, the brand name and link hover.'],
+            ['var' => '--footer-text',       'label' => 'Text and links', 'light' => '#636368',          'dark' => '#b8b8bd', 'follows' => '--color-text-secondary', 'hint' => 'Set this whenever you darken the background, or the links go dark-on-dark.'],
+            ['var' => '--footer-text-muted', 'label' => 'Text muted',     'light' => '#6e6e73',          'dark' => '#a6a6ab', 'follows' => '--color-text-tertiary',  'hint' => 'The rating line under the tagline.'],
+            ['var' => '--footer-border',     'label' => 'Border',         'light' => 'rgba(0,0,0,0.1)',  'dark' => 'rgba(255,255,255,0.1)',  'hint' => 'The lines between the brand block, the menus and the copyright row.'],
+            ['var' => '--footer-divider',    'label' => 'Link separator', 'light' => 'rgba(0,0,0,0.18)', 'dark' => 'rgba(255,255,255,0.18)', 'hint' => 'The short bars between the links in the bottom row.'],
         ],
 
         // Avatars joined the icon tiles: both are small painted identity

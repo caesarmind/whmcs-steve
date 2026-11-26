@@ -52,7 +52,8 @@ export default defineConfig({
     {
       // client-area.spec and order.spec: one test per feature in tests/FEATURES.md (TH-*, OF-*)
       // that needs no setting changed. The ones that do are in theme-settings.spec (settings project).
-      name: 'browser', testMatch: /(browser|flows|flows-more|sweep|client-area|order)\.spec\.mjs/, dependencies: ['setup'],
+      // colour-scope.spec measures the panes check-colors-scope-leak.php writes (a local file, no site).
+      name: 'browser', testMatch: /(browser|flows|flows-more|sweep|client-area|order|colour-scope)\.spec\.mjs/, dependencies: ['setup'],
       use: { ...devices['Desktop Chrome'], userAgent: USER_AGENT, viewport: { width: 1280, height: 860 } },
     },
     {

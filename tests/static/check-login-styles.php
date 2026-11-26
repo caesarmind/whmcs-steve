@@ -118,13 +118,22 @@ foreach ($variants as $name => $v) {
    variant below: all five sheets plus eight panes came to 554 KB and the pane
    refuses to open a file that large.
 
-   apple-layout.css is NOT inlined. It is the nav/sidebar/rail stylesheet, and
+   core-layout.css is NOT inlined. It is the nav/sidebar/rail stylesheet, and
    both of these variants declare fullPage -- the theme suppresses that chrome
-   entirely, so nothing here can read a rule from it. */
+   entirely, so nothing here can read a rule from it.
+
+   A sheet that is not there stops the run: until 2026-11-25 this read
+   apple-theme.css, renamed to core-theme.css on 2026-08-21, and every preview
+   since was built without the theme's own CSS. */
 $css = '';
-foreach (['apple-theme.css', 'pages/login.css',
+foreach (['core-theme.css', 'pages/login.css',
           'pages/login-split.css', 'pages/login-beacon.css'] as $f) {
-    $css .= "\n/* ---- {$f} ---- */\n" . file_get_contents($theme . '/assets/css/' . $f);
+    $sheet = is_file($theme . '/assets/css/' . $f) ? file_get_contents($theme . '/assets/css/' . $f) : false;
+    if ($sheet === false || trim($sheet) === '') {
+        echo "FAIL the theme stylesheet assets/css/{$f} is missing or empty - update this checker\n";
+        exit(1);
+    }
+    $css .= "\n/* ---- {$f} ---- */\n" . $sheet;
 }
 
 $shell = <<<CSS

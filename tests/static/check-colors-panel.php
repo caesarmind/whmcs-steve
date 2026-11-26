@@ -108,8 +108,15 @@ $check('  ...and posts under the same c[] name', str_contains($body, 'name="c[--
 $check('  ...and keeps its hidden scope twin', (bool)preg_match('/class="mt-color-other" data-var="--sidebar-grad-angle"/', $body));
 $check('colour rows still render a swatch', substr_count($body, 'mt-color-swatch') > 20);
 $check('Light chip no longer hardcoded active', !preg_match('/mt-sbt-mode is-active/', $body));
-$check('all five nav styles present', substr_count($body, 'data-sbt-mode=') === 5,
-       substr_count($body, 'data-sbt-mode=') . ' chips');
+/* Count chips per AREA row: the sidebar and the footer each have one. */
+$areaChips = function (string $area) use ($body): int {
+    if (!preg_match('/<div[^>]*data-sbt-area="' . $area . '"[^>]*>(.*?)<\/div>/s', $body, $m)) { return -1; }
+    return substr_count($m[1], 'data-sbt-mode=');
+};
+$check('all five nav styles present', $areaChips('sidebar') === 5, $areaChips('sidebar') . ' chips');
+$check('all four footer styles present', $areaChips('footer') === 4, $areaChips('footer') . ' chips');
+$check('  ...the footer row resets to Default', (bool)preg_match('/data-sbt-area="footer"[^>]*>.*?data-sbt-mode="off">\s*<span[^>]*><\/span>Default</s', $body));
+$check('  ...and Brand carries its own ink ramp', (bool)preg_match('/data-sbt-mode="brand"[^>]*data-sbt-ink="[^"]*--footer-text/s', $body));
 
 printf("\nwrote tests/.local/adminpreview/colorspanel.html\n%d failing\n", $fails);
 exit($fails ? 1 : 0);

@@ -107,6 +107,20 @@
     if (fapp) fapp.addEventListener('change', function(){ build(fstk, fname, fapp.checked, '"'); });
     [].slice.call(form.querySelectorAll('input[name="ff_mode"]')).forEach(function(r){ r.addEventListener('change', sync); });
     sync();
+
+    /* Heading font: its picker works only in "Google Font" mode, and picking a
+       family selects that mode. */
+    var hwrap = form.querySelector('.mt-typo-heading [data-fontpick]');
+    var hbtn  = hwrap ? hwrap.querySelector('[data-fontpick-field]') : null;
+    var hval  = hwrap ? hwrap.querySelector('[data-fontpick-value]') : null;
+    function hmode() { var c = form.querySelector('input[name="hf_mode"]:checked'); return c ? c.value : 'body'; }
+    function hsync() { if (hbtn) hbtn.disabled = hmode() !== 'google'; }
+    if (hval) hval.addEventListener('change', function(){
+        var r = form.querySelector('input[name="hf_mode"][value="google"]');
+        if (r) { r.checked = true; hsync(); }
+    });
+    [].slice.call(form.querySelectorAll('input[name="hf_mode"]')).forEach(function(r){ r.addEventListener('change', hsync); });
+    hsync();
 })();
 
 /* Google Font picker -- searchable combobox over the whole library.
@@ -115,10 +129,10 @@
    memory but only a slice reaches the DOM), and a preview that renders each
    name in its own face -- because "Caveat" and "Cinzel" mean nothing as text.
    Writes to the hidden ff_google input and fires `change` on it, so the stack
-   builder in the block above is untouched by any of this. */
-(function(){
-    var wrap = document.querySelector('[data-fontpick]');
-    if (!wrap) return;
+   builder in the block above is untouched by any of this.
+   Every [data-fontpick] on the page gets one (body font, heading font). Only
+   the first carries the catalog <script>s; the others read it from there. */
+[].forEach.call(document.querySelectorAll('[data-fontpick]'), function(wrap){
 
     var value   = wrap.querySelector('[data-fontpick-value]');
     var field   = wrap.querySelector('[data-fontpick-field]');
@@ -149,7 +163,7 @@
     function load() {
         if (catalog) return catalog;
         function parse(sel, dflt) {
-            var el = wrap.querySelector(sel);
+            var el = wrap.querySelector(sel) || document.querySelector(sel);
             try { return el ? JSON.parse(el.textContent) : dflt; } catch (_) { return dflt; }
         }
         catalog = parse('[data-fontpick-catalog]', []) || [];
@@ -325,7 +339,7 @@
     document.addEventListener('click', function(e){ if (!wrap.contains(e.target)) close(); });
 
     paint();
-})();
+});
 
 /* Colors panel: every token row has a native swatch + a hex/rgba text field
    kept in sync; preset chips cascade the brand-token fields; "Reset all" puts
@@ -684,9 +698,14 @@
        Placed above the generator's early return: the presets are not part of the
        generator and must still work if that section is absent.
        ------------------------------------------------------------------ */
-    var sbt = form.querySelector('[data-sbt]');
-    var sbtRefresh = function(){};
-    if (sbt) {
+    /* One chip row per AREA: the sidebar's under Navigation & bars, the
+       footer's under Footer. Each row gets its own copy of the logic below;
+       data-sbt-bg names the row's background token (autoInk reads it, and
+       the off chip paints it). The probe and the resolver are shared. */
+    var sbtRows = [].slice.call(form.querySelectorAll('[data-sbt]'));
+    var sbtRefreshers = [];
+    var sbtRefresh = function(){ sbtRefreshers.forEach(function(f){ f(); }); };
+    if (sbtRows.length) {
         /* Resolving CSS to a literal needs somewhere to compute it. The probe
            lives inside the form so it inherits the same context, and the canvas
            converts whatever colour space the browser hands back -- color-mix()
@@ -734,6 +753,8 @@
                               : rgba([d[0], d[1], d[2]], Math.round(a * 100) / 100);
         }
 
+        sbtRows.forEach(function(sbt){
+        var sbBg = sbt.getAttribute('data-sbt-bg') || '--sidebar-bg';
         // Which rows a style owns, learned from the styles themselves so Light
         // resets exactly the set the others write.
         var sbRows = {};
@@ -752,7 +773,7 @@
                 var css = b.getAttribute('data-sbt-css');
                 // Light has no CSS of its own: it IS --sidebar-bg's default,
                 // which is literally what the nav renders untinted.
-                dot.style.background = css || defVal('--sidebar-bg') || '#f6f6f8';
+                dot.style.background = css || defVal(sbBg) || '#f6f6f8';
             });
         }
         function sbApply(btn){
@@ -793,12 +814,24 @@
                    background rescues it because a deepened yellow is still
                    light. Runs after the loop so it overrides the declared ink. */
                 if (!auto) return;
-                var bgLit = sbResolve(map['--sidebar-bg'], other);
+                var bgLit = sbResolve(map[sbBg], other);
                 if (!bgLit) return;
                 var c = toRgb(bgLit) || [0, 0, 0];
                 var f = function(x){ x /= 255; return x <= 0.03928 ? x/12.92 : Math.pow((x+0.055)/1.055, 2.4); };
                 var dark = (0.2126*f(c[0]) + 0.7152*f(c[1]) + 0.0722*f(c[2])) > 0.179129;
                 var ink = dark ? '0,0,0' : '255,255,255';
+                /* A style may carry its own ramp (the footer does): token ->
+                   [alpha on a light background, alpha on a dark one], 1 meaning
+                   solid. Without one, the sidebar ramp below applies. */
+                var ramp = null;
+                try { ramp = JSON.parse(btn.getAttribute('data-sbt-ink') || 'null'); } catch (e) { ramp = null; }
+                if (ramp) {
+                    Object.keys(ramp).forEach(function(v){
+                        var al = ramp[v][dark ? 0 : 1];
+                        put(v, al >= 1 ? (dark ? '#000000' : '#ffffff') : 'rgba(' + ink + ',' + al + ')');
+                    });
+                    return;
+                }
                 put('--sidebar-text', dark ? '#000000' : '#ffffff');
                 [['--sidebar-text-secondary', dark ? 0.78 : 0.82],
                  ['--sidebar-text-muted',     dark ? 0.62 : 0.70],
@@ -865,7 +898,7 @@
             modes.forEach(function(b){ b.classList.toggle('is-active', b === hit); });
         }
 
-        sbtRefresh = sbPaintDots;
+        sbtRefreshers.push(sbPaintDots);
         /* Delegated, because the Accent changes without its own field ever
            firing input: the swatch handler assigns .value directly and the
            generator writes through setToken. Repainting five dots is free. */
@@ -879,6 +912,7 @@
         });
         sbPaintDots();
         sbDetectActive();
+        });
     }
     function fieldVal(name){ var t = textFor(name); return t ? t.value : ''; }
 
@@ -1281,11 +1315,33 @@
 (function(){
     var form = document.querySelector('.mt-general');
     if (!form) return;
+    /* Custom shadow: slider readouts and the preview tile. The preview uses
+       rgba(tint, strength), which is what core-theme.css's
+       color-mix(in srgb, tint N%, transparent) resolves to. */
+    var shcCard = form.querySelector('[data-shc-preview]');
+    function shcVal(v){ var el = form.querySelector('[data-shc="' + v + '"]'); return el ? el.value : ''; }
+    function shcPaint(){
+        [].slice.call(form.querySelectorAll('input[type="range"][data-shc]')).forEach(function(r){
+            var o = r.parentNode.querySelector('.mt-shc-out');
+            if (o) o.textContent = r.value + (r.getAttribute('data-unit') || '');
+        });
+        var col = form.querySelector('input[type="color"][data-shc]'), hx = form.querySelector('.mt-shc-hex');
+        if (col && hx) hx.textContent = col.value;
+        if (!shcCard) return;
+        var c = /^#[0-9a-f]{6}$/i.test(shcVal('--shadow-custom-color')) ? shcVal('--shadow-custom-color') : '#000000';
+        var rgb = [1, 3, 5].map(function(i){ return parseInt(c.substr(i, 2), 16); });
+        var a = Math.max(0, Math.min(100, +shcVal('--shadow-custom-strength') || 0)) / 100;
+        shcCard.style.boxShadow = '0 ' + (+shcVal('--shadow-custom-y') || 0) + 'px '
+            + (+shcVal('--shadow-custom-blur') || 0) + 'px rgba(' + rgb.join(',') + ',' + a + ')';
+    }
+    form.addEventListener('input', shcPaint);
+    shcPaint();
     var greset = form.querySelector('#mt-general-reset');
     if (greset) greset.addEventListener('click', function(){
         [].slice.call(form.querySelectorAll('[data-default]')).forEach(function(el){
             el.value = el.getAttribute('data-default');
         });
+        shcPaint();
     });
 })();
 

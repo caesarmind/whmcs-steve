@@ -27,10 +27,11 @@ return [
         ['key' => 'primary-lighter-2', 'group' => 'Primary',   'label' => 'Primary tint 70%', 'css' => 'var(--brand-primary-lighter-2)', 'swatch' => '#b3d5f7'],
         ['key' => 'primary-lighter-3', 'group' => 'Primary',   'label' => 'Primary tint 84%', 'css' => 'var(--brand-primary-lighter-3)', 'swatch' => '#d6e2fa'],
         ['key' => 'primary-lighter-4', 'group' => 'Primary',   'label' => 'Primary tint 92%', 'css' => 'var(--brand-primary-lighter-4)', 'swatch' => '#eaf1fc'],
-        // Slate / secondary brand ramp
-        ['key' => 'slate',             'group' => 'Slate',     'label' => 'Slate',            'css' => 'var(--brand-secondary)',         'swatch' => '#64748b'],
-        ['key' => 'slate-darker',      'group' => 'Slate',     'label' => 'Slate darker',     'css' => 'var(--brand-secondary-darker)',  'swatch' => '#4e5a6c'],
-        ['key' => 'slate-lighter-3',   'group' => 'Slate',     'label' => 'Slate tint 84%',   'css' => 'var(--brand-secondary-lighter-3)','swatch' => '#dfe2e8'],
+        // Secondary brand ramp (Styles > Colors > Brand > Secondary). The
+        // keys keep their old 'slate' names because they are what is stored.
+        ['key' => 'slate',             'group' => 'Secondary', 'label' => 'Secondary',          'css' => 'var(--brand-secondary)',         'swatch' => '#64748b'],
+        ['key' => 'slate-darker',      'group' => 'Secondary', 'label' => 'Secondary darker',   'css' => 'var(--brand-secondary-darker)',  'swatch' => '#4e5a6c'],
+        ['key' => 'slate-lighter-3',   'group' => 'Secondary', 'label' => 'Secondary tint 84%', 'css' => 'var(--brand-secondary-lighter-3)','swatch' => '#dfe2e8'],
         // Info
         ['key' => 'info',              'group' => 'Status',    'label' => 'Info',             'css' => 'var(--brand-info)',              'swatch' => '#0a84ff'],
         ['key' => 'info-darker',       'group' => 'Status',    'label' => 'Info darker',      'css' => 'var(--brand-info-darker)',       'swatch' => '#0867c6'],

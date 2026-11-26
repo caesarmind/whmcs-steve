@@ -256,6 +256,9 @@ function expected(field, maps, kind) {
     case 'ms':     return `${field.def}ms ${maps.easing}`;
     case 'em':     return `${field.def}em`;
     case 'px':     return `${field.def}px`;
+    // general.php's Custom shadow strength and tint.
+    case 'pct':    return `${field.def}%`;
+    case 'hex':    return String(field.def);
     // Unitless: the --lh-* ramp, the --fw-* weights, and --font-family, all of
     // which the emitter writes verbatim.
     case 'raw':    return String(field.def);

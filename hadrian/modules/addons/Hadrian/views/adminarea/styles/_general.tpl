@@ -39,6 +39,20 @@
                         <option value="{$o.key|escape}"{if $o.key == $f.value} selected{/if}>{$o.label|escape}</option>
                         {/foreach}
                     </select>
+                {elseif $f.type == 'hex'}
+                    {* Custom shadow tint. A native colour input posts #rrggbb,
+                       the one form the save path accepts. *}
+                    <span class="mt-shc-color">
+                        <input type="color" id="gn{$f.var|replace:'--':'_'}" name="gen[{$f.var}]" class="mt-color-swatch-input" value="{$f.value|escape}" data-default="{$f.default|escape}" data-shc="{$f.var|escape}">
+                        <code class="mt-shc-hex">{$f.value|escape}</code>
+                    </span>
+                {elseif isset($f.max)}
+                    {* A bounded field (the Custom shadow offset, blur and
+                       strength) is a slider with its value beside it. *}
+                    <span class="mt-shc-slider">
+                        <input type="range" id="gn{$f.var|replace:'--':'_'}" name="gen[{$f.var}]" value="{$f.value}" data-default="{$f.default}" min="{$f.min|default:0}" max="{$f.max}" step="1" data-shc="{$f.var|escape}" data-unit="{if $f.type == 'pct'}%{else}px{/if}">
+                        <output class="mt-shc-out" for="gn{$f.var|replace:'--':'_'}">{$f.value}{if $f.type == 'pct'}%{else}px{/if}</output>
+                    </span>
                 {elseif $f.type == 'em'}
                     <span class="mt-affix">
                         <input type="number" id="gn{$f.var|replace:'--':'_'}" name="gen[{$f.var}]" class="mt-input mt-input-compact" value="{$f.value}" data-default="{$f.default}" min="0" max="20" step="0.01" inputmode="decimal">
@@ -53,8 +67,23 @@
             </div>
             {/foreach}
         </div>
+        {if $fields.0.var == '--shadow-custom-y'}
+        {* Live preview. footer.tpl repaints it from the four controls, with
+           the same formula core-theme.css composes --shadow-custom from. *}
+        <div class="mt-shc-stage" aria-hidden="true"><div class="mt-shc-card" data-shc-preview>Custom shadow</div></div>
+        <p class="mt-field-help">To use it, pick <b>Custom</b> in the Card, Card hover or Dropdown menu above, or in the Shadow menu on the Elements tab. Until something picks it, these values change nothing.</p>
+        {/if}
         {/foreach}
     </section>
+    {literal}<style>
+    .mt-shc-slider { display: flex; align-items: center; gap: 10px; }
+    .mt-shc-slider input[type="range"] { flex: 1; min-width: 0; accent-color: var(--mt-primary); margin: 0; }
+    .mt-shc-out { min-width: 42px; text-align: right; font-variant-numeric: tabular-nums; font-size: 12px; color: var(--mt-text-2); }
+    .mt-shc-color { display: inline-flex; align-items: center; gap: 8px; }
+    .mt-shc-hex { font-size: 12px; color: var(--mt-text-2); }
+    .mt-shc-stage { margin: 12px 0 8px; padding: 28px; border-radius: 12px; background: var(--mt-surface-2); display: flex; justify-content: center; }
+    .mt-shc-card { width: 220px; padding: 18px 20px; border-radius: 12px; background: var(--mt-surface); color: var(--mt-text); font-size: 13px; font-weight: 500; text-align: center; }
+    </style>{/literal}
 
     {* The inline action row became the floating save bar that every page with
        a page-level save now carries. Safe here even though all six style panels

@@ -25,6 +25,7 @@ return [
             ['key' => 'soft',   'label' => 'Soft',   'css' => 'var(--shadow-card)'],
             ['key' => 'medium', 'label' => 'Medium', 'css' => 'var(--shadow-card-hover)'],
             ['key' => 'strong', 'label' => 'Strong', 'css' => 'var(--shadow-dropdown)'],
+            ['key' => 'custom', 'label' => 'Custom', 'css' => 'var(--shadow-custom)'],
         ],
     ],
     'sizeGroups' => [
