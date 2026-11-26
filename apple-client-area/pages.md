@@ -5,7 +5,7 @@
 
 ---
 
-## Public / Marketing (18)
+## Public / Marketing (21)
 
 | # | Page | Link |
 |---|------|------|
@@ -28,6 +28,9 @@
 | 16 | 360 Monitoring | [monitoring-360.html](monitoring-360.html) |
 | 17 | XOVI Now | [xovi-now.html](xovi-now.html) |
 | 18 | SocialBee | [socialbee.html](socialbee.html) |
+| 18a | Promo: Winter Sale | [promo-winter-sale.html](promo-winter-sale.html) |
+| 18b | Promo: Christmas Sale | [promo-christmas-sale.html](promo-christmas-sale.html) |
+| 18c | Promo: Cyber Monday | [promo-cyber-monday.html](promo-cyber-monday.html) |
 
 ## Authentication & User Management (9)
 
@@ -240,7 +243,7 @@
 
 | Category | Count |
 |----------|-------|
-| Public / Marketing | 18 |
+| Public / Marketing | 21 |
 | Authentication | 9 |
 | Dashboard | 1 |
 | Products / Services | 2 |
