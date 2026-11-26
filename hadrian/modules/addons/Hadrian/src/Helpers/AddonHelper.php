@@ -28,6 +28,18 @@ final class AddonHelper
         try {
             return new Template(self::getActiveTemplateName());
         } catch (\Throwable) {
+            // The site is on another theme. For visitors that is the end of
+            // it: Hadrian's hooks must stay out of someone else's pages. In
+            // the admin the addon still manages Hadrian, so Styles, Layouts
+            // and Pages can be set up before the theme is switched on (they
+            // used to answer "No active template" until then).
+            if (defined('ADMINAREA')) {
+                try {
+                    return new Template(ThemeSwitch::THEME);
+                } catch (\Throwable) {
+                    return null;
+                }
+            }
             return null;
         }
     }

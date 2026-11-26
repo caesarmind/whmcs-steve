@@ -8,9 +8,9 @@ declare(strict_types=1);
  *
  * Lifecycle:
  *   _config()     → admin metadata + dbrollback field
- *   _activate()   → no-op (migrations run on first admin visit / upgrade)
+ *   _activate()   → Database\Installer: tables, preset menus, caches, upload folder
  *   _deactivate() → optionally drop tables + clean tblconfiguration
- *   _upgrade()    → run pending migrations
+ *   _upgrade()    → the same Installer run (idempotent)
  *   _output()     → render admin UI
  */
 
@@ -64,50 +64,23 @@ function Hadrian_activate()
     // We do this here AND in _upgrade() because WHMCS doesn't reliably trigger
     // _upgrade() on first activation across versions — some 8.x and earlier
     // installs only call it on subsequent version bumps. Belt and braces.
+    //
+    // Installer::run() is the same work the Setup page's "Run now" button
+    // does: tables, the preset menus (a menu that already exists is left
+    // alone, so re-activation doesn't clobber admin customisations), the
+    // page and layout discovery caches, and the branding upload folder.
     try {
-        $migrator = new Hadrian\Database\Migrator(__DIR__);
-        $migrator->migrate();
-
-        // Seed the 4 preset menus on first activation. The seeder skips any
-        // preset whose (name, location) already exists, so re-activation
-        // doesn't clobber admin customisations.
-        (new Hadrian\Menu\Seeder())->run();
-
-        // Build the pages-discovery cache for every installed template.
-        // The Pages admin tab reads this on every visit; without it the
-        // tab would surface only the pages explicitly declared in
-        // theme.json's provides.pages. Filesystem scan happens here at
-        // activation time — never during a client-area request.
-        foreach (Hadrian\Template\Template::getAll() as $tpl) {
-            try {
-                Hadrian\Template\PagesCache::rebuild($tpl);
-                Hadrian\Template\LayoutsCache::rebuild($tpl);
-            } catch (\Throwable $e) {
-                error_log('Hadrian: discovery rebuild failed for '
-                    . $tpl->getName() . ': ' . $e->getMessage());
-            }
-        }
-
-        // Prime the branding upload directory + drop the security
-        // .htaccess sidecar before the admin's first upload. Failure here
-        // isn't fatal — the Uploader self-heals lazily on first use — but
-        // doing it at activation surfaces filesystem permission issues
-        // immediately rather than at upload time.
-        try {
-            if (!(new Hadrian\Helpers\Uploader())->prepareStorage()) {
-                error_log('Hadrian: branding storage dir not writable. '
-                    . 'Check filesystem permissions on templates/hadrian/assets/img/branding/');
-            }
-        } catch (\Throwable $e) {
-            error_log('Hadrian: branding storage prep failed: ' . $e->getMessage());
-        }
+        Hadrian\Database\Installer::run(__DIR__);
     } catch (\Throwable $e) {
         return [
             'status'      => 'error',
             'description' => 'Migration failed: ' . $e->getMessage(),
         ];
     }
-    return ['status' => 'success'];
+    return [
+        'status'      => 'success',
+        'description' => 'Activated. Open Addons > Hadrian to finish setup: license key, checks, and switching the theme on.',
+    ];
 }
 
 function Hadrian_deactivate()
@@ -128,11 +101,12 @@ function Hadrian_deactivate()
 
 function Hadrian_upgrade($vars)
 {
-    $migrator = new Hadrian\Database\Migrator(__DIR__);
-    $migrator->migrate();
-    // Belt and braces: seed presets if they were never installed (e.g. upgrading
-    // from a version that predates the menu manager). Idempotent.
-    (new Hadrian\Menu\Seeder())->run();
+    // Pending migrations, then the presets if they were never installed (e.g.
+    // upgrading from a version that predates the menu manager), then the page
+    // and layout discovery caches so new core/pages/ or core/layouts/ folders
+    // shipped with the upgrade are picked up, then the branding upload folder
+    // (an existing .htaccess there is kept). All idempotent; see Installer.
+    Hadrian\Database\Installer::run(__DIR__);
 
     // The custom_link → whmcs_page conversion used to run here, unconditionally,
     // on every upgrade, under a comment claiming it was "safe to re-run". It
@@ -148,29 +122,6 @@ function Hadrian_upgrade($vars)
     //
     // The conversion itself is unchanged in purpose but no longer destructive;
     // see the guards in Seeder::migrateCustomLinksToWhmcsPages().
-
-    // Refresh pages + layouts discovery so any new core/pages/ or
-    // core/layouts/ directories shipped with the upgrade are picked up
-    // without the buyer touching anything.
-    foreach (Hadrian\Template\Template::getAll() as $tpl) {
-        try {
-            Hadrian\Template\PagesCache::rebuild($tpl);
-            Hadrian\Template\LayoutsCache::rebuild($tpl);
-        } catch (\Throwable $e) {
-            error_log('Hadrian: discovery rebuild failed for '
-                . $tpl->getName() . ': ' . $e->getMessage());
-        }
-    }
-
-    // Re-prime the branding upload directory. Newly-shipped upgrades may
-    // tighten the .htaccess rules; the Uploader will rewrite the file
-    // only if it doesn't already exist (idempotent), so existing buyer
-    // customisations to the sidecar are preserved.
-    try {
-        (new Hadrian\Helpers\Uploader())->prepareStorage();
-    } catch (\Throwable $e) {
-        error_log('Hadrian upgrade: branding storage prep failed: ' . $e->getMessage());
-    }
 }
 
 function Hadrian_output($vars)

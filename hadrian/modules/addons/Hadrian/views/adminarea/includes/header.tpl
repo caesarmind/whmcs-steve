@@ -5,7 +5,7 @@
 {* Map currentAction -> primary nav section so sub-views highlight their parent. *}
 {$mt_action = $currentAction|default:'info'}
 {$mt_nav = $mt_action}
-{if $mt_action == 'index' || $mt_action == 'info' || $mt_action == 'license' || $mt_action == 'templates' || $mt_action == 'template'}
+{if $mt_action == 'index' || $mt_action == 'info' || $mt_action == 'setup' || $mt_action == 'license' || $mt_action == 'templates' || $mt_action == 'template'}
     {$mt_nav = 'info'}
 {elseif $mt_action == 'editStyle'}
     {$mt_nav = 'styles'}
@@ -88,3 +88,12 @@
     </nav>
 
     <div class="mt-body">
+        {* While the theme is not live yet, or an upload has left the database
+           behind the files (AbstractController::view sets $mtSetupOpen), every
+           page but Setup itself says where to finish. *}
+        {if $mtSetupOpen|default:false && $mt_action != 'setup'}
+            <div class="mt-alert mt-alert-info" role="status" style="margin-top:20px;margin-bottom:0">
+                <strong>Setup is not finished.</strong> Hadrian is not live on this site yet, or an update still has to be applied.
+                <a href="{$viewHelper->url('setup')}" style="font-weight:600;text-decoration:underline">Open Setup</a>
+            </div>
+        {/if}

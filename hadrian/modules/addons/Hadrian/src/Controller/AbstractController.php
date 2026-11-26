@@ -73,6 +73,9 @@ abstract class AbstractController
             // The theme version in the header pill: the same value the Info
             // page shows (core/hadrian.php). Empty when the theme can't load.
             'mtThemeVersion' => \Hadrian\Helpers\AddonHelper::getTemplate()?->getVersion() ?? '',
+            // True while the theme is not live yet or the database is behind
+            // the files: header.tpl then points at the Setup page.
+            'mtSetupOpen'   => \Hadrian\Helpers\SetupProbe::needsAttention(),
             // Vendor name and links, one source: src/Brand.php.
             'mtBrand'       => \Hadrian\Brand::toArray(),
             ...$vars,

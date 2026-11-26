@@ -116,5 +116,5 @@ export const ROUTES = [
 // remove, generate) are never visited.
 export const ADMIN_ACTIONS = [
   'index', 'settings', 'styles', 'layouts', 'pages', 'sitemap', 'menu',
-  'branding', 'media', 'extensions', 'tools', 'templates', 'license',
+  'branding', 'media', 'extensions', 'tools', 'templates', 'license', 'setup',
 ];

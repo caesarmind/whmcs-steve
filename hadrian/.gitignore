@@ -9,6 +9,12 @@ templates/hadrian/core/styles/*/style.css
 # Generated
 modules/addons/Hadrian/src/Helpers/IntegrityHashes.php
 
+# What an admin uploads on the Branding page and in the media library. Runtime
+# data of one site: never committed, and so never in a release zip
+# (scripts/package.mjs ships what git lists).
+templates/hadrian/assets/img/branding/
+templates/hadrian/assets/img/media/
+
 # Distribution
 dist/
 *.zip

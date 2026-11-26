@@ -9,7 +9,7 @@
     "build:js": "node scripts/build-js.mjs",
     "build:integrity": "node scripts/inject-integrity-hashes.mjs",
     "watch": "node scripts/build-css.mjs --watch & node scripts/build-js.mjs --watch",
-    "package": "npm run build && node scripts/package.mjs"
+    "package": "node scripts/package.mjs"
   },
   "devDependencies": {
     "esbuild": "^0.24.0",

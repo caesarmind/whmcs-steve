@@ -9,8 +9,9 @@ use Hadrian\Controller\AbstractController;
  * Admin entry point. Delegates by ?action= to a sub-controller.
  *
  * Routes:
- *   ?action=index            → Info (default landing)
- *   ?action=info             → Info (alias)
+ *   ?action=index            → Info, or Setup while setup is open (default landing)
+ *   ?action=info             → Info
+ *   ?action=setup            → setup checklist (POST setup_do=install|license|golive|switchback)
  *   ?action=settings         → addon-wide settings
  *   ?action=styles           → style picker
  *   ?action=editStyle        → style editor (color groups, typography, etc.)
@@ -30,9 +31,19 @@ use Hadrian\Controller\AbstractController;
  */
 final class MainController extends AbstractController
 {
-    /** Default landing — Info page (mirrors Lagom). */
-    public function indexAction(): string      { return (new InfoController())->indexAction(); }
+    /**
+     * Default landing: the Info page, or Setup while the theme is not the
+     * site's theme yet or new files are ahead of the database. ?action=info
+     * always gives Info.
+     */
+    public function indexAction(): string
+    {
+        return \Hadrian\Helpers\SetupProbe::needsAttention()
+            ? (new SetupController())->indexAction()
+            : (new InfoController())->indexAction();
+    }
     public function infoAction(): string       { return (new InfoController())->indexAction(); }
+    public function setupAction(): string      { return (new SetupController())->indexAction(); }
     public function settingsAction(): string   { return (new SettingsController())->indexAction(); }
     public function stylesAction(): string     { return (new StylesController())->indexAction(); }
     public function editStyleAction(): string  { return (new StylesController())->editAction(); }

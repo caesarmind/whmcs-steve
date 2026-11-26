@@ -16,6 +16,10 @@
         <dt>Theme Version</dt>
         <dd>{$info.version|escape}{if $info.newVersion} <span class="mt-badge mt-badge-primary">Version {$info.newVersion|escape} available</span>{if !$info.newAllowed} <span class="mt-text-3">(renew support to install it)</span>{/if}{/if}</dd>
     </dl>
+
+    <div style="margin-top:16px">
+        <a href="{$viewHelper->url('setup')}" class="mt-btn mt-btn-secondary mt-btn-sm">Setup checklist</a>
+    </div>
 </section>
 
 <section class="mt-section">

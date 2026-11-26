@@ -120,22 +120,54 @@ Rebuilds CSS on `.scss` change, JS on `.js` change. Skips integrity-hash regener
 ## Packaging for distribution
 
 ```bash
-npm run package        # produces dist/Hadrian-<version>.zip
+node hadrian/scripts/package.mjs --hooks <dir> --version 1.8.0
+# or, from hadrian/:  npm run package -- --hooks <dir> --version 1.8.0
 ```
 
-The packaged zip:
-- Runs `npm run build`
-- Encodes the protected files
-- Strips source maps and `.scss` files (for the buyer-facing zip; ship `BUILD.md` separately or in `dist/source/`)
-- Generates a manifest with file hashes for the installer to verify
-- Bundles into `dist/Hadrian-<version>.zip`
+It writes `dist/Hadrian-<version>.zip`, laid out like a WHMCS installation so a buyer extracts it at their WHMCS root:
+
+```
+templates/hadrian/                    from hadrian/templates/hadrian
+templates/orderforms/hadrian_cart/    from hadrian_cart (repo root)
+modules/addons/Hadrian/               from hadrian/modules/addons/Hadrian
+includes/hooks/                       the two license files in --hooks
+```
+
+What it does, in order:
+
+1. Lists the files to ship with git. Only tracked files go in, so branding uploads, generated CSS and anything else git ignores stay out. It stops if those folders have uncommitted changes (`--allow-dirty` overrides that for a test build).
+2. Copies them into `dist/stage/`, text with LF line endings. `.scss`, `.map`, `.ts` and the cart's `_archive/` are left out.
+3. Copies `hostnodes_theme_license.php` and `hostnodes_license_config.php` from `--hooks`, byte for byte. It stops if the first one is not encoded, because in plain form its licence check can simply be edited out (`--allow-plain-hook` overrides that for a test build). The hook holds only the licence server's public key, so nothing secret is in it either way.
+4. Stamps the release version into the staged `Hadrian.php`, `core/hadrian.php` and `theme.json`, and writes a `release.json` into each of the three folders. The addon's Setup page compares those marks to catch a half-finished upload.
+5. Computes the integrity hashes from the staged files and writes `IntegrityHashes.php` there.
+6. Writes the zip. No `zip` binary and no `npm install` are needed.
+
+The working tree is never changed. Its own version numbers keep their jobs: `core/hadrian.php` is the CSS cache-buster and is bumped far more often than releases happen.
+
+The version comes from `--version`, or from `"version"` in `hadrian/package.json`.
+
+### Encoding
+
+The hashes must describe the files exactly as the buyer receives them, so encoding goes between staging and hashing:
+
+```bash
+node hadrian/scripts/package.mjs --hooks <dir> --version 1.8.0 --stage-only
+# encode the PHP inside hadrian/dist/stage/ in place
+node hadrian/scripts/package.mjs --version 1.8.0 --from-stage
+```
+
+Do not run `npm run build:integrity` on the working tree for a release. It hashes the unstamped source files, and the next PHP edit trips the check on any site running from that tree.
+
+### Checking a build
+
+`node tests/static/check-release-package.mjs` builds a throwaway release and reads it back with PHP's `ZipArchive`: four folders, one version, hashes that match the zipped bytes, and every file the Setup page looks for. It runs in the static test tier.
 
 ## Recommended workflow
 
 ```
-develop:  npm run watch
-test:     copy modules/ + templates/ → local WHMCS install
-release:  npm run build && npm run build:integrity && encode → npm run package
+develop:  edit, then node tests/run.mjs --tier static,compile
+test:     the local stack junctions the working tree into WHMCS (scripts/local-stack)
+release:  commit → package.mjs --stage-only → encode dist/stage → package.mjs --from-stage
 ```
 
 ## When a build fails

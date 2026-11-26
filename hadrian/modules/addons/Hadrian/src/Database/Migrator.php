@@ -32,6 +32,29 @@ final class Migrator
         }
     }
 
+    /**
+     * Names of the migrations that have not run yet, in the order migrate()
+     * would run them. Reads only: unlike migrate() it does not create the
+     * tracking table, so the Setup page can ask on every view.
+     *
+     * @return list<string>
+     */
+    public function pending(): array
+    {
+        $all = array_keys($this->discover());
+        if (!\WHMCS\Database\Capsule::schema()->hasTable('hadrian_migrations')) {
+            return $all;
+        }
+        $ran = \WHMCS\Database\Capsule::table('hadrian_migrations')->pluck('name')->all();
+        return array_values(array_diff($all, $ran));
+    }
+
+    /** How many migrations this version ships. */
+    public function total(): int
+    {
+        return count($this->discover());
+    }
+
     public function rollback(): void
     {
         $this->ensureTable();

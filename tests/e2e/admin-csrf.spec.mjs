@@ -47,6 +47,10 @@ const POSTS = [
   ['styles',                           {}],                              // harmless: no style named
   ['tools',                            { tool: 'clear_template_cache' }], // harmless: a cache
   ['license',                          {}],                              // harmless: no key sent
+  ['setup',                            { setup_do: 'license', license_key: 'forged-key' }],
+  ['setup',                            { setup_do: 'install' }],        // harmless: adds only what is missing
+  ['setup',                            { setup_do: 'golive' }],
+  ['setup',                            { setup_do: 'switchback' }],
 ];
 const GETS = [
   'menu&sub=seed',
@@ -134,6 +138,17 @@ test('the screens still save when used normally', async ({ page }) => {
   await page.locator('a', { hasText: 'Generate now' }).click();
   await page.waitForLoadState('load');
   await ok('sitemap generate');
+
+  // Setup: "Run now" is only drawn while the database is behind, so send what
+  // the button sends, with the token WHMCS put in the page's own form. It adds
+  // only what is missing, so it is safe on an install that is up to date.
+  await page.goto(`${H}&action=setup`);
+  const setupToken = await page.locator('#mt-setup-license input[name="token"]').inputValue();
+  const ran = await page.request.post(`${H}&action=setup`, { form: { setup_do: 'install', token: setupToken }, maxRedirects: 0 });
+  expect(ran.status(), 'setup install: accepted, then redirected').toBe(302);
+  expect(ran.headers()['location'] || '', 'setup install: confirmed').toContain('done=installed');
+  await page.goto(`${H}&action=setup&done=installed`);
+  await expect(page.locator('.mt-alert-success')).toContainText('up to date');
 
   // Tools.
   await page.goto(`${H}&action=tools`);

@@ -4,37 +4,50 @@
 // Computes sha256 of every protected PHP file and writes the resulting map
 // into modules/addons/Hadrian/src/Helpers/IntegrityHashes.php.
 //
-// Run AFTER any PHP edit, BEFORE encoding.
+// The hashes must describe the files exactly as they reach the buyer, so run it
+// on the tree that ships, after the last change to it: scripts/package.mjs
+// calls writeIntegrityHashes() on its staging folder once the release version
+// is stamped in. Anything that rewrites a protected file afterwards (an
+// encoder included) makes the hashes wrong, and the site then blocks itself.
 //
-// Run: npm run build:integrity
+// Run: npm run build:integrity            the working tree (rarely what you want:
+//                                         the next PHP edit trips the check)
+//      node scripts/inject-integrity-hashes.mjs --root <dir>
 
 import { createHash } from 'node:crypto';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { resolve, dirname, relative } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = resolve(__dirname, '..');
 
+/**
+ * Hash the protected files under `root` (a folder laid out like hadrian/, or
+ * like a WHMCS root) and write IntegrityHashes.php there.
+ *
+ * @returns {number} how many files were hashed
+ * @throws when a protected file is missing
+ */
+export function writeIntegrityHashes(root, log = console.log) {
 // Targets — paths relative to ROOTDIR (the WHMCS install root, where this addon
 // gets dropped into modules/addons/Hadrian/).
 const TARGETS_FILE = resolve(__dirname, 'integrity-targets.json');
 const targets = JSON.parse(readFileSync(TARGETS_FILE, 'utf8'));
 
-console.log('Computing integrity hashes...');
+log('Computing integrity hashes...');
 
 const hashes = {};
 for (const relativePath of targets) {
   const abs = resolve(root, relativePath);
+  let buf;
   try {
-    const buf = readFileSync(abs);
-    const hash = createHash('sha256').update(buf).digest('hex');
-    hashes[relativePath] = hash;
-    console.log(`  ${relativePath} → ${hash.slice(0, 16)}...`);
+    buf = readFileSync(abs);
   } catch (e) {
-    console.error(`  MISSING: ${relativePath}`);
-    process.exit(1);
+    throw new Error(`Integrity target is missing: ${relativePath}`);
   }
+  const hash = createHash('sha256').update(buf).digest('hex');
+  hashes[relativePath] = hash;
+  log(`  ${relativePath} → ${hash.slice(0, 16)}...`);
 }
 
 const phpEntries = Object.entries(hashes)
@@ -107,4 +120,18 @@ HTML;
 
 const outFile = resolve(root, 'modules/addons/Hadrian/src/Helpers/IntegrityHashes.php');
 writeFileSync(outFile, phpContent);
-console.log(`\n✓ Wrote ${relative(root, outFile)} (${Object.keys(hashes).length} hashes)`);
+log(`\n✓ Wrote ${relative(root, outFile)} (${Object.keys(hashes).length} hashes)`);
+return Object.keys(hashes).length;
+}
+
+// Run directly (not imported by package.mjs).
+if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
+  const at = process.argv.indexOf('--root');
+  const root = at >= 0 && process.argv[at + 1] ? resolve(process.argv[at + 1]) : resolve(__dirname, '..');
+  try {
+    writeIntegrityHashes(root);
+  } catch (e) {
+    console.error(`  ${e.message}`);
+    process.exit(1);
+  }
+}
