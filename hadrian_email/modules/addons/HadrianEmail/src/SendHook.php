@@ -23,7 +23,7 @@ final class SendHook
     /** @var array<string,mixed>|null */
     private static ?array $layout = null;
 
-    /** @var array<string,string> subjects by template name and language */
+    /** @var array<string, array{0:string,1:string}> [subject, type] by template name and language */
     private static array $subjects = [];
 
     /**
@@ -54,7 +54,11 @@ final class SendHook
 
             $name = (string)($vars['messagename'] ?? '');
             if (self::showsSubject()) {
-                $fields['hx_subject'] = Renderer::subjectText(self::subject($name, $lang), $fields);
+                [$subject, $type] = self::template($name, $lang);
+                $fields['hx_subject'] = Renderer::subjectText($subject, $fields);
+                // The client-area designs head the title with its section and
+                // status. Set for every design; only those draw the markers.
+                $fields = Status::fields($name, $type, $lang) + $fields;
             }
 
             [$header, $footer] = Renderer::fill(self::$parts[$lang], $fields, self::preheader($name, $lang, $fields));
@@ -78,7 +82,11 @@ final class SendHook
         if ($design === null || ($design['status'] ?? '') !== 'published') {
             return '';
         }
-        $text = Merge::pick($design['doc']['settings']['preheader'] ?? '', $lang);
+        // The published copy, not the saved document: a saved edit is a draft
+        // until it is published. A design published before the copy was kept
+        // has only its saved document.
+        $doc  = is_array($design['published_doc'] ?? null) && $design['published_doc'] !== [] ? $design['published_doc'] : $design['doc'];
+        $text = Merge::pick($doc['settings']['preheader'] ?? '', $lang);
         if (trim($text) === '') {
             return '';
         }
@@ -105,17 +113,20 @@ final class SendHook
      * by the caller. An ad-hoc message has no subject here (its template row
      * is a generic one), so its header has no title rather than a wrong one.
      */
-    private static function subject(string $messageName, string $lang): string
+    /** @return array{0:string,1:string} [subject, template type] */
+    private static function template(string $messageName, string $lang): array
     {
         if ($messageName === '' || $messageName === 'Mass Mail Template') {
-            return '';
+            return ['', ''];
         }
         $key = $messageName . "\0" . $lang;
         if (!array_key_exists($key, self::$subjects)) {
             $q = static fn(string $l) => \WHMCS\Database\Capsule::table('tblemailtemplates')
-                ->where('name', $messageName)->where('language', $l)->value('subject');
-            $s = $lang !== Bridge::defaultLanguage() ? $q($lang) : null;
-            self::$subjects[$key] = trim((string)($s ?: $q('') ?: ''));
+                ->where('name', $messageName)->where('language', $l)->first(['subject', 'type']);
+            $own  = $lang !== Bridge::defaultLanguage() ? $q($lang) : null;
+            $base = $q('');
+            $subject = trim((string)(($own->subject ?? '') ?: ($base->subject ?? '')));
+            self::$subjects[$key] = [$subject, (string)($base->type ?? $own->type ?? '')];
         }
         return self::$subjects[$key];
     }

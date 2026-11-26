@@ -33,7 +33,7 @@ Activating the addon changes nothing about outgoing mail. Your emails only chang
 
 :::steps
 1. Install and activate the addon, then open **Hadrian -> Email**.
-2. Pick one of the three designs under **Layout**. Adjust the header and footer if you want to, and set an email logo.
+2. Pick one of the six designs under **Layout**. Adjust the header and footer if you want to, and set an email logo.
 3. **Turn on.** Every client email now goes out inside your layout.
 4. Pick an email, click **Design**, and arrange its blocks. Preview it in light, dark and on a phone.
 5. **Publish.** Repeat for the emails that matter most to you.
@@ -41,7 +41,7 @@ Activating the addon changes nothing about outgoing mail. Your emails only chang
 
 ## What clients receive
 
-- One of three designs: Card, Banner or Letter. See [Layout and appearance](../layout/).
+- One of six designs: Card, Banner, Letter, or Page, Panel and Notice, which look like your client area. See [Layout and appearance](../layout/).
 - One column, 600 pixels wide by default, built from tables so it holds together in Outlook.
 - Light by default, switching to your dark colours where the recipient's mail app is in dark mode. You can lock it to either.
 - Mirrored automatically for right-to-left languages.

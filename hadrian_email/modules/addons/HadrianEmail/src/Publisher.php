@@ -83,6 +83,9 @@ final class Publisher
     }
 
     /**
+     * Publish: the design as last saved goes live, and is kept as the
+     * published copy.
+     *
      * @return array{ok:bool, errors:list<string>, languages:list<string>}
      */
     public static function publish(int $designId): array
@@ -91,14 +94,31 @@ final class Publisher
         if ($design === null || $design['kind'] !== Blocks::KIND_MESSAGE || (string)$design['target'] === '') {
             return self::fail('This design is not a message design.');
         }
-        $target  = (string)$design['target'];
-        $default = self::template($target);
+        return self::write($design, (array)$design['doc'], true);
+    }
+
+    /**
+     * Compile $source and write it into the WHMCS template.
+     *
+     * $saved: $source is the saved document (Publish), which is stored back
+     * normalised. A recompile passes the published copy instead and leaves
+     * the saved document, and any edit in it not yet published, as it is.
+     *
+     * @param array<string,mixed> $design
+     * @param array<string,mixed> $source
+     * @return array{ok:bool, errors:list<string>, languages:list<string>}
+     */
+    private static function write(array $design, array $source, bool $saved): array
+    {
+        $designId = (int)$design['id'];
+        $target   = (string)$design['target'];
+        $default  = self::template($target);
         if ($default === null) {
             return self::fail('WHMCS has no email template called "' . $target . '".');
         }
 
         $installed = Bridge::languages();
-        $doc       = Blocks::normalize((array)$design['doc'], Blocks::KIND_MESSAGE, $installed);
+        $doc       = Blocks::normalize($source, Blocks::KIND_MESSAGE, $installed);
         if ($doc['blocks'] === []) {
             return self::fail('Add at least one block before publishing.');
         }
@@ -178,12 +198,12 @@ final class Publisher
             }
         });
 
-        Design::update($designId, [
-            'doc'          => $doc,
-            'status'       => 'published',
-            'published'    => $published,
-            'backup'       => $backup,
-            'published_at' => $now,
+        Design::update($designId, ($saved ? ['doc' => $doc] : []) + [
+            'published_doc' => $doc,
+            'status'        => 'published',
+            'published'     => $published,
+            'backup'        => $backup,
+            'published_at'  => $now,
         ]);
 
         return ['ok' => true, 'errors' => [], 'languages' => array_map(
@@ -212,7 +232,7 @@ final class Publisher
             }
         });
 
-        Design::update($designId, ['status' => 'draft', 'published' => null, 'backup' => null, 'published_at' => null]);
+        Design::update($designId, ['status' => 'draft', 'published_doc' => null, 'published' => null, 'backup' => null, 'published_at' => null]);
         return ['ok' => true, 'errors' => [], 'languages' => array_map('strval', array_keys($backup))];
     }
 
@@ -268,16 +288,22 @@ final class Publisher
     /**
      * Recompile every published design, after the theme's colours or the
      * email appearance changed: a button's colour is written into the body.
-     * Designs edited outside are left alone.
+     *
+     * Each is recompiled from its published copy, never from the saved
+     * document: an edit saved but not published stays a draft. Left alone:
+     * designs edited outside, and designs published before the copy was kept
+     * (their saved document may hold such an edit; publishing them once keeps
+     * a copy, and the builder shows them as having unpublished changes).
      */
     public static function republishAll(): int
     {
         $count = 0;
         foreach (Design::published() as $design) {
-            if (self::drift($design) !== []) {
+            $live = $design['published_doc'] ?? [];
+            if (!is_array($live) || $live === [] || self::drift($design) !== []) {
                 continue;
             }
-            if (self::publish((int)$design['id'])['ok']) {
+            if (self::write($design, $live, false)['ok']) {
                 $count++;
             }
         }

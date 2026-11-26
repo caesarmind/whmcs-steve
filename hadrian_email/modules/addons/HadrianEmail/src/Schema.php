@@ -14,7 +14,12 @@ namespace HadrianEmail;
  *   kind      layout | message
  *   target    for a message, the WHMCS template name it replaces
  *             (tblemailtemplates.name). Null for a layout.
- *   doc       the block document, JSON. This is the design.
+ *   doc       the block document, JSON. This is the design as last saved,
+ *             which for a published email can be ahead of what is live.
+ *   published_doc  the document as it was last published. Recompiling after
+ *             a style change and the send hook read this one, so saving an
+ *             edit never reaches a customer before Publish does. Null for a
+ *             draft, and for a design published before this column existed.
  *   published what a publish wrote into tblemailtemplates, per language:
  *             {"": {"rowId": 12, "hash": "..."}, "french": {...}}
  *             The hash is how an edit made in WHMCS's own editor is noticed.
@@ -44,12 +49,17 @@ final class Schema
                 $t->string('name', 191);
                 $t->string('target', 191)->nullable();
                 $t->longText('doc');
+                $t->longText('published_doc')->nullable();
                 $t->string('status', 16)->default('draft');
                 $t->longText('published')->nullable();
                 $t->longText('backup')->nullable();
                 $t->timestamp('published_at')->nullable();
                 $t->timestamps();
                 $t->index(['kind', 'target']);
+            });
+        } elseif (!$schema->hasColumn(self::DESIGNS, 'published_doc')) {
+            $schema->table(self::DESIGNS, function ($t) {
+                $t->longText('published_doc')->nullable();
             });
         }
     }

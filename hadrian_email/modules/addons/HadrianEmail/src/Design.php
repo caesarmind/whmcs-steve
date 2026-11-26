@@ -16,6 +16,9 @@ final class Design
 {
     private const TABLE = Schema::DESIGNS;
 
+    /** Columns stored as JSON. published_doc is absent from a table Schema::ensure() has not upgraded yet. */
+    private const JSON = ['doc', 'published_doc', 'published', 'backup'];
+
     /** Setting holding the id of the layout in use. */
     public const ACTIVE_LAYOUT_KEY = 'layout_id';
 
@@ -157,7 +160,7 @@ final class Design
                 $out[$k] = $data[$k];
             }
         }
-        foreach (['doc', 'published', 'backup'] as $k) {
+        foreach (self::JSON as $k) {
             if (array_key_exists($k, $data)) {
                 $out[$k] = $data[$k] === null
                     ? null
@@ -171,7 +174,7 @@ final class Design
     private static function hydrate(object $row): array
     {
         $a = (array)$row;
-        foreach (['doc', 'published', 'backup'] as $k) {
+        foreach (self::JSON as $k) {
             if (array_key_exists($k, $a)) {
                 $decoded = is_string($a[$k]) && $a[$k] !== '' ? json_decode($a[$k], true) : null;
                 $a[$k]   = is_array($decoded) ? $decoded : [];

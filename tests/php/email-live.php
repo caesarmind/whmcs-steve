@@ -150,6 +150,33 @@ try {
     $check('preview text comes from the design, amounts included',
         (bool) preg_match('/mso-hide:all[^>]*>[^<]*\d[^<]*due on/', $i), substr($i, (int) strpos($i, 'mso-hide:all'), 160));
 
+    // Bugs 1 and 2 in tests/FEATURES.md, fixed 2026-11-25: Save wrote the one
+    // document the recompile and the send hook read, so an edit reached
+    // customers before Publish did.
+    echo "== a saved edit stays a draft until it is published\n";
+    $live = (array) Design::find($designId)['doc'];
+    $edit = $live;
+    $edit['blocks'][0]['props']['text'] = ['_' => 'Unpublished heading HX7'];
+    $edit['settings']['preheader'] = ['_' => 'Unpublished preview HX7'];
+    Design::update($designId, ['doc' => Blocks::normalize($edit, Blocks::KIND_MESSAGE)]);   // what Save does
+    SendHook::reset();
+    $before = $newest();
+    $api = $send($TEMPLATE, (int) $invoice->id);
+    $s = $arrived($before);
+    $check('sent after the save', ($api['result'] ?? '') === 'success' && $s !== '', json_encode($api));
+    $check('the saved edit is not in the body customers get', str_contains($s, 'hx-btn') && !str_contains($s, 'Unpublished heading HX7'));
+    $check('...nor in its preview line, which is still the published one',
+        !str_contains($s, 'Unpublished preview HX7') && (bool) preg_match('/mso-hide:all[^>]*>[^<]*\d[^<]*due on/', $s));
+    $recompiled = Publisher::republishAll();
+    $body = (string) DB::table('tblemailtemplates')->where('name', $TEMPLATE)->where('language', '')->value('message');
+    $check('recompiling after a style change rewrites the published version', $recompiled === 1 && str_contains($body, 'hx-btn') && !str_contains($body, 'Unpublished heading HX7'));
+    $check('...and keeps the saved edit as the draft', str_contains(json_encode(Design::find($designId)['doc']), 'Unpublished heading HX7'));
+    Publisher::publish($designId);
+    $body = (string) DB::table('tblemailtemplates')->where('name', $TEMPLATE)->where('language', '')->value('message');
+    $check('Publish then makes the edit live', str_contains($body, 'Unpublished heading HX7'));
+    Design::update($designId, ['doc' => $live]);
+    Publisher::publish($designId);
+
     echo "== translations become per-language WHMCS templates\n";
     $langRows = static fn(): array => DB::table('tblemailtemplates')->where('name', $TEMPLATE)->where('language', '!=', '')->pluck('message', 'language')->all();
     $hadLangRows = $langRows();

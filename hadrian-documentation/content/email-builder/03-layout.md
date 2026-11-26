@@ -7,15 +7,34 @@ lead: The header and footer around every email, and the handful of settings only
 
 ## Designs
 
-Three designs set the overall look of every email. Pick one on the Email page under **Layout**, or in the layout builder with no block selected.
+Six designs set the overall look of every email. Pick one on the Email page under **Layout**, or in the layout builder with no block selected. They come in two groups.
 
-:::shot img/email-designs.png The three designs, rendered with your own colours and logo
+:::shot img/email-designs.png The designs, rendered with your own colours and logo
+
+**Classic**
 
 - **Card.** Your logo above the message, which sits on a white card on a soft grey page. The default.
 - **Banner.** A band in your accent colour carries your logo and the email's subject as a large title, joined to the card below it.
 - **Letter.** No card: a centred logo, the message on a plain page and fine rules between the parts, like a receipt.
 
-All three take their colours, font and logo from your Hadrian style, switch to your dark colours in dark mode, and mirror for right-to-left languages.
+**Client area**
+
+These three are drawn from screens of your Hadrian client area, so an email looks like the account it came from. Each heads the message the way the client area heads a page: the section in small capitals, the title, and a status pill.
+
+- **Page.** Like a client area page. Your logo and links sit on a bar with a fine rule under it, then the section, title and status, then the message on a card.
+- **Panel.** Like the client area's summary panels. The logo, the heading and the message share one card, with a fine rule under the logo.
+- **Notice.** Like the client area's notice bar. The title and status sit on a tinted bar with an info mark, and the message is on a card below it.
+
+All six take their colours, font and logo from your Hadrian style, switch to your dark colours in dark mode, and mirror for right-to-left languages. If you change your Hadrian style, the emails follow it.
+
+### Section and status
+
+The client-area designs add two things next to the title. Both come from WHMCS, and both are in the recipient's language.
+
+- **Section.** The kind of email, from its WHMCS template type: Billing, Services, Domains, Support, Account or Affiliates.
+- **Status.** Only for the stock WHMCS emails that are always sent in one state. For example, an invoice is Unpaid when **Invoice Created** goes out and Paid when **Invoice Payment Confirmation** does. Welcome emails show Active, a suspension notice shows Suspended, and a ticket reply shows Answered.
+
+Every other email, including any template you created yourself, shows its section and title with no status. The words are WHMCS's own client area strings, so your language overrides apply to them.
 
 ### What switching changes
 
@@ -25,9 +44,9 @@ Everything you wrote stays: the tagline, header and footer links, footer text, s
 
 ### The subject in the header
 
-**Show the email subject** in the header block puts each email's subject under your logo as a title. Banner turns it on; the other two leave it off, but you can turn it on in any design.
+**Show the email subject** in the header block puts each email's subject under your logo as a title. Banner and the three client-area designs turn it on; Card and Letter leave it off, but you can turn it on in any design. In the client-area designs the section and status go with the title, so turning the subject off removes all three.
 
-The subject is the one WHMCS sends, in the recipient's language, with its merge fields filled in. If the module is ever not available when an email is sent, that email goes out without the title rather than with a placeholder.
+The subject is the one WHMCS sends, in the recipient's language, with its merge fields filled in. If the module is ever not available when an email is sent, that email goes out without the title, section and status rather than with placeholders.
 
 :::info The banner needs a light logo
 Your normal logo is usually dark, which disappears on a coloured band. The Banner design uses your **Logo for dark mode** on the band. Without one, it sets your company name in white instead.

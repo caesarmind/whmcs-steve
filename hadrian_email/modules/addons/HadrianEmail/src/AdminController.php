@@ -134,6 +134,7 @@ final class AdminController
             'groups'      => $groups,
             'counts'      => $counts,
             'designs'     => $this->designCards($theme),
+            'designGroups' => Designs::GROUPS,
             'token'       => $this->token(),
             'notes'       => $notes,
             'flashMsg'    => (string)($_GET['flash'] ?? ''),
@@ -337,12 +338,14 @@ final class AdminController
         // The header's subject title: this email's own subject when editing
         // one (the design's, else the WHMCS template's), a sample otherwise.
         if ($kind === Blocks::KIND_MESSAGE) {
+            $template = Publisher::template((string)($in['target'] ?? ''));
             $own = trim(\HadrianEmail\Merge::pick($doc['settings']['subject'], $lang));
             if ($own === '') {
-                $template = Publisher::template((string)($in['target'] ?? ''));
-                $own      = $template !== null ? (string)$template->subject : '';
+                $own = $template !== null ? (string)$template->subject : '';
             }
             $opts['subject'] = $own;
+            $opts['message'] = $template !== null ? (string)$template->name : '';
+            $opts['type']    = $template !== null ? (string)$template->type : '';
         }
         if ($kind === Blocks::KIND_MESSAGE && $doc['blocks'] === []) {
             $target = (string)($in['target'] ?? '');
@@ -466,7 +469,7 @@ final class AdminController
             } catch (\Throwable $e) {
                 error_log('Hadrian Email: design preview failed: ' . $e->getMessage());
             }
-            $out[] = ['id' => $id, 'label' => $d['label'], 'description' => $d['description'], 'active' => $id === $active, 'html' => $html];
+            $out[] = ['id' => $id, 'label' => $d['label'], 'description' => $d['description'], 'group' => Designs::group($id), 'active' => $id === $active, 'html' => $html];
         }
         return $out;
     }

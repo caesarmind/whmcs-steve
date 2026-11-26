@@ -13,6 +13,8 @@
 .mt-em-design-head h3 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
 .mt-em-design p { margin: 0; font-size: 12.5px; line-height: 1.5; color: var(--mt-text-3); flex: 1; }
 .mt-em-design form { margin: 6px 0 0; }
+.mt-em-dgroup { margin: 4px 0 10px; font-size: 12px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; color: var(--mt-text-3); }
+.mt-em-designs + .mt-em-dgroup { margin-top: 24px; }
 /* A scaled-down live render. 0.5 of a 680px-wide frame fills the card. */
 .mt-em-thumb { position: relative; height: 300px; overflow: hidden; border-bottom: 1px solid var(--mt-border); background: var(--mt-surface-2); }
 .mt-em-thumb iframe { position: absolute; top: 0; left: 50%; width: 680px; height: 640px; margin-left: -340px; border: 0; transform: scale(0.5); transform-origin: 50% 0; pointer-events: none; }
@@ -116,8 +118,11 @@
             <a class="mt-btn mt-btn-primary mt-btn-sm" href="{$base}&action=builder&layout=1">Edit layout</a>
         </header>
         <p class="mt-row-help" style="margin:0 0 16px;">The header and footer around every email. Pick a design; your logo, links and footer text carry over. An email with no design of its own keeps its WHMCS text and sits inside this.</p>
-        <div class="mt-em-designs">
+        {foreach $designGroups as $gid => $glabel}
+        <h3 class="mt-em-dgroup">{$glabel|escape}</h3>
+        <div class="mt-em-designs" data-mt-em-design-group="{$gid|escape}">
             {foreach $designs as $d}
+                {if $d.group != $gid}{continue}{/if}
                 <div class="mt-em-design{if $d.active} is-active{/if}" data-mt-em-design="{$d.id|escape}">
                     <div class="mt-em-thumb">
                         {if $d.html}<iframe title="{$d.label|escape} design" sandbox="" loading="lazy" srcdoc="{$d.html|escape}"></iframe>{/if}
@@ -139,6 +144,7 @@
                 </div>
             {/foreach}
         </div>
+        {/foreach}
     </section>
 </div>
 

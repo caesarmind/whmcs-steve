@@ -147,21 +147,61 @@ final class Merge
      * $fields = null turns them into Smarty, for the static fallback that
      * WHMCS evaluates itself; otherwise they are decided here.
      *
+     * Markers may nest (a status pill inside the subject title). The innermost
+     * ones are resolved first, so each pass only ever sees marker pairs with
+     * no other marker between them.
+     *
      * @param array<string,mixed>|null $fields
      */
     public static function conditionals(string $html, ?array $fields): string
     {
-        return (string)preg_replace_callback(
-            '/<!--hx-if:([a-z_][a-z0-9_]*)-->(.*?)<!--\/hx-if-->/s',
-            static function (array $m) use ($fields): string {
-                if ($fields === null) {
-                    return '{if $' . $m[1] . '}' . $m[2] . '{/if}';
-                }
-                $v = $fields[$m[1]] ?? '';
-                return ((is_scalar($v) || $v instanceof \Stringable) && trim((string)$v) !== '') ? $m[2] : '';
-            },
-            $html
-        );
+        return self::innermost($html, static function (string $name, string $inner) use ($fields): string {
+            if ($fields === null) {
+                return '{if $' . $name . '}' . $inner . '{/if}';
+            }
+            $v = $fields[$name] ?? '';
+            return ((is_scalar($v) || $v instanceof \Stringable) && trim((string)$v) !== '') ? $inner : '';
+        });
+    }
+
+    /**
+     * Replace every marker pair, innermost first, with what $fn returns for it.
+     *
+     * @param callable(string, string): string $fn  (field name, inner html)
+     */
+    public static function innermost(string $html, callable $fn): string
+    {
+        $re = '/<!--hx-if:([a-z_][a-z0-9_]*)-->((?:(?!<!--hx-if:).)*?)<!--\/hx-if-->/s';
+        // Our own markup nests two deep at most; the cap only stops a
+        // malformed document from looping.
+        for ($i = 0; $i < 6 && str_contains($html, '<!--hx-if:'); $i++) {
+            $next = (string)preg_replace_callback($re, static fn(array $m): string => $fn($m[1], $m[2]), $html);
+            if ($next === $html) {
+                break;
+            }
+            $html = $next;
+        }
+        return $html;
+    }
+
+    /**
+     * Drop the markers for the renderer's own per-email values (hx_*), and
+     * what they wrap, leaving every other marker in place. For the static
+     * fallback, where nothing fills those values.
+     */
+    public static function dropOwn(string $html): string
+    {
+        // An hx_ marker never wraps a marker of another kind in our markup,
+        // so the innermost-hx_ pattern is enough.
+        $re = '/<!--hx-if:hx_[a-z0-9_]*-->((?:(?!<!--hx-if:hx_).)*?)<!--\/hx-if-->/s';
+        for ($i = 0; $i < 6 && str_contains($html, '<!--hx-if:hx_'); $i++) {
+            $next = (string)preg_replace($re, '', $html);
+            if ($next === $html) {
+                break;
+            }
+            $html = $next;
+        }
+        return $html;
     }
 
     /**

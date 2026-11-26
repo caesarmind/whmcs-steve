@@ -13,6 +13,10 @@ final class Samples
     /** The subject shown in a header's title while previewing the layout on its own. */
     public const SUBJECT = 'Invoice #{$invoice_num} is ready';
 
+    /** The WHMCS template the sample stands for, and its type. */
+    public const MESSAGE = 'Invoice Created';
+    public const TYPE    = 'invoice';
+
     /**
      * @param array<string,mixed> $theme
      * @return array<string,string>

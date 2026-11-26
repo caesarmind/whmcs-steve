@@ -39,10 +39,15 @@ final class Renderer
     private bool $markSlot;
     private string $start;
     private string $end;
+    /** The content cell's padding options, in pixels. */
+    private const PADDING = ['compact' => 20, 'regular' => 32, 'roomy' => 44];
+
     /** The layout design (Designs): set by layout() from the document. */
     private string $design = Designs::DEFAULT;
-    /** Banner header directly above a carded content cell: they draw as one card. */
+    /** Banner or Panel header directly above a carded content cell: they draw as one card. */
     private bool $joined = false;
+    /** The content cell's side padding, which the Panel header lines up with. */
+    private int $contentPad = 32;
 
     /**
      * @param array<string,mixed> $theme  Theme::load()
@@ -95,8 +100,11 @@ final class Renderer
         $this->joined = false;
         $blocks = array_values((array)$doc['blocks']);
         foreach ($blocks as $i => $b) {
+            if ($b['type'] === 'content') {
+                $this->contentPad = self::PADDING[$b['props']['padding'] ?? 'regular'] ?? 32;
+            }
             if ($b['type'] === 'header' && isset($blocks[$i + 1]) && $blocks[$i + 1]['type'] === 'content') {
-                $this->joined = $this->design === 'banner' && !empty($blocks[$i + 1]['props']['card']);
+                $this->joined = in_array($this->design, ['banner', 'panel'], true) && !empty($blocks[$i + 1]['props']['card']);
             }
         }
 
@@ -211,6 +219,8 @@ final class Renderer
             . '.hx-stack-gap{padding-top:10px!important}'
             . '.hx-btn-full a{display:block!important}'
             . ($this->design === 'banner' ? '.hx-band{padding:22px 20px 24px!important}' : '')
+            . ($this->design === 'panel' ? '.hx-panel-x{padding-left:20px!important;padding-right:20px!important}' : '')
+            . ($this->design === 'notice' ? '.hx-notice{padding:12px 14px!important}' : '')
             . '.hx-title{font-size:22px!important}'
             . '}';
 
@@ -247,6 +257,9 @@ final class Renderer
             ['.hx-tint-success', 'background-color:' . $d['successTint'] . ';border-color:' . $d['success']],
             ['.hx-tint-warning', 'background-color:' . $d['warningTint'] . ';border-color:' . $d['warning']],
             ['.hx-tint-danger', 'background-color:' . $d['dangerTint'] . ';border-color:' . $d['danger']],
+            ['.hx-ink-success', 'color:' . $d['success']],
+            ['.hx-ink-warning', 'color:' . $d['warning']],
+            ['.hx-ink-danger', 'color:' . $d['danger']],
             ['.hx-logo-l', 'display:none'],
             ['.hx-logo-d', 'display:block;max-height:none;overflow:visible'],
         ];
@@ -283,6 +296,9 @@ final class Renderer
     /** @param array<string,mixed> $b */
     private function rowHeader(array $b): string
     {
+        if (Designs::isClientArea($this->design)) {
+            return $this->rowHeaderClient($b);
+        }
         $pr     = $b['props'];
         $p      = $this->p;
         $center = $pr['align'] === 'center';
@@ -306,20 +322,8 @@ final class Renderer
                 . Merge::escape($tagline) . '</div>';
         }
 
-        $nav = $this->linkList($pr['nav'], 'font-weight:500;text-decoration:none;', $cls2, $ink2);
-
-        if ($center || $nav === '' || $brand === '') {
-            $inner = $brand;
-            if ($nav !== '') {
-                $inner .= '<div class="' . $cls2 . '" style="' . ($brand !== '' ? 'margin-top:12px;' : '') . 'font-size:13px;line-height:1.5;color:' . $ink2 . ';">' . $nav . '</div>';
-            }
-            $cell = '<td align="' . $align . '" style="text-align:' . $align . ';">' . $inner . '</td>';
-        } else {
-            $cell = '<td class="hx-stack" align="' . $this->start . '" valign="middle" style="text-align:' . $this->start . ';">' . $brand . '</td>'
-                . '<td class="hx-stack hx-stack-gap ' . $cls2 . '" align="' . $this->end . '" valign="middle" style="text-align:' . $this->end
-                . ';font-size:13px;line-height:1.5;color:' . $ink2 . ';padding-' . $this->start . ':16px;">' . $nav . '</td>';
-        }
-        $rows = $this->table() . '<tr>' . $cell . '</tr></table>';
+        $nav  = $this->linkList($pr['nav'], 'font-weight:500;text-decoration:none;', $cls2, $ink2);
+        $rows = $this->brandBar($brand, $nav, $center, $cls2, $ink2);
 
         // The email's subject as a title. A marker, not a value: it is filled
         // per email at send time, and dropped wherever there is no subject.
@@ -342,6 +346,153 @@ final class Renderer
             : 'padding:4px 6px 20px;';
         return '<tr' . $this->mark($b) . '><td' . ($this->design === 'letter' ? ' class="hx-border"' : '') . ' style="' . $rule . 'font-family:' . $this->font . ';">'
             . $rows . '</td></tr>' . "\n";
+    }
+
+    /** Logo (and tagline) at the start, links at the end; stacked when centred. */
+    private function brandBar(string $brand, string $nav, bool $center, string $cls2, string $ink2): string
+    {
+        $align = $center ? 'center' : $this->start;
+        if ($center || $nav === '' || $brand === '') {
+            $inner = $brand;
+            if ($nav !== '') {
+                $inner .= '<div class="' . $cls2 . '" style="' . ($brand !== '' ? 'margin-top:12px;' : '') . 'font-size:13px;line-height:1.5;color:' . $ink2 . ';">' . $nav . '</div>';
+            }
+            $cell = '<td align="' . $align . '" style="text-align:' . $align . ';">' . $inner . '</td>';
+        } else {
+            $cell = '<td class="hx-stack" align="' . $this->start . '" valign="middle" style="text-align:' . $this->start . ';">' . $brand . '</td>'
+                . '<td class="hx-stack hx-stack-gap ' . $cls2 . '" align="' . $this->end . '" valign="middle" style="text-align:' . $this->end
+                . ';font-size:13px;line-height:1.5;color:' . $ink2 . ';padding-' . $this->start . ':16px;">' . $nav . '</td>';
+        }
+        return $this->table() . '<tr>' . $cell . '</tr></table>';
+    }
+
+    // ------------------------------------------------ the client-area designs
+
+    /**
+     * Header for Page, Panel and Notice. Each repeats one screen of the client
+     * area: the top bar with its fine rule and the page heading (section in
+     * small capitals, title, status pill); the summary panels; the notice bar.
+     *
+     * The heading parts are markers, filled per email by SendHook from Status:
+     * an email with no section or status simply shows its title.
+     *
+     * @param array<string,mixed> $b
+     */
+    private function rowHeaderClient(array $b): string
+    {
+        $pr     = $b['props'];
+        $p      = $this->p;
+        $center = $pr['align'] === 'center';
+        $font   = 'font-family:' . $this->font . ';';
+
+        $brand   = $pr['logo'] ? $this->logo((int)$pr['logoWidth']) : '';
+        $tagline = trim(Merge::pick($pr['tagline'], $this->lang));
+        if ($tagline !== '') {
+            $brand .= '<div class="hx-muted" style="margin-top:6px;font-size:13px;line-height:1.4;color:' . $p['muted'] . ';">' . Merge::escape($tagline) . '</div>';
+        }
+        $nav  = $this->linkList($pr['nav'], 'font-weight:500;text-decoration:none;');
+        $bar  = $this->brandBar($brand, $nav, $center, 'hx-muted', $p['muted']);
+        $sub  = (bool)$pr['subject'];
+        $rule = 'border-bottom:1px solid ' . $p['border'] . ';';
+
+        if ($this->design === 'panel') {
+            $r     = $this->radius;
+            $x     = $this->contentPad;
+            $frame = $this->joined
+                ? 'border:1px solid ' . $p['border'] . ';border-bottom:0;border-radius:' . $r . 'px ' . $r . 'px 0 0;'
+                : 'border:1px solid ' . $p['border'] . ';border-radius:' . $r . 'px;';
+            // The rule under the logo only where the message follows in the
+            // same card; on its own the card's edge already closes it.
+            $rows = '<tr><td class="hx-panel-x' . ($this->joined ? ' hx-border' : '') . '" style="padding:18px ' . $x . 'px;' . ($this->joined ? $rule : '') . '">' . $bar . '</td></tr>';
+            if ($sub) {
+                $rows .= '<tr><td class="hx-panel-x" style="padding:0 ' . $x . 'px;"><!--hx-if:hx_subject--><div style="padding-top:28px;">'
+                    . $this->pageHead($center, 26) . '</div><!--/hx-if--></td></tr>';
+            }
+            return '<tr' . $this->mark($b) . '><td style="padding:0 0 ' . ($this->joined ? 0 : 20) . 'px;' . $font . '">'
+                . $this->table() . '<tr><td class="hx-surface hx-border" bgcolor="' . $p['surface'] . '" style="background-color:' . $p['surface'] . ';' . $frame . '">'
+                . $this->table() . $rows . '</table></td></tr></table></td></tr>' . "\n";
+        }
+
+        if ($this->design === 'notice') {
+            return '<tr' . $this->mark($b) . '><td style="padding:0 0 2px;' . $font . '">'
+                . $this->table() . '<tr><td style="padding:4px 6px 18px;">' . $bar . '</td></tr></table>'
+                . ($sub ? '<!--hx-if:hx_subject--><div style="padding:0 0 12px;">' . $this->noticeBar($center) . '</div><!--/hx-if-->' : '')
+                . '</td></tr>' . "\n";
+        }
+
+        // Page.
+        return '<tr' . $this->mark($b) . '><td style="padding:0 0 20px;' . $font . '">'
+            . $this->table() . '<tr><td class="hx-border" style="padding:4px 6px 16px;' . $rule . '">' . $bar . '</td></tr></table>'
+            . ($sub ? '<!--hx-if:hx_subject--><div style="padding:28px 6px 4px;">' . $this->pageHead($center, 30) . '</div><!--/hx-if-->' : '')
+            . '</td></tr>' . "\n";
+    }
+
+    /** Section, title and status, the way the client area heads a page. */
+    private function pageHead(bool $center, int $size): string
+    {
+        $p       = $this->p;
+        $eyebrow = '<!--hx-if:hx_eyebrow--><div class="hx-muted" style="margin:0 0 6px;font-size:12px;line-height:1.3;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:'
+            . $p['muted'] . ';">{$hx_eyebrow}</div><!--/hx-if-->';
+        $title   = '<div class="hx-title hx-text" style="font-size:' . $size . 'px;line-height:1.15;font-weight:700;letter-spacing:-0.02em;color:' . $p['text'] . ';">{$hx_subject}</div>';
+
+        if ($center) {
+            return '<div style="text-align:center;">' . $eyebrow . $title
+                . '<!--hx-if:hx_status--><div style="margin-top:12px;">' . $this->pills(false) . '</div><!--/hx-if--></div>';
+        }
+        return $this->table() . '<tr>'
+            . '<td class="hx-stack" valign="bottom" style="text-align:' . $this->start . ';">' . $eyebrow . $title . '</td>'
+            . '<!--hx-if:hx_status--><td class="hx-stack hx-stack-gap" valign="bottom" align="' . $this->end . '" style="text-align:' . $this->end
+            . ';padding-' . $this->start . ':16px;padding-bottom:4px;white-space:nowrap;">' . $this->pills(false) . '</td><!--/hx-if-->'
+            . '</tr></table>';
+    }
+
+    /** The client area's notice bar: tinted and rounded, an info mark, then the title and status. */
+    private function noticeBar(bool $center): string
+    {
+        $p       = $this->p;
+        $mark    = '<div class="hx-surface hx-link" style="width:24px;height:24px;border-radius:12px;background-color:' . $p['surface'] . ';color:' . $p['link']
+            . ';font-size:13px;line-height:24px;font-weight:700;text-align:center;">i</div>';
+        $eyebrow = '<!--hx-if:hx_eyebrow--><div class="hx-muted" style="margin:0 0 2px;font-size:11px;line-height:1.3;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:'
+            . $p['muted'] . ';">{$hx_eyebrow}</div><!--/hx-if-->';
+        $title   = '<div class="hx-text" style="font-size:16px;line-height:1.35;font-weight:600;color:' . $p['text'] . ';">{$hx_subject}</div>';
+
+        if ($center) {
+            $inner = '<td align="center" style="text-align:center;">' . $eyebrow . $title
+                . '<!--hx-if:hx_status--><div style="margin-top:8px;">' . $this->pills(true) . '</div><!--/hx-if--></td>';
+        } else {
+            $inner = '<td width="36" valign="middle" style="width:36px;">' . $mark . '</td>'
+                . '<td class="hx-stack" valign="middle" style="text-align:' . $this->start . ';">' . $eyebrow . $title . '</td>'
+                . '<!--hx-if:hx_status--><td class="hx-stack hx-stack-gap" valign="middle" align="' . $this->end . '" style="text-align:' . $this->end
+                . ';padding-' . $this->start . ':12px;white-space:nowrap;">' . $this->pills(true) . '</td><!--/hx-if-->';
+        }
+        return $this->table() . '<tr><td class="hx-notice hx-tint-info" bgcolor="' . $p['accentTint'] . '" style="background-color:' . $p['accentTint']
+            . ';border-radius:' . $this->radius . 'px;padding:14px 18px;">' . $this->table() . '<tr>' . $inner . '</tr></table></td></tr></table>';
+    }
+
+    /**
+     * One pill per tone, each behind its own marker, so only the email's tone
+     * is kept. On the tinted notice bar a pill sits on the surface colour: a
+     * tint there would all but vanish.
+     */
+    private function pills(bool $onTint): string
+    {
+        $p   = $this->p;
+        $out = '';
+        foreach (Status::TONES as $t) {
+            [$bg, $bgClass, $ink, $inkClass] = match ($t) {
+                'success' => [$p['successTint'], 'hx-tint-success', $p['success'], 'hx-ink-success'],
+                'warning' => [$p['warningTint'], 'hx-tint-warning', $p['warning'], 'hx-ink-warning'],
+                'danger'  => [$p['dangerTint'], 'hx-tint-danger', $p['danger'], 'hx-ink-danger'],
+                'info'    => [$p['accentTint'], 'hx-tint-info', $p['link'], 'hx-link'],
+                default   => [$p['surface2'], 'hx-surface2', $p['muted'], 'hx-muted'],
+            };
+            if ($onTint) {
+                [$bg, $bgClass] = [$p['surface'], 'hx-surface'];
+            }
+            $out .= '<!--hx-if:hx_tone_' . $t . '--><span class="' . $bgClass . ' ' . $inkClass . '" style="display:inline-block;padding:4px 11px;border-radius:999px;background-color:'
+                . $bg . ';color:' . $ink . ';font-size:12px;line-height:16px;font-weight:600;white-space:nowrap;">{$hx_status}</span><!--/hx-if-->';
+        }
+        return $out;
     }
 
     /** Secondary text on the band: the on-accent colour, softened toward the accent. */
@@ -389,7 +540,7 @@ final class Renderer
     {
         $pr  = $b['props'];
         $p   = $this->p;
-        $pad = ['compact' => 20, 'regular' => 32, 'roomy' => 44][$pr['padding']] ?? 32;
+        $pad = self::PADDING[$pr['padding']] ?? 32;
         // Every block ends in 16px of its own bottom spacing, so the cell's
         // bottom padding gives that back.
         $bottom = max(8, $pad - 16);
@@ -403,8 +554,11 @@ final class Renderer
             $frame = $this->joined
                 ? 'border:1px solid ' . $p['border'] . ';border-top:0;border-radius:0 0 ' . $r . 'px ' . $r . 'px;'
                 : 'border:1px solid ' . $p['border'] . ';border-radius:' . $r . 'px;';
+            // Under the Panel's heading the message starts closer: the heading
+            // already holds the space a card's top padding would.
+            $top = $this->joined && $this->design === 'panel' ? 24 : $pad;
             return '<tr' . $this->mark($b) . '><td class="hx-content hx-surface hx-border hx-text"' . $slot . ' dir="' . ($this->rtl ? 'rtl' : 'ltr')
-                . '" bgcolor="' . $p['surface'] . '" style="' . $base . 'padding:' . $pad . 'px ' . $pad . 'px ' . $bottom . 'px;'
+                . '" bgcolor="' . $p['surface'] . '" style="' . $base . 'padding:' . $top . 'px ' . $pad . 'px ' . $bottom . 'px;'
                 . 'background-color:' . $p['surface'] . ';' . $frame . '">';
         }
         $top = $this->design === 'letter' ? 28 : max(8, $pad - 16);
@@ -778,7 +932,7 @@ final class Renderer
         $run = static function (string $html) use ($own): string {
             // Parts that show one of our own per-email values (the subject
             // title) are dropped: WHMCS has no such field to fill them with.
-            $html = (string)preg_replace('/<!--hx-if:hx_[a-z0-9_]+-->.*?<!--\/hx-if-->/s', '', $html);
+            $html = Merge::dropOwn($html);
             $html = Merge::stripLogic($html);
             foreach ($own as $k => $v) {
                 $html = str_replace('{$' . $k . '}', $v, $html);
@@ -813,6 +967,8 @@ final class Renderer
      *        annotate 'layout' or 'message': which document's blocks get markers
      *        subject  plain text for the header's subject title (sample data
      *                 is substituted into it)
+     *        message  the WHMCS template name and type the section and
+     *        type     status pill are worked out from (Status)
      */
     public static function preview(array $theme, array $layoutDoc, ?array $messageDoc, array $opts = []): string
     {
@@ -826,6 +982,13 @@ final class Renderer
             'hx_preheader' => '',
             'hx_subject'   => self::subjectText($subject, $fields),
         ];
+        // Section and status for the client-area designs: the email being
+        // edited, or the sample's own (an invoice that has just been created).
+        $fields += Status::fields(
+            (string)($opts['message'] ?? Samples::MESSAGE),
+            (string)($opts['type'] ?? Samples::TYPE),
+            $lang
+        );
 
         $outer = new self($theme, $lang, ['scheme' => $scheme, 'annotate' => $annotate === 'layout', 'slot' => $annotate !== null]);
         [$header, $footer] = $outer->layout($layoutDoc);

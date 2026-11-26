@@ -34,7 +34,10 @@ final class MediaSource
         }
 
         try {
-            $designs = $db::table(Schema::DESIGNS)->get(['kind', 'name', 'target', 'doc', 'published']);
+            // Every column, not a list: published_doc is missing until the
+            // module's own admin page has upgraded the table, and naming it
+            // would make every email image look unused to the Media screen.
+            $designs = $db::table(Schema::DESIGNS)->get();
         } catch (\Throwable $e) {
             return $out;
         }
@@ -43,7 +46,9 @@ final class MediaSource
             $out[] = [
                 'where' => $layout ? 'Email layout' : 'Email "' . ((string)$d->name !== '' ? (string)$d->name : (string)$d->target) . '"',
                 'url'   => AdminController::BASE . '&action=builder&' . ($layout ? 'layout=1' : 'target=' . rawurlencode((string)$d->target)),
-                'text'  => (string)$d->doc . "\n" . (string)$d->published,
+                // The saved and the published document: an image a draft
+                // removed can still be in the email customers receive.
+                'text'  => (string)$d->doc . "\n" . (string)($d->published_doc ?? '') . "\n" . (string)$d->published,
             ];
         }
         return $out;

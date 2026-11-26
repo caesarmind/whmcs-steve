@@ -348,6 +348,43 @@ final class Bridge
             : [];
     }
 
+    /**
+     * One of WHMCS's own client-area strings ($_LANG[$key]) in a language,
+     * with the install's lang/overrides applied. Read from the language files
+     * directly, because an email for a French client can be sent from a
+     * request running in English. Null when the file or key is missing.
+     */
+    public static function whmcsLang(string $lang, string $key): ?string
+    {
+        static $loaded = [];
+        $lang = strtolower(preg_replace('/[^A-Za-z0-9_-]/', '', $lang) ?? '');
+        // The language files end the request when WHMCS is not defined.
+        if ($lang === '' || !defined('WHMCS')) {
+            return null;
+        }
+        if (!isset($loaded[$lang])) {
+            $read = static function (string $file): array {
+                if (!is_file($file)) {
+                    return [];
+                }
+                $_LANG = [];
+                try {
+                    include $file;
+                } catch (\Throwable $e) {
+                    return [];
+                }
+                return is_array($_LANG) ? $_LANG : [];
+            };
+            $dir = self::root() . '/lang/';
+            $loaded[$lang] = $read($dir . 'overrides/' . $lang . '.php') + $read($dir . $lang . '.php');
+        }
+        $v = $loaded[$lang][$key] ?? null;
+        if (!is_string($v) || trim($v) === '') {
+            return $lang !== 'english' ? self::whmcsLang('english', $key) : null;
+        }
+        return $v;
+    }
+
     /** Hadrian's version (core/hadrian.php), for the version pill in the shared admin header. */
     public static function themeVersion(): string
     {

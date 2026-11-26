@@ -95,4 +95,4 @@ That edit is what clients now receive, and the module leaves it alone. It is not
 
 ## After a style change
 
-A button's colour is written into the email when it is published. When you change your Hadrian style, open the Email page once: published designs are recompiled with the new colours.
+A button's colour is written into the email when it is published. When you change your Hadrian style, open the Email page once: published designs are recompiled with the new colours. Each one is recompiled as it was last published, so changes you saved but haven't published stay drafts.

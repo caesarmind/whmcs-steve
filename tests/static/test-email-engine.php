@@ -236,7 +236,8 @@ same('import: a body with a table is kept verbatim in an HTML block',
 
 // ---------------------------------------------------------------- Designs
 $section = 'designs';
-same('three designs, Card first', array_keys(\HadrianEmail\Designs::all()), ['card', 'banner', 'letter']);
+same('six designs, Card first', array_keys(\HadrianEmail\Designs::all()), ['card', 'banner', 'letter', 'page', 'panel', 'notice']);
+same('three classic, three drawn from the client area', array_map([\HadrianEmail\Designs::class, 'group'], array_keys(\HadrianEmail\Designs::all())), ['classic', 'classic', 'classic', 'client', 'client', 'client']);
 $mine = Blocks::normalize(['blocks' => [
     ['type' => 'header', 'props' => ['tagline' => ['_' => 'Hosting that answers'], 'align' => 'center', 'nav' => [['label' => ['_' => 'Status'], 'url' => 'https://status.test']]]],
     ['type' => 'text', 'props' => ['html' => ['_' => '<p>Line on every email</p>']]],
@@ -282,14 +283,57 @@ check('letter: the page is the surface colour, no card', str_contains($lh, '<bod
 check('letter: a fine rule under the header and over the footer', substr_count($lh . $lf, 'border-bottom:1px solid ' . $p['light']['border']) >= 1 && str_contains($lf, 'border-top:1px solid ' . $p['light']['border']));
 [$arb] = $render($theme, 'banner', ['hx_subject' => 'S'], 'arabic');
 check('banner mirrors for right to left', str_contains($arb, 'dir="rtl"') && str_contains(substr($arb, (int)strpos($arb, 'hx-band')), 'text-align:right'));
-foreach (['card', 'banner', 'letter'] as $id) {
+foreach (array_keys(\HadrianEmail\Designs::all()) as $id) {
     [$fh, $ff] = Renderer::fallback($theme, $designDoc($id));
     same("{$id}: static fallback is balanced Smarty", Merge::lint($fh . 'BODY' . $ff), []);
-    check("{$id}: static fallback never asks WHMCS for our own fields", !str_contains($fh . $ff, 'hx_subject') && !str_contains($fh . $ff, 'hx-if'));
+    check("{$id}: static fallback never asks WHMCS for our own fields", !preg_match('/\$hx_|hx-if|class="hx-[a-z]+ hx-ink-/', $fh . $ff));
     $both = implode('', Renderer::forSend($theme, $designDoc($id), 'english', ['companyname' => 'Acme', 'hx_subject' => 'S', 'unsubscribe_url' => 'https://u'], 'P'));
     check("{$id}: send output has nothing unresolved", !preg_match('/\{\$|\{if |hx-if/', $both));
     check("{$id}: stays small", strlen($both) < 18000, strlen($both) . ' bytes');
 }
+
+// -------------------------------------------------- client-area designs
+$section = 'client-area designs';
+same('nested markers resolve innermost first',
+    Merge::conditionals('<!--hx-if:a-->A<!--hx-if:b-->B<!--/hx-if--><!--hx-if:c-->C<!--/hx-if-->!<!--/hx-if-->', ['a' => '1', 'c' => '1']), 'AC!');
+same('nested markers: an empty outer drops what it wraps', Merge::conditionals('x<!--hx-if:a-->A<!--hx-if:b-->B<!--/hx-if--><!--/hx-if-->y', ['b' => '1']), 'xy');
+same('nested markers become nested Smarty for the fallback',
+    Merge::conditionals('<!--hx-if:a-->A<!--hx-if:b-->B<!--/hx-if--><!--/hx-if-->', null), '{if $a}A{if $b}B{/if}{/if}');
+same('dropOwn removes nested own markers and keeps the others',
+    Merge::dropOwn('<!--hx-if:hx_subject-->T<!--hx-if:hx_tone_success-->P<!--/hx-if--><!--/hx-if--><!--hx-if:unsubscribe_url-->U<!--/hx-if-->'), '<!--hx-if:unsubscribe_url-->U<!--/hx-if-->');
+
+$st = \HadrianEmail\Status::fields('Invoice Created', 'invoice', 'english');
+same('status: an invoice that was just created is Unpaid, under Billing', [$st['hx_eyebrow'], $st['hx_status'], $st['hx_tone_warning']], ['Billing', 'Unpaid', '1']);
+same('status: only one tone is set', count(array_filter($st, static fn($v, $k) => str_starts_with($k, 'hx_tone_') && $v !== '', ARRAY_FILTER_USE_BOTH)), 1);
+same('status: a payment confirmation is Paid', \HadrianEmail\Status::fields('Invoice Payment Confirmation', 'invoice', 'english')['hx_tone_success'], '1');
+same('status: every welcome email is Active', \HadrianEmail\Status::fields('Hosting Account Welcome Email', 'product', 'english')['hx_status'], 'Active');
+$custom = \HadrianEmail\Status::fields('My Own Promo', 'general', 'english');
+same('status: a custom template gets its section but no pill', [$custom['hx_eyebrow'], $custom['hx_status']], ['Account', '']);
+same('status: an unknown type gets neither', \HadrianEmail\Status::fields('Whatever', 'admin', 'english')['hx_eyebrow'], '');
+
+$caFields = ['hx_subject' => 'Customer Invoice'] + \HadrianEmail\Status::fields('Invoice Created', 'invoice', 'english');
+[$pgh] = $render($theme, 'page', $caFields);
+check('page: section, title and status pill in the heading', str_contains($pgh, '>Billing<') && str_contains($pgh, '>Customer Invoice<') && (bool)preg_match('/class="hx-tint-warning hx-ink-warning"[^>]*>Unpaid</', $pgh));
+check('page: only the email\'s own tone is drawn', substr_count($pgh, 'border-radius:999px') === 1 && !str_contains($pgh, 'class="hx-tint-success hx-ink-success"'));
+check('page: a fine rule under the logo bar', str_contains($pgh, 'class="hx-border" style="padding:4px 6px 16px;border-bottom:1px solid ' . $p['light']['border']));
+[$pgn] = $render($theme, 'page', ['hx_subject' => 'Hello']);
+check('page: no status, no pill and no empty pill cell', str_contains($pgn, '>Hello<') && !str_contains($pgn, 'border-radius:999px') && !str_contains($pgn, 'white-space:nowrap;"></td>'));
+[$pgx] = $render($theme, 'page', ['hx_subject' => '']);
+check('page: no subject, no heading at all', !str_contains($pgx, 'class="hx-title') && !str_contains($pgx, 'padding:28px 6px 4px'));
+[$pnh] = $render($theme, 'panel', $caFields);
+check('panel: logo, heading and message share one card',
+    (bool)preg_match('/class="hx-surface hx-border"[^>]*border-bottom:0;border-radius:\d+px \d+px 0 0/', $pnh)
+    && (bool)preg_match('/class="hx-content hx-surface[^"]*"[^>]*padding:24px [^"]*border-top:0;border-radius:0 0 \d+px \d+px/', $pnh));
+[$nth] = $render($theme, 'notice', $caFields);
+check('notice: the title sits on the tinted bar, the pill on the surface colour',
+    (bool)preg_match('/class="hx-notice hx-tint-info" bgcolor="' . preg_quote($p['light']['accentTint'], '/') . '"/', $nth)
+    && (bool)preg_match('/class="hx-surface hx-ink-warning"[^>]*>Unpaid</', $nth));
+check('client-area designs: dark mode recolours the pills', str_contains($nth, '.hx-ink-warning{color:' . $p['dark']['warning'] . '!important}'));
+[$arp] = $render($theme, 'page', $caFields, 'arabic');
+check('page mirrors for right to left: the pill cell aligns left', (bool)preg_match('/align="left" style="text-align:left;padding-right:16px;[^"]*">[^<]*<span[^>]*>Unpaid/', $arp));
+check('the classic designs draw no section or pill', !str_contains(implode('', $render($theme, 'banner', $caFields)), '>Billing<'));
+$prev = Renderer::preview($theme, $designDoc('page'), null, ['scheme' => 'light']);
+check('preview: the sample invoice is headed Billing and Unpaid', str_contains($prev, '>Billing<') && str_contains($prev, '>Unpaid<'));
 
 echo "\n" . ($ok + $fails) . " checks, {$fails} failing\n";
 exit($fails ? 1 : 0);

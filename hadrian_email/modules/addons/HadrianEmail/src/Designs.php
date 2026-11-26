@@ -53,12 +53,64 @@ final class Designs
                 'footer'  => ['align' => 'center'],
             ],
         ],
+
+        // The client-area designs: each is drawn from a screen of Hadrian's
+        // client area, and heads the message the way that screen heads a
+        // page: the section in small capitals, the title, a status pill
+        // (Status). All three turn the subject on.
+        'page' => [
+            'label'       => 'Page',
+            'description' => 'Like a client area page: your logo on a bar with a fine rule, then the section, title and status above the message card.',
+            'group'       => 'client',
+            'presets'     => [
+                'header'  => ['align' => 'start', 'subject' => true],
+                'content' => ['card' => true, 'padding' => 'regular'],
+                'footer'  => ['align' => 'center'],
+            ],
+        ],
+        'panel' => [
+            'label'       => 'Panel',
+            'description' => "Like the client area's summary panels: logo, title, status and message all in one card, the logo set off by a fine rule.",
+            'group'       => 'client',
+            'presets'     => [
+                'header'  => ['align' => 'start', 'subject' => true],
+                'content' => ['card' => true, 'padding' => 'regular'],
+                'footer'  => ['align' => 'center'],
+            ],
+        ],
+        'notice' => [
+            'label'       => 'Notice',
+            'description' => "Like the client area's notice bar: the title and status on a tinted bar, with the message on a card below it.",
+            'group'       => 'client',
+            'presets'     => [
+                'header'  => ['align' => 'start', 'subject' => true],
+                'content' => ['card' => true, 'padding' => 'regular'],
+                'footer'  => ['align' => 'center'],
+            ],
+        ],
     ];
 
-    /** @return array<string, array{label:string, description:string, presets:array<string,array<string,mixed>>}> */
+    /** Gallery groups, in order. */
+    public const GROUPS = [
+        'classic' => 'Classic',
+        'client'  => 'Client area',
+    ];
+
+    /** @return array<string, array{label:string, description:string, group?:string, presets:array<string,array<string,mixed>>}> */
     public static function all(): array
     {
         return self::ALL;
+    }
+
+    /** A design drawn from the client area: heads the message with section, title and status. */
+    public static function isClientArea(string $id): bool
+    {
+        return (self::ALL[$id]['group'] ?? 'classic') === 'client';
+    }
+
+    public static function group(string $id): string
+    {
+        return (string)(self::ALL[$id]['group'] ?? 'classic');
     }
 
     public static function valid(string $id): string

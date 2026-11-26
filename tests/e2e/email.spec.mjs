@@ -232,12 +232,14 @@ test('the layout builder saves, and a saved layout is live straight away', async
   expect(mail.html).toContain('Hosting that answers the phone');
 });
 
-test('three designs: picking one on the Email page changes the next email', async ({ page }) => {
+test('six designs: picking one on the Email page changes the next email', async ({ page }) => {
   email('enable');
   await page.goto(MODULE);
-  await expect(page.locator('.mt-em-design')).toHaveCount(3);
+  await expect(page.locator('.mt-em-design')).toHaveCount(6);
+  await expect(page.locator('[data-mt-em-design-group="classic"] .mt-em-design')).toHaveCount(3);
+  await expect(page.locator('[data-mt-em-design-group="client"] .mt-em-design')).toHaveCount(3);
   await expect(page.locator('.mt-em-design.is-active h3')).toHaveText('Card');
-  for (const id of ['card', 'banner', 'letter']) {
+  for (const id of ['card', 'banner', 'letter', 'page', 'panel', 'notice']) {
     await expect(page.locator(`[data-mt-em-design="${id}"] iframe`), `${id} has a live preview`).toHaveCount(1);
   }
 
@@ -261,6 +263,22 @@ test('three designs: picking one on the Email page changes the next email', asyn
   expect(mail.html).toContain('<body class="hx-surface"');
   expect(mail.html).not.toContain('class="hx-band"');
   expect(mail.html, 'no card around the message').not.toMatch(/class="hx-content hx-surface/);
+
+  // Page: headed like a client-area page. Section from the template's type,
+  // status pill from what "Invoice Created" means, both in WHMCS's own words.
+  await page.locator('[data-mt-em-design="page"] button', { hasText: 'Use Page' }).click();
+  await expect(page.locator('.mt-em-design.is-active h3')).toHaveText('Page');
+  since = Date.now();
+  email('send', 'Invoice Created', String(fx.ids.invoiceId));
+  mail = await mailTo(full.email, since);
+  expect(mail.html, 'the section').toMatch(/text-transform:uppercase;[^"]*">Billing</);
+  expect(mail.html, 'the title').toMatch(/class="hx-title[^"]*"[^>]*>Customer Invoice</);
+  expect(mail.html, 'the status pill').toMatch(/class="hx-tint-warning hx-ink-warning"[^>]*>Unpaid</);
+  expect(mail.html).not.toMatch(/\{\$|hx-if|hx_/);
+
+  // Back to the default, so later tests start where they expect.
+  await page.locator('[data-mt-em-design="card"] button', { hasText: 'Use Card' }).click();
+  await expect(page.locator('.mt-em-design.is-active h3')).toHaveText('Card');
 });
 
 test('the builder switches design and keeps what was written', async ({ page }) => {
