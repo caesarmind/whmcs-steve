@@ -37,7 +37,7 @@ part of the site it belongs to. The rail on the left narrows it.
 | **Area** | All pages, or only the Website, the Client area or the Order process. Inside one area the list is grouped by the page's own group: Billing, Support, Built pages and so on. These are the same areas [Layout Manager](/client-theme/layout-manager/#by-visitor-or-by-area) and [Menu Manager](/client-theme/menu-manager/#menus-by-area) use. |
 | **Changed by you** | Only the pages where you set something of your own: a template, SEO, visibility, indexing, an area or a layout. A good place to see what you have done to the theme. |
 | **With templates** | Only the pages that offer more than one template. Each row names the template it uses and how many there are; hover that to see their names. |
-| **Built with Page Builder** | Only the pages you made with the Page Builder, when it is installed. |
+| **Built with Page Builder** | Only the pages you made with the Page Builder, when it is installed. Export and import for them sit above the list. |
 | **System pages** | Reveals pages you never navigate to: wizard sub-steps, parts another page includes, and the error states WHMCS shows instead of what you asked for. |
 
 The search above the list matches a page's name, description and address as you
