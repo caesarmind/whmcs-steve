@@ -11,12 +11,25 @@
 
 <link rel="stylesheet" href="{$WEB_ROOT}/templates/{$template}/assets/css/pages/homepage.css?v={$hadrian.version|default:'1.0'}">
 
+{* Pages -> Homepage "Hero title" and "Hero subtitle". Blank keeps the theme's
+   own heading. Printed as text, as on Modern. *}
+{assign var=phTitle value=$hadrian.pages.homepage.options.heroTitle|default:''}
+{assign var=phSub value=$hadrian.pages.homepage.options.heroSubtitle|default:''}
+
+{* Pages -> Homepage "Show domain search" (on by default). Read with isset(),
+   never |default:true: a switched-off bool is stored as a real false. The
+   other four section switches have no section here; they apply to Modern. *}
+{assign var=phShowDomain value=true}
+{if isset($hadrian.pages.homepage.options.show_domain_search)}{assign var=phShowDomain value=$hadrian.pages.homepage.options.show_domain_search}{/if}
+{if !($registerdomainenabled|default:false) && !($transferdomainenabled|default:false)}{assign var=phShowDomain value=false}{/if}
+
 {* ═══════════ HERO + DOMAIN SEARCH ═══════════ *}
 <section class="ph-hero">
     <div class="ph-hero-inner">
-        <h1>{$hadrianLang.dashboard.heroTitle}</h1>
-        <p>{$hadrianLang.dashboard.heroSubtitle}</p>
+        <h1>{if $phTitle != ''}{$phTitle|escape:'html'}{else}{$hadrianLang.dashboard.heroTitle}{/if}</h1>
+        <p>{if $phSub != ''}{$phSub|escape:'html'}{else}{$hadrianLang.dashboard.heroSubtitle}{/if}</p>
 
+        {if $phShowDomain}
         <div class="ph-domain-tabs" role="tablist">
             <button type="button" class="active" data-dtab="search" role="tab" aria-selected="true">{$LANG.search}</button>
             <button type="button" data-dtab="transfer" role="tab" aria-selected="false">{$LANG.transferdomain}</button>
@@ -44,6 +57,7 @@
                 <a href="{$WEB_ROOT}/cart.php?a=add&domain=register">{$LANG.viewallpricing|default:'View all pricing'} &rarr;</a>
             </div>
         </form>
+        {/if}
     </div>
 </section>
 

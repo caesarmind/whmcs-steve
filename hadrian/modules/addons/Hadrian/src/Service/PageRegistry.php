@@ -46,7 +46,8 @@ final class PageRegistry
      * only what the module owns is written: the address and whether the page
      * is live, which together decide whether it is in the sitemap. What an
      * admin set in Pages (SEO, visibility, area, layout) is never touched.
-     * A row whose page the module no longer reports is removed.
+     * A row whose page the module no longer reports is removed, but only when
+     * the module did report: one whose page list failed keeps every row.
      *
      * Cheap enough to call whenever a module changes one of its pages, which
      * is what keeps the sitemap right without a visit to the Pages screen.
@@ -77,12 +78,13 @@ final class PageRegistry
                 || !empty($before['published']) !== $live;
         }
         // Rows left behind by pages that are gone. Only keys of modules that
-        // registered on this request are considered, so a module that is
-        // switched off keeps its rows (and the settings in them) until it is
-        // back, or its pages are really deleted.
+        // registered AND listed their pages on this request are considered: a
+        // module that is switched off, or whose page list failed (a database
+        // error, say), keeps its rows and the settings in them until it
+        // answers again, or its pages are really deleted.
         foreach (Page::all($tpl) as $row) {
             $page = (string)($row['page'] ?? '');
-            if (ExtensionPages::owns($page) && !isset($pages[$page])) {
+            if (ExtensionPages::answered($page) && !isset($pages[$page])) {
                 Page::delete($tpl, $page);
                 $changed = true;
             }
@@ -90,7 +92,9 @@ final class PageRegistry
         // Which module pages stand in for which theme pages also decides what
         // the sitemap lists (SitemapGenerator), and no row records it: it
         // moves when the site is switched between Theme and Page Builder. A
-        // remembered signature tells a switch from an ordinary visit.
+        // remembered signature tells a switch from an ordinary visit. Left as
+        // it is while a module could not list its pages: its stand-ins are
+        // unknown, not gone.
         $standIns = [];
         foreach ($pages as $page => $meta) {
             $replaced = (string)($meta['extension']['replaces'] ?? '');
@@ -100,7 +104,7 @@ final class PageRegistry
         }
         ksort($standIns);
         $signature = $standIns === [] ? '' : (string)json_encode($standIns);
-        if ((string)Settings::getValue($tpl . '_extension_standins', '') !== $signature) {
+        if (!ExtensionPages::anyFailed() && (string)Settings::getValue($tpl . '_extension_standins', '') !== $signature) {
             Settings::setValue($tpl . '_extension_standins', $signature);
             $changed = true;
         }

@@ -15,8 +15,7 @@ return [
 
     // Page options are PAGE-scoped, not variant-scoped: the editor shows all of
     // these whichever variant is selected. Names are kept generic so the other
-    // variants can adopt them once their dead $hadrian.pages.homepage.config.*
-    // reads are corrected to the real .options.* path.
+    // variants can adopt them by reading the same .options.* path.
     //
     // Consumed today by core/pages/homepage/default/default.tpl. Read at render
     // time as $hadrian.pages.homepage.options.<key>; the stored array is taken
@@ -30,13 +29,13 @@ return [
             'type'    => 'text',
             'label'   => 'Hero title',
             'default' => '',
-            'tooltip' => 'Override the big hero heading. Leave blank to use the theme default ("Hosting, redesigned.").',
+            'tooltip' => 'Override the big hero heading on either template. Leave blank to use the template\'s own heading. Shown as plain text.',
         ],
         'heroSubtitle' => [
             'type'    => 'text',
             'label'   => 'Hero subtitle',
             'default' => '',
-            'tooltip' => 'Override the tagline under the hero heading. Leave blank to use the theme default.',
+            'tooltip' => 'Override the tagline under the hero heading on either template. Leave blank to use the template\'s own. Shown as plain text.',
         ],
         'show_domain_search' => [
             'type'    => 'bool',

@@ -761,6 +761,12 @@ var _localLang = {
 
 <script>
 {literal}
+/* The order form's own address. WHMCS can be installed in a folder
+   (https://example.com/billing/), so never a path from the web root: that
+   reaches whatever owns the domain's root (tests/FEATURES.md, bug 7).
+   header.tpl sets WEB_ROOT on every order-form page; '' at the root. */
+var hnCartUrl = (typeof WEB_ROOT === 'string' ? WEB_ROOT : '') + '/cart.php';
+
 /* Split each .cp-cycle-price text into currency / amount / period
    spans so the mockup typography (small / big / small) can be applied.
    WHMCS emits price as one string e.g. "$20.00 USD Monthly". We parse:
@@ -995,7 +1001,7 @@ var _localLang = {
                 refetchTimeoutId = null;
                 if (refetchInflight) return;
                 refetchInflight = true;
-                fetch('/cart.php?a=view', { method: 'GET', credentials: 'same-origin' })
+                fetch(hnCartUrl + '?a=view', { method: 'GET', credentials: 'same-origin' })
                     .then(function (r) { return r.text(); })
                     .then(function (html) {
                         var d = (new DOMParser()).parseFromString(html, 'text/html');
@@ -1120,7 +1126,7 @@ var _localLang = {
             // on validation failure.
             return new Promise(function (resolve, reject) {
                 var xhr = new XMLHttpRequest();
-                xhr.open('POST', '/cart.php?ajax=1&a=confproduct', true);
+                xhr.open('POST', hnCartUrl + '?ajax=1&a=confproduct', true);
                 xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
                 xhr.setRequestHeader('Accept', 'text/html, */*');
                 xhr.onload = function () {
@@ -1139,7 +1145,7 @@ var _localLang = {
             var btn = document.getElementById('btnCompleteProductConfig');
             if (btn) btn.disabled = true;
             commitConfig().then(function () {
-                window.location = '/cart.php?a=view';
+                window.location = hnCartUrl + '?a=view';
             }).catch(function (errHtml) {
                 if (btn) btn.disabled = false;
                 showInlineError(errHtml);
@@ -1166,7 +1172,7 @@ var _localLang = {
                 applyBtn.disabled = true;
 
                 commitConfig().then(function () {
-                    return fetch('/cart.php?a=view', {
+                    return fetch(hnCartUrl + '?a=view', {
                         method: 'POST',
                         credentials: 'same-origin',
                         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

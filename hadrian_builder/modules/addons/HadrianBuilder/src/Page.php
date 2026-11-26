@@ -84,7 +84,16 @@ final class Page
                 ->orderBy('id')
                 ->get(['id', 'slug', 'name', 'status', 'meta', 'replaces', 'replace_rule']);
         } catch (\Throwable $e) {
-            return [];
+            // A table that is not there yet (files uploaded, module never
+            // activated) holds no pages. Any other failure is passed on: this
+            // list is what Hadrian keeps the Pages rows of built pages by, and
+            // an empty answer would cost every one of them its SEO and
+            // visibility settings (tests/FEATURES.md, bug 3). Hadrian catches
+            // it and lists the module's pages as unknown.
+            if (self::tableMissing()) {
+                return [];
+            }
+            throw $e;
         }
         $out = [];
         foreach ($rows as $row) {
@@ -250,6 +259,16 @@ final class Page
             }
         }
         return $out;
+    }
+
+    /** True only when the database says the table does not exist; false when it cannot be asked. */
+    private static function tableMissing(): bool
+    {
+        try {
+            return !\WHMCS\Database\Capsule::schema()->hasTable(self::TABLE);
+        } catch (\Throwable $e) {
+            return false;
+        }
     }
 
     /** @return array<string,mixed> */

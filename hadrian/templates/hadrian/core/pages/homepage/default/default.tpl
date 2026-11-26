@@ -13,8 +13,26 @@
 
    WHMCS variables expected: $loggedin, $companyname, $LANG.*, $captcha. *}
 
-{assign var=_hTitle value=$hadrian.pages.homepage.config.heroTitle|default:''}
-{assign var=_hSub value=$hadrian.pages.homepage.config.heroSubtitle|default:''}
+{* Page options arrive as $hadrian.pages.homepage.options.* (declared in
+   ../page.php supportedOptions). There is no .config member. *}
+{assign var=_hTitle value=$hadrian.pages.homepage.options.heroTitle|default:''}
+{assign var=_hSub value=$hadrian.pages.homepage.options.heroSubtitle|default:''}
+
+{* The five section switches, all on by default. Read with isset(), never
+   |default:true: Pages stores a switched-off bool as a real false, which an
+   empty()-based |default: mistakes for "not set". *}
+{assign var=hpShowDomain value=true}
+{if isset($hadrian.pages.homepage.options.show_domain_search)}{assign var=hpShowDomain value=$hadrian.pages.homepage.options.show_domain_search}{/if}
+{assign var=hpShowProducts value=true}
+{if isset($hadrian.pages.homepage.options.show_products)}{assign var=hpShowProducts value=$hadrian.pages.homepage.options.show_products}{/if}
+{assign var=hpShowFeatures value=true}
+{if isset($hadrian.pages.homepage.options.show_features)}{assign var=hpShowFeatures value=$hadrian.pages.homepage.options.show_features}{/if}
+{assign var=hpShowNews value=true}
+{if isset($hadrian.pages.homepage.options.show_news)}{assign var=hpShowNews value=$hadrian.pages.homepage.options.show_news}{/if}
+{assign var=hpShowCta value=true}
+{if isset($hadrian.pages.homepage.options.show_cta)}{assign var=hpShowCta value=$hadrian.pages.homepage.options.show_cta}{/if}
+{* No domain form when WHMCS sells no domains: it would be a dead control. *}
+{if !($registerdomainenabled|default:false) && !($transferdomainenabled|default:false)}{assign var=hpShowDomain value=false}{/if}
 
 {* ── Real-data state ────────────────────────────────────────────────────────
    $homeProductGroups  ← Hooks::clientAreaPageHomepage (live product catalogue)
@@ -48,10 +66,11 @@
 {* 1. Hero - "Hosting, redesigned" + working domain search *}
 <section class="hp-hero" style="padding: 96px 22px 40px; background: transparent;">
     <div class="hp-eyebrow">{$hadrianLang.home.heroEyebrow}</div>
-    <h1>{if $_hTitle != ''}{$_hTitle}{else}{$hadrianLang.home.heroTitle}{/if}</h1>
-    <p class="hp-subhead">{if $_hSub != ''}{$_hSub}{else}{$hadrianLang.home.heroSubtitle}{/if}</p>
+    <h1>{if $_hTitle != ''}{$_hTitle|escape:'html'}{else}{$hadrianLang.home.heroTitle}{/if}</h1>
+    <p class="hp-subhead">{if $_hSub != ''}{$_hSub|escape:'html'}{else}{$hadrianLang.home.heroSubtitle}{/if}</p>
 
     {* Working domain search (reused from the portal homepage) *}
+    {if $hpShowDomain}
     <form class="ph-domain-form" action="{$WEB_ROOT}/domainchecker.php" method="post" style="max-width: 600px; margin: 28px auto 0;">
         <div class="ph-domain-tabs" role="tablist">
             <button type="button" class="active" data-dtab="search" role="tab" aria-selected="true">{$LANG.search}</button>
@@ -86,10 +105,12 @@
             <a href="{$WEB_ROOT}/cart.php?a=add&domain=register">{$LANG.viewallpricing|default:'View all pricing'} &rarr;</a>
         </div>
     </form>
+    {/if}
 
     <div class="hp-cta-row" style="margin-top: 20px;">
         <a href="{$WEB_ROOT}/cart.php" class="hp-buy-btn">{$hadrianLang.home.heroCta}</a>
-        <a href="#how">{$hadrianLang.home.heroSecondary} &rsaquo;</a>
+        {* Points at the capability tiles, so it goes when they do. *}
+        {if $hpShowFeatures}<a href="#how">{$hadrianLang.home.heroSecondary} &rsaquo;</a>{/if}
     </div>
 </section>
 
@@ -114,6 +135,7 @@
    used to live on the cPanel-comparison section; when that was removed this
    became the first explanatory block, so the link keeps working instead of
    scrolling nowhere. *}
+{if $hpShowFeatures}
 <section id="how" class="hp-icon-grid cols-4" style="padding: 72px 22px 48px;">
     <div style="grid-column: 1 / -1; text-align: center; max-width: 800px; margin: 0 auto 40px;">
         <div class="hp-eyebrow" style="color: var(--color-accent);">{$hadrianLang.home.isoEyebrow}</div>
@@ -141,6 +163,7 @@
         <p>{$hadrianLang.home.iso4Text}</p>
     </div>
 </section>
+{/if}
 
 {* 7. White-label + dev tools - intel duo *}
 <section class="hp-intel-duo">
@@ -209,6 +232,7 @@
      has no positively-priced product, in which case we show the group without a
      price rather than inventing one. Previously these were four hardcoded tiers
      ($0/$9/$29/$79) with untranslated English bullets and CTAs to a bare cart.php. *}
+{if $hpShowProducts}
 <section class="hp-pricing-segmented" id="pricing">
     <h2 style="font-size: 44px;">{$hadrianLang.home.pricingTitle}</h2>
     <p class="sub">{$hadrianLang.home.pricingSub}</p>
@@ -225,7 +249,7 @@
            No "POPULAR" flag. It used to be pinned to $grp@iteration == 2, so
            whichever group happened to be second got badged as popular — a claim
            the data doesn't support. *}
-        {if $hadrian.pages.homepage.config.categoryRows|default:false}
+        {if $hadrian.pages.homepage.options.categoryRows|default:false}
         {* Row list (admin Pages -> Homepage -> "Categories as rows").
            Every string is live WHMCS data — name, tagline, price and cycle all
            come from Hooks::fetchProductGroups(), same source as the cards.
@@ -288,6 +312,7 @@
 
     <p style="text-align: center; font-size: 14px; color: var(--color-text-secondary); margin-top: 32px;">{$hadrianLang.home.pricingNote} <a href="{$WEB_ROOT}/cart.php" style="color: var(--color-accent);">{$hadrianLang.home.pricingNoteLink} &rsaquo;</a></p>
 </section>
+{/if}
 
 {* 10b. Testimonials — "What our customers say".
      Driven by $hadrianLang.home.testimonials, which SHIPS EMPTY on purpose: the
@@ -322,7 +347,7 @@
      $announcements is passed to homepage.tpl natively by WHMCS (stock
      six/homepage.tpl iterates the same var). WHMCS announcements carry only a
      title, date and body — there are no categories, so no tag chips here. *}
-{if $annCount > 0}
+{if $hpShowNews && $annCount > 0}
 {* Uses the .hp-announce-grid component already in core-theme.css (header +
    .hp-announce-cards + .hp-announce-item-card, with dark-mode and mobile rules
    already written) rather than inline styles — inline styles can't be
@@ -362,6 +387,7 @@
 {/if}
 
 {* 11. Final CTA *}
+{if $hpShowCta}
 <section class="hp-cta-immersive">
     <div class="inner">
         <h2>{$hadrianLang.home.ctaTitle}</h2>
@@ -369,6 +395,7 @@
         <a href="{$WEB_ROOT}/cart.php" class="btn">{$hadrianLang.home.ctaBtn}</a>
     </div>
 </section>
+{/if}
 
 {* Domain tab toggle - search vs transfer affects form action *}
 <script>

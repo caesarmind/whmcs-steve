@@ -287,26 +287,29 @@ copy, quick to scan, and aimed at visitors who already know what they came for.
 
 ### Homepage settings
 
-These seven belong to the page, so they apply whichever template is active.
+These seven belong to the page, so they stay set when you switch templates.
+Classic has a hero with a domain search and none of the other sections, so it
+uses the hero title, the hero subtitle and **Show domain search**. Modern uses
+all seven.
 
 :::shot img/pt-settings-homepage.png The Homepage settings.
 
 :::props
 | Setting | Default | What it does |
 | --- | --- | --- |
-| Hero title | theme default | Overrides the big hero heading. Blank uses the theme's own. |
+| Hero title | theme default | Overrides the big hero heading. Blank uses the theme's own. Shown as plain text, so HTML tags appear as typed. |
 | Hero subtitle | theme default | Overrides the tagline under the heading. |
 | Show domain search | on | The domain search box and live TLD price strip inside the hero. The heading and tagline always render. |
 | Show product groups | on | Lists your real WHMCS product groups with their tagline and cheapest starting price. |
-| Show capability tiles | on | Four tiles describing what the platform provides. Static copy from the theme language file. |
+| Show capability tiles | on | Four tiles describing what the platform provides. Static copy from the theme language file. Turning them off also removes the hero's link down to them. |
 | Show latest announcements | on | Up to three of your latest WHMCS announcements. |
 | Show closing call to action | on | The full-bleed gradient band that closes the page - one heading, one line of copy, one button into the cart. |
 :::
 
 :::info Sections that would be empty are skipped
 The announcements section is dropped entirely when there are none, and the
-domain search is additionally hidden when domain registration is switched off in
-WHMCS - so neither can render as an empty shell or a dead control.
+domain search is also hidden when WHMCS offers neither domain registration nor
+transfers - so neither can render as an empty shell or a dead control.
 :::
 
 ## Sign in

@@ -191,7 +191,19 @@ final class Page
         foreach (['seo_title', 'seo_description', 'settings'] as $k) {
             if (array_key_exists($k, $data)) {
                 $v = $data[$k];
-                $cols[$k] = (is_string($v) || $v === null) ? $v : json_encode($v);
+                if (is_string($v) || $v === null) {
+                    $cols[$k] = $v;
+                    continue;
+                }
+                // A failed encode used to be written as-is: false, stored as
+                // "0", which wiped the column (tests/FEATURES.md, bug 4).
+                // Invalid UTF-8 becomes U+FFFD; anything else that cannot be
+                // encoded stops the save instead of losing what was there.
+                $json = json_encode($v, JSON_INVALID_UTF8_SUBSTITUTE);
+                if ($json === false) {
+                    throw new \RuntimeException("Could not store {$k} for this page: " . json_last_error_msg());
+                }
+                $cols[$k] = $json;
             }
         }
         return $cols;

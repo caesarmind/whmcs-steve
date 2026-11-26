@@ -5,6 +5,7 @@ namespace Hadrian\Menu;
 
 use Hadrian\Models\Menu;
 use Hadrian\Models\MenuItem;
+use Hadrian\Models\Settings;
 
 /**
  * Idempotent preset seeding. Called from Hadrian::_activate() and on every
@@ -18,22 +19,45 @@ use Hadrian\Models\MenuItem;
  *     (e.g. they were accidentally wiped by an earlier save bug), top up
  *     the items section from the preset definition. Menu-level fields
  *     (active, audience) are left as-is in this case.
- *   - If no menu with the (name, location) exists, create it fresh.
+ *   - If no menu with the (name, location) exists, create it fresh -- unless
+ *     this preset was created before and has gone since. A preset is found
+ *     by its name, so one the admin renamed or deleted is "gone", and
+ *     bringing it back would put the shipped preset live over the admin's own
+ *     menu (Menu::pick takes the newest active one; tests/FEATURES.md, bug 5).
+ *     Only $restoreMissing (the Re-seed presets button) brings those back.
+ *   - A preset that is created while its slot (location + audience) already
+ *     has an active menu is created inactive.
  *   - Items are inserted in tree order so parent_id can reference IDs that
  *     already exist.
  */
 final class Seeder
 {
-    public function run(bool $force = false): int
+    /** hadrian_settings key: the presets created on this install, as "location|name". */
+    public const SEEDED_KEY = 'hadrian_menu_presets_seeded';
+
+    public function run(bool $force = false, bool $restoreMissing = false): int
     {
+        $record = Settings::getValue(self::SEEDED_KEY, null);
+        // No record yet (a fresh install, or the first run since it was
+        // added): a missing preset cannot be told from one never made, so it
+        // is made, as before. From then on every preset is remembered.
+        $known  = is_array($record) ? $record : [];
+        $before = $known;
+
         $seeded = 0;
         foreach (Presets::all() as $preset) {
+            $key      = self::key($preset);
             $existing = $this->existingMenu($preset['name'], $preset['location']);
             if ($existing === null) {
+                if (in_array($key, $known, true) && !$force && !$restoreMissing) {
+                    continue;   // renamed or deleted by the admin: theirs to restore
+                }
                 $this->seedOne($preset);
+                $known[] = $key;
                 $seeded++;
                 continue;
             }
+            $known[] = $key;
             // Menu exists. Re-seed items only if it's empty (recover from
             // a wipe) or if $force is set. When forcing, WIPE the existing
             // items first so we replace rather than append -- otherwise every
@@ -67,7 +91,29 @@ final class Seeder
                 $seeded++;
             }
         }
+        $this->remember($known, $before);
         return $seeded;
+    }
+
+    /** @param array{name:string, location:string} $preset */
+    private static function key(array $preset): string
+    {
+        return $preset['location'] . '|' . $preset['name'];
+    }
+
+    /**
+     * @param list<string> $known
+     * @param list<string> $before
+     */
+    private function remember(array $known, array $before): void
+    {
+        $known = array_values(array_unique($known));
+        sort($known);
+        $was = array_values(array_unique($before));
+        sort($was);
+        if ($known !== $was || Settings::getValue(self::SEEDED_KEY, null) === null) {
+            Settings::setValue(self::SEEDED_KEY, $known, 'json');
+        }
     }
 
     private function existingMenu(string $name, string $location): ?Menu
@@ -217,11 +263,16 @@ final class Seeder
 
     private function seedOne(array $preset): void
     {
+        // Never take over a slot the admin already has a live menu in.
+        $slotTaken = Menu::where('location', $preset['location'])
+            ->where('audience', $preset['audience'])
+            ->where('active', true)
+            ->exists();
         $menu = Menu::create([
             'name'            => $preset['name'],
             'location'        => $preset['location'],
             'audience'        => $preset['audience'],
-            'active'          => !empty($preset['active']),
+            'active'          => !empty($preset['active']) && !$slotTaken,
             'version'         => '1.0',
             'changed_by_user' => false,
         ]);

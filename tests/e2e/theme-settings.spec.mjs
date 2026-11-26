@@ -641,10 +641,11 @@ test.describe('TH-K Page variants', () => {
   });
 });
 
-// The hero title and subtitle half of TH-75 (bug 8) is in
-// known-bugs.spec.mjs. These are the five section switches beside them: the
-// Pages screen offers them (homepage/page.php supportedOptions), the docs
-// describe them, and no template reads them.
+// The hero title and subtitle half of TH-75 (bug 8, fixed) is in
+// known-bugs.spec.mjs. These are the five section switches beside them
+// (homepage/page.php supportedOptions). Until 2026-11-25 no template read them
+// (bug 36 in FEATURES.md). Pages saves a switched-off bool as a real false,
+// so that is what the tests store.
 const HOMEPAGE_SECTIONS = [
   ['show_domain_search', 'form.ph-domain-form'],
   ['show_products', 'section.hp-pricing-segmented'],
@@ -653,22 +654,32 @@ const HOMEPAGE_SECTIONS = [
   ['show_cta', 'section.hp-cta-immersive'],
 ];
 test.describe('TH-K Homepage section switches', () => {
-  // Not under test.fail(): if a section went missing for another reason, the
-  // switch tests below would "fail as expected" and hide it.
   test('TH-75 the Modern homepage draws all five switchable sections by default', async ({ page }) => {
     await page.goto('/');
     for (const [option, section] of HOMEPAGE_SECTIONS) await expect(page.locator(section), option).toHaveCount(1);
   });
   for (const [option, section] of HOMEPAGE_SECTIONS) {
     test(`TH-75 ${option} off hides ${section} on the Modern homepage`, async ({ page }) => {
-      test.fail(true, `BUG: ${option} is offered in Pages (core/pages/homepage/page.php supportedOptions) but homepage/default/default.tpl never reads it, so the section always shows`);
-      await page.goto('/');
-      await expect(page.locator(section), 'the section is there by default').toHaveCount(1);
-      pageRow({ homepage: { settings: { options: { [option]: '0' } } } });
+      pageRow({ homepage: { variant: 'default', settings: { options: { [option]: false } } } });
       await page.goto('/');
       await expect(page.locator(section)).toHaveCount(0);
+      for (const [other, otherSection] of HOMEPAGE_SECTIONS) {
+        if (other !== option) await expect(page.locator(otherSection), `${other} is still on`).toHaveCount(1);
+      }
+      if (option === 'show_features') {
+        await expect(page.locator('a[href="#how"]'), 'the hero link to the tiles goes with them').toHaveCount(0);
+      }
     });
   }
+  test('TH-75 show_domain_search off hides the Classic homepage\'s domain search too', async ({ page }) => {
+    pageRow({ homepage: { variant: 'portal' } });
+    await page.goto('/');
+    await expect(page.locator('section.ph-hero form.ph-domain-form'), 'Classic draws the search by default').toHaveCount(1);
+    pageRow({ homepage: { variant: 'portal', settings: { options: { show_domain_search: false } } } });
+    await page.goto('/');
+    await expect(page.locator('section.ph-hero')).toHaveCount(1);
+    await expect(page.locator('form.ph-domain-form, .ph-domain-tabs')).toHaveCount(0);
+  });
 });
 
 // ================================================================== TH-A

@@ -670,6 +670,13 @@
         if (c) c.textContent = f.value.length + '/' + f.maxLength;
         refreshCounts();
     });
+    // The server prints the first count with |strlen, which counts bytes:
+    // 60 Japanese characters read "180/64". Count characters from the start.
+    box.querySelectorAll('.mt-field').forEach(function (wrap) {
+        var f = wrap.querySelector('input[maxlength], textarea[maxlength]');
+        var c = wrap.querySelector('.mt-charcount');
+        if (f && c && f.maxLength > 0) c.textContent = f.value.length + '/' + f.maxLength;
+    });
 
     pick.addEventListener('change', function () { showLang(pick.value); });
     // Open on a language that already has content; otherwise the WHMCS system

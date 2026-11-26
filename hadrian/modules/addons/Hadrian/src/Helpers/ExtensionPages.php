@@ -59,6 +59,9 @@ final class ExtensionPages
     /** @var array<string, list<array{text:string, tone:string}>>|null theme page => notes */
     private static ?array $notes = null;
 
+    /** @var array<string, true> prefixes whose provider failed on the last listing */
+    private static array $failed = [];
+
     /**
      * @param array<string,mixed> $module
      *        id        the extension's id, as given to Extensions::register()
@@ -127,6 +130,29 @@ final class ExtensionPages
         ];
         self::$pages = null;
         self::$notes = null;
+    }
+
+    /**
+     * Did the module this key belongs to list its pages on this request? Only
+     * then does a key missing from all() mean the page is gone. A module whose
+     * provider failed said nothing about its pages, so nothing may be removed
+     * on its behalf: the Pages rows of its pages hold the admin's SEO,
+     * indexing and visibility (tests/FEATURES.md, bug 3).
+     */
+    public static function answered(string $key): bool
+    {
+        if (!self::owns($key)) {
+            return false;
+        }
+        self::all();
+        return !isset(self::$failed[explode('-', $key, 2)[0]]);
+    }
+
+    /** Have any registered modules failed to list their pages on this request? */
+    public static function anyFailed(): bool
+    {
+        self::all();
+        return self::$failed !== [];
     }
 
     /** Does this key belong to a registered module? No provider is called. */
@@ -223,12 +249,16 @@ final class ExtensionPages
         }
         $pages = [];
         $notes = [];
+        self::$failed = [];
         foreach (self::$modules as $prefix => $module) {
             try {
                 $rows = ($module['provider'])();
             } catch (\Throwable $e) {
-                // A module that cannot list its pages lists none; Pages still works.
+                // A module that cannot list its pages lists none; Pages still
+                // works. It is remembered as failed, so its pages are not
+                // taken for deleted (answered()).
                 error_log('Hadrian: extension "' . $module['id'] . '" could not list its pages: ' . $e->getMessage());
+                self::$failed[$prefix] = true;
                 continue;
             }
             foreach (is_array($rows) ? $rows : [] as $row) {
@@ -343,8 +373,9 @@ final class ExtensionPages
      */
     public static function refresh(): void
     {
-        self::$pages = null;
-        self::$notes = null;
+        self::$pages  = null;
+        self::$notes  = null;
+        self::$failed = [];
     }
 
     /** Forget what was registered and listed. For tests. */
@@ -353,6 +384,7 @@ final class ExtensionPages
         self::$modules = [];
         self::$pages   = null;
         self::$notes   = null;
+        self::$failed  = [];
     }
 
     /**

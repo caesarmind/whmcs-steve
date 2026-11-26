@@ -18,11 +18,9 @@
  * the old text claimed a reviews section this template has never had), and
  * hp-cta-immersive.
  *
- * NOTE for whoever edits default.tpl next: it reads its toggles as
- * $hadrian.pages.homepage.config.*, and resolveCurrentPage builds no 'config'
- * member at all -- so those reads return null and the |default: always wins.
- * The real path is .options.* (see the login variants for working reads; the
- * removed homepage/simple variant did it correctly and is in git history).
+ * default.tpl reads its options as $hadrian.pages.homepage.options.*.
+ * resolveCurrentPage builds no 'config' member, so a .config.* read always
+ * returns null and its |default: wins (bug 8 in tests/FEATURES.md).
  */
 return [
     'name'        => 'Modern',

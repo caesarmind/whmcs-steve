@@ -137,6 +137,30 @@ yet. They are reported on every run without failing it, so one open bug cannot
 block every other fix at the gate. Entries clean themselves up: if a listed
 issue stops occurring, the run fails asking for the entry to be removed.
 
+## Known bugs
+
+A bug that is confirmed but not fixed gets a test that asserts the right
+behaviour, so it fails today, plus a marker that keeps that failure out of the
+gate. The run lists each one under "Known issues". When a fix makes the test
+pass, the run fails until the marker is removed, and the test stays as a
+regression test.
+
+- **Playwright:** check the scenario was set up first, then call
+  `test.fail(true, 'BUG n in tests/FEATURES.md: ...')` and assert. A setup
+  failure before that line still fails the run. See `e2e/known-bugs.spec.mjs`.
+- **Static checkers:** print `KNOWN BUG <id>: ...` instead of failing and exit 0;
+  print `FIXED <id>: ...` and exit 1 once the check passes.
+  `static/check-root-paths.mjs` has the mechanism (its `KNOWN` list, empty
+  since bug 7 was fixed).
+
+`e2e/known-bugs.spec.mjs` runs in the settings project, because it renames the
+live guest menu and saves page settings. Its PHP half is `php/known-bugs.php`,
+which refuses to touch a menu an admin made. When a bug is fixed, its test can
+move to where its feature is tested: bugs 1 and 2 (email drafts) went to
+`php/email-live.php`.
+
+The bugs and the rows they affect are listed in [FEATURES.md](FEATURES.md).
+
 ## Adding coverage
 
 - **A new page:** add a line to `ROUTES` in `tests/e2e/routes.mjs` with its URL,

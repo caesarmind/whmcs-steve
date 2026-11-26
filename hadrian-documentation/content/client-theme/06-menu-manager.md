@@ -37,7 +37,7 @@ Hadrian ships four ready-made menus - a Main menu for clients, a Main menu for g
 :::props
 | Button | What it does |
 | --- | --- |
-| Re-seed presets | Adds back any preset item that has gone missing. Never overwrites what is already there, so it is the safe one to try first |
+| Re-seed presets | Adds back any preset item that has gone missing. Never overwrites what is already there, so it is the safe one to try first. A preset menu you renamed or deleted only comes back from here, and it comes back switched off if that place already has a live menu |
 | Reset WHMCS Defaults | Rebuilds the factory WHMCS Defaults menus and the Footer Secondary menu. Menus you built yourself are left alone |
 | Force re-sync to presets | Rebuilds **every** preset menu to match the shipped originals, overwriting their current items |
 :::

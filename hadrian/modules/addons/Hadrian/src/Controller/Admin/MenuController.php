@@ -439,8 +439,11 @@ final class MenuController extends AbstractController
         // menu changes). Without it, seeding only fills in missing preset menus
         // and never overwrites an existing one. Overwrites preset items, so the
         // UI gates it behind a confirm.
+        // The admin asked for it, so presets they renamed or deleted come back
+        // too (inactive if their slot already has a live menu). The automatic
+        // runs never do that.
         $force  = !empty($_GET['force']);
-        $seeded = (new Seeder())->run($force);
+        $seeded = (new Seeder())->run($force, true);
         $this->redirect('?module=Hadrian&action=menu&flash=seeded-' . $seeded);
     }
 

@@ -121,7 +121,11 @@ async function runChecks(title, list) {
       const ch = queue.shift();
       const [cmd, ...args] = typeof ch.cmd === 'function' ? ch.cmd() : ch.cmd;
       const r = await run(cmd, args, { cwd: ch.cwd });
-      items.push({ ...ch, ok: r.code === 0, ms: r.ms, detail: lastLine(r.out), output: r.out.replace(/\x1b\[[0-9;]*m/g, '').slice(-6000) });
+      // A checker that reproduces a bug which is understood but not fixed yet
+      // prints "KNOWN BUG <id>: ..." and still exits 0 (see tests/README.md,
+      // "Known bugs"); those lines are listed with the other known issues.
+      const knownBugs = r.out.replace(/\x1b\[[0-9;]*m/g, '').match(/^KNOWN BUG .*$/gm) || [];
+      items.push({ ...ch, ok: r.code === 0, ms: r.ms, detail: lastLine(r.out), output: r.out.replace(/\x1b\[[0-9;]*m/g, '').slice(-6000), knownBugs });
     }
   };
   await Promise.all(Array.from({ length: 4 }, worker));
@@ -134,7 +138,8 @@ async function runChecks(title, list) {
   const failed = items.filter(i => !i.ok && i.blocking);
   for (const f of failed) console.log('\n' + red(`  --- ${f.title} ---`) + '\n' + f.output.split('\n').slice(-25).map(l => '    ' + l).join('\n'));
   summary.sections.push({ name: title, blocking: true, ok: failed.length === 0,
-    items: items.map(({ cmd, cwd, output, ...rest }) => ({ ...rest, output: rest.ok ? undefined : output })) });
+    items: items.map(({ cmd, cwd, output, knownBugs, ...rest }) => ({ ...rest, output: rest.ok ? undefined : output })),
+    known: items.flatMap(i => i.knownBugs.map(k => `${i.title}: ${k.replace(/^KNOWN BUG /, '')}`)) });
   return failed.length === 0;
 }
 

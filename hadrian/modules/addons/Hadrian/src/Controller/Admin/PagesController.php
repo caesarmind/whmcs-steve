@@ -500,17 +500,20 @@ final class PagesController extends AbstractController
         $descIn   = self::postLangMap('seo_description');
         $titleMap = [];
         $descMap  = [];
+        // Cut by characters, never bytes: a byte cut through a Japanese or
+        // Arabic character left invalid UTF-8, json_encode() failed, and the
+        // whole map for every language was lost (tests/FEATURES.md, bug 4).
         foreach (LocaleHelper::effectiveList() as $lang) {
-            $t = substr(htmlspecialchars_decode(trim((string)($titleIn[$lang] ?? '')), ENT_QUOTES), 0, 200);
-            $d = substr(htmlspecialchars_decode(trim((string)($descIn[$lang]  ?? '')), ENT_QUOTES), 0, 400);
+            $t = mb_substr(htmlspecialchars_decode(trim((string)($titleIn[$lang] ?? '')), ENT_QUOTES), 0, 200, 'UTF-8');
+            $d = mb_substr(htmlspecialchars_decode(trim((string)($descIn[$lang]  ?? '')), ENT_QUOTES), 0, 400, 'UTF-8');
             if ($t !== '') { $titleMap[$lang] = $t; }
             if ($d !== '') { $descMap[$lang]  = $d; }
         }
-        $socialImage = substr(htmlspecialchars_decode(trim((string)($_POST['seo_social_image'] ?? '')), ENT_QUOTES), 0, 500);
+        $socialImage = mb_substr(htmlspecialchars_decode(trim((string)($_POST['seo_social_image'] ?? '')), ENT_QUOTES), 0, 500, 'UTF-8');
 
         // Public URL — relative to the system URL; blank = not crawlable (null).
         $urlRaw = trim((string)($_POST['url'] ?? ''));
-        $url    = $urlRaw === '' ? null : ltrim(substr($urlRaw, 0, 255), '/');
+        $url    = $urlRaw === '' ? null : ltrim(mb_substr($urlRaw, 0, 255, 'UTF-8'), '/');
 
         // Supported options — type-coerce per spec. The declared set spans the
         // page AND every variant, so saving while template A is selected does
@@ -547,7 +550,9 @@ final class PagesController extends AbstractController
                 'select' => in_array((string)$raw, array_map('strval', (array)($spec['options'] ?? [])), true)
                     ? (string)$raw
                     : (string)($spec['default'] ?? ''),
-                default => substr((string)$raw, 0, 500),
+                // Characters, not bytes: see the SEO fields above. A byte cut
+                // here would cost the page its whole settings blob.
+                default => mb_substr((string)$raw, 0, 500, 'UTF-8'),
             };
         }
 
