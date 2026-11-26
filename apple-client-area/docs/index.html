@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Apple Client Area — Page Specs</title>
+  <meta name="description" content="Page specs and cross-page roadmap for the Apple client-area HTML mockups.">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/css/theme-simple.css">
+  <style>
+    :root {
+      --base-font-size: 15px;
+      --theme-color: #0071e3;
+      --sidebar-width: 280px;
+      --sidebar-nav-link-color--active: #0071e3;
+      --sidebar-nav-link-border-color--active: #0071e3;
+      --sidebar-nav-link-font-weight--active: 600;
+      --code-font-size: 0.875em;
+      --blockquote-border-color: #0071e3;
+      --base-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+    .sidebar-nav > ul > li > a,
+    .sidebar-nav > ul > li > p {
+      font-weight: 600;
+      text-transform: uppercase;
+      font-size: 0.8em;
+      letter-spacing: 0.06em;
+      color: #86868b;
+    }
+    .sidebar-nav > ul > li > ul > li > a {
+      font-weight: normal;
+      text-transform: none;
+      font-size: 0.95em;
+      letter-spacing: normal;
+    }
+    .markdown-section table {
+      display: table;
+      width: 100%;
+    }
+    .markdown-section pre > code {
+      font-family: 'SF Mono', 'JetBrains Mono', 'Consolas', monospace;
+    }
+    .markdown-section h1 {
+      border-bottom: 2px solid #0071e3;
+      padding-bottom: 10px;
+    }
+    /* Links out to the mockups themselves, so they read as leaving the docs. */
+    .markdown-section a.mockup-link::after {
+      content: ' \2197';
+      opacity: .5;
+      font-size: .9em;
+    }
+  </style>
+</head>
+<body>
+  <div id="app"></div>
+  <script>
+    // Served with `apple-client-area/` as the document root, not `docs/`: the specs
+    // link up and out (../../pages.md, ../../portal-home.html), so only that root
+    // resolves them -- and it is the root the existing launch entry already uses.
+    var currentDir = '';
+
+    window.$docsify = {
+      name: 'Apple Client Area Specs',
+      repo: '',
+      basePath: '/',
+      homepage: 'pages.md',
+      loadSidebar: true,
+      // One sidebar for every route, since the Markdown lives at three depths.
+      alias: {
+        '/_sidebar.md': '/docs/_sidebar.md',
+        '/.*/_sidebar.md': '/docs/_sidebar.md',
+      },
+      // The specs link each other with plain relative paths.
+      relativePath: true,
+      subMaxLevel: 3,
+      auto2top: true,
+      search: {
+        maxAge: 86400000,
+        // Listed explicitly: 'auto' walks the sidebar and is unsupported
+        // alongside relativePath.
+        paths: [
+          '/pages.md',
+          '/docs/_roadmap.md',
+          '/docs/clientareaproducts.md',
+          '/docs/pages/README.md',
+          '/docs/pages/_shared-header-nav.md',
+          '/docs/pages/portal-home.md',
+        ],
+        placeholder: 'Search the specs...',
+        noData: 'No results found',
+        depth: 3,
+        hideOtherSidebarContent: false,
+      },
+      copyCode: {
+        buttonText: 'Copy',
+        errorText: 'Error',
+        successText: 'Copied!'
+      },
+      pagination: {
+        previousText: 'Previous',
+        nextText: 'Next',
+        crossChapter: true,
+        crossChapterText: true,
+      },
+      markdown: {
+        renderer: {
+          // The specs and pages.md link straight at the mockup .html files. Left
+          // alone, docsify swallows those into its own hash router and tries to
+          // parse the mockup as Markdown; send them to the real file instead,
+          // resolved against the directory of the doc doing the linking.
+          link: function (href, title, text) {
+            var isLocalHtml = /\.html($|[?#])/.test(href) && !/^(https?:)?\/\//.test(href);
+            if (isLocalHtml) {
+              var abs = href;
+              try {
+                abs = new URL(currentDir + href, location.origin + '/').pathname;
+              } catch (e) {}
+              return '<a class="mockup-link" href="' + abs + '" target="_blank" rel="noopener">' + text + '</a>';
+            }
+            return this.origin.link.apply(this, arguments);
+          }
+        }
+      },
+      plugins: [
+        // Track which file is rendering, so the link renderer above can resolve
+        // ../../ hops correctly.
+        function (hook, vm) {
+          hook.beforeEach(function (content) {
+            var file = (vm.route && vm.route.file) || '';
+            currentDir = file.slice(0, file.lastIndexOf('/') + 1);
+            return content;
+          });
+        }
+      ],
+      themeColor: '#0071e3',
+      notFoundPage: true,
+    }
+  </script>
+  <!-- Docsify core -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/docsify.min.js"></script>
+  <!-- Plugins -->
+  <script src="https://cdn.jsdelivr.net/npm/docsify@4/lib/plugins/search.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-copy-code@2/dist/docsify-copy-code.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docsify-pagination@2/dist/docsify-pagination.min.js"></script>
+  <!-- Syntax highlighting -->
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-php.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-smarty.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-json.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/prismjs@1/components/prism-bash.min.js"></script>
+</body>
+</html>
