@@ -23,7 +23,7 @@ composer install -d tests/static
 |---|---|
 | exit 0, `PASSED` | nothing blocking failed |
 | exit 1, `FAILED` | a blocking check failed - the report says which and why |
-| exit 2 | the **environment** is not ready (preflight) - a setup problem, not a theme bug; the message names the fix |
+| exit 2 | the **environment** is not ready (preflight) - a setup problem, not a theme bug; the message names the fix. Also: another run is using the site and `--no-wait` was given (see "Things worth knowing") |
 
 The report is `tests/reports/index.html` (summary) with a link to the detailed
 Playwright report (screenshots, traces, the HTML of every failing page).
@@ -188,6 +188,30 @@ instrumented, because templates test captured output for emptiness.
 
 ## Things worth knowing
 
+- **Runs that use the site go one at a time.** The settings tier and its
+  neighbours change what every request sees, so two runs started from
+  different terminals (or Claude sessions) used to break each other: on
+  2026-11-25 one run's email "stands down" test took Hadrian out of
+  `ActiveAddonModules` under another run's builder test, and one run emptied
+  the Playwright output folder the other was writing traces to. Now a run
+  takes `tests/.local/site.lock` (pid, command, start time) first:
+  `run.mjs` for every tier but static, Playwright's `globalSetup` for a direct
+  `playwright test`, and the coverage runner. A second run prints who holds
+  it and waits; `--no-wait` (or `HADRIAN_SITE_LOCK_WAIT=0` for any run) makes
+  it refuse with exit 2 instead, and `HADRIAN_SITE_LOCK_WAIT=<minutes>` sets
+  how long it waits (default 60). The lock goes on exit, failure and Ctrl+C;
+  a lock whose process is gone (a run that was killed) is taken over by the
+  next run. `--tier static` alone never takes it. The PHP drivers that change
+  global state (`settings.php`, `email-live.php`, `known-bugs.php`) refuse
+  with exit 75 while another process holds it; under the holder they get its
+  token through `HADRIAN_SITE_LOCK_TOKEN` and run. Code: `lib/site-lock.mjs`,
+  `php/site-lock.php`.
+- **Each Playwright invocation has its own output folder**,
+  `tests/reports/output/<tag>-<pid>`, because Playwright empties its
+  `outputDir` when it starts. Folders of runs that have ended are removed at
+  the start of the next one (the HTML reports keep their own copies of
+  traces and screenshots). `--last-failed` needs `--output` to point at the
+  previous run's folder.
 - **Windows + a cold template cache.** Smarty cannot replace a compiled
   template atomically on Windows, so parallel requests against a cold or just-
   edited template can get truncated pages (Linux production is not affected).

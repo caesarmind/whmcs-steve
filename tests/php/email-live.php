@@ -17,6 +17,10 @@
 
 declare(strict_types=1);
 
+// Not while another test run holds the local site (tests/php/site-lock.php).
+require_once __DIR__ . '/site-lock.php';
+hadrian_site_lock_guard('email-live.php');
+
 $whmcsRoot = getenv('WHMCS_ROOT') ?: 'C:/laragon/www/whmcs';
 chdir($whmcsRoot);
 require_once $whmcsRoot . '/init.php';

@@ -12,6 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { BASE_URL, USER_AGENT, WHMCS_ROOT, REPO_ROOT, LOCAL_DIR, credentials } from './env.mjs';
+import { acquireSiteLock, pruneOutputDirs, SiteLockBusy } from './site-lock.mjs';
 
 const COLD_BELOW = 120;   // compiled files; a warm run leaves ~250+
 const STAMP = path.join(LOCAL_DIR, 'warmup-stamp.json');
@@ -38,6 +39,18 @@ async function get(url, cookie = '') {
 }
 
 export default async function warmup() {
+  // One run at a time against the site (site-lock.mjs). Under run.mjs this
+  // finds run.mjs's lock and takes nothing; a direct `playwright test` takes
+  // it here, and lets go when the Playwright process exits.
+  try { await acquireSiteLock(); }
+  catch (e) {
+    if (!(e instanceof SiteLockBusy)) throw e;
+    const busy = new Error(e.message);
+    busy.stack = e.message; // the message says it all; no code frame
+    throw busy;
+  }
+  pruneOutputDirs();
+
   const dir = path.join(WHMCS_ROOT, 'templates_c');
   let n = 0;
   try { n = fs.readdirSync(dir).filter(f => f.endsWith('.php')).length; } catch { return; }

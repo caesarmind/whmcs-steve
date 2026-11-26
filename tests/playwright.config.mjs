@@ -13,6 +13,7 @@
 import { defineConfig, devices } from '@playwright/test';
 import path from 'node:path';
 import { BASE_URL, USER_AGENT, LOCAL_DIR, REPORTS_DIR } from './lib/env.mjs';
+import { playwrightOutputDir } from './lib/site-lock.mjs';
 
 // run.mjs runs the site tiers and the advisory visual tier as separate
 // invocations; a tag keeps their reports from overwriting each other.
@@ -20,7 +21,10 @@ const TAG = process.env.HADRIAN_REPORT_TAG || 'playwright';
 
 export default defineConfig({
   testDir: './e2e',
-  outputDir: path.join(REPORTS_DIR, `${TAG}-artifacts`),
+  // reports/output/<tag>-<pid>: one per invocation, because Playwright empties
+  // its outputDir on start and a shared one lost another run's traces.
+  // globalSetup (lib/warmup.mjs) takes the site lock and prunes ended runs' folders.
+  outputDir: playwrightOutputDir(TAG),
   timeout: 60_000,
   expect: { timeout: 10_000 },
   fullyParallel: true,

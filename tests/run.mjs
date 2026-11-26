@@ -11,6 +11,10 @@
 //   node tests/run.mjs --tier visual         screenshot comparison (advisory)
 //   node tests/run.mjs --approve             accept the current look as the visual baseline
 //   node tests/run.mjs --open                open the HTML report when done
+//   node tests/run.mjs --no-wait             refuse (exit 2) instead of waiting when another run is using the site
+//
+// Runs that use the site go one at a time (tests/lib/site-lock.mjs): a second
+// one waits for the first and says so. The static tier alone never waits.
 //
 // Exit 0 = nothing blocking failed. Exit 1 = a blocking check failed.
 // Exit 2 = the environment is not ready (preflight) - a setup problem, not a theme bug.
@@ -21,6 +25,7 @@ import { spawn, execFileSync } from 'node:child_process';
 import { CHECKS, COMPILE } from './lib/registry.mjs';
 import { preflight, staticPreflight } from './lib/preflight.mjs';
 import { REPO_ROOT, TESTS_DIR, REPORTS_DIR, BASE_URL, PHP, readJson } from './lib/env.mjs';
+import { acquireSiteLock, SiteLockBusy } from './lib/site-lock.mjs';
 import { KNOWN_ISSUES } from './e2e/known-issues.mjs';
 
 const argv = process.argv.slice(2);
@@ -44,15 +49,32 @@ fs.mkdirSync(REPORTS_DIR, { recursive: true });
 const summary = { startedAt: new Date().toISOString(), baseUrl: BASE_URL, tiers: [...tiers], commit: null, sections: [] };
 try { summary.commit = execFileSync('git', ['rev-parse', '--short', 'HEAD'], { cwd: REPO_ROOT, encoding: 'utf8' }).trim(); } catch {}
 
+const children = new Set();
+let stopping = false;
 function run(cmd, args, { cwd = REPO_ROOT, env = {} } = {}) {
   return new Promise(res => {
     const started = Date.now();
     const child = spawn(cmd, args, { cwd, env: { ...process.env, ...env }, stdio: ['ignore', 'pipe', 'pipe'] });
+    children.add(child);
+    const done = r => { children.delete(child); if (stopping && !children.size) process.exit(130); res(r); };
     let out = '';
     child.stdout.on('data', d => (out += d));
     child.stderr.on('data', d => (out += d));
-    child.on('error', e => res({ code: 127, out: String(e), ms: Date.now() - started }));
-    child.on('close', code => res({ code, out, ms: Date.now() - started }));
+    child.on('error', e => done({ code: 127, out: String(e), ms: Date.now() - started }));
+    child.on('close', code => done({ code, out, ms: Date.now() - started }));
+  });
+}
+
+// Ctrl+C reaches every process on the console, so a running Playwright gets
+// it too and winds down, its afterAll hooks putting the settings back. Wait
+// for that before exiting (which releases the site lock); a second Ctrl+C
+// quits at once. Elsewhere a signal sent to this process alone is passed on.
+for (const sig of ['SIGINT', 'SIGTERM', 'SIGHUP', 'SIGBREAK']) {
+  process.on(sig, () => {
+    if (stopping || !children.size) process.exit(130);
+    stopping = true;
+    console.log(dim(`\n${sig}: letting the running step stop first (again to quit now)`));
+    if (process.platform !== 'win32' && sig !== 'SIGINT') for (const ch of children) ch.kill(sig);
   });
 }
 const lastLine = s => (s.trim().split('\n').filter(l => l.trim()).pop() || '').replace(/\x1b\[[0-9;]*m/g, '').slice(0, 110);
@@ -64,6 +86,17 @@ console.log(bold(`Hadrian test suite`) + dim(`  ${[...tiers].join(' + ')}  @ ${s
 // `composer install -d tests/static` provides; every other tier needs the local
 // stack. Both are environment problems, not theme bugs: exit 2, with the fix.
 const needsSite = ['compile', 'smoke', 'browser', 'settings', 'a11y', 'visual'].some(t => tiers.has(t));
+// One run at a time against the site (lib/site-lock.mjs). Taken before the
+// preflight, which restores a settings snapshot it finds: another run's
+// settings test, still going, leaves one too. A refused run writes no report,
+// so the report of the run that holds the lock is left alone.
+if (needsSite) {
+  try { await acquireSiteLock({ wait: flag('--no-wait') ? false : undefined }); }
+  catch (e) {
+    if (!(e instanceof SiteLockBusy)) throw e;
+    console.log('\n' + red(e.message)); process.exit(2);
+  }
+}
 if (needsSite || tiers.has('static')) {
   console.log('\n' + bold('Preflight'));
   const checks = tiers.has('static') ? staticPreflight() : [];

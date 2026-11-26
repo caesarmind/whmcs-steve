@@ -17,14 +17,18 @@
 //   5. write tests/reports/coverage/index.html and coverage.json
 //
 // Never run it while another suite run is going: for its duration the local
-// site serves instrumented templates. The preflight's junction check fails
-// (exit 2) if a crashed run left them swapped; --restore fixes that.
+// site serves instrumented templates. It takes the site lock
+// (tests/lib/site-lock.mjs), so it waits for a run that is going, and runs
+// started meanwhile wait for it; --no-wait refuses instead. The preflight's
+// junction check fails (exit 2) if a crashed run left them swapped; --restore
+// fixes that.
 
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { REPO_ROOT, LOCAL_DIR, REPORTS_DIR, WHMCS_ROOT, BASE_URL, JUNCTIONS, PHP } from '../lib/env.mjs';
 import { instrument, strip, MARK } from './instrument.mjs';
+import { acquireSiteLock, SiteLockBusy } from '../lib/site-lock.mjs';
 
 const COV_DIR = path.join(LOCAL_DIR, 'cov');
 const OUT_DIR = path.join(REPORTS_DIR, 'coverage');
@@ -84,6 +88,9 @@ async function restore() {
   }
   await settle(false, 'restore');
 }
+
+try { await acquireSiteLock({ wait: process.argv.includes('--no-wait') ? false : undefined }); }
+catch (e) { if (!(e instanceof SiteLockBusy)) throw e; console.error(e.message); process.exit(2); }
 
 if (process.argv.includes('--restore')) { await restore(); console.log('junctions restored, compiled cache cleared'); process.exit(0); }
 
