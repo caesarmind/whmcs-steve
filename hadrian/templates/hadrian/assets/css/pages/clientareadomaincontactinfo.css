@@ -16,14 +16,14 @@ body[data-subnav-side="left"] .ci-split > .ci-main { grid-column: 2; grid-row: 1
 .ci-alert svg { width: 16px; height: 16px; flex-shrink: 0; }
 .ci-alert-success { background: var(--color-green-bg); color: var(--color-green-text); }
 .ci-alert-error   { background: var(--color-red-bg);   color: var(--color-red-text); }
-.ci-alert-info    { background: var(--color-accent-light); color: var(--color-accent); }
+.ci-alert-info    { background: var(--color-accent-light); color: var(--color-link); }
 
 .ci-card { padding: 0; }
 
 .ci-tabs { display: flex; align-items: center; gap: 24px; border-bottom: 0.5px solid var(--color-border); padding: 0 24px; flex-wrap: wrap; }
 .ci-tab { position: relative; padding: 14px 0; background: none; border: 0; font-size: var(--text-base); font-weight: var(--fw-medium); color: var(--color-text-tertiary); cursor: pointer; font-family: inherit; transition: color var(--transition-fast); }
 .ci-tab:hover { color: var(--color-text-primary); }
-.ci-tab.active { color: var(--color-accent); }
+.ci-tab.active { color: var(--color-link); }
 .ci-tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -0.5px; height: 2px; background: var(--color-accent); border-radius: 2px 2px 0 0; }
 
 .ci-panel { display: none; padding: 18px 24px 6px; }
@@ -62,7 +62,7 @@ body[data-subnav-side="left"] .ci-split > .ci-main { grid-column: 2; grid-row: 1
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 
 @media (max-width: 880px) {
     .ci-split { grid-template-columns: 1fr; }

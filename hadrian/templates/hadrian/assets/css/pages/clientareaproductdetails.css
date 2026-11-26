@@ -59,7 +59,7 @@ body[data-subnav="off"] .pd-split > .pd-aside { display: none; }
 .pd-tabs { display: flex; align-items: center; gap: 24px; border-bottom: 0.5px solid var(--color-border); padding: 0 24px; flex-wrap: wrap; }
 .pd-tab { position: relative; padding: 14px 0; background: none; border: 0; font-size: var(--text-base); font-weight: var(--fw-medium); color: var(--color-text-tertiary); cursor: pointer; font-family: inherit; transition: color var(--transition-fast); }
 .pd-tab:hover { color: var(--color-text-primary); }
-.pd-tab.active { color: var(--color-accent); }
+.pd-tab.active { color: var(--color-link); }
 .pd-tab.active::after { content: ""; position: absolute; left: 0; right: 0; bottom: -0.5px; height: 2px; background: var(--color-accent); border-radius: 2px 2px 0 0; }
 .pd-tab-panel { display: none; padding: 22px 24px 24px; }
 .pd-tab-panel.active { display: block; }

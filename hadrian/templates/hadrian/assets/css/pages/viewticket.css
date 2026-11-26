@@ -117,7 +117,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
     transition: color var(--transition-fast);
 }
 .tk-tab:hover { color: var(--color-text-primary); }
-.tk-tab.active { color: var(--color-accent); }
+.tk-tab.active { color: var(--color-link); }
 .tk-tab.active::after {
     content: "";
     position: absolute;
@@ -224,14 +224,14 @@ html[data-palette="slate"]   .tk-info-avatar { background: linear-gradient(135de
 .tk-drop:hover {
     border-color: var(--color-accent);
     background: var(--color-accent-light);
-    color: var(--color-accent);
+    color: var(--color-link);
 }
 .tk-drop svg { width: 14px; height: 14px; flex-shrink: 0; }
 .tk-drop-label { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .tk-drop.has-file {
     border-style: solid;
     border-color: var(--color-accent);
-    color: var(--color-accent);
+    color: var(--color-link);
     background: var(--color-accent-light);
 }
 /* Visually hide the native file input but keep it clickable via the wrapping label */
@@ -290,7 +290,7 @@ html[data-palette="slate"]   .tk-info-avatar { background: linear-gradient(135de
 }
 .tk-attach-add:hover {
     border-color: var(--color-accent);
-    color: var(--color-accent);
+    color: var(--color-link);
     background: var(--color-accent-light);
 }
 .tk-attach-add svg { width: 14px; height: 14px; }
@@ -437,7 +437,7 @@ html[data-palette="slate"]   .tk-info-avatar { background: linear-gradient(135de
     flex-shrink: 0;
     transition: all var(--transition-fast);
 }
-.thread-att:hover .thread-att-dl { background: var(--color-accent-light); color: var(--color-accent); }
+.thread-att:hover .thread-att-dl { background: var(--color-accent-light); color: var(--color-link); }
 .thread-att-dl svg { width: 13px; height: 13px; }
 /* Conversation is iterated from $descreplies (newest first); reverse the visual
    order so the opening post stays at the top while newest sits by the reply box. */

@@ -209,7 +209,7 @@
 .co-page-header h1 { font-size: 32px; font-weight: 600; letter-spacing: -0.03em; color: var(--color-text-primary); margin: 0 0 6px; }
 .co-page-header .co-sub { font-size: 14px; color: var(--color-text-tertiary); letter-spacing: -0.008em; margin: 0; }
 .co-page-header .co-back-cart { height: 36px; padding: 0 16px; font-size: 13px; font-weight: 500; color: var(--color-text-primary); background: transparent; border: 0.5px solid var(--color-border); border-radius: 999px; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; letter-spacing: -0.008em; transition: all 0.15s; }
-.co-page-header .co-back-cart:hover { border-color: var(--color-accent); color: var(--color-accent); }
+.co-page-header .co-back-cart:hover { border-color: var(--color-accent); color: var(--color-link); }
 
 .co-steps { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 18px; font-size: 12.5px; color: var(--color-text-tertiary); letter-spacing: -0.008em; }
 .co-step { display: inline-flex; align-items: center; gap: 8px; }
@@ -294,7 +294,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
     letter-spacing: -0.008em;
     margin-top: 2px;
 }
-.co-summary-footer .co-back-link:hover { color: var(--color-accent); }
+.co-summary-footer .co-back-link:hover { color: var(--color-link); }
 
 /* Already-registered toggle row, restyled minimally so it fits the checkout chrome */
 .already-registered { padding: 10px 0 14px; }
@@ -339,7 +339,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
     transition: color 0.15s;
 }
 .co-auth-tab:hover { color: var(--color-text-primary); }
-.co-auth-tab.active { color: var(--color-accent); font-weight: 600; }
+.co-auth-tab.active { color: var(--color-link); font-weight: 600; }
 .co-auth-tab.active::after {
     content: ""; position: absolute; left: 0; right: 0; bottom: -0.5px;
     height: 2px; background: var(--color-accent); border-radius: 2px 2px 0 0;
@@ -360,7 +360,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
     margin-bottom: 4px;
 }
 .co-forgot-link {
-    font-size: 11.5px; color: var(--color-accent);
+    font-size: 11.5px; color: var(--color-link);
     text-decoration: none; letter-spacing: -0.004em;
 }
 .co-forgot-link:hover { color: var(--color-accent-hover); text-decoration: underline; }
@@ -405,7 +405,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
 
 /* Marketing-email-optin card */
 .co-mailing { padding: 16px 20px; display: flex; align-items: center; gap: 14px; background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: 14px; }
-.co-mailing-icon { width: 38px; height: 38px; border-radius: 10px; background: var(--color-accent-light); color: var(--color-accent); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.co-mailing-icon { width: 38px; height: 38px; border-radius: 10px; background: var(--color-accent-light); color: var(--color-link); display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .co-mailing-icon svg { width: 18px; height: 18px; }
 .co-mailing-meta { flex: 1; min-width: 0; }
 .co-mailing-title { font-size: 13.5px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.008em; margin: 0 0 3px; }
@@ -461,7 +461,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
 /* Head matches the cart page's "Last chance" card (cart mockup
    .ct-recommend-head): accent pill, title, subtitle pushed right. */
 .co-lastchance-head { padding: 16px 22px; border-bottom: 0.5px solid var(--color-border); display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.co-lastchance-badge { padding: 3px 10px; border-radius: var(--radius-pill, 999px); background: var(--color-accent-light); color: var(--color-accent); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+.co-lastchance-badge { padding: 3px 10px; border-radius: var(--radius-pill, 999px); background: var(--color-accent-light); color: var(--color-link); font-size: 10px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
 .co-lastchance-title { font-size: 14px; font-weight: 600; color: var(--color-text-primary); letter-spacing: -0.012em; }
 .co-lastchance-sub { font-size: 11.5px; color: var(--color-text-tertiary); margin-left: auto; letter-spacing: -0.004em; }
 .co-lastchance-body > div + div { margin-top: 10px; }
@@ -619,7 +619,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
 .btn-info:hover,
 .btn-warning:hover {
     border-color: var(--color-accent);
-    color: var(--color-accent);
+    color: var(--color-link);
 }
 
 /* Existing-user signin form */
@@ -685,7 +685,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
 /* "Total Due Today" banner above payment radios */
 #totalDueToday.alert-success {
     background: var(--color-accent-light);
-    color: var(--color-accent);
+    color: var(--color-link);
     border: 0;
     border-radius: 12px;
     padding: 14px 18px;
@@ -1063,7 +1063,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
     justify-content: center;
     transition: border-color 0.15s, color 0.15s;
 }
-#existingCardInfo .pm-cvc-help:hover { border-color: var(--color-accent); color: var(--color-accent); }
+#existingCardInfo .pm-cvc-help:hover { border-color: var(--color-accent); color: var(--color-link); }
 /* error hidden until validation flags it (WHMCS/Bootstrap adds .has-error) */
 #existingCardInfo .field-error-msg { display: none; font-size: 11.5px; color: var(--color-red-text, #d70015); letter-spacing: -0.004em; }
 #existingCardInfo.has-error .field-error-msg,
@@ -1497,7 +1497,7 @@ body[data-tpl] #order-standard_cart .co-summary-total #totalDueToday {
 }
 .modal-generate-password .gp-btn-ghost:hover {
     border-color: var(--color-accent);
-    color: var(--color-accent);
+    color: var(--color-link);
 }
 .modal-generate-password .gp-btn-ghost i {
     font-size: 11px;
@@ -1561,7 +1561,7 @@ button.generate-password {
 .generate-password.btn-default:hover,
 button.generate-password:hover {
     border-color: var(--color-accent);
-    color: var(--color-accent);
+    color: var(--color-link);
 }
 
 /* ─── Last-chance inner ($hookOutput grid) ──────────────────────

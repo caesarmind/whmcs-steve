@@ -11,7 +11,7 @@
 @media (max-width: 720px) { .md-grid { grid-template-columns: 1fr; } }
 .md-section { padding: 18px 20px; }
 .md-section-title { font-size: var(--text-md); font-weight: var(--fw-semibold); color: var(--color-text-primary); letter-spacing: -0.01em; margin: 0 0 12px; display: flex; align-items: center; gap: 8px; }
-.md-section-title svg { width: 16px; height: 16px; color: var(--color-accent); }
+.md-section-title svg { width: 16px; height: 16px; color: var(--color-link); }
 .md-pre { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: var(--text-base); line-height: 1.7; background: var(--color-surface-secondary); border: 0.5px solid var(--color-border); border-radius: var(--radius-md); padding: 12px 14px; color: var(--color-text-primary); white-space: pre-wrap; word-break: break-word; margin: 0; }
 .md-pre strong { font-weight: var(--fw-bold); }
 .md-pre em { font-style: italic; }

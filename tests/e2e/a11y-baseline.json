@@ -10,1308 +10,349 @@
     "best-practice"
   ],
   "pages": {
-    "rail/dark | full | clientareahome": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "rail/dark | full | clientareaproducts": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "rail/dark | full | clientareahome": {},
+    "rail/dark | full | clientareaproducts": {},
     "rail/dark | guest | homepage": {
-      "color-contrast": 6,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 5
     },
-    "rail/dark | guest | login": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "rail/dark | guest | store group": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "rail/dark | guest | viewcart": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "rail/light | full | clientareahome": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "rail/light | full | clientareaproducts": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "rail/light | guest | homepage": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "rail/light | guest | login": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "rail/light | guest | store group": {
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "rail/light | guest | viewcart": {
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/dark | empty | account-contacts-manage": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | account-paymentmethods": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | account-paymentmethods-manage": {
-      "color-contrast": 2,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | account-user-management": {
-      "color-contrast": 3,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | affiliate signup": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "rail/dark | guest | login": {},
+    "rail/dark | guest | store group": {},
+    "rail/dark | guest | viewcart": {},
+    "rail/light | full | clientareahome": {},
+    "rail/light | full | clientareaproducts": {},
+    "rail/light | guest | homepage": {},
+    "rail/light | guest | login": {},
+    "rail/light | guest | store group": {},
+    "rail/light | guest | viewcart": {},
+    "sidebar/dark | empty | account-contacts-manage": {},
+    "sidebar/dark | empty | account-paymentmethods": {},
+    "sidebar/dark | empty | account-paymentmethods-manage": {},
+    "sidebar/dark | empty | account-user-management": {},
+    "sidebar/dark | empty | affiliate signup": {},
     "sidebar/dark | empty | clientareadetails": {
-      "color-contrast": 4,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 2
     },
-    "sidebar/dark | empty | clientareadomains": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | clientareaemails": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | clientareahome": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | clientareainvoices": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | clientareaproducts": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | clientareaquotes": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | managessl": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | supportticketslist": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | supportticketsubmit-stepone": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | user-password": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | user-profile": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | empty | user-security": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/dark | empty | clientareadomains": {},
+    "sidebar/dark | empty | clientareaemails": {},
+    "sidebar/dark | empty | clientareahome": {},
+    "sidebar/dark | empty | clientareainvoices": {},
+    "sidebar/dark | empty | clientareaproducts": {},
+    "sidebar/dark | empty | clientareaquotes": {},
+    "sidebar/dark | empty | managessl": {},
+    "sidebar/dark | empty | supportticketslist": {},
+    "sidebar/dark | empty | supportticketsubmit-stepone": {},
+    "sidebar/dark | empty | user-password": {},
+    "sidebar/dark | empty | user-profile": {},
+    "sidebar/dark | empty | user-security": {},
     "sidebar/dark | full | account-contacts-manage": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 1
     },
-    "sidebar/dark | full | account-paymentmethods": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | account-paymentmethods-manage": {
-      "color-contrast": 1,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | account-user-management": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | account-user-permissions": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | addons": {
-      "color-contrast": 1,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/dark | full | affiliate dashboard": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | announcements": {
-      "color-contrast": 1,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | cart: cart": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
+    "sidebar/dark | full | account-paymentmethods": {},
+    "sidebar/dark | full | account-paymentmethods-manage": {},
+    "sidebar/dark | full | account-user-management": {},
+    "sidebar/dark | full | account-user-permissions": {},
+    "sidebar/dark | full | addons": {},
+    "sidebar/dark | full | affiliate dashboard": {},
+    "sidebar/dark | full | announcements": {},
+    "sidebar/dark | full | cart: cart": {},
     "sidebar/dark | full | cart: checkout": {
-      "color-contrast": 1,
-      "heading-order": 1,
-      "label-content-name-mismatch": 2,
-      "target-size": 12
+      "heading-order": 1
     },
-    "sidebar/dark | full | cart: configure": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "sidebar/dark | full | cart: product domain step": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "sidebar/dark | full | clientareaaddfunds": {
-      "color-contrast": 3,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/dark | full | cart: configure": {},
+    "sidebar/dark | full | cart: product domain step": {},
+    "sidebar/dark | full | clientareaaddfunds": {},
     "sidebar/dark | full | clientareacancelrequest": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 1
     },
     "sidebar/dark | full | clientareadetails": {
-      "color-contrast": 3,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 2
     },
-    "sidebar/dark | full | clientareadomaincontactinfo": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | clientareadomaindetails": {
-      "color-contrast": 1,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | clientareadomaindns": {
-      "color-contrast": 1,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | clientareadomainemailforwarding": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/dark | full | clientareadomaincontactinfo": {},
+    "sidebar/dark | full | clientareadomaindetails": {},
+    "sidebar/dark | full | clientareadomaindns": {},
+    "sidebar/dark | full | clientareadomainemailforwarding": {},
     "sidebar/dark | full | clientareadomaingetepp": {
-      "color-contrast": 1,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "heading-order": 1
     },
     "sidebar/dark | full | clientareadomainregisterns": {
-      "color-contrast": 2,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 1
     },
-    "sidebar/dark | full | clientareadomains": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | clientareaemails": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | clientareahome": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | clientareainvoices": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | clientareaproductdetails": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | clientareaproducts": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | clientareaquotes": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | clientareasecurity": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | closed ticket": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | contact": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | custom-page": {
-      "color-contrast": 1,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | domain-pricing": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | domain-renewals": {
-      "color-contrast": 1,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
+    "sidebar/dark | full | clientareadomains": {},
+    "sidebar/dark | full | clientareaemails": {},
+    "sidebar/dark | full | clientareahome": {},
+    "sidebar/dark | full | clientareainvoices": {},
+    "sidebar/dark | full | clientareaproductdetails": {},
+    "sidebar/dark | full | clientareaproducts": {},
+    "sidebar/dark | full | clientareaquotes": {},
+    "sidebar/dark | full | clientareasecurity": {},
+    "sidebar/dark | full | closed ticket": {},
+    "sidebar/dark | full | contact": {},
+    "sidebar/dark | full | custom-page": {},
+    "sidebar/dark | full | domain-pricing": {},
+    "sidebar/dark | full | domain-renewals": {},
     "sidebar/dark | full | domainregister": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
+      "color-contrast": 1
     },
-    "sidebar/dark | full | downloaddenied": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | downloads": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | downloadscat": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/dark | full | downloaddenied": {},
+    "sidebar/dark | full | downloads": {},
+    "sidebar/dark | full | downloadscat": {},
     "sidebar/dark | full | edit contact": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 1
     },
     "sidebar/dark | full | homepage": {
-      "color-contrast": 6,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 5
     },
-    "sidebar/dark | full | knowledgebase": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | knowledgebasearticle": {
-      "color-contrast": 1,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | knowledgebasecat": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | managessl": {
-      "color-contrast": 1,
-      "empty-table-header": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | masspay": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | missing ticket": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | overdue invoice": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | products": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/dark | full | serverstatus": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | service-renewals": {
-      "color-contrast": 1,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/dark | full | store group": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/dark | full | supportticketslist": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | supportticketsubmit-stepone": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/dark | full | knowledgebase": {},
+    "sidebar/dark | full | knowledgebasearticle": {},
+    "sidebar/dark | full | knowledgebasecat": {},
+    "sidebar/dark | full | managessl": {},
+    "sidebar/dark | full | masspay": {},
+    "sidebar/dark | full | missing ticket": {},
+    "sidebar/dark | full | overdue invoice": {},
+    "sidebar/dark | full | products": {},
+    "sidebar/dark | full | serverstatus": {},
+    "sidebar/dark | full | service-renewals": {},
+    "sidebar/dark | full | store group": {},
+    "sidebar/dark | full | supportticketslist": {},
+    "sidebar/dark | full | supportticketsubmit-stepone": {},
     "sidebar/dark | full | supportticketsubmit-steptwo": {
-      "color-contrast": 3,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 2
     },
     "sidebar/dark | full | ticketfeedback": {
-      "color-contrast": 1,
-      "definition-list": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "definition-list": 1
     },
-    "sidebar/dark | full | upgrade": {
-      "color-contrast": 1,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | upgrade options": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | user-password": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | user-profile": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | user-security": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | user-switch-account": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | viewcart": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
+    "sidebar/dark | full | upgrade": {},
+    "sidebar/dark | full | upgrade options": {},
+    "sidebar/dark | full | user-password": {},
+    "sidebar/dark | full | user-profile": {},
+    "sidebar/dark | full | user-security": {},
+    "sidebar/dark | full | user-switch-account": {},
+    "sidebar/dark | full | viewcart": {},
     "sidebar/dark | full | viewemail": {
       "hadrian-theme-not-applied": 1
     },
-    "sidebar/dark | full | viewinvoice": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | viewquote": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | full | viewticket": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | guest | announcements": {
-      "color-contrast": 2,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | guest | cart: cart": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "sidebar/dark | guest | cart: checkout": {
-      "aria-progressbar-name": 1,
-      "color-contrast": 2,
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "sidebar/dark | guest | cart: configure": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "sidebar/dark | guest | cart: product domain step": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "sidebar/dark | guest | clientregister": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | guest | contact": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | guest | custom-page": {
-      "color-contrast": 2,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/dark | full | viewinvoice": {},
+    "sidebar/dark | full | viewquote": {},
+    "sidebar/dark | full | viewticket": {},
+    "sidebar/dark | guest | announcements": {},
+    "sidebar/dark | guest | cart: cart": {},
+    "sidebar/dark | guest | cart: checkout": {},
+    "sidebar/dark | guest | cart: configure": {},
+    "sidebar/dark | guest | cart: product domain step": {},
+    "sidebar/dark | guest | clientregister": {},
+    "sidebar/dark | guest | contact": {},
+    "sidebar/dark | guest | custom-page": {},
     "sidebar/dark | guest | domain search results": {
-      "color-contrast": 3,
-      "label-content-name-mismatch": 1,
-      "region": 1,
-      "target-size": 12
+      "color-contrast": 1,
+      "region": 1
     },
-    "sidebar/dark | guest | domain-pricing": {
-      "color-contrast": 3,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/dark | guest | domain-pricing": {},
     "sidebar/dark | guest | domainregister": {
-      "color-contrast": 3,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
+      "color-contrast": 1
     },
-    "sidebar/dark | guest | domaintransfer": {
-      "color-contrast": 2,
-      "heading-order": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/dark | guest | downloads": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | guest | downloadscat": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/dark | guest | domaintransfer": {},
+    "sidebar/dark | guest | downloads": {},
+    "sidebar/dark | guest | downloadscat": {},
     "sidebar/dark | guest | homepage": {
-      "color-contrast": 7,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 5
     },
-    "sidebar/dark | guest | knowledgebase": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | guest | knowledgebasearticle": {
-      "color-contrast": 2,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | guest | knowledgebasecat": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | guest | login": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | guest | password-reset-container": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | guest | products": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/dark | guest | store group": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/dark | guest | store product": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/dark | guest | user-invite-accept": {
-      "color-contrast": 3,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | guest | viewannouncement": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | guest | viewcart": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/dark | subuser | access-denied": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | subuser | sub-user dashboard": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | suspended | clientareahome": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | suspended | clientareaproducts": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/dark | suspended | suspended service": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | account-contacts-manage": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | account-paymentmethods": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | account-paymentmethods-manage": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/dark | guest | knowledgebase": {},
+    "sidebar/dark | guest | knowledgebasearticle": {},
+    "sidebar/dark | guest | knowledgebasecat": {},
+    "sidebar/dark | guest | login": {},
+    "sidebar/dark | guest | password-reset-container": {},
+    "sidebar/dark | guest | products": {},
+    "sidebar/dark | guest | store group": {},
+    "sidebar/dark | guest | store product": {},
+    "sidebar/dark | guest | user-invite-accept": {},
+    "sidebar/dark | guest | viewannouncement": {},
+    "sidebar/dark | guest | viewcart": {},
+    "sidebar/dark | subuser | access-denied": {},
+    "sidebar/dark | subuser | sub-user dashboard": {},
+    "sidebar/dark | suspended | clientareahome": {},
+    "sidebar/dark | suspended | clientareaproducts": {},
+    "sidebar/dark | suspended | suspended service": {},
+    "sidebar/light | empty | account-contacts-manage": {},
+    "sidebar/light | empty | account-paymentmethods": {},
+    "sidebar/light | empty | account-paymentmethods-manage": {},
     "sidebar/light | empty | account-user-management": {
-      "color-contrast": 3,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 3
     },
-    "sidebar/light | empty | affiliate signup": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/light | empty | affiliate signup": {},
     "sidebar/light | empty | clientareadetails": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 2
     },
-    "sidebar/light | empty | clientareadomains": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | clientareaemails": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | clientareahome": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | clientareainvoices": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | clientareaproducts": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | clientareaquotes": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | managessl": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | supportticketslist": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | supportticketsubmit-stepone": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | user-password": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | user-profile": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | empty | user-security": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | account-contacts-manage": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | account-paymentmethods": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | account-paymentmethods-manage": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/light | empty | clientareadomains": {},
+    "sidebar/light | empty | clientareaemails": {},
+    "sidebar/light | empty | clientareahome": {},
+    "sidebar/light | empty | clientareainvoices": {},
+    "sidebar/light | empty | clientareaproducts": {},
+    "sidebar/light | empty | clientareaquotes": {},
+    "sidebar/light | empty | managessl": {},
+    "sidebar/light | empty | supportticketslist": {},
+    "sidebar/light | empty | supportticketsubmit-stepone": {},
+    "sidebar/light | empty | user-password": {},
+    "sidebar/light | empty | user-profile": {},
+    "sidebar/light | empty | user-security": {},
+    "sidebar/light | full | account-contacts-manage": {},
+    "sidebar/light | full | account-paymentmethods": {},
+    "sidebar/light | full | account-paymentmethods-manage": {},
     "sidebar/light | full | account-user-management": {
-      "color-contrast": 3,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 3
     },
-    "sidebar/light | full | account-user-permissions": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | addons": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/light | full | affiliate dashboard": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | announcements": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | cart: cart": {
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
+    "sidebar/light | full | account-user-permissions": {},
+    "sidebar/light | full | addons": {},
+    "sidebar/light | full | affiliate dashboard": {},
+    "sidebar/light | full | announcements": {},
+    "sidebar/light | full | cart: cart": {},
     "sidebar/light | full | cart: checkout": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 2,
-      "target-size": 12
+      "heading-order": 1
     },
-    "sidebar/light | full | cart: configure": {
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "sidebar/light | full | cart: product domain step": {
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "sidebar/light | full | clientareaaddfunds": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/light | full | cart: configure": {},
+    "sidebar/light | full | cart: product domain step": {},
+    "sidebar/light | full | clientareaaddfunds": {},
     "sidebar/light | full | clientareacancelrequest": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 1
     },
     "sidebar/light | full | clientareadetails": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 2
     },
-    "sidebar/light | full | clientareadomaincontactinfo": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | clientareadomaindetails": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | clientareadomaindns": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | clientareadomainemailforwarding": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/light | full | clientareadomaincontactinfo": {},
+    "sidebar/light | full | clientareadomaindetails": {},
+    "sidebar/light | full | clientareadomaindns": {},
+    "sidebar/light | full | clientareadomainemailforwarding": {},
     "sidebar/light | full | clientareadomaingetepp": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "heading-order": 1
     },
-    "sidebar/light | full | clientareadomainregisterns": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | clientareadomains": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | clientareaemails": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | clientareahome": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | clientareainvoices": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | clientareaproductdetails": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | clientareaproducts": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | clientareaquotes": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | clientareasecurity": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | closed ticket": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | contact": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | custom-page": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | domain-pricing": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | domain-renewals": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
+    "sidebar/light | full | clientareadomainregisterns": {},
+    "sidebar/light | full | clientareadomains": {},
+    "sidebar/light | full | clientareaemails": {},
+    "sidebar/light | full | clientareahome": {},
+    "sidebar/light | full | clientareainvoices": {},
+    "sidebar/light | full | clientareaproductdetails": {},
+    "sidebar/light | full | clientareaproducts": {},
+    "sidebar/light | full | clientareaquotes": {},
+    "sidebar/light | full | clientareasecurity": {},
+    "sidebar/light | full | closed ticket": {},
+    "sidebar/light | full | contact": {},
+    "sidebar/light | full | custom-page": {},
+    "sidebar/light | full | domain-pricing": {},
+    "sidebar/light | full | domain-renewals": {},
     "sidebar/light | full | domainregister": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
+      "color-contrast": 1
     },
-    "sidebar/light | full | downloaddenied": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | downloads": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | downloadscat": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | edit contact": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | homepage": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | knowledgebase": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | knowledgebasearticle": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | knowledgebasecat": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | managessl": {
-      "empty-table-header": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | masspay": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | missing ticket": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | overdue invoice": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | products": {
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/light | full | serverstatus": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | service-renewals": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/light | full | store group": {
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/light | full | supportticketslist": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | supportticketsubmit-stepone": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/light | full | downloaddenied": {},
+    "sidebar/light | full | downloads": {},
+    "sidebar/light | full | downloadscat": {},
+    "sidebar/light | full | edit contact": {},
+    "sidebar/light | full | homepage": {},
+    "sidebar/light | full | knowledgebase": {},
+    "sidebar/light | full | knowledgebasearticle": {},
+    "sidebar/light | full | knowledgebasecat": {},
+    "sidebar/light | full | managessl": {},
+    "sidebar/light | full | masspay": {},
+    "sidebar/light | full | missing ticket": {},
+    "sidebar/light | full | overdue invoice": {},
+    "sidebar/light | full | products": {},
+    "sidebar/light | full | serverstatus": {},
+    "sidebar/light | full | service-renewals": {},
+    "sidebar/light | full | store group": {},
+    "sidebar/light | full | supportticketslist": {},
+    "sidebar/light | full | supportticketsubmit-stepone": {},
     "sidebar/light | full | supportticketsubmit-steptwo": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 2
     },
     "sidebar/light | full | ticketfeedback": {
-      "definition-list": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "definition-list": 1
     },
-    "sidebar/light | full | upgrade": {
-      "color-contrast": 2,
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | upgrade options": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | user-password": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | user-profile": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | user-security": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | user-switch-account": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | viewcart": {
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
+    "sidebar/light | full | upgrade": {},
+    "sidebar/light | full | upgrade options": {},
+    "sidebar/light | full | user-password": {},
+    "sidebar/light | full | user-profile": {},
+    "sidebar/light | full | user-security": {},
+    "sidebar/light | full | user-switch-account": {},
+    "sidebar/light | full | viewcart": {},
     "sidebar/light | full | viewemail": {},
-    "sidebar/light | full | viewinvoice": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | viewquote": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | full | viewticket": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | guest | announcements": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | guest | cart: cart": {
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "sidebar/light | guest | cart: checkout": {
-      "aria-progressbar-name": 1,
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "sidebar/light | guest | cart: configure": {
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "sidebar/light | guest | cart: product domain step": {
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
+    "sidebar/light | full | viewinvoice": {},
+    "sidebar/light | full | viewquote": {},
+    "sidebar/light | full | viewticket": {},
+    "sidebar/light | guest | announcements": {},
+    "sidebar/light | guest | cart: cart": {},
+    "sidebar/light | guest | cart: checkout": {},
+    "sidebar/light | guest | cart: configure": {},
+    "sidebar/light | guest | cart: product domain step": {},
     "sidebar/light | guest | clientregister": {
-      "color-contrast": 3,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 3
     },
-    "sidebar/light | guest | contact": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | guest | custom-page": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/light | guest | contact": {},
+    "sidebar/light | guest | custom-page": {},
     "sidebar/light | guest | domain search results": {
       "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "region": 1,
-      "target-size": 12
+      "region": 1
     },
-    "sidebar/light | guest | domain-pricing": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "sidebar/light | guest | domain-pricing": {},
     "sidebar/light | guest | domainregister": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
+      "color-contrast": 1
     },
-    "sidebar/light | guest | domaintransfer": {
-      "heading-order": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/light | guest | downloads": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | guest | downloadscat": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | guest | homepage": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | guest | knowledgebase": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | guest | knowledgebasearticle": {
-      "heading-order": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | guest | knowledgebasecat": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | guest | login": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | guest | password-reset-container": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | guest | products": {
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/light | guest | store group": {
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/light | guest | store product": {
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/light | guest | user-invite-accept": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | guest | viewannouncement": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | guest | viewcart": {
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "sidebar/light | subuser | access-denied": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | subuser | sub-user dashboard": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | suspended | clientareahome": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | suspended | clientareaproducts": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light | suspended | suspended service": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light/320px | full | clientareahome": {
-      "label-content-name-mismatch": 1,
-      "target-size": 18
-    },
-    "sidebar/light/320px | full | clientareainvoices": {
-      "label-content-name-mismatch": 1,
-      "target-size": 18
-    },
-    "sidebar/light/320px | full | clientareaproducts": {
-      "label-content-name-mismatch": 1,
-      "target-size": 18
-    },
-    "sidebar/light/320px | full | viewinvoice": {
-      "label-content-name-mismatch": 1,
-      "target-size": 18
-    },
-    "sidebar/light/320px | full | viewticket": {
-      "label-content-name-mismatch": 1,
-      "target-size": 18
-    },
+    "sidebar/light | guest | domaintransfer": {},
+    "sidebar/light | guest | downloads": {},
+    "sidebar/light | guest | downloadscat": {},
+    "sidebar/light | guest | homepage": {},
+    "sidebar/light | guest | knowledgebase": {},
+    "sidebar/light | guest | knowledgebasearticle": {},
+    "sidebar/light | guest | knowledgebasecat": {},
+    "sidebar/light | guest | login": {},
+    "sidebar/light | guest | password-reset-container": {},
+    "sidebar/light | guest | products": {},
+    "sidebar/light | guest | store group": {},
+    "sidebar/light | guest | store product": {},
+    "sidebar/light | guest | user-invite-accept": {},
+    "sidebar/light | guest | viewannouncement": {},
+    "sidebar/light | guest | viewcart": {},
+    "sidebar/light | subuser | access-denied": {},
+    "sidebar/light | subuser | sub-user dashboard": {},
+    "sidebar/light | suspended | clientareahome": {},
+    "sidebar/light | suspended | clientareaproducts": {},
+    "sidebar/light | suspended | suspended service": {},
+    "sidebar/light/320px | full | clientareahome": {},
+    "sidebar/light/320px | full | clientareainvoices": {},
+    "sidebar/light/320px | full | clientareaproducts": {},
+    "sidebar/light/320px | full | viewinvoice": {},
+    "sidebar/light/320px | full | viewticket": {},
     "sidebar/light/320px | guest | clientregister": {
-      "color-contrast": 3,
-      "label-content-name-mismatch": 1,
-      "target-size": 18
+      "color-contrast": 3
     },
-    "sidebar/light/320px | guest | homepage": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 18
-    },
-    "sidebar/light/320px | guest | login": {
-      "label-content-name-mismatch": 1,
-      "target-size": 18
-    },
-    "sidebar/light/320px | guest | store group": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "sidebar/light/320px | guest | viewcart": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "top/dark | full | clientareahome": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 2,
-      "target-size": 15
-    },
-    "top/dark | full | clientareaproducts": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 2,
-      "target-size": 15
-    },
+    "sidebar/light/320px | guest | homepage": {},
+    "sidebar/light/320px | guest | login": {},
+    "sidebar/light/320px | guest | store group": {},
+    "sidebar/light/320px | guest | viewcart": {},
+    "top/dark | full | clientareahome": {},
+    "top/dark | full | clientareaproducts": {},
     "top/dark | guest | homepage": {
-      "color-contrast": 6,
-      "label-content-name-mismatch": 2,
-      "target-size": 15
+      "color-contrast": 5
     },
-    "top/dark | guest | login": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 2,
-      "target-size": 15
-    },
-    "top/dark | guest | store group": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "top/dark | guest | viewcart": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "top/light | full | clientareahome": {
-      "label-content-name-mismatch": 2,
-      "target-size": 15
-    },
-    "top/light | full | clientareaproducts": {
-      "label-content-name-mismatch": 2,
-      "target-size": 15
-    },
-    "top/light | guest | homepage": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 2,
-      "target-size": 15
-    },
-    "top/light | guest | login": {
-      "label-content-name-mismatch": 2,
-      "target-size": 15
-    },
-    "top/light | guest | store group": {
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "top/light | guest | viewcart": {
-      "label-content-name-mismatch": 2,
-      "target-size": 12
-    },
-    "topbar-minimal/dark | full | clientareahome": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "topbar-minimal/dark | full | clientareaproducts": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
+    "top/dark | guest | login": {},
+    "top/dark | guest | store group": {},
+    "top/dark | guest | viewcart": {},
+    "top/light | full | clientareahome": {},
+    "top/light | full | clientareaproducts": {},
+    "top/light | guest | homepage": {},
+    "top/light | guest | login": {},
+    "top/light | guest | store group": {},
+    "top/light | guest | viewcart": {},
+    "topbar-minimal/dark | full | clientareahome": {},
+    "topbar-minimal/dark | full | clientareaproducts": {},
     "topbar-minimal/dark | guest | homepage": {
-      "color-contrast": 6,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
+      "color-contrast": 5
     },
-    "topbar-minimal/dark | guest | login": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "topbar-minimal/dark | guest | store group": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "topbar-minimal/dark | guest | viewcart": {
-      "color-contrast": 1,
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "topbar-minimal/light | full | clientareahome": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "topbar-minimal/light | full | clientareaproducts": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "topbar-minimal/light | guest | homepage": {
-      "color-contrast": 2,
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "topbar-minimal/light | guest | login": {
-      "label-content-name-mismatch": 1,
-      "target-size": 15
-    },
-    "topbar-minimal/light | guest | store group": {
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    },
-    "topbar-minimal/light | guest | viewcart": {
-      "label-content-name-mismatch": 1,
-      "target-size": 12
-    }
+    "topbar-minimal/dark | guest | login": {},
+    "topbar-minimal/dark | guest | store group": {},
+    "topbar-minimal/dark | guest | viewcart": {},
+    "topbar-minimal/light | full | clientareahome": {},
+    "topbar-minimal/light | full | clientareaproducts": {},
+    "topbar-minimal/light | guest | homepage": {},
+    "topbar-minimal/light | guest | login": {},
+    "topbar-minimal/light | guest | store group": {},
+    "topbar-minimal/light | guest | viewcart": {}
   }
 }

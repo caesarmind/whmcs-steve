@@ -29,7 +29,7 @@
             <input type="hidden" name="sub" value="register">
             <input type="hidden" name="domainid" value="{$domainid|escape}">
 
-            <h3 class="rns-section-title">{$LANG.domainregisternsreg}</h3>
+            <h3 class="rns-section-title" aria-level="2">{$LANG.domainregisternsreg}</h3>
 
             <div class="rns-row">
                 <label class="rns-label" for="rns-reg-ns">{$LANG.domainregisternsns}</label>
@@ -52,7 +52,7 @@
             <input type="hidden" name="sub" value="modify">
             <input type="hidden" name="domainid" value="{$domainid|escape}">
 
-            <h3 class="rns-section-title">{$LANG.domainregisternsmod}</h3>
+            <h3 class="rns-section-title" aria-level="2">{$LANG.domainregisternsmod}</h3>
 
             <div class="rns-row">
                 <label class="rns-label" for="rns-mod-ns">{$LANG.domainregisternsns}</label>
@@ -79,7 +79,7 @@
             <input type="hidden" name="sub" value="delete">
             <input type="hidden" name="domainid" value="{$domainid|escape}">
 
-            <h3 class="rns-section-title">{$LANG.domainregisternsdel}</h3>
+            <h3 class="rns-section-title" aria-level="2">{$LANG.domainregisternsdel}</h3>
 
             <div class="rns-row">
                 <label class="rns-label" for="rns-del-ns">{$LANG.domainregisternsns}</label>

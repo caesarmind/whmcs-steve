@@ -64,7 +64,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 
 /* Error banner */
 .tk-error-banner {
@@ -303,12 +303,12 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 .tk-drop:hover {
     border-color: var(--color-accent);
     background: var(--color-accent-light);
-    color: var(--color-accent);
+    color: var(--color-link);
 }
 .tk-drop.has-file {
     border-style: solid;
     border-color: var(--color-accent);
-    color: var(--color-accent);
+    color: var(--color-link);
     background: var(--color-accent-light);
 }
 .tk-drop svg { width: 14px; height: 14px; flex-shrink: 0; }
@@ -385,7 +385,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 }
 .tk-attach-add:hover {
     border-color: var(--color-accent);
-    color: var(--color-accent);
+    color: var(--color-link);
     background: var(--color-accent-light);
 }
 .tk-attach-add svg { width: 14px; height: 14px; }

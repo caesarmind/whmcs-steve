@@ -65,7 +65,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 
 /* Announcement list */
 .ann-main { display: flex; flex-direction: column; gap: 12px; }
@@ -106,7 +106,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 }
 .announcement-footer .service-chevron svg { width: 14px; height: 14px; }
 .announcement-link:hover .service-chevron {
-    color: var(--color-accent);
+    color: var(--color-link);
     transform: translateX(2px);
 }
 

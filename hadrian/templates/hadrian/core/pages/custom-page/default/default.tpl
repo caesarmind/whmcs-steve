@@ -24,11 +24,11 @@
     {* -- Custom 2-column section -- *}
     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 40px;">
         <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 28px;">
-            <h3 style="font-size: 19px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">Left column</h3>
+            <h3 aria-level="2" style="font-size: 19px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">Left column</h3>
             <p style="font-size: 14px; color: var(--color-text-secondary); line-height: 1.6; margin: 0;">Drop in any content &mdash; text, images, a form, a pricing table. Because the header and footer come from the theme, you only design what goes here.</p>
         </div>
         <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 28px;">
-            <h3 style="font-size: 19px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">Right column</h3>
+            <h3 aria-level="2" style="font-size: 19px; font-weight: 600; color: var(--color-text-primary); margin: 0 0 8px;">Right column</h3>
             <p style="font-size: 14px; color: var(--color-text-secondary); line-height: 1.6; margin: 0;">Want a full-width landing instead? Reuse the <code>hp-*</code> marketing components, or set <code>fullPage =&gt; true</code> in a variant meta to drop the chrome entirely.</p>
         </div>
     </div>

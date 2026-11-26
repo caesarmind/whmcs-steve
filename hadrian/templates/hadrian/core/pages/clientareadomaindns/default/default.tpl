@@ -132,7 +132,7 @@
             </a>
         </div>
         <div class="card dns-help">
-            <h4 class="dns-help-title">{$hadrianLang.domains.dnsHelpTitle}</h4>
+            <h4 class="dns-help-title" aria-level="2">{$hadrianLang.domains.dnsHelpTitle}</h4>
             <dl class="dns-help-list">
                 <dt>A</dt><dd>{$hadrianLang.domains.dnsHelpA}</dd>
                 <dt>AAAA</dt><dd>{$hadrianLang.domains.dnsHelpAaaa}</dd>

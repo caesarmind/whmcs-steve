@@ -49,7 +49,7 @@ body[data-subnav-side="left"] .rns-split > .rns-main { grid-column: 2; grid-row:
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 
 @media (max-width: 880px) {
     .rns-split { grid-template-columns: 1fr; }

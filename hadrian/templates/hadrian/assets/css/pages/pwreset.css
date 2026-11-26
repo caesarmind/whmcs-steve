@@ -49,7 +49,7 @@
 .pw-submit { width: 100%; height: 44px; font-size: var(--text-md); font-weight: var(--fw-medium); margin-top: 4px; }
 .pw-cta { display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 18px; font-size: var(--text-md); margin: 0 auto; }
 .pw-altlink { text-align: center; margin: 16px 0 0; font-size: var(--text-base); }
-.pw-altlink a { color: var(--color-accent); text-decoration: none; }
+.pw-altlink a { color: var(--color-link); text-decoration: none; }
 .pw-altlink a:hover { text-decoration: underline; }
 
 /* CAPTCHA widget */

@@ -92,7 +92,7 @@
             <div class="card">
                 <div class="card-body">
                     <a href="{$WEB_ROOT}/announcements.php?id={$ann.id}" class="announcement-link">
-                        <h3 class="announcement-title">{$ann.title|escape}</h3>
+                        <h3 class="announcement-title" aria-level="2">{$ann.title|escape}</h3>
                         {if isset($ann.text) && $ann.text}
                         <p class="announcement-excerpt">{$ann.text|strip_tags|truncate:240:"…"}</p>
                         {/if}

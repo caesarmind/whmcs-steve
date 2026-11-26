@@ -18,8 +18,8 @@
 .mp-table input[type="checkbox"] { accent-color: var(--color-accent); width: 16px; height: 16px; cursor: pointer; }
 .mp-summary { padding: 14px 18px; background: var(--color-accent-light); border-radius: var(--radius-md); }
 .mp-summary-row { display: flex; justify-content: space-between; align-items: center; }
-.mp-summary-label { font-size: var(--text-md); font-weight: var(--fw-medium); color: var(--color-accent); }
-.mp-summary-value { font-size: var(--text-2xl); font-weight: var(--fw-semibold); color: var(--color-accent); font-variant-numeric: tabular-nums; }
+.mp-summary-label { font-size: var(--text-md); font-weight: var(--fw-medium); color: var(--color-link); }
+.mp-summary-value { font-size: var(--text-2xl); font-weight: var(--fw-semibold); color: var(--color-link); font-variant-numeric: tabular-nums; }
 .mp-pay-card { }
 .mp-pay-title { font-size: var(--text-md); font-weight: var(--fw-semibold); color: var(--color-text-primary); margin: 0 0 12px; }
 .mp-methods { display: flex; flex-direction: column; gap: 8px; }

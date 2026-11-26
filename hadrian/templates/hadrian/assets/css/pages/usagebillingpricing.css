@@ -22,7 +22,7 @@
 /* Info banner */
 .ub-info { margin-top: 24px; padding: 18px 20px; background: var(--color-accent-light); border-radius: var(--radius-md); font-size: var(--text-md); line-height: 1.6; color: var(--color-text-primary); }
 .ub-info strong { font-weight: var(--fw-semibold); }
-.ub-info a { color: var(--color-accent); text-decoration: none; }
+.ub-info a { color: var(--color-link); text-decoration: none; }
 .ub-info a:hover { text-decoration: underline; }
 
 /* Actions */

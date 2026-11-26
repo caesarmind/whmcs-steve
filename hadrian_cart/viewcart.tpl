@@ -109,7 +109,7 @@
     .ct-product-meta { flex: 1; min-width: 0; }
     .ct-product-eyebrow {
         font-size: 10.5px; font-weight: 600;
-        color: var(--color-accent);
+        color: var(--color-link);
         text-transform: uppercase; letter-spacing: 0.06em;
         margin-bottom: 2px;
     }
@@ -189,7 +189,7 @@
         flex-wrap: wrap;
     }
     .ct-manage-addons a {
-        color: var(--color-accent); text-decoration: none;
+        color: var(--color-link); text-decoration: none;
         letter-spacing: -0.008em;
         display: inline-flex; align-items: center; gap: 4px;
         cursor: pointer;
@@ -273,7 +273,7 @@
         transition: color var(--transition-fast);
     }
     .ct-tab:hover { color: var(--color-text-primary); }
-    .ct-tab.active { color: var(--color-accent); }
+    .ct-tab.active { color: var(--color-link); }
     .ct-tab.active::after {
         content: ""; position: absolute; left: 0; right: 0; bottom: -0.5px;
         height: 2px; background: var(--color-accent); border-radius: 2px 2px 0 0;
@@ -481,7 +481,7 @@
         display: inline-flex; align-items: center; justify-content: center; gap: 4px;
         letter-spacing: -0.004em;
     }
-    .ct-continue-shop:hover { color: var(--color-accent); }
+    .ct-continue-shop:hover { color: var(--color-link); }
     .ct-continue-shop svg { width: 11px; height: 11px; }
 
     /* Express-checkout + gateway hook strip (server-rendered HTML, just gives it some breathing room) */
@@ -499,7 +499,7 @@
     }
     .ct-recommend-badge {
         padding: 3px 10px; border-radius: var(--radius-pill, 999px);
-        background: var(--color-accent-light); color: var(--color-accent);
+        background: var(--color-accent-light); color: var(--color-link);
         font-size: 10px; font-weight: 600;
         letter-spacing: 0.06em; text-transform: uppercase;
     }
@@ -711,7 +711,7 @@
     .ct-empty-actions .btn-primary { background: var(--color-accent); color: var(--color-on-accent); border: 0; }
     .ct-empty-actions .btn-primary:hover { background: var(--color-accent-hover); color: var(--color-on-accent); }
     .ct-empty-actions .btn-secondary { background: transparent; color: var(--color-text-primary); border: 0.5px solid var(--color-border); }
-    .ct-empty-actions .btn-secondary:hover { border-color: var(--color-accent); color: var(--color-accent); }
+    .ct-empty-actions .btn-secondary:hover { border-color: var(--color-accent); color: var(--color-link); }
     .ct-empty-actions svg { width: 13px; height: 13px; }
 
     /* Alerts (kept compact so they sit above the steps) */
@@ -723,7 +723,7 @@
     }
     .vc-alert.warn   { border-color: var(--color-yellow-text, #b25c00); background: var(--color-yellow-bg, #fff7e6); color: var(--color-yellow-text, #b25c00); }
     .vc-alert.error  { border-color: var(--color-red-text); background: var(--color-red-bg); color: var(--color-red-text); }
-    .vc-alert.info   { border-color: var(--color-accent); background: var(--color-accent-light); color: var(--color-accent); }
+    .vc-alert.info   { border-color: var(--color-accent); background: var(--color-accent-light); color: var(--color-link); }
     .vc-alert.ok     { border-color: var(--color-green-text); background: var(--color-green-bg); color: var(--color-green-text); }
     .vc-alert ul { margin: 4px 0 0; padding-left: 18px; }
 

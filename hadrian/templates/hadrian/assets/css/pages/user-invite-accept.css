@@ -2,7 +2,7 @@
 .uia-card { max-width: 520px; width: 100%; padding: 40px 32px 32px; text-align: center; }
 .uia-ico {
     width: 64px; height: 64px; border-radius: 50%;
-    background: var(--color-accent-light); color: var(--color-accent);
+    background: var(--color-accent-light); color: var(--color-link);
     display: inline-flex; align-items: center; justify-content: center;
     margin: 0 auto 20px;
 }
@@ -34,7 +34,7 @@
     display: inline-flex; align-items: center; gap: 5px;
     height: 28px; padding: 0 10px;
     background: transparent; border: 0.5px solid var(--color-border); border-radius: var(--radius-sm);
-    color: var(--color-accent); font-size: var(--text-sm); font-weight: var(--fw-medium); font-family: inherit;
+    color: var(--color-link); font-size: var(--text-sm); font-weight: var(--fw-medium); font-family: inherit;
     cursor: pointer; transition: border-color var(--transition-fast), background var(--transition-fast);
 }
 .uia-genpw:hover { border-color: var(--color-accent); background: var(--color-accent-light); }
@@ -46,7 +46,7 @@
     color: var(--color-text-tertiary); cursor: pointer;
 }
 .uia-pw-reveal:hover { color: var(--color-text-primary); border-color: var(--color-text-secondary); }
-.uia-pw-reveal.is-on { color: var(--color-accent); border-color: var(--color-accent); }
+.uia-pw-reveal.is-on { color: var(--color-link); border-color: var(--color-accent); }
 .uia-pw-reveal svg { width: 15px; height: 15px; }
 .uia-pwmeter { display: flex; align-items: center; gap: 8px; }
 .uia-pwmeter-track { flex: 1; height: 5px; border-radius: var(--radius-pill); background: var(--color-surface); border: 0.5px solid var(--color-border); overflow: hidden; }
@@ -59,7 +59,7 @@
 .uia-pwmeter-label { font-size: var(--text-xs); color: var(--color-text-tertiary); min-width: 58px; text-align: right; }
 .uia-tos { display: flex; align-items: flex-start; gap: 8px; font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.5; cursor: pointer; text-align: left; }
 .uia-tos input { margin-top: 2px; accent-color: var(--color-accent); width: 15px; height: 15px; flex-shrink: 0; }
-.uia-tos a { color: var(--color-accent); text-decoration: none; }
+.uia-tos a { color: var(--color-link); text-decoration: none; }
 .uia-tos a:hover { text-decoration: underline; }
 .uia-btn { width: 100%; height: 40px; font-size: var(--text-md); font-weight: var(--fw-medium); margin-top: 2px; }
 .uia-captcha { display: flex; flex-direction: column; align-items: center; gap: 8px; }

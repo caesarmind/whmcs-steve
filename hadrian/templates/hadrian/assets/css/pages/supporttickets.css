@@ -31,13 +31,13 @@
     font-size: var(--text-md);
     font-weight: var(--fw-medium);
     letter-spacing: -0.008em;
-    color: var(--color-accent);
+    color: var(--color-link);
     text-decoration: none;
     flex-shrink: 0;
     white-space: nowrap;
     transition: color var(--transition-fast);
 }
-.page-header-action:hover { color: var(--color-accent); text-decoration: none; }
+.page-header-action:hover { color: var(--color-link); text-decoration: none; }
 .page-header-action:hover .chev { transform: translateX(2px); }
 .page-header-action .chev { width: 12px; height: 12px; transition: transform var(--transition-fast); }
 
@@ -89,7 +89,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 .subnav-count {
     margin-left: auto;
     font-size: var(--text-xs);
@@ -99,7 +99,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
     background: var(--color-surface-secondary);
     color: var(--color-text-tertiary);
 }
-.subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-accent); }
+.subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-link); }
 
 /* Muted status banner */
 .tk-banner {
@@ -118,7 +118,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
     height: 26px;
     border-radius: 50%;
     background: var(--color-accent-light);
-    color: var(--color-accent);
+    color: var(--color-link);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -199,7 +199,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 }
 
 .tk-subject-cell { min-width: 0; }
-.tk-subject-id { font-size: var(--text-sm); font-weight: var(--fw-medium); color: var(--color-accent); letter-spacing: -0.003em; }
+.tk-subject-id { font-size: var(--text-sm); font-weight: var(--fw-medium); color: var(--color-link); letter-spacing: -0.003em; }
 .tk-subject-title {
     font-size: var(--text-base);
     font-weight: var(--fw-medium);
@@ -327,8 +327,8 @@ body[data-svc-layout="outside"] .tk-table tbody tr:last-child  td:last-child  { 
     align-items: center;
     justify-content: center;
 }
-.tk-pages button:hover:not(:disabled):not(.active) { color: var(--color-accent); }
-.tk-pages button.active { color: var(--color-accent); font-weight: var(--fw-semibold); }
+.tk-pages button:hover:not(:disabled):not(.active) { color: var(--color-link); }
+.tk-pages button.active { color: var(--color-link); font-weight: var(--fw-semibold); }
 .tk-pages button:disabled { opacity: 0.25; cursor: default; }
 .tk-pages button svg { width: 11px; height: 11px; }
 .tk-pages .ellipsis { min-width: 20px; color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; }

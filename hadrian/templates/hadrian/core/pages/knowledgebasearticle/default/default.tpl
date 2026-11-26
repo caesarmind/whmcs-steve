@@ -74,7 +74,7 @@
         </article>
 
         <div class="card helpful-card">
-            <h3 class="helpful-title">{$LANG.knowledgebasehelpful}</h3>
+            <h3 class="helpful-title" aria-level="2">{$LANG.knowledgebasehelpful}</h3>
             {if isset($kbarticle.voted) && $kbarticle.voted}
             <p class="helpful-thanks">{$LANG.knowledgebaseArticleRatingThanks}</p>
             {else}

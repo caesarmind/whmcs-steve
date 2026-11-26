@@ -17,7 +17,7 @@
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 
 /* Email table */
 .em-table { width: 100%; border-collapse: collapse; }
@@ -29,7 +29,7 @@
 .em-date { color: var(--color-text-secondary); white-space: nowrap; font-variant-numeric: tabular-nums; width: 200px; }
 .em-subject { display: flex; align-items: center; gap: 8px; }
 .em-subject a { color: var(--color-text-primary); text-decoration: none; font-weight: var(--fw-medium); }
-.em-subject a:hover { color: var(--color-accent); }
+.em-subject a:hover { color: var(--color-link); }
 .em-clip { width: 13px; height: 13px; color: var(--color-text-tertiary); flex-shrink: 0; }
 
 /* Toolbar -- search box */
@@ -75,8 +75,8 @@
     transition: all var(--transition-fast);
     display: inline-flex; align-items: center; justify-content: center;
 }
-.em-pages button:hover:not(:disabled):not(.active) { color: var(--color-accent); }
-.em-pages button.active { color: var(--color-accent); font-weight: var(--fw-semibold); }
+.em-pages button:hover:not(:disabled):not(.active) { color: var(--color-link); }
+.em-pages button.active { color: var(--color-link); font-weight: var(--fw-semibold); }
 .em-pages button:disabled { opacity: 0.25; cursor: default; }
 .em-pages button svg { width: 11px; height: 11px; }
 .em-ellipsis { padding: 0 2px; color: var(--color-text-tertiary); }

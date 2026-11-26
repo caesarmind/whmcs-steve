@@ -10,7 +10,7 @@
 
 /* Centered notice / success */
 .tk-notice { text-align: center; padding: 56px 24px; }
-.tk-notice-ico { width: 68px; height: 68px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; background: var(--color-accent-light); color: var(--color-accent); }
+.tk-notice-ico { width: 68px; height: 68px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; background: var(--color-accent-light); color: var(--color-link); }
 .tk-notice-ico.ok { background: #34c759; color: var(--color-surface); }
 .tk-notice-ico.warn { background: var(--color-orange-bg); color: var(--color-orange-text); }
 .tk-notice-ico svg { width: 32px; height: 32px; }
@@ -22,7 +22,7 @@
 .tk-kb-item { display: flex; align-items: flex-start; gap: 14px; padding: 16px 20px; border-bottom: 0.5px solid var(--color-border); text-decoration: none; color: inherit; transition: background var(--transition-fast); }
 .tk-kb-item:last-child { border-bottom: 0; }
 .tk-kb-item:hover { background: var(--sidebar-item-hover); }
-.tk-kb-ico { width: 36px; height: 36px; border-radius: 9px; background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.tk-kb-ico { width: 36px; height: 36px; border-radius: 9px; background: var(--color-accent-light); color: var(--color-link); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .tk-kb-ico svg { width: 18px; height: 18px; }
 .tk-kb-title { font-size: var(--text-md); font-weight: var(--fw-semibold); color: var(--color-text-primary); letter-spacing: -0.01em; }
 .tk-kb-excerpt { font-size: var(--text-base); color: var(--color-text-tertiary); margin-top: 3px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }

@@ -143,7 +143,7 @@
                 <input type="hidden" name="id" value="{$id|default:''|escape}">
                 <input type="hidden" name="pid" value="{$pkg.pid|escape}">
                 {if $isCurrent}<span class="st-plan-badge up-st-badge-current">{$LANG.upgradecurrentconfig}</span>{/if}
-                <h3 class="st-plan-name">{$pkg.name|escape}</h3>
+                <h3 class="st-plan-name" aria-level="2">{$pkg.name|escape}</h3>
                 <p class="st-plan-tag">{if isset($pkg.groupname) && $pkg.groupname}{$pkg.groupname|escape}{else}&nbsp;{/if}</p>
 
                 {if $pkg.pricing.type == 'free'}

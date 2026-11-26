@@ -52,7 +52,7 @@
 .mon-check-form { display: grid; grid-template-columns: 1fr 220px auto; gap: 8px; margin-top: 20px; max-width: 620px; }
 .mon-check-form .ds-search-box { grid-column: 1 / 2; }
 .mon-check-form .mon-location { display: flex; align-items: center; gap: 8px; background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 16px; padding: 0 14px; box-shadow: 0 12px 32px rgba(0,0,0,0.06); }
-.mon-check-form .mon-location svg { width: 16px; height: 16px; color: var(--color-accent); flex-shrink: 0; }
+.mon-check-form .mon-location svg { width: 16px; height: 16px; color: var(--color-link); flex-shrink: 0; }
 .mon-check-form .mon-location select { flex: 1; border: 0; outline: none; background: transparent; font: inherit; font-size: 14px; color: var(--color-text-primary); padding: 14px 0; appearance: none; cursor: pointer; -webkit-appearance: none; }
 .mon-check-form .mon-check-btn { background: var(--color-accent); color: var(--color-on-accent); border: 0; border-radius: 16px; padding: 0 22px; font: inherit; font-size: 14px; font-weight: 500; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: background 0.15s; }
 .mon-check-form .mon-check-btn:hover { background: #0077ed; }

@@ -59,7 +59,7 @@ body[data-subnav-side="left"] .ss-split > .ss-main  { grid-column: 2; grid-row: 
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 
 /* ---- Overall status banner ---- */
 .ss-overall {
@@ -420,7 +420,7 @@ body[data-subnav-side="left"] .ss-split > .ss-main  { grid-column: 2; grid-row: 
 }
 .ss-muted { color: var(--color-text-quaternary); }
 .ss-server-link a { color: var(--color-text-tertiary); display: inline-flex; transition: color var(--transition-fast); }
-.ss-server-link a:hover { color: var(--color-accent); }
+.ss-server-link a:hover { color: var(--color-link); }
 .ss-server-link svg { width: 16px; height: 16px; }
 .ss-server-empty { padding: 24px 0; text-align: center; font-size: var(--text-md); color: var(--color-text-secondary); }
 

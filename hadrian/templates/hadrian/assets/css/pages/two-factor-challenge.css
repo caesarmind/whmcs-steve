@@ -2,7 +2,7 @@
 .tfac-card { max-width: 480px; width: 100%; padding: 36px 32px 28px; text-align: center; }
 .tfac-ico {
     width: 56px; height: 56px; border-radius: 50%;
-    background: var(--color-accent-light); color: var(--color-accent);
+    background: var(--color-accent-light); color: var(--color-link);
     display: inline-flex; align-items: center; justify-content: center;
     margin: 0 auto 18px;
 }
@@ -40,7 +40,7 @@
 .tfac-foot { margin-top: 16px; padding-top: 16px; border-top: 0.5px solid var(--color-border); }
 .tfac-link {
     background: none; border: 0; padding: 0;
-    color: var(--color-accent); font-size: var(--text-base); font-weight: var(--fw-medium);
+    color: var(--color-link); font-size: var(--text-base); font-weight: var(--fw-medium);
     cursor: pointer; font-family: inherit;
 }
 .tfac-link:hover { text-decoration: underline; }

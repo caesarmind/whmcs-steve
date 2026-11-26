@@ -79,7 +79,7 @@
         <h2 style="text-align: center; font-size: 48px; font-weight: 600; letter-spacing: -0.02em; margin: 0 0 48px;">{$hadrianLang.store.mgStepsTitle}</h2>
         <div class="hp-onboarding-steps-row" style="gap: 20px; position: relative;">
             <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 18px; padding: 32px 24px; text-align: center; position: relative;">
-                <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">1</div>
+                <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--color-accent); color: var(--color-on-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">1</div>
                 <div style="width: 72px; height: 72px; margin: 8px auto 16px; background: linear-gradient(135deg, #eaf4ff, #dbeafe); border-radius: 18px; display: flex; align-items: center; justify-content: center;">
                     <svg aria-hidden="true" focusable="false" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#0071e3" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="22" y1="11" x2="16" y2="11"/></svg>
                 </div>
@@ -87,7 +87,7 @@
                 <p style="font-size: 14px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.mgStep1Text}</p>
             </div>
             <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 18px; padding: 32px 24px; text-align: center; position: relative;">
-                <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">2</div>
+                <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--color-accent); color: var(--color-on-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">2</div>
                 <div style="width: 72px; height: 72px; margin: 8px auto 16px; background: linear-gradient(135deg, #eaf8ee, #d4f0dc); border-radius: 18px; display: flex; align-items: center; justify-content: center;">
                     <svg aria-hidden="true" focusable="false" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#30d158" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                 </div>
@@ -95,7 +95,7 @@
                 <p style="font-size: 14px; color: var(--color-text-secondary); margin: 0;">{$hadrianLang.store.mgStep2Text}</p>
             </div>
             <div style="background: var(--color-surface); border: 1px solid var(--color-border); border-radius: 18px; padding: 32px 24px; text-align: center; position: relative;">
-                <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--color-accent); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">3</div>
+                <div style="position: absolute; top: -18px; left: 50%; transform: translateX(-50%); width: 36px; height: 36px; background: var(--color-accent); color: var(--color-on-accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 14px;">3</div>
                 <div style="width: 72px; height: 72px; margin: 8px auto 16px; background: linear-gradient(135deg, #faf0ff, #f0dbff); border-radius: 18px; display: flex; align-items: center; justify-content: center;">
                     <svg aria-hidden="true" focusable="false" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#bf5af2" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
                 </div>

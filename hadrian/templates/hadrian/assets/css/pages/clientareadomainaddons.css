@@ -5,7 +5,7 @@
 .da-wrap { max-width: 560px; margin: 0 auto; }
 .da-card { padding: 36px 32px; display: flex; flex-direction: column; align-items: center; text-align: center; }
 
-.da-icon { width: 64px; height: 64px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--color-accent-light); color: var(--color-accent); margin-bottom: 18px; }
+.da-icon { width: 64px; height: 64px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: var(--color-accent-light); color: var(--color-link); margin-bottom: 18px; }
 .da-icon svg { width: 28px; height: 28px; }
 
 .da-desc { font-size: var(--text-md); color: var(--color-text-secondary); line-height: 1.55; margin: 0 0 22px; max-width: 420px; }
@@ -26,7 +26,7 @@
 .da-danger-btn { color: var(--color-red-text); border-color: var(--color-red-text); }
 .da-danger-btn:hover { background: var(--color-red-text); color: var(--color-surface); }
 .da-back { font-size: var(--text-base); color: var(--color-text-tertiary); text-decoration: none; margin-top: 6px; transition: color var(--transition-fast); }
-.da-back:hover { color: var(--color-accent); }
+.da-back:hover { color: var(--color-link); }
 
 @media (max-width: 600px) {
     .da-card { padding: 28px 22px; }

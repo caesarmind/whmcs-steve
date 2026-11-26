@@ -17,7 +17,7 @@
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 
 /* Current-card hero */
 .pm-hero { display: flex; align-items: center; gap: 16px; padding: 20px 22px; }
@@ -67,7 +67,7 @@
 .pm-bc-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; font-size: var(--text-base); color: var(--color-text-primary); }
 .pm-bc-addr { color: var(--color-text-secondary); font-size: var(--text-sm); overflow-wrap: anywhere; }
 .pm-bc-add { margin: 10px 0 0; font-size: var(--text-sm); }
-.pm-bc-add a { color: var(--color-accent); text-decoration: none; }
+.pm-bc-add a { color: var(--color-link); text-decoration: none; }
 .field-error-msg { display: block; margin-top: 6px; font-size: var(--text-sm); color: var(--color-red-text); }
 .field-error-msg[hidden] { display: none; }
 .frm-credit-card-input [aria-invalid="true"] { border-color: var(--color-red, #ff3b30); }

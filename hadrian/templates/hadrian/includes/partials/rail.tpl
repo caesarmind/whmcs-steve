@@ -76,7 +76,7 @@
         </div>
     {else}
         <a href="{$WEB_ROOT}/login.php" class="ph-rail-item only-out" style="margin-top:auto">
-            <span class="rail-ico" style="background:var(--color-accent);color:#fff"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></span>
+            <span class="rail-ico" style="background:var(--color-accent);color: var(--color-on-accent)"><svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 012 2v14a2 2 0 01-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg></span>
             <span>{$LANG.login}</span>
         </a>
     {/if}

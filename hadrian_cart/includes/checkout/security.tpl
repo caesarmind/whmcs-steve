@@ -53,7 +53,7 @@
             <div class="col-sm-6">
                 <div class="password-strength-meter">
                     <div class="progress">
-                        <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="passwordStrengthMeterBar">
+                        <div class="progress-bar progress-bar-success progress-bar-striped" role="progressbar" aria-label="{$LANG.pwstrength}" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" id="passwordStrengthMeterBar">
                         </div>
                     </div>
                     <p class="text-center small text-muted" id="passwordStrengthTextLabel">{$LANG.pwstrength}: {$LANG.pwstrengthenter}</p>

@@ -67,7 +67,7 @@
                         <th>{$LANG.sslproduct}</th>
                         <th>{$LANG.invoicesstatus}</th>
                         <th>{$LANG.sslrenewaldate}</th>
-                        <th></th>
+                        <th><span class="sr-only">{$hadrianLang.a11y.actions}</span></th>
                     </tr>
                 </thead>
                 <tbody>

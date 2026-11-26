@@ -30,7 +30,7 @@
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 
 /* Category banner */
 .dl-cat-banner { display: flex; align-items: center; gap: 14px; padding: 18px 22px; }
@@ -87,17 +87,17 @@
 
 .dl-file-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .dl-dl-btn { height: 32px; padding: 0 14px; display: inline-flex; align-items: center; gap: 6px; background: var(--color-surface); border: 0.5px solid var(--color-border); border-radius: var(--radius-pill); color: var(--color-text-primary); font-size: var(--text-base); font-weight: var(--fw-medium); letter-spacing: -0.008em; cursor: pointer; font-family: inherit; text-decoration: none; transition: all var(--transition-fast); }
-.dl-dl-btn:hover { border-color: var(--color-accent); color: var(--color-accent); background: var(--color-accent-light); }
+.dl-dl-btn:hover { border-color: var(--color-accent); color: var(--color-link); background: var(--color-accent-light); }
 .dl-dl-btn svg { width: 12px; height: 12px; }
 
 /* Subcategory folder rows */
-.dl-subcat-ico { width: 34px; height: 34px; border-radius: var(--radius-sm); background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.dl-subcat-ico { width: 34px; height: 34px; border-radius: var(--radius-sm); background: var(--color-accent-light); color: var(--color-link); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .dl-subcat-ico svg { width: 16px; height: 16px; }
 
 /* Footer */
 .dl-footer { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 20px; border-top: 0.5px solid var(--color-border); background: var(--color-surface-tertiary); font-size: var(--text-sm); color: var(--color-text-tertiary); }
 .dl-footer .spacer { flex: 1; }
-.dl-footer a { color: var(--color-accent); font-size: var(--text-base); text-decoration: none; letter-spacing: -0.008em; }
+.dl-footer a { color: var(--color-link); font-size: var(--text-base); text-decoration: none; letter-spacing: -0.008em; }
 
 /* Empty state */
 .dl-empty { text-align: center; padding: 60px 24px; }

@@ -112,7 +112,7 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
     letter-spacing: -0.004em;
 }
 .dt-field-help {
-    color: var(--color-accent);
+    color: var(--color-link);
     text-decoration: none;
     font-size: 11.5px; font-weight: 500;
     display: inline-flex; align-items: center; gap: 4px;
@@ -210,7 +210,7 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
     margin-bottom: 14px;
 }
 .dt-step-ico svg { width: 20px; height: 20px; }
-.dt-step-ico.blue   { background: var(--color-accent-light); color: var(--color-accent); }
+.dt-step-ico.blue   { background: var(--color-accent-light); color: var(--color-link); }
 .dt-step-ico.green  { background: var(--color-green-bg);     color: var(--color-green-text); }
 .dt-step-ico.orange { background: rgba(255, 149, 0, 0.12);   color: #ff9500; }
 .dt-step-ico.purple { background: rgba(175, 82, 222, 0.12);  color: #af52de; }
@@ -390,21 +390,21 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
                             <div class="dt-step-ico blue" aria-hidden="true">
                                 <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                             </div>
-                            <h4>{$hadrianLang.domains.transferStep1Title}</h4>
+                            <h4 aria-level="3">{$hadrianLang.domains.transferStep1Title}</h4>
                             <p>{$hadrianLang.domains.transferStep1Desc}</p>
                         </div>
                         <div class="dt-step">
                             <div class="dt-step-ico green" aria-hidden="true">
                                 <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
                             </div>
-                            <h4>{$hadrianLang.domains.transferStep2Title}</h4>
+                            <h4 aria-level="3">{$hadrianLang.domains.transferStep2Title}</h4>
                             <p>{$hadrianLang.domains.transferStep2Desc}</p>
                         </div>
                         <div class="dt-step">
                             <div class="dt-step-ico orange" aria-hidden="true">
                                 <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4z"/></svg>
                             </div>
-                            <h4>{$hadrianLang.domains.transferStep3Title}</h4>
+                            <h4 aria-level="3">{$hadrianLang.domains.transferStep3Title}</h4>
                             <p>{$hadrianLang.domains.transferStep3Desc}</p>
                         </div>
                     </div>
@@ -420,21 +420,21 @@ body:not([data-data="empty"]) .dt-when-empty { display: none; }
                             <div class="dt-step-ico purple" aria-hidden="true">
                                 <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                             </div>
-                            <h4>{$hadrianLang.domains.transferWhyExtendTitle}</h4>
+                            <h4 aria-level="3">{$hadrianLang.domains.transferWhyExtendTitle}</h4>
                             <p>{$hadrianLang.domains.transferWhyExtendDesc}</p>
                         </div>
                         <div class="dt-step">
                             <div class="dt-step-ico blue" aria-hidden="true">
                                 <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
                             </div>
-                            <h4>{$hadrianLang.domains.transferWhy24Title}</h4>
+                            <h4 aria-level="3">{$hadrianLang.domains.transferWhy24Title}</h4>
                             <p>{$hadrianLang.domains.transferWhy24Desc}</p>
                         </div>
                         <div class="dt-step">
                             <div class="dt-step-ico green" aria-hidden="true">
                                 <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
                             </div>
-                            <h4>{$hadrianLang.domains.transferWhyPrivacyTitle}</h4>
+                            <h4 aria-level="3">{$hadrianLang.domains.transferWhyPrivacyTitle}</h4>
                             <p>{$hadrianLang.domains.transferWhyPrivacyDesc}</p>
                         </div>
                     </div>

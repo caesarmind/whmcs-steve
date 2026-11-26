@@ -17,7 +17,7 @@
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 
 /* Current-card hero */
 .pm-hero { display: flex; align-items: center; gap: 16px; padding: 20px 22px; }
@@ -58,10 +58,10 @@
 .page-header-text { flex: 1; min-width: 0; }
 .bc-list { display: flex; flex-direction: column; gap: 10px; }
 .bc-row { display: flex; align-items: center; gap: 14px; padding: 16px 18px; }
-.bc-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; font-weight: var(--fw-semibold); font-size: var(--text-md); flex-shrink: 0; text-transform: uppercase; }
+.bc-avatar { width: 40px; height: 40px; border-radius: 50%; background: var(--color-accent-light); color: var(--color-link); display: flex; align-items: center; justify-content: center; font-weight: var(--fw-semibold); font-size: var(--text-md); flex-shrink: 0; text-transform: uppercase; }
 .bc-meta { flex: 1; min-width: 0; }
 .bc-name { display: flex; align-items: center; gap: 8px; font-size: var(--text-md); font-weight: var(--fw-semibold); color: var(--color-text-primary); letter-spacing: -0.01em; }
-.bc-pill { font-size: var(--text-xs); font-weight: var(--fw-semibold); text-transform: uppercase; letter-spacing: 0.04em; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--color-accent-light); color: var(--color-accent); }
+.bc-pill { font-size: var(--text-xs); font-weight: var(--fw-semibold); text-transform: uppercase; letter-spacing: 0.04em; padding: 1px 7px; border-radius: var(--radius-pill); background: var(--color-accent-light); color: var(--color-link); }
 .bc-email { font-size: var(--text-base); color: var(--color-text-tertiary); margin-top: 1px; }
 .bc-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
 .bc-action-btn { width: 32px; height: 32px; border-radius: 50%; background: transparent; border: 0; color: var(--color-text-tertiary); display: inline-flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--transition-fast); text-decoration: none; }

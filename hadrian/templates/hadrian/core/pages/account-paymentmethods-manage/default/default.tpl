@@ -70,7 +70,7 @@
                     <input type="hidden" name="token" value="{$token|default:''|escape}">
                     <div class="pm-alert pm-alert-error gateway-errors assisted-cc-input-feedback" hidden>{$LANG.paymentMethodsManage.invalidCardDetails}</div>
 
-                    <h3 class="pm-section-title">{$LANG.paymentMethods.type}</h3>
+                    <h3 class="pm-section-title" aria-level="2">{$LANG.paymentMethods.type}</h3>
                     <div class="pm-types" role="radiogroup">
                         {if !empty($pmTypes.tokenGateways)}
                             {foreach $tokenGateways as $tokenGateway}
@@ -96,7 +96,7 @@
                     <div id="paymentGatewayInput"></div>
 
                     <div class="fieldgroup-creditcard"{if ($pmEdit && !$payMethod->isCreditCard()) || $paymentMethodType|default:'' == 'bankacct' || $remoteUpdate|default:false} hidden{/if}>
-                        <h3 class="pm-section-title">{$LANG.creditcardenterdetails|default:$LANG.paymentMethodsManage.creditCard}</h3>
+                        <h3 class="pm-section-title" aria-level="2">{$LANG.creditcardenterdetails|default:$LANG.paymentMethodsManage.creditCard}</h3>
                         <div class="form-group">
                             <label class="form-label" for="inputCardNumber">{$LANG.creditcardcardnumber}</label>
                             <input type="tel" class="form-input cc-number-field {$creditCard->getCardType()|default:''|lower|escape}" id="inputCardNumber" name="ccnumber" autocomplete="cc-number" inputmode="numeric" value="{$creditCard->getMaskedCardNumber()|default:''|escape}"{if !$creditCardNumberFieldEnabled} disabled{/if} data-message-invalid="{$LANG.paymentMethodsManage.cardNumberNotValid|escape}" data-supported-cards="{$supportedCardTypes|default:''|escape}">
@@ -132,7 +132,7 @@
                     </div>
 
                     <div class="fieldgroup-bankaccount"{if $remoteUpdate|default:false || ($pmEdit && $payMethod->isCreditCard()) || ($paymentMethodType|default:'' != 'bankacct' && !$pmEdit)} hidden{/if}>
-                        <h3 class="pm-section-title">{$LANG.paymentMethodsManage.bankAccount}</h3>
+                        <h3 class="pm-section-title" aria-level="2">{$LANG.paymentMethodsManage.bankAccount}</h3>
                         <div class="form-group">
                             <span class="form-label">{$LANG.paymentMethodsManage.accountType}</span>
                             <div class="pm-types">
@@ -165,7 +165,7 @@
                     </div>
 
                     <div class="fieldgroup-auxfields"{if $remoteUpdate|default:false} hidden{/if}>
-                        <h3 class="pm-section-title">{$LANG.billingAddress}</h3>
+                        <h3 class="pm-section-title" aria-level="2">{$LANG.billingAddress}</h3>
                         <div id="billingContactsContainer">
                             {include file="$template/account-paymentmethods-billing-contacts.tpl"}
                         </div>

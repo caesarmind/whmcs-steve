@@ -53,7 +53,7 @@ body[data-subnav-side="left"] .ef-split > .ef-main { grid-column: 2; grid-row: 1
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 
 @media (max-width: 880px) {
     .ef-split { grid-template-columns: 1fr; }

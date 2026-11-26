@@ -716,7 +716,7 @@ var _localLang = {
 .cp-opt-radio:has(input:checked) {
     border-color: var(--color-accent);
     background: var(--color-accent-light);
-    color: var(--color-accent);
+    color: var(--color-link);
 }
 .cp-opt-radio input { margin: 0; accent-color: var(--color-accent); }
 

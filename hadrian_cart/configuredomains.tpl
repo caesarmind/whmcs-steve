@@ -109,7 +109,7 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
 .cd-domain-head-ico {
     width: 32px; height: 32px; border-radius: 8px;
     background: var(--color-accent-light);
-    color: var(--color-accent);
+    color: var(--color-link);
     display: inline-flex; align-items: center; justify-content: center;
     flex-shrink: 0;
 }
@@ -156,7 +156,7 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
 }
 .cd-field-static .badge-warn {
     display: inline-flex; align-items: center; gap: 6px;
-    color: var(--color-accent);
+    color: var(--color-link);
     text-decoration: none;
     font-weight: 500;
 }
@@ -267,7 +267,7 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
 }
 .cd-addons .panel-add {
     font-size: 11.5px;
-    color: var(--color-accent);
+    color: var(--color-link);
     font-weight: 500;
     letter-spacing: -0.004em;
     display: inline-flex; align-items: center; gap: 4px;
@@ -275,7 +275,7 @@ body:not([data-data="empty"]) .cd-when-empty { display: none; }
 /* When the addon is selected, scripts.js swaps the .panel-add text from
    "+ Add to Cart" to "Added to Cart (Remove)" -- keep the element visible
    in both states; it's the click target the user reads to toggle off. */
-.cd-addons .panel-addon-selected .panel-add { color: var(--color-accent); }
+.cd-addons .panel-addon-selected .panel-add { color: var(--color-link); }
 /* iCheck (loaded by standard_cart/scripts.js) replaces the native
    checkbox with a custom .icheckbox_minimal element; hide the now-
    redundant original input. The icheckbox layer remains clickable. */

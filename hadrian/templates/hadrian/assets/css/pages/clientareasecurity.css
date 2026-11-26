@@ -65,7 +65,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 .subnav-item.danger { color: var(--color-red-text); }
 .subnav-item.danger:hover { background: var(--color-red-bg); color: var(--color-red-text); }
 .subnav-item.danger svg { color: var(--color-red-text); }
@@ -202,7 +202,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
     padding: 1px 7px;
     border-radius: var(--radius-pill);
     background: var(--color-accent-light);
-    color: var(--color-accent);
+    color: var(--color-link);
     font-size: var(--text-xs);
     font-weight: var(--fw-semibold);
     letter-spacing: 0.04em;
@@ -369,7 +369,7 @@ body[data-subnav-side="outside-left"]:not([data-layout="top"]):not([data-align="
 .sec-alert-success { background: var(--color-green-bg); color: var(--color-green-text); }
 .sec-alert-error { background: var(--color-red-bg); color: var(--color-red-text); }
 .sec-alert-warn { background: var(--color-orange-bg); color: var(--color-orange-text); }
-.sec-alert-info { background: var(--color-accent-light); color: var(--color-accent); }
+.sec-alert-info { background: var(--color-accent-light); color: var(--color-link); }
 
 /* Two-factor setup modal (user-security) -- vanilla, loads the WHMCS 2FA fragment */
 .tfa-modal { display: none; position: fixed; inset: 0; z-index: 1000; align-items: center; justify-content: center; }

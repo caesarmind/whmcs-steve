@@ -259,6 +259,8 @@ Phase 6 notes (done 2026-11-26):
 - Dragging: confirm every drag-to-scroll strip has arrow buttons.
 - Consistent help: the support or contact link sits in the same place on every page.
 
+Phase 7 notes (done 2026-11-26): every one of the 3,966 target-size failures was a footer link, rows of 13px links 18px apart. Footer links are now at least 24px tall (the text does not move), and carousel dots keep their 8px look inside a 24px button. Dragging strips already had arrow buttons (2.5.7), and the contact link sits in the footer on every page (3.2.6). Target size and label-in-name both reached zero on the scan.
+
 ### Phase 8: Outside the theme pages (M)
 
 - Page Builder (`hadrian_builder/`). It is an authoring tool under EN 301 549 clause 11.8. Eleven sections emit an `<h1>`, so two heroes on one page give two h1s: add a heading-level control or demote automatically. Image fields need an alt text input and a "decorative" choice. The editor should warn on low contrast for custom colours.
@@ -282,6 +284,8 @@ Phase 8 and 9 notes (done 2026-11-26):
 - Accessibility statement: a new `accessibility` page (Page Manager group Public) with the Annex V content written in the lang file and seven options for what only the site owner knows (status, limitations, method, contact email, enforcement body, dates). Hadrian does not ship the root `accessibility.php` entry file, so a statement still holding default answers never goes live by itself; the docs say how to create it.
 - Docs: a new chapter, `client-theme/10-accessibility.md`, covering what the theme does, what stays the owner's job, publishing the statement and a pre-launch checklist.
 - Not built: an Accessibility settings group. Links in running text are already underlined and reduced motion follows the visitor's own device setting, so neither toggle the plan proposed earns its place. The admin colour panel's contrast warning is still not built (its files carry other uncommitted work).
+
+Phase 10 notes (2026-11-26): the final scan's leftovers were fixed where they were clear. Text painted in the accent colour now uses the link colour (334 declarations; the accent is a fill colour and was 4.31:1 as text on the grey surface). The dark-mode "Resend" button on the email verification banner gets dark ink (white on the lifted orange was 1.89:1). Nine inline styles that put white on an accent fill use the derived ink. The checkout's password meter is named, an empty table header got a label, and section titles that jumped from h1 to h3 or h4 on the domain, upgrade, payment method, announcement and knowledgebase pages announce the right level. The results and the exceptions left are in [accessibility-conformance-report.md](accessibility-conformance-report.md).
 
 ### Phase 10: Sign-off (M)
 

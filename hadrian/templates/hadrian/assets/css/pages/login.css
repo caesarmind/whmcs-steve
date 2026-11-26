@@ -85,10 +85,10 @@
 
 .auth-link-row { text-align: center; margin-top: 14px; }
 .auth-link {
-    font-size: var(--text-base); color: var(--color-accent);
+    font-size: var(--text-base); color: var(--color-link);
     text-decoration: none; transition: opacity var(--transition-fast);
 }
-.auth-link:hover { color: var(--color-accent); opacity: 0.8; text-decoration: none; }
+.auth-link:hover { color: var(--color-link); opacity: 0.8; text-decoration: none; }
 
 .auth-footer {
     text-align: center;

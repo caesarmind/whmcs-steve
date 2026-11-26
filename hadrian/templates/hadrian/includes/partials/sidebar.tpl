@@ -193,7 +193,7 @@
             </div>
         {else}
             <div class="only-out" style="padding:12px;display:flex;flex-direction:column;gap:8px">
-                <a href="{$WEB_ROOT}/login.php" style="padding:9px 14px;border-radius:10px;background:var(--color-accent);color:#fff;text-align:center;font-size:13px;font-weight:500;text-decoration:none">{$LANG.login}</a>
+                <a href="{$WEB_ROOT}/login.php" style="padding:9px 14px;border-radius:10px;background:var(--color-accent);color:var(--color-on-accent);text-align:center;font-size:13px;font-weight:500;text-decoration:none">{$LANG.login}</a>
                 <a href="{$WEB_ROOT}/register.php" style="padding:9px 14px;border-radius:10px;background:var(--color-surface-secondary);color:var(--color-text-primary);text-align:center;font-size:13px;font-weight:500;text-decoration:none">{$LANG.createaccount|default:'Create your account'}</a>
             </div>
         {/if}

@@ -231,7 +231,7 @@ body[data-bleed="1"][data-align="left"]:not([data-layout="top"]) .ph-main-wrap .
 }
 .state-chip .swatch-group button:hover { transform: scale(1.12); }
 .state-chip .swatch-group button.active { border-color: var(--color-surface); }
-.state-chip .swatch-group button[data-palette="blue"]    { color: var(--color-accent); }
+.state-chip .swatch-group button[data-palette="blue"]    { color: var(--color-link); }
 .state-chip .swatch-group button[data-palette="emerald"] { color: #14b17d; }
 .state-chip .swatch-group button[data-palette="violet"]  { color: #8c5cff; }
 .state-chip .swatch-group button[data-palette="rose"]    { color: #ff2d6b; }
@@ -322,7 +322,7 @@ html[data-palette="slate"]   .sidebar-avatar { background: linear-gradient(135de
     display: inline-flex; align-items: center; gap: 5px;
     font-family: inherit; cursor: pointer;
 }
-.ph-auth-strip a:hover { color: var(--color-accent); text-decoration: none; }
+.ph-auth-strip a:hover { color: var(--color-link); text-decoration: none; }
 .ph-auth-strip .signed-in-as { color: var(--color-text-tertiary); }
 .ph-auth-strip .signed-in-as strong { color: var(--color-text-primary); font-weight: var(--fw-semibold); margin-left: 4px; }
 .ph-auth-strip .masq-chip {
@@ -368,7 +368,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
     font-size: var(--text-lg); font-weight: var(--fw-semibold); letter-spacing: -0.01em;
     color: var(--color-text-primary); text-decoration: none;
 }
-.homepage-nav .nav-logo.text-logo:hover { color: var(--color-accent); text-decoration: none; }
+.homepage-nav .nav-logo.text-logo:hover { color: var(--color-link); text-decoration: none; }
 .homepage-nav-inner { gap: 14px; }
 .homepage-nav-inner > a,
 .homepage-nav-inner .nav-simple-trigger { font-size: var(--text-sm); }
@@ -418,7 +418,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 }
 .nav-simple-menu a:hover {
     background: var(--color-surface-secondary);
-    color: var(--color-accent); opacity: 1; text-decoration: none;
+    color: var(--color-link); opacity: 1; text-decoration: none;
 }
 .nav-simple-menu .divider { height: 1px; background: var(--color-border); margin: 5px 0; }
 
@@ -450,7 +450,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
     align-self: center;
     width: 56px; height: 56px;
     border-radius: 14px;
-    background: var(--color-accent-light); color: var(--color-accent);
+    background: var(--color-accent-light); color: var(--color-link);
     display: flex; align-items: center; justify-content: center;
     margin: 2px 0 4px;
     flex-shrink: 0;
@@ -459,7 +459,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
 .promo-slide-copy { font-size: var(--text-sm); color: var(--color-text-secondary); line-height: 1.45; margin: 0; }
 .promo-slide-link {
     font-size: var(--text-sm); font-weight: var(--fw-medium);
-    color: var(--color-accent); text-decoration: none;
+    color: var(--color-link); text-decoration: none;
     display: inline-flex; align-items: center; gap: 4px;
     margin-top: 2px;
 }
@@ -532,7 +532,7 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
     color: var(--color-text-tertiary); text-decoration: none;
     transition: color 0.15s;
 }
-.ph-breadcrumb-inner a:hover { color: var(--color-accent); text-decoration: none; }
+.ph-breadcrumb-inner a:hover { color: var(--color-link); text-decoration: none; }
 .ph-breadcrumb-inner .sep { opacity: 0.4; font-size: var(--text-xs); }
 .ph-breadcrumb-inner .current { color: var(--color-text-primary); font-weight: var(--fw-medium); }
 
@@ -551,11 +551,11 @@ body.screenshot .ph-auth-strip .masq-chip { display: none !important; }
    renders grey instead of accent blue. */
 .ph-breadcrumb-inner a.ph-back-link {
     display: inline-flex; align-items: center; gap: 4px;
-    color: var(--color-accent); font-size: var(--text-base); font-weight: var(--fw-normal);
+    color: var(--color-link); font-size: var(--text-base); font-weight: var(--fw-normal);
     text-decoration: none; transition: opacity 0.15s;
 }
 .ph-breadcrumb-inner a.ph-back-link svg { width: 15px; height: 15px; margin-left: -3px; }
-.ph-breadcrumb-inner a.ph-back-link:hover { color: var(--color-accent); text-decoration: none; opacity: 0.7; }
+.ph-breadcrumb-inner a.ph-back-link:hover { color: var(--color-link); text-decoration: none; opacity: 0.7; }
 
 /* -- Hide Breadcrumb (admin "Hide Breadcrumb" toggle) ------- */
 /* One rule covers every main-menu layout: the top-layout "Portal Home"
@@ -710,7 +710,7 @@ body[data-affixed-nav="1"].nav-open .ph-side-topbar { transform: translateY(0); 
     margin: 0 auto 10px;
     border-radius: var(--radius-sm);
     display: flex; align-items: center; justify-content: center;
-    color: var(--color-accent);
+    color: var(--color-link);
     transition: background var(--transition-fast);
 }
 .ph-rail-logo:hover { background: var(--sidebar-item-hover-bg); }
@@ -915,14 +915,14 @@ body[data-layout="rail"] .ph-hero-inner { max-width: none; }
     font-size: var(--text-base); color: var(--color-text-tertiary);
 }
 .ph-side-crumbs a { color: var(--color-text-tertiary); text-decoration: none; }
-.ph-side-crumbs a:hover { color: var(--color-accent); }
+.ph-side-crumbs a:hover { color: var(--color-link); }
 .ph-side-crumbs .sep { opacity: 0.4; font-size: var(--text-xs); }
 .ph-side-crumbs .current { color: var(--color-text-primary); font-weight: var(--fw-medium); }
 .ph-side-topbar-actions { display: flex; align-items: center; gap: 6px; font-size: var(--text-sm); }
 /* Mobile-only brand in the side/rail topbar -- hidden on desktop, where the
    sidebar/rail itself shows the logo. Revealed <=900px (see media block). */
 .ph-side-logo { display: none; align-items: center; flex-shrink: 0; text-decoration: none; color: var(--color-text-primary); font-weight: var(--fw-semibold); font-size: var(--text-lg); letter-spacing: -0.01em; }
-.ph-side-logo:hover { color: var(--color-accent); text-decoration: none; }
+.ph-side-logo:hover { color: var(--color-link); text-decoration: none; }
 /* height, not max-height -- a viewBox-only SVG has no intrinsic size to cap and
    lays out at 0x0. See the note on .sidebar-brand-logo in core-theme.css. */
 .ph-side-logo.img-logo img { height: 24px; width: auto; max-width: 140px; object-fit: contain; display: block; }
@@ -1064,11 +1064,11 @@ body[data-layout="side"] .ph-section:last-of-type { padding-bottom: 48px; }
 }
 .locale-grid button:hover {
     background: var(--color-surface-secondary);
-    color: var(--color-accent);
+    color: var(--color-link);
 }
 .locale-grid button.active {
     background: rgba(0,113,227,0.1);
-    color: var(--color-accent); font-weight: var(--fw-semibold);
+    color: var(--color-link); font-weight: var(--fw-semibold);
 }
 .locale-modal-footer {
     padding: 14px 22px; border-top: 1px solid var(--color-border);
@@ -1701,7 +1701,7 @@ body[data-tpl="fraudcheck"] {
         font-weight: var(--fw-medium);
         line-height: 1.4;
     }
-    .label-primary, .badge-primary { background: var(--color-accent-light); color: var(--color-accent); }
+    .label-primary, .badge-primary { background: var(--color-accent-light); color: var(--color-link); }
     .label-success, .badge-success { background: var(--color-green-bg); color: var(--color-green-text); }
     .label-danger,  .badge-danger  { background: var(--color-red-bg);   color: var(--color-red-text); }
     .label-warning, .badge-warning { background: var(--color-orange-bg); color: var(--color-orange-text); }

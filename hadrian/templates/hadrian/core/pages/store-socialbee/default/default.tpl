@@ -75,7 +75,7 @@
                 <div style="background: linear-gradient(135deg, #eaf4ff, #dbeafe); border-radius: 14px; padding: 16px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                         <div style="font-size: 13px; font-weight: 600; color: var(--color-text-primary);">November 2026</div>
-                        <div style="display: flex; gap: 4px;"><span style="padding: 4px 10px; background: var(--color-surface); border-radius: 6px; font-size: 10px;">Week</span><span style="padding: 4px 10px; background: var(--color-accent); color: #fff; border-radius: 6px; font-size: 10px;">Month</span></div>
+                        <div style="display: flex; gap: 4px;"><span style="padding: 4px 10px; background: var(--color-surface); border-radius: 6px; font-size: 10px;">Week</span><span style="padding: 4px 10px; background: var(--color-accent); color: var(--color-on-accent); border-radius: 6px; font-size: 10px;">Month</span></div>
                     </div>
                     <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px;">
                         <div style="background: var(--color-surface); border-radius: 6px; padding: 8px; min-height: 44px;"><div style="font-size: 9px; color: var(--color-text-tertiary);">25</div></div>
@@ -130,7 +130,7 @@
                             <div style="width: 26px; height: 26px; background: linear-gradient(135deg, #833AB4, #FD1D1D); border-radius: 6px;"></div>
                             <div style="width: 26px; height: 26px; background: #1da1f2; border-radius: 6px;"></div>
                             <div style="width: 26px; height: 26px; background: #0a66c2; border-radius: 6px;"></div>
-                            <button style="margin-left: auto; padding: 6px 12px; background: var(--color-accent); color: #fff; border: 0; border-radius: 6px; font-size: 11px; font-weight: 600;">Schedule</button>
+                            <button style="margin-left: auto; padding: 6px 12px; background: var(--color-accent); color: var(--color-on-accent); border: 0; border-radius: 6px; font-size: 11px; font-weight: 600;">Schedule</button>
                         </div>
                     </div>
                 </div>

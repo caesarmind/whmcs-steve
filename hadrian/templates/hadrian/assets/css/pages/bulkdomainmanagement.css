@@ -11,7 +11,7 @@
 /* Alerts */
 .bdm-alert { display: flex; gap: 10px; padding: 13px 16px; border-radius: var(--radius-md); font-size: var(--text-base); line-height: 1.5; margin-bottom: 16px; }
 .bdm-alert svg { width: 17px; height: 17px; flex-shrink: 0; margin-top: 1px; }
-.bdm-alert.info { background: var(--color-accent-light); color: var(--color-accent); }
+.bdm-alert.info { background: var(--color-accent-light); color: var(--color-link); }
 .bdm-alert.success { background: var(--color-green-bg); color: var(--color-green-text); }
 .bdm-alert.error { background: var(--color-red-bg); color: var(--color-red-text); }
 .bdm-alert ul { margin: 6px 0 0; padding-left: 18px; }

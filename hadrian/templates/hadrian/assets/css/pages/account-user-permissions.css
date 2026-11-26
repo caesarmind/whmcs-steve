@@ -18,11 +18,11 @@
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 
 /* User chip */
 .perm-user { display: flex; align-items: center; gap: 12px; padding: 14px 18px; margin-bottom: 16px; }
-.perm-user-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--color-accent-light); color: var(--color-accent); display: flex; align-items: center; justify-content: center; font-weight: var(--fw-semibold); font-size: var(--text-lg); flex-shrink: 0; text-transform: uppercase; }
+.perm-user-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--color-accent-light); color: var(--color-link); display: flex; align-items: center; justify-content: center; font-weight: var(--fw-semibold); font-size: var(--text-lg); flex-shrink: 0; text-transform: uppercase; }
 .perm-user-email { font-size: var(--text-md); font-weight: var(--fw-medium); color: var(--color-text-primary); }
 .perm-user-sub { font-size: var(--text-base); color: var(--color-text-tertiary); }
 

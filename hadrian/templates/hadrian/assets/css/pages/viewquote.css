@@ -50,9 +50,9 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .subnav-item:hover { background: var(--sidebar-item-hover); color: var(--color-text-primary); text-decoration: none; }
 .subnav-item.active { background: var(--sidebar-item-active); font-weight: var(--fw-medium); }
 .subnav-item svg { width: 14px; height: 14px; color: var(--color-text-tertiary); flex-shrink: 0; }
-.subnav-item.active svg { color: var(--color-accent); }
+.subnav-item.active svg { color: var(--color-link); }
 .subnav-count { margin-left: auto; font-size: var(--text-xs); font-weight: var(--fw-medium); padding: 1px 7px; border-radius: var(--radius-pill); background: var(--color-surface-secondary); color: var(--color-text-tertiary); }
-.subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-accent); }
+.subnav-item.active .subnav-count { background: var(--color-accent-light); color: var(--color-link); }
 
 /* Quote summary header card */
 .vq-head { padding: 22px 24px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
@@ -97,7 +97,7 @@ body[data-subnav-side="outside-left"][data-align="left"]:not([data-layout="top"]
 .vq-accept { padding: 18px 24px; border-top: 0.5px solid var(--color-border); display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
 .vq-tos { display: flex; align-items: flex-start; gap: 8px; font-size: var(--text-base); color: var(--color-text-secondary); line-height: 1.45; flex: 1; min-width: 220px; }
 .vq-tos input { margin-top: 2px; accent-color: var(--color-accent); }
-.vq-tos a { color: var(--color-accent); text-decoration: none; }
+.vq-tos a { color: var(--color-link); text-decoration: none; }
 .vq-tos a:hover { text-decoration: underline; }
 
 /* Aside summary card */

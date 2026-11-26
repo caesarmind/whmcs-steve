@@ -140,7 +140,7 @@
 
                 {if !empty($managementoptions) && ($managementoptions.nameservers || $managementoptions.contacts || $managementoptions.locking || !empty($renew))}
                 <div class="dd-quickactions">
-                    <h3 class="dd-section-title">{$LANG.doToday}</h3>
+                    <h3 class="dd-section-title" aria-level="2">{$LANG.doToday}</h3>
                     <div class="dd-action-list">
                         {if $systemStatus == 'Active' && !empty($managementoptions.nameservers)}
                             <a href="#" class="dd-action" data-dd-jump="nameservers">

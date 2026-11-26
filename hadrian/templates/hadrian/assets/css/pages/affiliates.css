@@ -293,7 +293,7 @@ body[data-svc-layout="outside"] .aff-card > .aff-payout {
     height: 64px;
     border-radius: 50%;
     background: var(--color-blue-bg);
-    color: var(--color-accent);
+    color: var(--color-link);
     display: inline-flex;
     align-items: center;
     justify-content: center;

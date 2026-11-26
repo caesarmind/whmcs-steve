@@ -163,7 +163,7 @@
                                 <div style="font-size: 11px; color: var(--color-text-tertiary);">Estimated time: 3 min</div>
                             </div>
                         </div>
-                        <button style="width: 100%; margin-top: 12px; padding: 10px; background: var(--color-accent); color: #fff; border: 0; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;">Start restore</button>
+                        <button style="width: 100%; margin-top: 12px; padding: 10px; background: var(--color-accent); color: var(--color-on-accent); border: 0; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer;">Start restore</button>
                     </div>
                 </div>
             </div>
