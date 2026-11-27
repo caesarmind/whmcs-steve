@@ -75,6 +75,14 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], userAgent: USER_AGENT, viewport: { width: 1280, height: 860 } },
     },
     {
+      // Every Hadrian admin feature through the real screen, with proof
+      // (tests/e2e/audit/, tests/ADMIN-FEATURES.md). Not part of the gate. It
+      // changes what the whole site sees, so it runs alone, one worker, in file
+      // order: `npx playwright test --project=admin-audit`.
+      name: 'admin-audit', testMatch: /audit[\\/].+\.audit\.mjs$/, fullyParallel: false, timeout: 180_000,
+      use: { ...devices['Desktop Chrome'], userAgent: USER_AGENT, viewport: { width: 1280, height: 900 } },
+    },
+    {
       name: 'visual', testMatch: /visual\.spec\.mjs/, dependencies: ['setup'],
       use: { ...devices['Desktop Chrome'], userAgent: USER_AGENT, viewport: { width: 1280, height: 860 } },
     },
