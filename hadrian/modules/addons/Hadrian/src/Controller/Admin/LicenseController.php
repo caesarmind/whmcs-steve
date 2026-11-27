@@ -23,7 +23,7 @@ final class LicenseController extends AbstractController
         if ($saved) {
             Configuration::setValue(self::CFG_KEY, trim((string) $_POST['license_key']));
             // Drop the cached front-end result so the site re-checks the new key.
-            @unlink(sys_get_temp_dir() . '/hn_theme_license.json');
+            LicenseCheck::dropSiteCache();
         }
 
         $key    = (string) Configuration::getValue(self::CFG_KEY);

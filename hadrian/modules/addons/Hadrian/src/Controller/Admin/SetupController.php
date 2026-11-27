@@ -5,6 +5,7 @@ namespace Hadrian\Controller\Admin;
 
 use Hadrian\Controller\AbstractController;
 use Hadrian\Database\Installer;
+use Hadrian\Helpers\LicenseCheck;
 use Hadrian\Helpers\SetupChecks;
 use Hadrian\Helpers\SetupProbe;
 use Hadrian\Helpers\ThemeSwitch;
@@ -87,7 +88,7 @@ final class SetupController extends AbstractController
                 Configuration::setValue('hadrian_license_key', trim((string)($_POST['license_key'] ?? '')));
                 // The site-side check keeps its own answer; drop it so the new
                 // key is asked about on the next page view.
-                @unlink(sys_get_temp_dir() . '/hn_theme_license.json');
+                LicenseCheck::dropSiteCache();
                 SetupProbe::facts(freshLicense: true);
                 return ['license', null];
 

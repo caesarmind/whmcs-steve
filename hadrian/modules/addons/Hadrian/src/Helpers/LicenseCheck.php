@@ -134,7 +134,10 @@ PEM;
     private static function installedRelease(): string
     {
         $root = defined('ROOTDIR') ? ROOTDIR : '';
-        $mark = json_decode((string) @file_get_contents($root . '/templates/hadrian/release.json'), true);
+        $file = $root . '/templates/hadrian/release.json';
+        // A git deploy has no release.json (the build stamps it in), and WHMCS
+        // logs a warning for a missing file even when @ hides it.
+        $mark = is_file($file) ? json_decode((string) @file_get_contents($file), true) : null;
         return is_array($mark) ? (string) ($mark['release'] ?? '') : '';
     }
 
@@ -142,15 +145,36 @@ PEM;
 
     private static function cacheFile(): string
     {
-        // Distinct from the enforcement hook's hn_theme_license.json - the two
-        // caches answer different questions and expire on different clocks.
-        return sys_get_temp_dir() . '/hn_admin_license_status.json';
+        // Distinct from the enforcement hook's cache - the two answer different
+        // questions and expire on different clocks. One per install: the temp
+        // folder is shared by every WHMCS on the server, and a file keyed only
+        // by licence key showed one install's "Active" on another's screen.
+        return sys_get_temp_dir() . '/hn_admin_license_status_' . substr(sha1(self::installDir()), 0, 16) . '.json';
+    }
+
+    /**
+     * Drop the enforcement hook's cached answer so the next page view asks the
+     * licence server again (after a key is saved). The hook names its cache
+     * after this install's hooks folder; ask it when it is loaded, and also
+     * remove the single shared file older hooks used.
+     */
+    public static function dropSiteCache(): void
+    {
+        $file = function_exists('hostnodes_license_cachefile')
+            ? (string) \hostnodes_license_cachefile()
+            : sys_get_temp_dir() . '/hn_theme_license_' . substr(sha1(self::installDir()), 0, 16) . '.json';
+        // is_file first: WHMCS logs a warning even when @ hides it.
+        foreach ([$file, sys_get_temp_dir() . '/hn_theme_license.json'] as $f) {
+            if (is_file($f)) {
+                @unlink($f);
+            }
+        }
     }
 
     /** @return array{active:bool,status:string,data:array}|null */
     private static function readCache(string $key): ?array
     {
-        $raw = @file_get_contents(self::cacheFile());
+        $raw = is_file(self::cacheFile()) ? @file_get_contents(self::cacheFile()) : false;
         if ($raw === false) {
             return null;
         }
