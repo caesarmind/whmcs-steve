@@ -53,10 +53,10 @@
     {elseif $mtType == 'divider'}
         <hr class="sidebar-divider">
     {elseif $mtType == 'dropdown_parent' || ($mtType == 'account_dropdown' && $item.children)}
-        <div class="sidebar-group" data-group="{$item.name|escape}">
-            <button type="button" class="sidebar-group-toggle">
+        <div class="sidebar-group{if $item.css_class} {$item.css_class|escape}{/if}" data-group="{$item.name|escape}">
+            <button type="button" class="sidebar-group-toggle"{if $item.description} title="{$item.description|escape}"{/if}>
                 <div class="sidebar-item-icon {$mtColor|escape}">{mtSidebarIcon iconName=$mtIconName}</div>
-                <span class="group-label">{$item.label|escape}</span>
+                <span class="group-label">{include file="`$template`/includes/partials/nav-label.tpl" item=$item hasIcon=true}</span>
                 <svg aria-hidden="true" focusable="false" class="group-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 6 15 12 9 18"/></svg>
             </button>
             <div class="sidebar-group-items">
@@ -66,7 +66,7 @@
                     {elseif $child.type == 'header'}
                         <div class="sidebar-group-section">{$child.label|escape}</div>
                     {else}
-                        <a href="{$child.uri|escape}">{$child.label|escape}</a>
+                        <a href="{$child.uri|escape}"{if $child.css_class} class="{$child.css_class|escape}"{/if}{if $child.target} target="{$child.target|escape}"{/if}{if $child.description} title="{$child.description|escape}"{/if}>{include file="`$template`/includes/partials/nav-label.tpl" item=$child hasIcon=false}</a>
                     {/if}
                 {/foreach}
             </div>
@@ -90,9 +90,9 @@
         {/if}
     {else}
         {* whmcs_page, custom_link, account_dropdown (no children) *}
-        <a href="{$item.uri|escape}" class="sidebar-item" data-nav="{$item.name|escape}"{if $item.target} target="{$item.target|escape}"{/if}>
+        <a href="{$item.uri|escape}" class="sidebar-item{if $item.css_class} {$item.css_class|escape}{/if}" data-nav="{$item.name|escape}"{if $item.target} target="{$item.target|escape}"{/if}{if $item.description} title="{$item.description|escape}"{/if}>
             <div class="sidebar-item-icon {$mtColor|escape}">{mtSidebarIcon iconName=$mtIconName}</div>
-            {$item.label|escape}
+            {include file="`$template`/includes/partials/nav-label.tpl" item=$item hasIcon=true}
             {if $mtBadge}<span class="sidebar-item-badge">{$mtBadge|escape}</span>{/if}
         </a>
     {/if}

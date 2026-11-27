@@ -26,12 +26,15 @@ final class TemplatesController extends AbstractController
 
     public function showAction(): string
     {
-        $slug = $_GET['templateName'] ?? '';
-        try {
-            $template = new Template($slug);
-        } catch (\Throwable $e) {
-            return $this->view('error', ['error' => $e->getMessage()]);
+        // Only a template the list itself offers. The slug becomes part of a
+        // file path inside Template, so an arbitrary value must never reach
+        // it, and the error must not print server paths back to the browser.
+        $slug = (string)($_GET['templateName'] ?? '');
+        $all  = Template::getAll();
+        if (!isset($all[$slug])) {
+            return $this->view('error', ['error' => 'There is no Hadrian template called "' . $slug . '".']);
         }
+        $template = $all[$slug];
         return $this->view('templates/show', [
             'template' => [
                 'slug'    => $template->getName(),

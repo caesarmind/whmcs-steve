@@ -1364,6 +1364,13 @@
     }
     var subs = rows.map(subsOf);
 
+    // Everything on the other tab, as the page drew it. A search covers both
+    // tabs, so a match over there has to come out of .mt-tab-off (it is
+    // display:none !important, which [hidden] alone cannot undo) together
+    // with its group and sub-panels; clearing the box puts them all back.
+    var offEls = [].slice.call(document.querySelectorAll('.mt-tab-off'));
+    offEls.forEach(function (el) { el.setAttribute('data-tab-off', ''); });
+
     function apply() {
         var q = (box.value || '').trim().toLowerCase();
         clear.hidden = q === '';
@@ -1380,6 +1387,17 @@
             subs[i].forEach(function (el) { el.toggleAttribute('data-search-off', !hit); });
             if (hit) shown++;
         });
+
+        offEls.forEach(function (el) { el.classList.add('mt-tab-off'); });
+        if (q) {
+            rows.forEach(function (row, i) {
+                if (!row.hasAttribute('data-tab-off') || row.hidden) return;
+                row.classList.remove('mt-tab-off');
+                subs[i].forEach(function (el) { if (el.hasAttribute('data-tab-off')) el.classList.remove('mt-tab-off'); });
+                var g = row.closest('[data-set-group]');
+                if (g && g.hasAttribute('data-tab-off')) g.classList.remove('mt-tab-off');
+            });
+        }
 
         // A group with nothing visible would leave a bare heading behind, and
         // its live count should reflect only rows on the active tab -- a row

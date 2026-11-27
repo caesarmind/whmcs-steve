@@ -314,6 +314,14 @@ var _localLang = {
                                         {assign var=hnSuffix    value=$hadrian.addonSettings.op_custom_hostname_suffix|default:''}
                                         {assign var=hnCustom    value=$hadrian.addonSettings.op_custom_hostname|default:false}
                                         {assign var=hnCharsSet  value=$hadrian.addonSettings.op_custom_hostname_chars|default:[]}
+                                        {* "Use Custom Hostname" off: the admin help promises a random
+                                           string, and the three fields are hidden on the Settings
+                                           screen, so values stored there earlier must not apply. *}
+                                        {if !$hnCustom}
+                                            {assign var=hnInterfix  value=20}
+                                            {assign var=hnPrefixRaw value=''}
+                                            {assign var=hnSuffix    value=''}
+                                        {/if}
                                         {if $hnPrefixRaw != ''}{assign var=hnPrefix value=".`$hnPrefixRaw`"}{else}{assign var=hnPrefix value=""}{/if}
                                         {assign var=hnTail value="`$hnPrefix``$hnSuffix`"}
                                         {if $hnTail == ''}

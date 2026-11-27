@@ -221,18 +221,18 @@ You can delete individual items, but the interface has no way to delete an entir
 If your hosting account's PHP form limit is too small for a menu this size, the save is refused outright with a message rather than saving half of it. And if the browser sends no items at all, your existing menu is kept rather than wiped.
 :::
 
-## Settings that save but do not show yet
+## How an item's styling fields show
 
-A few fields in the item drawer store their value and are not yet read by the theme. They are listed here so you do not spend time wondering why nothing changed:
+These fields in the item drawer change how one item looks, wherever its menu is drawn: the sidebar, the top bar, the minimal top bar and the footers.
 
 :::props
-| Field | Where | Status |
+| Field | Where | What it does |
 | --- | --- | --- |
-| Description | Under Name | Saves. Intended for mega-menu and rail tooltips; nothing prints it yet |
-| Badge | Menu Item Label | Saves. No badge is drawn beside the label yet |
-| Text Transform | Menu Item Label | Saves. Label capitalisation is not changed yet |
-| Hide Label Text | Menu Item Label | Saves. The label is still shown |
-| Custom CSS Class | Display Settings | Saves, and reaches WHMCS's own navigation object, but Hadrian's sidebar, rail and top bar do not apply it |
+| Description | Under Name | Shows as the item's tooltip. In a mega-menu panel it is printed as a second line under the name |
+| Badge | Menu Item Label | Draws a short pill beside the label, for example "New" |
+| Text Transform | Menu Item Label | Shows the label in capitals, or with each word capitalised. The label you typed is unchanged |
+| Hide Label Text | Menu Item Label | Hides the label where an icon is shown beside it, leaving the icon. Screen readers still read the label. Where no icon is drawn (footers, a top bar with icons off) the label stays, so the item never turns into an empty link |
+| Custom CSS Class | Display Settings | Added to the item's link, so a rule in Custom CSS can style that one item |
 :::
 
 :::info What Hadrian's Menu Manager does not do

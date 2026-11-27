@@ -151,7 +151,8 @@ final class StylesController extends AbstractController
             'generalSaved'=> isset($_GET['general_saved']),
             'navigationSaved' => isset($_GET['navigation_saved']),
             'elementsSaved'=> isset($_GET['elements_saved']),
-            'customCss'   => (string)Settings::getValue($template->getName() . '_custom_css', ''),
+            // Decoded: CSS saved before postText() was stored HTML-escaped.
+            'customCss'   => html_entity_decode((string)Settings::getValue($template->getName() . '_custom_css', ''), ENT_QUOTES | ENT_HTML5, 'UTF-8'),
             'cssSaved'    => isset($_GET['css_saved']),
         ]);
     }
@@ -498,7 +499,8 @@ final class StylesController extends AbstractController
         $fallback     = (string)($cfg['fontFamily']['fallback'] ?? 'system-ui, sans-serif');
         $systemPrefix = (string)($cfg['fontFamily']['systemPrefix'] ?? 'system-ui');
         $ffMode       = (string)($ff['mode'] ?? 'default');
-        $storedStack  = (string)($ff['stack'] ?? '');
+        // Decoded: stacks saved before postText() were stored HTML-escaped.
+        $storedStack  = html_entity_decode((string)($ff['stack'] ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $stacks = [
             'system' => ($ffMode === 'system' && $storedStack !== '') ? $storedStack : (string)($cfg['fontFamily']['system'] ?? $fallback),
             'google' => ($ffMode === 'google' && $storedStack !== '') ? $storedStack : ((string)($ff['google'] ?? '') !== '' ? "'" . (string)$ff['google'] . "', " . $fallback : ''),
@@ -632,8 +634,8 @@ final class StylesController extends AbstractController
 
         // Heading font: "Same as body text" stores nothing; a Google family is
         // allowlisted against the catalog exactly as the body font is below.
-        if ((string)($_POST['hf_mode'] ?? 'body') === 'google' && trim((string)($_POST['hf_google'] ?? '')) !== '') {
-            $name    = trim((string)$_POST['hf_google']);
+        if ((string)($_POST['hf_mode'] ?? 'body') === 'google' && self::postText('hf_google') !== '') {
+            $name    = self::postText('hf_google');
             $catalog = $this->loadGoogleFontCatalog($template, $cfg);
             if ($catalog === [] || in_array($name, array_column($catalog, 0), true)) {
                 $heading = ['mode' => 'google', 'google' => $name];
@@ -651,17 +653,17 @@ final class StylesController extends AbstractController
         // (a leading system-ui), so no separate flag is kept.
         $mode      = (string)($_POST['ff_mode'] ?? 'default');
         $stackKey  = ['system' => 'ff_system', 'google' => 'ff_google_stack', 'folder' => 'ff_folder_stack', 'bundled' => 'ff_bundled_stack'][$mode] ?? '';
-        $stack     = $stackKey !== '' ? trim((string)($_POST[$stackKey] ?? '')) : '';
+        $stack     = $stackKey !== '' ? self::postText($stackKey) : '';
         $withStack = static fn (array $base): array => $base + ($stack !== '' ? ['stack' => $stack] : []);
         if ($mode === 'system') {
             $out['fontFamily'] = $withStack(['mode' => 'system']);
-        } elseif ($mode === 'google' && trim((string)($_POST['ff_google'] ?? '')) !== '') {
+        } elseif ($mode === 'google' && self::postText('ff_google') !== '') {
             // Allowlist against the catalog rather than character-filtering the
             // POST. With 1,942 pickable families the field is no longer a closed
             // <select>, so "is this a real Google family?" has to be answered
             // here -- an unknown name would otherwise be written into a
             // font-family declaration and a fonts.googleapis.com URL.
-            $name    = trim((string)$_POST['ff_google']);
+            $name    = self::postText('ff_google');
             $catalog = $this->loadGoogleFontCatalog($template, $cfg);
             if ($catalog === [] || in_array($name, array_column($catalog, 0), true)) {
                 $family  = ['mode' => 'google', 'google' => $name];
@@ -673,10 +675,10 @@ final class StylesController extends AbstractController
                 }
                 $out['fontFamily'] = $withStack($family);
             }
-        } elseif ($mode === 'folder' && trim((string)($_POST['ff_folder'] ?? '')) !== '') {
+        } elseif ($mode === 'folder' && self::postText('ff_folder') !== '') {
             // Self-hosted: the admin types the font-face NAME; Hooks @font-faces a
             // matching file in assets/fonts/custom. Allow letters/digits/space/_/-.
-            $name = trim((string)preg_replace('/[^A-Za-z0-9 _-]/', '', (string)$_POST['ff_folder']));
+            $name = trim((string)preg_replace('/[^A-Za-z0-9 _-]/', '', self::postText('ff_folder')));
             if ($name !== '') {
                 $out['fontFamily'] = $withStack(['mode' => 'folder', 'folder' => $name]);
             }
@@ -689,13 +691,26 @@ final class StylesController extends AbstractController
     }
 
     /**
-     * Persist the global Custom CSS box (site-wide, all styles). Stored raw so
-     * the textarea round-trips exactly; the render-time emitter
-     * (Hooks::buildCustomCss) neutralizes any </style> on output.
+     * A text field as the admin typed it. WHMCS HTML-escapes every admin POST
+     * value before the addon sees it, so a quote arrives as &#039; and ">" as
+     * &gt;. Free text that ends up in CSS (font stacks, family names, custom
+     * CSS) has to be stored decoded, or the site gets the entities.
+     */
+    private static function postText(string $key, bool $trim = true): string
+    {
+        $v = html_entity_decode((string)($_POST[$key] ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        return $trim ? trim($v) : $v;
+    }
+
+    /**
+     * Persist the global Custom CSS box (site-wide, all styles). Stored as the
+     * admin typed it (decoded, see postText) so the textarea round-trips
+     * exactly; the render-time emitter (Hooks::buildCustomCss) neutralizes any
+     * </style> on output.
      */
     private function saveCustomCss($template): string
     {
-        Settings::setValue($template->getName() . '_custom_css', (string)($_POST['custom_css'] ?? ''), 'string');
+        Settings::setValue($template->getName() . '_custom_css', self::postText('custom_css', false), 'string');
         $style = (string)($_POST['style'] ?? 'default');
         $this->redirect('?module=Hadrian&action=editStyle&style=' . urlencode($style) . '&tab=custom-css&css_saved=1');
     }

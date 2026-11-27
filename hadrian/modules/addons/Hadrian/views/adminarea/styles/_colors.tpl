@@ -86,13 +86,9 @@
             Pick your brand colour and rebuild the whole palette around it. Lightness is preserved
             wherever contrast depends on it, and status colours keep their own hue &mdash; a warning
             stays amber whatever you pick.
-            {if $colors.mode == 'dark'}
-                You are editing the <strong>dark</strong> scope, so the accent is derived <em>lighter</em>
-                than the colour you pick, far enough to stay legible on a dark card.
-            {else}
-                This writes the <strong>light</strong> scope only &mdash; switch to Dark above and
-                generate again to do the other one.
-            {/if}
+            It fills in the <strong>light and dark</strong> palettes together; the dark accent is
+            derived <em>lighter</em> than the colour you pick, far enough to stay legible on a dark card.
+            Nothing is stored until you press Save colors.
         </p>
 
         <div class="mt-gen-rail">

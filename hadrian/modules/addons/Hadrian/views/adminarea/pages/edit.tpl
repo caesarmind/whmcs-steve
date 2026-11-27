@@ -1243,7 +1243,12 @@
         }
 
         var state = readState();
-        var dirty = (input.value || '').trim() !== '';
+        // Only an edit in this builder makes it rewrite the stored string.
+        // Starting dirty for any non-empty layout re-serialised it on every
+        // submit, so saving one template rewrote the OTHER templates' stored
+        // layouts too (readState adds catalogue keys the string never named,
+        // which SectionLayout::parse already does server-side).
+        var dirty = false;
         var openKey = null;   // which section's settings drawer is open
         // Which colour mode that drawer's switch is showing. UI state, not
         // layout state: it survives the repaint so choosing Theme before

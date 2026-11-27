@@ -213,6 +213,11 @@ final class TreeRenderer
             }
         }
 
+        // The item drawer's styling fields. Checked here so a template can
+        // print them as they are: a class name is limited to class characters,
+        // and text transform to the drawer's own choices.
+        $transform = (string)($config['text_transform'] ?? '');
+
         return [
             'type'           => $node->item_type,
             'name'           => 'mt-' . $node->id,
@@ -221,7 +226,11 @@ final class TreeRenderer
             'icon'           => (string)($config['icon'] ?? ''),
             'color'          => $color,
             'side'           => ($config['position_side'] ?? '') === 'right' ? 'right' : '',
-            'css_class'      => (string)($config['css_class'] ?? ''),
+            'css_class'      => trim((string)preg_replace('/[^A-Za-z0-9_ -]/', '', (string)($config['css_class'] ?? ''))),
+            'description'    => trim((string)($config['description'] ?? '')),
+            'badge'          => trim((string)($config['badge'] ?? '')),
+            'text_transform' => in_array($transform, ['uppercase', 'capitalize', 'lowercase'], true) ? $transform : '',
+            'hide_label'     => !empty($config['hide_label']),
             'badge_source'   => (string)($config['badge_source'] ?? ''),
             'dropdown_style' => (string)($config['dropdown_style'] ?? ''),
             'target'         => ($config['target'] ?? '') === '_blank' ? '_blank' : '',

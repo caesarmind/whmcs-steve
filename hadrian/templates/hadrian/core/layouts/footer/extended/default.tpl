@@ -27,7 +27,7 @@
                             <ul>
                                 {foreach $col.children as $link}
                                     {if $link.type == 'divider' || $link.type == 'header'}{continue}{/if}
-                                    <li><a href="{$link.uri|escape}"{if $link.target} target="{$link.target|escape}"{/if}>{$link.label|escape}</a></li>
+                                    <li><a href="{$link.uri|escape}"{if $link.css_class} class="{$link.css_class|escape}"{/if}{if $link.target} target="{$link.target|escape}"{/if}{if $link.description} title="{$link.description|escape}"{/if}>{include file="`$template`/includes/partials/nav-label.tpl" item=$link hasIcon=false}</a></li>
                                 {/foreach}
                             </ul>
                         </div>
@@ -46,7 +46,7 @@
                 <div class="hp-footer-bottom-links">
                     {foreach $mtFooterSecondaryItems as $item}
                         {if $item.type == 'divider' || $item.type == 'header' || $item.type == 'dropdown_parent'}{continue}{/if}
-                        <a href="{$item.uri|escape}"{if $item.target} target="{$item.target|escape}"{/if}>{$item.label|escape}</a>
+                        <a href="{$item.uri|escape}"{if $item.css_class} class="{$item.css_class|escape}"{/if}{if $item.target} target="{$item.target|escape}"{/if}{if $item.description} title="{$item.description|escape}"{/if}>{include file="`$template`/includes/partials/nav-label.tpl" item=$item hasIcon=false}</a>
                     {/foreach}
                 </div>
             {/if}

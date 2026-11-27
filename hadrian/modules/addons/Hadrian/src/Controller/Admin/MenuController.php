@@ -189,7 +189,12 @@ final class MenuController extends AbstractController
         $itemCount        = $allItems->count();
         $estimatedVars    = ($itemCount * 7) + 10; // 10 for menu-level fields + safety margin
         $maxInputVars     = (int)(ini_get('max_input_vars') ?: 1000);
-        $inputVarsWarning = ($estimatedVars > ($maxInputVars - 50));
+        // Warn BEFORE saveAction would refuse. It refuses within 100 of the
+        // limit, counting every request and cookie field too, so warning at
+        // "within 50" left a band of menus (about 128-134 items at 1000) that
+        // were refused with no warning first. 150 covers that band and the
+        // non-menu fields the estimate cannot see.
+        $inputVarsWarning = ($estimatedVars > ($maxInputVars - 150));
 
         // Power the WHMCS-page picker drawer in the item editor. Grouped + sorted
         // by Pages-tab order so the menu builder mirrors the admin Pages layout.
@@ -291,14 +296,26 @@ final class MenuController extends AbstractController
         }
 
         // Top-level menu fields
-        $menu->name     = trim((string)($_POST['name'] ?? $menu->name));
-        $menu->audience = (string)($_POST['audience'] ?? $menu->audience);
+        // A blank name keeps the old one; the audience must be one Menu::pick
+        // understands (anything else stored as '' and the menu never rendered).
+        $oldAudience    = (string)$menu->audience;
+        $postedName     = trim(html_entity_decode((string)($_POST['name'] ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+        $postedAudience = (string)($_POST['audience'] ?? $oldAudience);
+        if ($postedName !== '') {
+            $menu->name = $postedName;
+        }
+        if (in_array($postedAudience, ['client', 'guest', 'all'], true)) {
+            $menu->audience = $postedAudience;
+        }
         $newActive      = !empty($_POST['active']);
 
         // Mutual exclusion (Lagom-equivalent): only one menu can be active
         // per (location, audience). Activating this one deactivates any
         // peers — admin doesn't have to remember to flip the old one off.
-        if ($newActive && (!$menu->active || $menu->audience !== ($_POST['audience'] ?? $menu->audience))) {
+        // Compared with the audience it had BEFORE this save: comparing with
+        // the posted value after assigning it never saw a change, so a live
+        // menu moved to the other audience left two live menus there.
+        if ($newActive && (!$menu->active || $menu->audience !== $oldAudience)) {
             Menu::where('location', $menu->location)
                 ->where('audience', $menu->audience)
                 ->where('id', '!=', $menu->id)
@@ -654,6 +671,10 @@ final class MenuController extends AbstractController
                     $entry['item']->parent_id = null;
                 } else {
                     $resolved = $idMap[(string)$parentKey] ?? null;
+                    // Never its own parent: such a row renders nowhere.
+                    if ($resolved !== null && (int)$resolved === (int)$entry['item']->id) {
+                        $resolved = null;
+                    }
                     $entry['item']->parent_id = $resolved;
                 }
                 $entry['item']->save();

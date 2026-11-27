@@ -791,7 +791,11 @@ final class Hooks
         // stack from the pick.
         $ff    = is_array($stored['fontFamily'] ?? null) ? $stored['fontFamily'] : [];
         $mode  = (string)($ff['mode'] ?? 'default');
-        $stack = trim((string)preg_replace('/[^A-Za-z0-9 ,\'"\-]/', '', (string)($ff['stack'] ?? '')));
+        // Decoded first: stacks saved before StylesController::postText() were
+        // stored HTML-escaped (&#039;Roboto&#039;), and stripping & and ; from
+        // those left "039Roboto039", a family that never matches.
+        $stack = trim((string)preg_replace('/[^A-Za-z0-9 ,\'"\-]/', '',
+            html_entity_decode((string)($ff['stack'] ?? ''), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
         if ($mode === 'system') {
             // Each visitor's OS font; no link, no @font-face, nothing downloads.
             $decls['--font-family'] = $stack !== '' ? $stack : (string)($cfg['fontFamily']['system'] ?? $fallback);
@@ -931,6 +935,10 @@ final class Hooks
         if ($css === '') {
             return '';
         }
+        // CSS saved before StylesController::postText() was stored HTML-escaped
+        // (body &gt; .x), which no browser applies. CSS has no use for HTML
+        // entities, so decoding here heals those saves without a re-save.
+        $css = html_entity_decode($css, ENT_QUOTES | ENT_HTML5, 'UTF-8');
         $css = (string)preg_replace('#</\s*style#i', '', $css);
         return '<style id="hadrian-custom-css">' . $css . '</style>';
     }

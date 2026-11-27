@@ -34,7 +34,7 @@
             {elseif $license.status == 'No key'}<span class="mt-badge mt-badge-neutral">No key set</span>
             {elseif $license.status == 'Suspended' || $license.status == 'Expired'}<span class="mt-badge mt-badge-warning">{$license.status|escape} &middot; theme running</span>
             {elseif $license.status == 'Banned' || $license.status == 'Cancelled' || $license.status == 'Revoked'}<span class="mt-badge mt-badge-danger">Revoked</span>
-            {elseif $license.status == 'Unreachable' || $license.status == 'Unknown'}<span class="mt-badge mt-badge-warning">Unverified</span>
+            {elseif $license.status == 'Unreachable' || $license.status == 'Unknown' || $license.status == 'Error'}<span class="mt-badge mt-badge-warning">Unverified</span>
             {else}<span class="mt-badge mt-badge-danger">Not active</span>{/if}
         </dd>
 

@@ -879,7 +879,14 @@
     function initAffixedNav() {
         if (document.body.dataset.affixedNav !== '1') return;
 
-        var bar = document.querySelector('.topbar, .ph-side-topbar');
+        // The Top layout's bar is nav.homepage-nav; the side layouts draw
+        // .topbar / .ph-side-topbar. Several can be in the markup with only one
+        // shown (.only-top), so take the first one that is actually rendered.
+        var bar = null;
+        var bars = document.querySelectorAll('.homepage-nav, .topbar, .ph-side-topbar');
+        for (var i = 0; i < bars.length; i++) {
+            if (bars[i].getClientRects().length) { bar = bars[i]; break; }
+        }
         if (!bar) return;
 
         // Ignore deltas smaller than the bar's own height: without this a

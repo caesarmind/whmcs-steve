@@ -90,7 +90,12 @@ PEM;
 
         $status = (string) ($data['status'] ?? 'Invalid');
         $result = ['active' => $status === 'Active', 'status' => $status, 'data' => $data];
-        self::writeCache($key, $result);
+        // A server-side 'Error' is no verdict on the key; like Unreachable it
+        // is not cached, so the next view asks again instead of showing the
+        // fault for 15 minutes.
+        if ($status !== 'Error') {
+            self::writeCache($key, $result);
+        }
         return $result;
     }
 

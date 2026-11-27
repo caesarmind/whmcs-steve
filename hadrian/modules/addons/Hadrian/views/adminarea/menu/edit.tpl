@@ -2099,7 +2099,15 @@
                     parent_id: (function(){
                         if (it.parent_id == null) return null;
                         var p = state.items.find(function(x){ return x.tempId === it.parent_id; });
-                        return p ? (p.id || it.parent_id) : null;
+                        if (!p) return null;
+                        if (p.id) return p.id;
+                        // A parent added in this same save has no DB id yet.
+                        // MenuController::persistItems keys new rows
+                        // 'new_<index in this payload>', and the payload is
+                        // state.items in order, so name the parent that way.
+                        // Sending the editor's tempId matched nothing and the
+                        // child was saved as its own parent.
+                        return 'new_' + state.items.indexOf(p);
                     })(),
                     position: it.position,
                     item_type: it.item_type,

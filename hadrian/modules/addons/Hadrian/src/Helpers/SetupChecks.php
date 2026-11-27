@@ -267,7 +267,9 @@ final class SetupChecks
                 'No key entered yet. It is in your order confirmation and in your account.'),
             'Suspended', 'Expired' => self::row('license', 'License key', self::WARN,
                 $status . '. The theme keeps running, but updates are paused until you renew.'),
-            'Unreachable', 'Unknown' => self::row('license', 'License key', self::WARN,
+            // 'Error' is a fault on the licence server's side, not a verdict
+            // on the key: say "try again", never "this key is not valid".
+            'Unreachable', 'Unknown', 'Error' => self::row('license', 'License key', self::WARN,
                 'The license server could not be reached just now. Reload this page in a minute to check again.'),
             'Banned', 'Cancelled', 'Revoked' => self::row('license', 'License key', self::FAIL,
                 'This license has been revoked. Contact support if you think that is a mistake.'),

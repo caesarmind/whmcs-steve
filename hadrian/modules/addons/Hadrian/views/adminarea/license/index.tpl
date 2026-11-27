@@ -15,7 +15,7 @@
     <div class="mt-alert mt-alert-warning"><strong>License {$status|escape}.</strong> The theme keeps working, but you won&rsquo;t receive theme updates until you renew.</div>
 {elseif $status == 'Banned' || $status == 'Cancelled' || $status == 'Revoked'}
     <div class="mt-alert mt-alert-danger"><strong>License revoked.</strong> This license has been revoked for this site; the client area reverts to the default theme.</div>
-{elseif $status == 'Unreachable' || $status == 'Unknown'}
+{elseif $status == 'Unreachable' || $status == 'Unknown' || $status == 'Error'}
     <div class="mt-alert mt-alert-warning"><strong>Could not verify right now.</strong> The license server was unreachable; the theme keeps working during the grace period. Try again shortly.</div>
 {else}
     <div class="mt-alert mt-alert-danger"><strong>Not active.</strong> This license key is not valid for this domain.</div>

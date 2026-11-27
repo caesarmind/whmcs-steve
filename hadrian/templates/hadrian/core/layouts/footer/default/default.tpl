@@ -11,7 +11,7 @@
                 <div class="hp-footer-bottom-links">
                     {foreach $mtFooterSecondaryItems as $item}
                         {if $item.type == 'divider' || $item.type == 'header' || $item.type == 'dropdown_parent'}{continue}{/if}
-                        <a href="{$item.uri|escape}"{if $item.target} target="{$item.target|escape}"{/if}>{$item.label|escape}</a>
+                        <a href="{$item.uri|escape}"{if $item.css_class} class="{$item.css_class|escape}"{/if}{if $item.target} target="{$item.target|escape}"{/if}{if $item.description} title="{$item.description|escape}"{/if}>{include file="`$template`/includes/partials/nav-label.tpl" item=$item hasIcon=false}</a>
                     {/foreach}
                 </div>
             {/if}

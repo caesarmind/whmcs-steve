@@ -42,10 +42,10 @@
         <span class="nav-divider{$sideRight}"></span>
     {elseif $mtType == 'dropdown_parent' || ($mtType == 'account_dropdown' && $item.children)}
         {assign var=mtDropdownStyle value=$item.dropdown_style|default:'default'}
-        <div class="nav-dropdown-wrap{$sideRight}{if $mtDropdownStyle == 'mega'} nav-dropdown-wrap--mega{/if}">
-            <button type="button" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+        <div class="nav-dropdown-wrap{$sideRight}{if $mtDropdownStyle == 'mega'} nav-dropdown-wrap--mega{/if}{if $item.css_class} {$item.css_class|escape}{/if}">
+            <button type="button" class="nav-dropdown-toggle" aria-haspopup="true" aria-expanded="false"{if $item.description} title="{$item.description|escape}"{/if}>
                 {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
-                {$item.label|escape}
+                {include file="`$template`/includes/partials/nav-label.tpl" item=$item hasIcon=($mtTopnavShowIcons && $mtIconName)}
                 <svg aria-hidden="true" focusable="false" class="nav-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 6 8 10 12 6"/></svg>
             </button>
             {if $item.children}
@@ -66,11 +66,14 @@
                                     {assign var=_megaOpen value=true}
                                 {elseif $childType != 'divider'}
                                     {if !$_megaOpen}<div class="nav-mega-col">{assign var=_megaOpen value=true}{/if}
-                                    <a href="{$child.uri|escape}" class="nav-mega-item{if $mtTopnavShowIcons && $childIcon} nav-mega-item--icon{/if}"{if $child.target} target="{$child.target|escape}"{/if}>
+                                    <a href="{$child.uri|escape}" class="nav-mega-item{if $mtTopnavShowIcons && $childIcon} nav-mega-item--icon{/if}{if $child.css_class} {$child.css_class|escape}{/if}"{if $child.target} target="{$child.target|escape}"{/if}>
+                                        {* The mega panel has room for the description, so it is
+                                           shown under the name (the drawer promises "shown in
+                                           mega-menu"); elsewhere it is the link's tooltip. *}
                                         {if $mtTopnavShowIcons && $childIcon}
-                                            <span class="nav-mega-icon">{mtTopnavIcon iconName=$childIcon}</span><span class="nav-mega-text"><span class="name">{$child.label|escape}</span></span>
+                                            <span class="nav-mega-icon">{mtTopnavIcon iconName=$childIcon}</span><span class="nav-mega-text"><span class="name">{include file="`$template`/includes/partials/nav-label.tpl" item=$child hasIcon=true}</span>{if $child.description}<span class="tag">{$child.description|escape}</span>{/if}</span>
                                         {else}
-                                            <span class="name">{$child.label|escape}</span>
+                                            <span class="name">{include file="`$template`/includes/partials/nav-label.tpl" item=$child hasIcon=false}</span>{if $child.description}<span class="tag">{$child.description|escape}</span>{/if}
                                         {/if}
                                     </a>
                                 {/if}
@@ -91,9 +94,9 @@
                             {elseif $childType == 'header'}
                                 <div class="nav-dropdown-section">{$child.label|escape}</div>
                             {else}
-                                <a href="{$child.uri|escape}" class="nav-dropdown-item"{if $child.target} target="{$child.target|escape}"{/if}>
+                                <a href="{$child.uri|escape}" class="nav-dropdown-item{if $child.css_class} {$child.css_class|escape}{/if}"{if $child.target} target="{$child.target|escape}"{/if}{if $child.description} title="{$child.description|escape}"{/if}>
                                     {if $mtTopnavShowIcons && $childIcon}<span class="nav-dropdown-item-icon">{mtTopnavIcon iconName=$childIcon}</span>{/if}
-                                    {$child.label|escape}
+                                    {include file="`$template`/includes/partials/nav-label.tpl" item=$child hasIcon=($mtTopnavShowIcons && $childIcon)}
                                 </a>
                             {/if}
                         {/foreach}
@@ -106,9 +109,9 @@
            without this a signed-in visitor still got a "Login" button sitting
            next to their own profile menu. *}
         {if !$loggedin}
-        <a href="{$item.uri|escape}" class="nav-cta{$sideRight}">
+        <a href="{$item.uri|escape}" class="nav-cta{$sideRight}{if $item.css_class} {$item.css_class|escape}{/if}"{if $item.description} title="{$item.description|escape}"{/if}>
             {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
-            {$item.label|escape}
+            {include file="`$template`/includes/partials/nav-label.tpl" item=$item hasIcon=($mtTopnavShowIcons && $mtIconName)}
         </a>
         {/if}
     {elseif $mtType == 'language' || $mtType == 'currency'}
@@ -121,9 +124,9 @@
         <a href="#" class="nav-switcher{$sideRight}" data-locale-open data-switcher="{$mtType|escape}">{$item.label|escape}</a>
         {/if}
     {else}
-        <a href="{$item.uri|escape}" class="nav-item{$sideRight}"{if $item.target} target="{$item.target|escape}"{/if}>
+        <a href="{$item.uri|escape}" class="nav-item{$sideRight}{if $item.css_class} {$item.css_class|escape}{/if}"{if $item.target} target="{$item.target|escape}"{/if}{if $item.description} title="{$item.description|escape}"{/if}>
             {if $mtTopnavShowIcons && $mtIconName}<span class="nav-item-icon">{mtTopnavIcon iconName=$mtIconName}</span>{/if}
-            {$item.label|escape}
+            {include file="`$template`/includes/partials/nav-label.tpl" item=$item hasIcon=($mtTopnavShowIcons && $mtIconName)}
         </a>
     {/if}
 {/function}

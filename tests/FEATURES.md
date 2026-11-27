@@ -405,7 +405,7 @@ What each setting does on the site is listed under TH and OF. The rows here cove
 | AD-01 | Default landing | Bare `?module=Hadrian` shows Setup while the theme isn't live or migrations are pending, otherwise Info; unknown action falls back to index | `C/MainController.php`, `H/SetupProbe.php` | Renders | admin.spec |
 | AD-02 | Info page | Theme version; licence badge, key, product, dates, domains (15-minute cache); "New version" flag never set | `C/InfoController.php`, `V/info/index.tpl` | None | `info` is not in `ADMIN_ACTIONS` |
 | AD-03 | "Setup not finished" banner | On every screen except Setup while setup needs attention | `V/includes/header.tpl` | None | |
-| AD-04 | Version source | Header pill, Info, Setup and cache invalidation read `core/hadrian.php` (1.1.242); `Hadrian.php` says 1.2.3 | `T/core/hadrian.php`, `A/Hadrian.php` | Static | check-release-package |
+| AD-04 | Version source | Header pill, Info, Setup and cache invalidation read the version in `core/hadrian.php`; `Hadrian.php` says 1.2.3 | `T/core/hadrian.php`, `A/Hadrian.php` | Static | check-release-package |
 | AD-05 | Setup checklist | Files, Requirements, Database, License, Go live; each group takes its worst row; missing cart warns; mismatched release marks fail | `H/SetupChecks.php`, `H/SetupProbe.php`, `V/setup/index.tpl` | Static | test-setup, every branch |
 | AD-06 | Setup: Run now | Migrations, preset menus, page and layout caches, branding folder with `.htaccess`; redirects to `done=installed` | `C/SetupController.php`, `A/src/Database/Installer.php` | Partial | admin-csrf, on an install that is already current |
 | AD-07 | Setup: save licence key | Trims and stores `hadrian_license_key`, deletes `hn_theme_license.json`, forces a fresh check | `C/SetupController.php` | None | admin-csrf checks a forged post is refused |
@@ -436,7 +436,7 @@ What each setting does on the site is listed under TH and OF. The rows here cove
 | AD-22 | Style editor routing | Subcategory and tab allow-listed; `?style=` resolved; migrations on GET | `C/StylesController.php`, `V/styles/edit.tpl` | Renders | admin.spec, every style editor |
 | AD-23 | Colours save | Light and dark post together; only schema tokens with valid hex, rgb, hsl that differ from default are kept; the rest dropped silently | `C/StylesController.php`, `V/styles/_colors.tpl` | Static | check-colors-panel (render); test-customize (validation) |
 | AD-24 | Reset to preset | Deletes both scope rows (and legacy keys for default), then re-seeds; check upgraded installs don't fall back to legacy keys | `C/StylesController.php` | Static | check-preset-reset |
-| AD-25 | Quick presets, generate from one colour, undo | Client-side, one scope at a time | `V/includes/footer.tpl` | Static | check-admin-js (parses) |
+| AD-25 | Quick presets, generate from one colour, undo | Client-side; fills the light and dark palettes together (dark accent derived lighter); nothing stored until Save | `V/includes/footer.tpl` | Static | check-admin-js (parses) |
 | AD-26 | Typography save | Sizes, weights, line-heights kept only in bounds and not default; Google family checked against the catalog (any name passes if it is missing); self-hosted name sanitised; heading font | `C/StylesController.php`, `Hooks.php` (buildTypographyHead) | None | |
 | AD-27 | Google Fonts catalog | Rows re-validated on read: name pattern, 5 categories, weights 100-900 | `T/core/config/google-fonts.json`, `scripts/fetch-google-fonts.mjs` | None | |
 | AD-28 | General, Buttons, Forms, Elements, Navigation save | Only valid keys or in-range numbers that differ from default; out-of-range silently resets; legacy nav values move out of `_layout_vars` | `C/StylesController.php`, `T/core/config/*.php` | None | |
@@ -502,9 +502,9 @@ What each setting does on the site is listed under TH and OF. The rows here cove
 | AD-63 | Delete | GET `confirm=1` with token; items cascade; area picks forgotten; no UI link | `C/MenuController.php`, `A/src/Menu/MenuPointers.php` | Tested | admin-csrf; test-menu-pointers |
 | AD-64 | Re-seed, force re-sync, reset WHMCS defaults | Re-seed fills missing or empty presets, a renamed one coming back switched off when its place has a live menu; force wipes and reseeds; reset rebuilds Defaults and Footer Secondary | `Seeder.php`, `A/src/Menu/Presets.php` | Partial | known-bugs.spec (re-seed after a rename); admin-csrf (flash); force and reset: none |
 | AD-65 | Menus by area | Menu must exist in that location; 0 means by visitor | `C/MenuController.php` | Tested | settings.spec; test-menu-pointers |
-| AD-66 | Editor save | Activating turns off peers in the slot; every item deleted and recreated without a transaction; refused near `max_input_vars` or with an empty list; name and audience not validated | `C/MenuController.php`, `V/menu/edit.tpl` | None | |
+| AD-66 | Editor save | Activating turns off peers in the slot; every item deleted and recreated without a transaction; refused near `max_input_vars` (warned first) or with an empty list; a blank name keeps the old one; audience limited to client, guest, all | `C/MenuController.php`, `V/menu/edit.tpl` | None | |
 | AD-67 | Item editing | 10 item types, page picker, translations, 34 icons, per-item audience and layouts, position, reorder | `A/src/Menu/ItemTypes.php`, `TreeRenderer.php`, `Icons.php` | Static | parses; oracle on preset icons |
-| AD-68 | Saved but not rendered | Description, badge, text transform, hide label, CSS class | `V/menu/edit.tpl` | None | Documented as not shown yet |
+| AD-68 | Item styling fields | Description (tooltip; second line in the mega menu), badge, text transform, hide label (only beside an icon) and CSS class are shown wherever the menu renders | `V/menu/edit.tpl`, `A/src/Menu/TreeRenderer.php`, `T/includes/partials/nav-label.tpl` | Tested | audit h-menu |
 | AD-69 | Diagnose | GET JSON dump of a menu | `C/MenuController.php` | None | |
 
 ### AD-I Branding
@@ -534,7 +534,7 @@ What each setting does on the site is listed under TH and OF. The rows here cove
 | AD-80 | Tools: clear template cache | Empties the admin's own compile folder only | `C/ToolsController.php` | Tested | admin-csrf ("Cleared") |
 | AD-81 | Tools: rebuild discovery | Rebuilds page and layout caches, reports counts | `C/ToolsController.php` | None | |
 | AD-82 | Tools: refresh licence | Calls the dormant `Template\License`, a no-op in dev mode with a separate key | `A/src/Template/License.php` | None | |
-| AD-83 | Templates list and show | `canActivate` per template; `show` reads `templateName` unvalidated | `C/TemplatesController.php` | Renders | list only |
+| AD-83 | Templates list and show | `canActivate` per template; `show` opens only a template from the list; an unknown name gets a plain error | `C/TemplatesController.php` | Renders | list only |
 | AD-84 | Licence page | Save and check; Active, No key, Expired, Revoked, Unverified, Not active; "Reissued" falls to Not active | `C/LicenseController.php`, `H/LicenseCheck.php`, `V/license/index.tpl` | None | Forged post refused only |
 
 ### AD-L Cross-cutting
@@ -554,7 +554,7 @@ What each setting does on the site is listed under TH and OF. The rows here cove
 | AD-95 | Addons flyout and admin CSS | Inlined in the admin head; flyout sections match the top nav | `A/hooks.php`, `V/assets/js/addons-flyout.js` | Static | parses; check-admin-nav-sections |
 | AD-96 | Bridge for other modules | `Extensions`, `ExtensionPages`, `PageRegistry::syncExtensionPages`, `MediaUsage::register`, `SiteLook`, `LocaleHelper`, `Menu::pick`, `TreeRenderer::buildFlatList`, `Settings::getValue` | `H/*`, `PageRegistry.php` | Partial | test-extension-pages; builder.spec; email.spec |
 | AD-97 | Integrity hashes | The real hash table exists only in builds; a mismatch returns 503 on every page | `H/IntegrityHashes.php` | Static | check-release-package; runtime 503: none |
-| AD-98 | `systpl` and `templateName` | An unvalidated slug reaches `new Template()`, which requires `core/<slug>.php`; needs a negative test | `H/AddonHelper.php`, `A/src/Template/Template.php` | None | |
+| AD-98 | `systpl` and `templateName` | An unvalidated `systpl` slug reaches `new Template()`, which requires `core/<slug>.php`; needs a negative test. `templateName` (Templates screen) is limited to listed templates | `H/AddonHelper.php`, `A/src/Template/Template.php` | None | |
 
 ## OF: Order form
 

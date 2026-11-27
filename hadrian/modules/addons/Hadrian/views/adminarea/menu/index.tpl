@@ -19,7 +19,7 @@
     <div class="mt-alert mt-alert-info">Re-seeded {$flashMsg|replace:'seeded-':''|escape} preset(s).</div>
 {elseif $flashMsg == 'areas-saved'}
     <div class="mt-alert mt-alert-info">Menus by area saved.</div>
-{elseif $flashMsg|substr:0:16 == 'reset-defaults-'}
+{elseif $flashMsg|substr:0:15 == 'reset-defaults-'}
     <div class="mt-alert mt-alert-info">Reset {$flashMsg|replace:'reset-defaults-':''|escape} WHMCS Defaults preset(s) to factory items.</div>
 {/if}
 
