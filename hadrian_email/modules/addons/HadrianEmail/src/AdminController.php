@@ -519,6 +519,7 @@ final class AdminController
             'currentAction' => self::NAV_KEY,
             'mtExtensions'  => Bridge::extensionNav(),
             'mtThemeVersion' => Bridge::themeVersion(),
+            'mtBrand'       => Bridge::brand(),
             'base'          => self::BASE,
         ] + $vars);
         return (string)$smarty->fetch($template . '.tpl');

@@ -21,7 +21,7 @@ const H = '/admin/addonmodules.php?module=Hadrian';
 const IMG = path.join(REPO_ROOT, 'hadrian', 'templates', 'hadrian', 'assets', 'img');
 // A valid 2x2 PNG: passes the uploader's MIME, extension and image checks.
 const PNG = Buffer.from(
-  'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAEklEQVR4nGNgYPj/n4GBgQEAFgAD/0v7cCcAAAAASUVORK5CYII=',
+  'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAYAAABytg0kAAAAFElEQVR4nGNgKHz8HwQYwETh4/8AbjEMn1ZYZjYAAAAASUVORK5CYII=',
   'base64',
 );
 const listing = dir => (fs.existsSync(dir) ? fs.readdirSync(dir).filter(f => !f.startsWith('.')).sort() : []);

@@ -773,6 +773,7 @@ final class AdminController
             'currentAction' => self::NAV_KEY,
             'mtExtensions'  => Bridge::extensionNav(),
             'mtThemeVersion' => Bridge::themeVersion(),
+            'mtBrand'       => Bridge::brand(),
             'base'          => self::BASE,
             // Where the list of built pages is: Hadrian's Pages, Built tab.
             'pagesUrl'      => SitePages::listUrl(),

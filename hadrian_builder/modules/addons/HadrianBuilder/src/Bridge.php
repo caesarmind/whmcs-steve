@@ -204,6 +204,29 @@ final class Bridge
         }
     }
 
+    /**
+     * Vendor name and links for Hadrian's shell header ($mtBrand). A Hadrian
+     * older than src/Brand.php gets the values that header used to print.
+     *
+     * @return array<string,string>
+     */
+    public static function brand(): array
+    {
+        $fallback = [
+            'vendor'  => 'Caesarthemes',
+            'docsUrl' => 'https://docs.hadrianthegreat.com/',
+            'bugsUrl' => 'https://github.com/hostnodes/issues',
+        ];
+        if (!self::boot() || !class_exists('\\Hadrian\\Brand')) {
+            return $fallback;
+        }
+        try {
+            return \Hadrian\Brand::toArray() + $fallback;
+        } catch (\Throwable $e) {
+            return $fallback;
+        }
+    }
+
     /** Smarty 4 and earlier use \Smarty; Smarty 5 moved it. */
     public static function smartyClass(): string
     {
